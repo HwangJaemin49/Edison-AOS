@@ -1,7 +1,9 @@
 package com.umc.edison.local.di
 
-import com.umc.edison.data.datasources.BubbleSpaceLocalDataSource
-import com.umc.edison.local.datasources.BubbleSpaceLocalDataSourceImpl
+import com.umc.edison.data.datasources.BubbleLocalDataSource
+import com.umc.edison.data.datasources.LabelLocalDataSource
+import com.umc.edison.local.datasources.BubbleLocalDataSourceImpl
+import com.umc.edison.local.datasources.LabelLocalDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,7 +15,13 @@ import javax.inject.Singleton
 internal abstract class LocalDataSourceModule {
     @Binds
     @Singleton
-    abstract fun bindBubbleSpaceLocalDataSource(
-        bubbleSpaceLocalDataSourceImpl: BubbleSpaceLocalDataSourceImpl
-    ): BubbleSpaceLocalDataSource
+    abstract fun bindBubbleLocalDataSource(
+        bubbleLocalDataSourceImpl: BubbleLocalDataSourceImpl
+    ): BubbleLocalDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindLabelLocalDataSource(
+        labelLocalDataSourceImpl: LabelLocalDataSourceImpl
+    ): LabelLocalDataSource
 }

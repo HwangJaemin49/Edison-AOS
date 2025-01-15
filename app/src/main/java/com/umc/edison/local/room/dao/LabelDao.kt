@@ -7,6 +7,10 @@ import com.umc.edison.local.room.RoomConstant
 
 @Dao
 interface LabelDao : BaseDao<LabelLocal> {
+
+    @Query("SELECT * FROM ${RoomConstant.Table.LABEL}")
+    fun getAllLabels(): List<LabelLocal>
+
     @Query(
         "SELECT * FROM ${RoomConstant.Table.LABEL} " +
                 "Where id IN (" +
@@ -14,4 +18,10 @@ interface LabelDao : BaseDao<LabelLocal> {
                 ")"
     )
     fun getAllLabelsByBubbleId(bubbleId: Int): List<LabelLocal>
+
+    @Query("UPDATE ${RoomConstant.Table.LABEL} SET isSynced = 1 WHERE id IN (:ids)")
+    fun updateSyncedLabels(ids: List<Int>)
+
+    @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE isSynced = 0")
+    fun getNotSyncedLabels(): List<LabelLocal>
 }
