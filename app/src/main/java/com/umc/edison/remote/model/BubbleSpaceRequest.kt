@@ -34,5 +34,5 @@ data class LabelRequest(
 
 fun LabelEntity.toRemote(): LabelRequest = LabelRequest(
     name = name,
-    color = color,
+    color = color.toString(),
 )

@@ -1,7 +1,9 @@
 package com.umc.edison.remote.di
 
-import com.umc.edison.data.datasources.BubbleSpaceRemoteDataSource
-import com.umc.edison.remote.datasources.BubbleSpaceRemoteDataSourceImpl
+import com.umc.edison.data.datasources.BubbleRemoteDataSource
+import com.umc.edison.data.datasources.LabelRemoteDataSource
+import com.umc.edison.remote.datasources.BubbleRemoteDataSourceImpl
+import com.umc.edison.remote.datasources.LabelRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,7 +15,13 @@ import javax.inject.Singleton
 internal abstract class RemoteDataSourceModule {
     @Binds
     @Singleton
-    abstract fun bindBubbleSpaceRemoteDataSource(
-        bubbleSpaceRemoteDataSourceImpl: BubbleSpaceRemoteDataSourceImpl
-    ): BubbleSpaceRemoteDataSource
+    abstract fun bindBubbleRemoteDataSource(
+        bubbleRemoteDataSourceImpl: BubbleRemoteDataSourceImpl
+    ): BubbleRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindLabelRemoteDataSource(
+        labelRemoteDataSourceImpl: LabelRemoteDataSourceImpl
+    ): LabelRemoteDataSource
 }
