@@ -1,7 +1,9 @@
 package com.umc.edison.data.di
 
-import com.umc.edison.data.repository.BubbleSpaceRepositoryImpl
-import com.umc.edison.domain.repository.BubbleSpaceRepository
+import com.umc.edison.data.repository.BubbleRepositoryImpl
+import com.umc.edison.data.repository.LabelRepositoryImpl
+import com.umc.edison.domain.repository.BubbleRepository
+import com.umc.edison.domain.repository.LabelRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,7 +15,13 @@ import javax.inject.Singleton
 internal abstract class RepositoryModule {
     @Binds
     @Singleton
-    abstract fun bindBubbleSpaceRepository(
-        bubbleSpaceRepositoryImpl: BubbleSpaceRepositoryImpl
-    ): BubbleSpaceRepository
+    abstract fun bindBubbleRepository(
+        bubbleRepositoryImpl: BubbleRepositoryImpl
+    ): BubbleRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLabelRepository(
+        labelRepositoryImpl: LabelRepositoryImpl
+    ): LabelRepository
 }
