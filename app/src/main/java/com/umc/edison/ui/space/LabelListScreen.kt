@@ -30,7 +30,9 @@ import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.space.LabelListViewModel
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
+import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
@@ -51,6 +53,9 @@ fun LabelListScreen(
                 .fillMaxSize()
         ) {
             // 라벨 추가 버튼
+            AddLabelButton(
+                onClick = { }
+            )
 
             // 라벨 리스트
             LabelList(
@@ -79,6 +84,72 @@ fun LabelList(
                 onClick = { onLabelClick(index) },
                 onEditClick = { onEditClick(index) },
                 onDeleteClick = { onDeleteClick(index) }
+            )
+        }
+    }
+}
+
+@Composable
+fun AddLabelButton(
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .background(White000)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .size(60.dp)
+                .background(color = Gray200, shape = RoundedCornerShape(15.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_plus),
+                contentDescription = "Add Label",
+                modifier = Modifier
+                    .size(42.dp),
+                tint = Gray500
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Row(
+                modifier = Modifier
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "새로운 라벨 추가하기",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Gray800,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    contentDescription = "Add Label",
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(end = 16.dp),
+                    tint = Gray500
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Gray300)
             )
         }
     }
@@ -154,7 +225,7 @@ fun LabelListItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray600,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(end = 16.dp)
+                    modifier = Modifier.padding(end = 24.dp)
                 )
 
                 AnimatedVisibility(
@@ -233,6 +304,16 @@ fun PreviewLabelListItem() {
             onClick = { },
             onEditClick = { },
             onDeleteClick = { }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewAddLabelButton() {
+    EdisonTheme {
+        AddLabelButton (
+            onClick = { },
         )
     }
 }
