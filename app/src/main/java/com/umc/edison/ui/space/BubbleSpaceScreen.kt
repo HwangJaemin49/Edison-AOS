@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BubbleSpaceScreen() {
+    // 탭 & 페이지 관련
     val tabs = listOf("스페이스", "라벨")
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState(
@@ -112,19 +113,22 @@ fun BubbleSpaceScreen() {
             )
         }
 
-        HorizontalPager(
-            state = pagerState,
+        Box(
             modifier = Modifier.weight(1f)
-        ) { page ->
-            selectedTabIndex = pagerState.currentPage
-            when (page) {
-                0 -> SpaceTabScreen()
-                1 -> LabelTabScreen()
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                selectedTabIndex = pagerState.currentPage
+                when (page) {
+                    0 -> SpaceTabScreen()
+                    1 -> LabelTabScreen()
+                }
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
