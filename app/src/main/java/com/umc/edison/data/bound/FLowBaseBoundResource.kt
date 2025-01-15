@@ -2,8 +2,10 @@ package com.umc.edison.data.bound
 
 import com.umc.edison.data.toDomain
 import com.umc.edison.domain.DataResource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.withContext
 
 abstract class FLowBaseBoundResource<DomainType, DataType>(
     private val dataAction: suspend () -> DataType
@@ -14,7 +16,9 @@ abstract class FLowBaseBoundResource<DomainType, DataType>(
     ) {
         collector.emit(DataResource.loading())
         try {
-            val data = dataAction()
+            val data = withContext(Dispatchers.IO) {
+                dataAction()
+            }
             collector.emit(DataResource.success(data.toDomain()))
             successAction?.invoke(data)
         } catch (e: Exception) {
