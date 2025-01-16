@@ -1,4 +1,4 @@
-package com.umc.edison.ui.art_letter
+package com.umc.edison.ui.artboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,7 @@ import com.umc.edison.R
 import com.umc.edison.ui.theme.EdisonTheme
 
 @Composable
-fun ArtLetterScreen() {
+fun ArtBoardScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -36,6 +36,6 @@ fun ArtLetterScreen() {
 @Composable
 fun BubbleSpaceScreenPreview() {
     EdisonTheme {
-        ArtLetterScreen()
+        ArtBoardScreen()
     }
 }
