@@ -1,10 +1,11 @@
 package com.umc.edison.presentation.space
 
-import android.util.Log
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.presentation.base.BaseViewModel
+import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.ui.space.EditMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,21 +29,29 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                Log.d("LabelListViewModel", "fetchLabels: $labels")
                 _uiState.update { it.copy(labels = labels.toPresentation()) }
             },
             onError = { error ->
-                Log.e("LabelListViewModel", "fetchLabels: $error")
                 _uiState.update { it.copy(error = error) }
             },
             onLoading = {
-                Log.d("LabelListViewModel", "fetchLabels: loading")
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                Log.d("LabelListViewModel", "fetchLabels: complete")
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
+    }
+
+    fun updateEditMode(editMode: EditMode) {
+        _uiState.update { it.copy(editMode = editMode) }
+    }
+
+    fun confirmLabelModal(label: LabelModel) {
+        if (uiState.value.editMode == EditMode.ADD) {
+            TODO("Add label")
+        } else if (uiState.value.editMode == EditMode.EDIT) {
+            TODO("Edit label")
+        }
     }
 }
