@@ -1,6 +1,8 @@
 package com.umc.edison.ui.space
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,22 +10,35 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.umc.edison.R
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.components.MiddleCancelButton
 import com.umc.edison.ui.components.MiddleConfirmButton
@@ -32,6 +47,7 @@ import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 import com.umc.edison.ui.theme.Yellow100
+import com.umc.edison.ui.theme.ColorPickerList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,17 +57,19 @@ fun LabelModalContent(
     label: LabelModel,
     onLabelChange: (LabelModel) -> Unit
 ) {
+    var selectedColor by remember { mutableStateOf(label.color) }
+    val colors = ColorPickerList
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(White000)
-            .padding(start = 24.dp, top = 32.dp, end = 24.dp, bottom = 12.dp)
+            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
                 .height(IntrinsicSize.Max)
-                .padding(bottom = 16.dp),
+                .padding(bottom = 16.dp)
+                .imePadding(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             TextField(
@@ -84,18 +102,23 @@ fun LabelModalContent(
             )
         }
 
-        // 컬러 선택 UI
-        Box(
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
+            shadowElevation = 4.dp,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .background(Color.LightGray)
-                .padding(16.dp)
+                .padding(bottom = 28.dp)
         ) {
-            Text("컬러 선택 UI")
+            ColorPalette(
+                colors = colors,
+                onColorSelected = { color ->
+                    selectedColor = color
+                    onLabelChange(label.copy(color = color))
+                }
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -111,11 +134,67 @@ fun LabelModalContent(
             MiddleConfirmButton(
                 text = "확인",
                 onClick = onConfirm,
-                enabled = label.name.isNotBlank(), // 이름이 비어 있으면 비활성화
+                enabled = label.name.isNotBlank(),
                 modifier = Modifier.weight(1f)
             )
         }
     }
+}
+
+@Composable
+fun ColorPalette(
+    colors: List<Color>,
+    onColorSelected: (Color) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(22.dp)
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.img_color_palette),
+                contentDescription = "Image to extract colors",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        Spacer(modifier = Modifier.height(22.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(11.dp),
+        ) {
+            colors.chunked(6).forEach { rowColors ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    rowColors.forEach { color ->
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(13.dp))
+                                .background(color)
+                                .clickable {
+                                    onColorSelected(color)
+                                }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 @Preview(showBackground = true)

@@ -3,7 +3,6 @@ package com.umc.edison.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Gray Scale
-val Gray10 = Color(0xFFF3F5F7)
 val Gray100 = Color(0xFFF1F4F8)
 val Gray200 = Color(0xFFE7EBEF)
 val Gray300 = Color(0xFFE2E5E8)
@@ -36,6 +35,9 @@ val Aqua300 = Color(0xFF4CBEF3)
 val Indigo300 = Color(0xFF7986CB)
 val Purple300 = Color(0xFFB56CC8)
 
+val Green200 = Color(0xFF96F4D4)
+val Purple200 = Color(0xFFEEC8FF)
+
 val Pink100 = Color(0xFFFBC1E5)
 val Red100 = Color(0xFFFFCDD2)
 val Yellow100 = Color(0xFFFFF0AB)
@@ -43,3 +45,21 @@ val Green100 = Color(0xFFBFF0D5)
 val Aqua100 = Color(0xFFB2E3FA)
 val Indigo100 = Color(0xFFC5CAE9)
 val Purple100 = Color(0xFFDFBFE7)
+val Orange100 = Color(0xFFFFE2CD)
+val LightGreen100 = Color(0XFFD5FFAB)
+val LightBlue100 = Color(0XFFA8F4F7)
+
+val ColorPickerList = listOf(
+    Red100,
+    Yellow100,
+    Green100,
+    Aqua100,
+    Indigo100,
+    Pink100,
+    Orange100,
+    LightGreen100,
+    LightBlue100,
+    Green200,
+    Purple100,
+    Color(0xFFC9CBD3),
+)

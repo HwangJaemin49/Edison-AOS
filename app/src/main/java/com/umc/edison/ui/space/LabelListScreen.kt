@@ -30,6 +30,7 @@ import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
+import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
 
 enum class EditMode {
@@ -41,10 +42,10 @@ enum class EditMode {
 fun LabelListScreen(
     viewModel: LabelListViewModel = hiltViewModel()
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val uiState by viewModel.uiState.collectAsState()
-    val labelState = remember { mutableStateOf(LabelModel(name = "", color = White000)) }
+    val labelState = remember { mutableStateOf(LabelModel(name = "", color = Red100)) }
 
     Scaffold { innerPadding ->
         if (uiState.editMode != EditMode.NONE) {
@@ -53,6 +54,8 @@ fun LabelListScreen(
                     viewModel.updateEditMode(EditMode.NONE)
                 },
                 sheetState = sheetState,
+                sheetMaxWidth = 600.dp,
+                containerColor = White000,
             ) {
                 LabelModalContent(
                     onDismiss = {
