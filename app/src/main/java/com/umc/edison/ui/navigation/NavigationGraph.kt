@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.umc.edison.ui.art_letter.ArtLetterScreen
+import com.umc.edison.ui.artboard.ArtBoardScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
@@ -22,7 +22,7 @@ fun NavigationGraph(navHostController: NavHostController) {
 //            BubbleScreen()
         }
         composable(BottomNavItem.ArtLetter.route) {
-            ArtLetterScreen()
+            ArtBoardScreen()
         }
         composable(BottomNavItem.MyPage.route) {
             MyPageScreen()

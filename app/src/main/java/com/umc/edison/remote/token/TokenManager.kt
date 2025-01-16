@@ -26,5 +26,6 @@ class TokenManager @Inject constructor(
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("access_token", token)
+        editor.apply()
     }
 }

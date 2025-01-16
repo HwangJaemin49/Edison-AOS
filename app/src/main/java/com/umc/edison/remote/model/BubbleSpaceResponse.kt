@@ -1,5 +1,6 @@
 package com.umc.edison.remote.model
 
+import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
@@ -39,11 +40,11 @@ data class LabelResponse(
     @SerializedName("label_name")
     val name: String,
     @SerializedName("label_color")
-    val color: String,
+    val color: Int,
 ) : RemoteMapper<LabelEntity> {
     override fun toData(): LabelEntity = LabelEntity(
         id = id,
         name = name,
-        color = color,
+        color = Color(color)
     )
 }

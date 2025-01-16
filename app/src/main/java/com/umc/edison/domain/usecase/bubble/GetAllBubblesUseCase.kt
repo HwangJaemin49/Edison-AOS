@@ -2,12 +2,12 @@ package com.umc.edison.domain.usecase.bubble
 
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Bubble
-import com.umc.edison.domain.repository.BubbleSpaceRepository
+import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetAllBubblesUseCase @Inject constructor(
-    private val bubbleSpaceRepository: BubbleSpaceRepository
+    private val bubbleRepository: BubbleRepository
 ) {
-    operator fun invoke(): Flow<DataResource<List<Bubble>>> = bubbleSpaceRepository.getAllBubbles()
+    operator fun invoke(): Flow<DataResource<List<Bubble>>> = bubbleRepository.getAllBubbles()
 }
