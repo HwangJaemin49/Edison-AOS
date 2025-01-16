@@ -37,6 +37,7 @@ class LabelLocalDataSourceImpl @Inject constructor(
 
     override suspend fun addLabel(label: LabelEntity) {
         labelDao.insert(label.toLocal())
+        Log.d("label color", label.toLocal().color.toString())
     }
 
     override suspend fun updateSyncedLabels(labels: List<LabelEntity>) {

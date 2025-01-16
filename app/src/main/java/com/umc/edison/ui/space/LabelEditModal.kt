@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,6 +36,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.R
@@ -52,32 +54,33 @@ import com.umc.edison.ui.theme.ColorPickerList
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelModalContent(
+    editMode: EditMode,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: (LabelModel) -> Unit,
     label: LabelModel,
-    onLabelChange: (LabelModel) -> Unit
 ) {
     var selectedColor by remember { mutableStateOf(label.color) }
     val colors = ColorPickerList
+    var text by remember { mutableStateOf(label.name) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = White000)
             .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
+            .imePadding()
     ) {
         Row(
             modifier = Modifier
                 .height(IntrinsicSize.Max)
-                .padding(bottom = 16.dp)
-                .imePadding(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             TextField(
-                value = label.name,
+                value = text,
                 textStyle = MaterialTheme.typography.displayLarge,
-                onValueChange = { updatedName ->
-                    onLabelChange(label.copy(name = updatedName))
-                },
+                onValueChange = { text = it },
                 placeholder = {
                     Text(
                         text = "라벨 이름",
@@ -85,20 +88,26 @@ fun LabelModalContent(
                         color = Gray500
                     )
                 },
-                modifier = Modifier.weight(1f).wrapContentHeight(),
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentHeight(),
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = White000,
                     focusedTextColor = Gray800,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
+                ),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
                 )
             )
 
             Box(
                 modifier = Modifier
                     .width(60.dp)
-                    .fillMaxHeight()
-                    .background(label.color, shape = RoundedCornerShape(15.dp))
+                    .height(32.dp)
+                    .background(selectedColor, shape = RoundedCornerShape(15.dp)),
             )
         }
 
@@ -113,10 +122,7 @@ fun LabelModalContent(
         ) {
             ColorPalette(
                 colors = colors,
-                onColorSelected = { color ->
-                    selectedColor = color
-                    onLabelChange(label.copy(color = color))
-                }
+                onColorSelected = { selectedColor = it }
             )
         }
 
@@ -132,9 +138,11 @@ fun LabelModalContent(
             )
 
             MiddleConfirmButton(
-                text = "확인",
-                onClick = onConfirm,
-                enabled = label.name.isNotBlank(),
+                text = if (editMode == EditMode.ADD) "생성" else "확인",
+                onClick = {
+                    onConfirm(label.copy(name = text, color = selectedColor))
+                },
+                enabled = text.isNotBlank(),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -202,10 +210,10 @@ fun ColorPalette(
 fun PreviewModalContent() {
     EdisonTheme {
         LabelModalContent(
+            editMode = EditMode.ADD,
             onDismiss = { },
             onConfirm = { },
             label = LabelModel(name = "라벨 이름", color = Yellow100),
-            onLabelChange = { }
         )
     }
 }

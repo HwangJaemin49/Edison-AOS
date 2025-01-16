@@ -88,6 +88,8 @@ fun BubbleSpaceScreen() {
                     )
                 }
             }
+            
+            // TODO: 검색 버튼 추가하기
         }
 
         Box(

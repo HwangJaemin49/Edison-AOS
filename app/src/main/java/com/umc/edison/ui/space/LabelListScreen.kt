@@ -58,17 +58,16 @@ fun LabelListScreen(
                 containerColor = White000,
             ) {
                 LabelModalContent(
+                    editMode = uiState.editMode,
                     onDismiss = {
                         viewModel.updateEditMode(EditMode.NONE)
                     },
-                    onConfirm = {
+                    onConfirm = { label ->
+                        labelState.value = label
                         viewModel.confirmLabelModal(labelState.value)
                         viewModel.updateEditMode(EditMode.NONE)
                     },
-                    label = labelState.value,
-                    onLabelChange = { updatedLabel ->
-                        labelState.value = updatedLabel
-                    }
+                    label = labelState.value
                 )
             }
         }
