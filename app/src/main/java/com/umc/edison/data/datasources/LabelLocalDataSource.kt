@@ -8,4 +8,5 @@ interface LabelLocalDataSource {
     suspend fun addLabel(label: LabelEntity)
     suspend fun updateSyncedLabels(labels: List<LabelEntity>)
     suspend fun updateLabel(label: LabelEntity)
+    suspend fun deleteLabel(label: LabelEntity)
 }

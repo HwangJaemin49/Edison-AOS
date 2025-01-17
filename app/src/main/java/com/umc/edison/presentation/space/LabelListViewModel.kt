@@ -2,6 +2,7 @@ package com.umc.edison.presentation.space
 
 import android.util.Log
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
+import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.UpdateLabelUseCase
 import com.umc.edison.presentation.base.BaseViewModel
@@ -19,6 +20,7 @@ class LabelListViewModel @Inject constructor(
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     private val addLabelUseCase: AddLabelUseCase,
     private val updateLabelUseCase: UpdateLabelUseCase,
+    private val deleteLabelUseCase: DeleteLabelUseCase,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(LabelListState.DEFAULT)
@@ -86,5 +88,23 @@ class LabelListViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun deleteLabel(label: LabelModel) {
+        collectDataResource(
+            flow = deleteLabelUseCase(label.toDomain()),
+            onSuccess = {
+                updateEditMode(EditMode.NONE)
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                fetchLabels()
+            }
+        )
     }
 }

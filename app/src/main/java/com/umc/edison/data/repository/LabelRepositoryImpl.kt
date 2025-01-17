@@ -36,4 +36,11 @@ class LabelRepositoryImpl @Inject constructor(
         updateSyncedAction = { labels -> labelLocalDataSource.updateSyncedLabels(labels as List<LabelEntity>) }
     )
 
+    override fun deleteLabel(label: Label): Flow<DataResource<Unit>> = flowDataResource (
+        localDataAction = { labelLocalDataSource.deleteLabel(label.toEntity()) },
+        getNotSyncedAction = { labelLocalDataSource.getNotSyncedLabels() },
+        syncRemoteAction = { labels -> labelRemoteDataSource.syncLabels(labels as List<LabelEntity>) },
+        updateSyncedAction = { labels -> labelLocalDataSource.updateSyncedLabels(labels as List<LabelEntity>) }
+    )
+
 }

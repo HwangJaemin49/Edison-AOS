@@ -1,7 +1,6 @@
 package com.umc.edison.local.datasources
 
 import android.util.Log
-import androidx.compose.ui.graphics.toArgb
 import com.umc.edison.data.datasources.LabelLocalDataSource
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.local.model.toData
@@ -48,7 +47,11 @@ class LabelLocalDataSourceImpl @Inject constructor(
 
     override suspend fun updateLabel(label: LabelEntity) {
         Log.d("LocalDataSource: updateLabel", label.toString())
-        labelDao.updateLabel(label.id, label.name, label.color.toArgb())
+        labelDao.update(label.toLocal())
+    }
+
+    override suspend fun deleteLabel(label: LabelEntity) {
+        labelDao.delete(label.toLocal())
     }
 
 }

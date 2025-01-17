@@ -21,13 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,15 +64,7 @@ fun LabelModalContent(
     val colors = ColorPickerList
     var text by remember { mutableStateOf(label.name) }
 
-    val snackbarHostState = remember { SnackbarHostState() }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
-            errorMessage = null
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -146,7 +136,6 @@ fun LabelModalContent(
             MiddleCancelButton(
                 text = "취소",
                 onClick = onDismiss,
-                enabled = true,
                 modifier = Modifier.weight(1f)
             )
 
@@ -159,15 +148,15 @@ fun LabelModalContent(
                     }
                     onConfirm(label.copy(name = text, color = selectedColor))
                 },
-                enabled = validateLabelInfo(label),
+                enabled = validateLabelInfo(text, selectedColor),
                 modifier = Modifier.weight(1f)
             )
         }
     }
 }
 
-private fun validateLabelInfo(label: LabelModel): Boolean {
-    return label.name.isNotBlank() && label.color != Gray300
+private fun validateLabelInfo(text: String, selectedColor: Color): Boolean {
+    return text.isNotBlank() && selectedColor != Gray300
 }
 
 @Composable

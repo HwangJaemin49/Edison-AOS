@@ -8,14 +8,12 @@ import com.umc.edison.data.model.LabelEntity
 
 @Entity
 data class LabelLocal(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val color: Int,
     var isDeleted: Boolean,
     var isSynced: Boolean,
 ) : LocalMapper<LabelEntity> {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-
     override fun toData(): LabelEntity = LabelEntity(
         id = id,
         name = name,
@@ -24,6 +22,7 @@ data class LabelLocal(
 }
 
 fun LabelEntity.toLocal(): LabelLocal = LabelLocal(
+    id = id,
     name = name,
     color = color.toArgb(),
     isDeleted = false,
