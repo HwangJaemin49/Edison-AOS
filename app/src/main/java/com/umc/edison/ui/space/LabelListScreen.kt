@@ -2,6 +2,7 @@ package com.umc.edison.ui.space
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,6 +15,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,7 +49,18 @@ fun LabelListScreen(
     val uiState by viewModel.uiState.collectAsState()
     val labelState = remember { mutableStateOf(LabelModel(name = "", color = Red100)) }
 
-    Scaffold { innerPadding ->
+    val draggedIndex = remember { mutableIntStateOf(-1) }
+
+    Scaffold(
+        modifier = Modifier
+            .clickable(
+                onClick = {
+                    draggedIndex.intValue = -1
+                },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            )
+    ) { innerPadding ->
         if (uiState.editMode != EditMode.NONE) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -65,7 +78,6 @@ fun LabelListScreen(
                     onConfirm = { label ->
                         labelState.value = label
                         viewModel.confirmLabelModal(labelState.value)
-                        viewModel.updateEditMode(EditMode.NONE)
                     },
                     label = labelState.value
                 )
@@ -81,19 +93,27 @@ fun LabelListScreen(
         ) {
             AddLabelButton(
                 onClick = {
-                    labelState.value = LabelModel(name = "", color = White000)
+                    labelState.value = LabelModel(name = "", color = Gray300)
                     viewModel.updateEditMode(EditMode.ADD)
                 }
             )
 
             LabelList(
                 labels = uiState.labels,
+                draggedIndex = draggedIndex.intValue,
                 onLabelClick = { },
                 onEditClick = { index ->
                     labelState.value = uiState.labels[index]
                     viewModel.updateEditMode(EditMode.EDIT)
                 },
-                onDeleteClick = { }
+                onDeleteClick = { },
+                onDrag = { index ->
+                    // 드래그된 아이템 인덱스 업데이트
+                    draggedIndex.intValue = index
+                },
+                resetDrag = {
+                    draggedIndex.intValue = -1
+                }
             )
         }
     }
@@ -102,9 +122,12 @@ fun LabelListScreen(
 @Composable
 fun LabelList(
     labels: List<LabelModel>,
+    draggedIndex: Int,
     onLabelClick: (Int) -> Unit,
     onEditClick: (Int) -> Unit,
-    onDeleteClick: (Int) -> Unit
+    onDeleteClick: (Int) -> Unit,
+    onDrag: (Int) -> Unit,
+    resetDrag: () -> Unit
 ) {
     Column {
         labels.forEachIndexed { index, label ->
@@ -112,9 +135,12 @@ fun LabelList(
                 labelColor = label.color,
                 labelText = label.name,
                 count = label.bubbleCnt,
+                isDragged = index == draggedIndex,
                 onClick = { onLabelClick(index) },
                 onEditClick = { onEditClick(index) },
-                onDeleteClick = { onDeleteClick(index) }
+                onDeleteClick = { onDeleteClick(index) },
+                onDrag = { onDrag(index) },
+                resetDrag = resetDrag
             )
         }
     }

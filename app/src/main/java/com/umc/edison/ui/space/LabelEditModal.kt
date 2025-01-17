@@ -21,11 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +52,7 @@ import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 import com.umc.edison.ui.theme.Yellow100
 import com.umc.edison.ui.theme.ColorPickerList
+import com.umc.edison.ui.theme.Gray300
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +65,16 @@ fun LabelModalContent(
     var selectedColor by remember { mutableStateOf(label.color) }
     val colors = ColorPickerList
     var text by remember { mutableStateOf(label.name) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            errorMessage = null
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -140,13 +153,21 @@ fun LabelModalContent(
             MiddleConfirmButton(
                 text = if (editMode == EditMode.ADD) "생성" else "확인",
                 onClick = {
+                    if (text.length > 20) {
+                        errorMessage = "라벨 이름은 20자 이하로 입력해주세요"
+                        return@MiddleConfirmButton
+                    }
                     onConfirm(label.copy(name = text, color = selectedColor))
                 },
-                enabled = text.isNotBlank(),
+                enabled = validateLabelInfo(label),
                 modifier = Modifier.weight(1f)
             )
         }
     }
+}
+
+private fun validateLabelInfo(label: LabelModel): Boolean {
+    return label.name.isNotBlank() && label.color != Gray300
 }
 
 @Composable
