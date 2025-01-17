@@ -1,20 +1,15 @@
 package com.umc.edison.ui.space
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,16 +27,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.umc.edison.R
 import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.ui.components.ColorPalette
 import com.umc.edison.ui.components.MiddleCancelButton
 import com.umc.edison.ui.components.MiddleConfirmButton
 import com.umc.edison.ui.theme.EdisonTheme
@@ -157,62 +149,6 @@ fun LabelModalContent(
 
 private fun validateLabelInfo(text: String, selectedColor: Color): Boolean {
     return text.isNotBlank() && selectedColor != Gray300
-}
-
-@Composable
-fun ColorPalette(
-    colors: List<Color>,
-    onColorSelected: (Color) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(22.dp)
-            .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .background(Color.LightGray),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.img_color_palette),
-                contentDescription = "Image to extract colors",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-
-        Spacer(modifier = Modifier.height(22.dp))
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(11.dp),
-        ) {
-            colors.chunked(6).forEach { rowColors ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    rowColors.forEach { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(13.dp))
-                                .background(color)
-                                .clickable {
-                                    onColorSelected(color)
-                                }
-                        )
-                    }
-                }
-            }
-        }
-    }
-
 }
 
 @Preview(showBackground = true)
