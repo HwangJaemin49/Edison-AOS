@@ -59,13 +59,12 @@ fun BasicFullButton(
 fun MiddleCancelButton(
     text: String,
     modifier: Modifier = Modifier,
-    enabled: Boolean = false,
     onClick: () -> Unit
 ) {
     BasicFullButton(
         text = text,
         modifier = modifier,
-        enabled = enabled,
+        enabled = true,
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = Gray100,
@@ -159,14 +158,12 @@ fun MiddleCancelButtonPreview() {
         ) {
             MiddleCancelButton(
                 text = "텍스트 입력",
-                enabled = true,
                 onClick = {},
                 modifier = Modifier.weight(1f)
             )
 
             MiddleCancelButton(
                 text = "텍스트 입력",
-                enabled = true,
                 onClick = {},
                 modifier = Modifier.weight(1f)
             )

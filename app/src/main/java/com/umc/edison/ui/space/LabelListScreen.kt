@@ -2,18 +2,19 @@ package com.umc.edison.ui.space
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,6 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.umc.edison.R
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.space.LabelListViewModel
+import com.umc.edison.ui.components.BottomSheet
+import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
@@ -34,7 +37,7 @@ import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
 
 enum class EditMode {
-    NONE, ADD, EDIT
+    NONE, ADD, EDIT, DELETE
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,15 +50,24 @@ fun LabelListScreen(
     val uiState by viewModel.uiState.collectAsState()
     val labelState = remember { mutableStateOf(LabelModel(name = "", color = Red100)) }
 
-    Scaffold { innerPadding ->
-        if (uiState.editMode != EditMode.NONE) {
-            ModalBottomSheet(
-                onDismissRequest = {
+    val draggedIndex = remember { mutableIntStateOf(-1) }
+
+    Scaffold(
+        modifier = Modifier
+            .clickable(
+                onClick = {
+                    draggedIndex.intValue = -1
+                },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            )
+    ) { innerPadding ->
+        if (uiState.editMode == EditMode.ADD || uiState.editMode == EditMode.EDIT) {
+            BottomSheet(
+                onDismiss = {
                     viewModel.updateEditMode(EditMode.NONE)
                 },
                 sheetState = sheetState,
-                sheetMaxWidth = 600.dp,
-                containerColor = White000,
             ) {
                 LabelModalContent(
                     editMode = uiState.editMode,
@@ -65,11 +77,25 @@ fun LabelListScreen(
                     onConfirm = { label ->
                         labelState.value = label
                         viewModel.confirmLabelModal(labelState.value)
-                        viewModel.updateEditMode(EditMode.NONE)
                     },
                     label = labelState.value
                 )
             }
+        }
+
+        if (uiState.editMode == EditMode.DELETE) {
+            BottomSheetPopUp(
+                title = "${labelState.value.name} 라벨을 삭제하시겠습니까?",
+                cancelText = "취소",
+                confirmText = "삭제",
+                onDismiss = {
+                    viewModel.updateEditMode(EditMode.NONE)
+                },
+                onConfirm = {
+                    viewModel.deleteLabel(labelState.value)
+                },
+                sheetState = sheetState,
+            )
         }
 
         Column(
@@ -81,19 +107,30 @@ fun LabelListScreen(
         ) {
             AddLabelButton(
                 onClick = {
-                    labelState.value = LabelModel(name = "", color = White000)
+                    labelState.value = LabelModel(name = "", color = Gray300)
                     viewModel.updateEditMode(EditMode.ADD)
                 }
             )
 
             LabelList(
                 labels = uiState.labels,
+                draggedIndex = draggedIndex.intValue,
                 onLabelClick = { },
                 onEditClick = { index ->
                     labelState.value = uiState.labels[index]
                     viewModel.updateEditMode(EditMode.EDIT)
                 },
-                onDeleteClick = { }
+                onDeleteClick = { index ->
+                    labelState.value = uiState.labels[index]
+                    viewModel.updateEditMode(EditMode.DELETE)
+                },
+                onDrag = { index ->
+                    // 드래그된 아이템 인덱스 업데이트
+                    draggedIndex.intValue = index
+                },
+                resetDrag = {
+                    draggedIndex.intValue = -1
+                }
             )
         }
     }
@@ -102,9 +139,12 @@ fun LabelListScreen(
 @Composable
 fun LabelList(
     labels: List<LabelModel>,
+    draggedIndex: Int,
     onLabelClick: (Int) -> Unit,
     onEditClick: (Int) -> Unit,
-    onDeleteClick: (Int) -> Unit
+    onDeleteClick: (Int) -> Unit,
+    onDrag: (Int) -> Unit,
+    resetDrag: () -> Unit
 ) {
     Column {
         labels.forEachIndexed { index, label ->
@@ -112,9 +152,12 @@ fun LabelList(
                 labelColor = label.color,
                 labelText = label.name,
                 count = label.bubbleCnt,
+                isDragged = index == draggedIndex,
                 onClick = { onLabelClick(index) },
                 onEditClick = { onEditClick(index) },
-                onDeleteClick = { onDeleteClick(index) }
+                onDeleteClick = { onDeleteClick(index) },
+                onDrag = { onDrag(index) },
+                resetDrag = resetDrag
             )
         }
     }

@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -30,25 +32,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.R
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
-import com.umc.edison.ui.theme.Yellow100
 
 @Composable
 fun LabelListItem(
     labelColor: Color,
     labelText: String,
     count: Int,
+    isDragged: Boolean,
     onClick: () -> Unit,
     onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onDrag: () -> Unit,
+    resetDrag: () -> Unit
 ) {
     val offsetX = remember { mutableFloatStateOf(0f) }
     val visibilityThreshold = -60f
@@ -89,17 +91,25 @@ fun LabelListItem(
                                     offsetX.floatValue = -120f
                                 } else {
                                     offsetX.floatValue = 0f
+                                    resetDrag()
                                 }
                             },
                             onHorizontalDrag = { change, dragAmount ->
+                                onDrag()
                                 change.consume()
                                 offsetX.floatValue =
                                     (offsetX.floatValue + dragAmount).coerceIn(-120f, 0f)
                             }
                         )
-                    },
+                    }
+                    .indication(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                if (!isDragged) offsetX.floatValue = 0f
+
                 Text(
                     text = labelText,
                     style = MaterialTheme.typography.titleLarge,
@@ -183,20 +193,5 @@ fun EditDeleteIcons(
                 tint = Gray100
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewLabelListItem() {
-    EdisonTheme {
-        LabelListItem(
-            labelColor = Yellow100,
-            labelText = "레이블 이름",
-            count = 10,
-            onClick = { },
-            onEditClick = { },
-            onDeleteClick = { }
-        )
     }
 }
