@@ -24,4 +24,7 @@ interface LabelDao : BaseDao<LabelLocal> {
 
     @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE isSynced = 0")
     fun getNotSyncedLabels(): List<LabelLocal>
+
+    @Query("UPDATE ${RoomConstant.Table.LABEL} SET name = :name, color = :color WHERE id = :labelId")
+    fun updateLabel(labelId: Int, name: String, color: Int)
 }

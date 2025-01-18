@@ -36,12 +36,22 @@ class LabelLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun addLabel(label: LabelEntity) {
+        Log.d("LocalDataSource: addLabel", label.toString())
         labelDao.insert(label.toLocal())
         Log.d("label color", label.toLocal().color.toString())
     }
 
     override suspend fun updateSyncedLabels(labels: List<LabelEntity>) {
         labelDao.updateSyncedLabels(labels.map { it.id })
+    }
+
+    override suspend fun updateLabel(label: LabelEntity) {
+        Log.d("LocalDataSource: updateLabel", label.toString())
+        labelDao.update(label.toLocal())
+    }
+
+    override suspend fun deleteLabel(label: LabelEntity) {
+        labelDao.delete(label.toLocal())
     }
 
 }

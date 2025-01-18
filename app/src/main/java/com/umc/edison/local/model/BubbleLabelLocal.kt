@@ -2,9 +2,11 @@ package com.umc.edison.local.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
+    indices = [Index(value = ["bubbleId"]), Index(value = ["labelId"])],
     foreignKeys = [
         ForeignKey(
             entity = BubbleLocal::class,

@@ -7,4 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface LabelRepository {
     fun getAllLabels(): Flow<DataResource<List<Label>>>
     fun addLabel(label: Label): Flow<DataResource<Unit>>
+    fun updateLabel(label: Label): Flow<DataResource<Unit>>
+    fun deleteLabel(label: Label): Flow<DataResource<Unit>>
 }

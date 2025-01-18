@@ -2,7 +2,9 @@ package com.umc.edison.presentation.space
 
 import android.util.Log
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
+import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
+import com.umc.edison.domain.usecase.label.UpdateLabelUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
@@ -17,6 +19,8 @@ import javax.inject.Inject
 class LabelListViewModel @Inject constructor(
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     private val addLabelUseCase: AddLabelUseCase,
+    private val updateLabelUseCase: UpdateLabelUseCase,
+    private val deleteLabelUseCase: DeleteLabelUseCase,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(LabelListState.DEFAULT)
@@ -30,19 +34,15 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                Log.d("fetchLabels", "onSuccess: $labels")
                 _uiState.update { it.copy(labels = labels.toPresentation()) }
             },
             onError = { error ->
-                Log.d("fetchLabels", "onError: $error")
                 _uiState.update { it.copy(error = error) }
             },
             onLoading = {
-                Log.d("fetchLabels", "onLoading: ${uiState.value.labels}")
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                Log.d("fetchLabels", "onComplete: ${uiState.value.labels}")
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
@@ -56,11 +56,11 @@ class LabelListViewModel @Inject constructor(
         if (uiState.value.editMode == EditMode.ADD) {
             collectDataResource(
                 flow = addLabelUseCase(label.toDomain()),
-                onSuccess = { result ->
-                    Log.d("addLabel", "onSuccess: $result")
+                onSuccess = {
+                    updateEditMode(EditMode.NONE)
                 },
                 onError = { error ->
-                    Log.d("addLabel", "onError: $error")
+                    Log.e("addLabel", "onError: $error")
                     _uiState.update { it.copy(error = error) }
                 },
                 onLoading = {
@@ -69,11 +69,42 @@ class LabelListViewModel @Inject constructor(
                 },
                 onComplete = {
                     fetchLabels()
-                    _uiState.update { it.copy(isLoading = false) }
                 }
             )
         } else if (uiState.value.editMode == EditMode.EDIT) {
-            TODO("Edit label")
+            collectDataResource(
+                flow = updateLabelUseCase(label.toDomain()),
+                onSuccess = {
+                    updateEditMode(EditMode.NONE)
+                },
+                onError = { error ->
+                    _uiState.update { it.copy(error = error) }
+                },
+                onLoading = {
+                    _uiState.update { it.copy(isLoading = true) }
+                },
+                onComplete = {
+                    fetchLabels()
+                }
+            )
         }
+    }
+
+    fun deleteLabel(label: LabelModel) {
+        collectDataResource(
+            flow = deleteLabelUseCase(label.toDomain()),
+            onSuccess = {
+                updateEditMode(EditMode.NONE)
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                fetchLabels()
+            }
+        )
     }
 }

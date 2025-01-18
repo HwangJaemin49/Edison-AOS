@@ -5,7 +5,7 @@ import com.umc.edison.data.DataMapper
 import com.umc.edison.domain.model.Label
 
 data class LabelEntity(
-    val id: Int = 0,
+    val id: Int,
     val name: String,
     val color: Color,
     var bubbleCnt: Int = 0,
@@ -19,6 +19,7 @@ data class LabelEntity(
 }
 
 fun Label.toEntity(): LabelEntity = LabelEntity(
+    id = id ?: 0,
     name = name,
     color = color,
     bubbleCnt = bubbleCnt
