@@ -19,12 +19,6 @@ interface LabelDao : BaseDao<LabelLocal> {
     )
     fun getAllLabelsByBubbleId(bubbleId: Int): List<LabelLocal>
 
-    @Query("UPDATE ${RoomConstant.Table.LABEL} SET isSynced = 1 WHERE id IN (:ids)")
-    fun updateSyncedLabels(ids: List<Int>)
-
-    @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE isSynced = 0")
-    fun getNotSyncedLabels(): List<LabelLocal>
-
-    @Query("UPDATE ${RoomConstant.Table.LABEL} SET name = :name, color = :color WHERE id = :labelId")
-    fun updateLabel(labelId: Int, name: String, color: Int)
+    @Query("UPDATE ${RoomConstant.Table.LABEL} SET isDeleted = :isDeleted WHERE id = :labelId")
+    fun updateDeletedStatus(labelId: Int, isDeleted: Boolean)
 }

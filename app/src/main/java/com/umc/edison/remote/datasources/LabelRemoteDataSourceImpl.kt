@@ -8,11 +8,7 @@ import javax.inject.Inject
 class LabelRemoteDataSourceImpl @Inject constructor(
     private val apiService: BubbleSpaceApiService
 ) : LabelRemoteDataSource{
-    override suspend fun getLabels(): List<LabelEntity> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun syncLabels(labels: List<LabelEntity>) {
-        TODO("Not yet implemented")
+    override suspend fun getAllLabels(): List<LabelEntity> {
+        return apiService.getAllLabels().data.map { it.toData() }
     }
 }

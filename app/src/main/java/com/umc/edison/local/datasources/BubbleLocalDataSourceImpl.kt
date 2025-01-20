@@ -21,17 +21,11 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         return bubbles
     }
 
-    override suspend fun getNotSyncedBubbles(): List<BubbleEntity> {
-        val bubbles = bubbleDao.getNotSyncedBubbles().toData()
-
-        bubbles.map { bubble ->
-            bubble.labels = labelDao.getAllLabelsByBubbleId(bubble.id).toData()
-        }
-
-        return bubbles
+    override suspend fun addBubbles(bubbles: List<BubbleEntity>) {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun updateSyncedBubbles(bubbles: List<BubbleEntity>) {
-        bubbleDao.updateSyncedBubbles(bubbles.map { it.id })
+    override suspend fun addBubble(bubble: BubbleEntity) {
+        TODO("Not yet implemented")
     }
 }

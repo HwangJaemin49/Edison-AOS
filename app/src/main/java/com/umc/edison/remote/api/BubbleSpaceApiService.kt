@@ -1,11 +1,9 @@
 package com.umc.edison.remote.api
 
-import com.umc.edison.remote.model.BubbleRequest
 import com.umc.edison.remote.model.BubbleResponse
-import com.umc.edison.remote.model.Response
+import com.umc.edison.remote.model.LabelResponse
 import com.umc.edison.remote.model.ResponseWithData
 import retrofit2.http.GET
-import retrofit2.http.POST
 
 interface BubbleSpaceApiService {
 
@@ -13,6 +11,6 @@ interface BubbleSpaceApiService {
     @GET("bubbles")
     suspend fun getAllBubbles(): ResponseWithData<List<BubbleResponse>>
 
-    @POST("bubbles")
-    suspend fun syncBubbles(bubbles: List<BubbleRequest>): Response
+    @GET("/labels")
+    suspend fun getAllLabels(): ResponseWithData<List<LabelResponse>>
 }

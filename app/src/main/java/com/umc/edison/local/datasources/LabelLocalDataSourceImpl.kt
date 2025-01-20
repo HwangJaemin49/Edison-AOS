@@ -25,14 +25,10 @@ class LabelLocalDataSourceImpl @Inject constructor(
         return labels
     }
 
-    override suspend fun getNotSyncedLabels(): List<LabelEntity> {
-        val labels = labelDao.getNotSyncedLabels().toData()
-
-        labels.map { label ->
-            label.bubbleCnt = bubbleDao.getBubbleCntByLabelId(label.id)
+    override suspend fun addLabels(labels: List<LabelEntity>) {
+        labels.forEach { label ->
+            labelDao.insert(label.toLocal())
         }
-
-        return labels
     }
 
     override suspend fun addLabel(label: LabelEntity) {
@@ -41,13 +37,13 @@ class LabelLocalDataSourceImpl @Inject constructor(
         Log.d("label color", label.toLocal().color.toString())
     }
 
-    override suspend fun updateSyncedLabels(labels: List<LabelEntity>) {
-        labelDao.updateSyncedLabels(labels.map { it.id })
-    }
-
     override suspend fun updateLabel(label: LabelEntity) {
         Log.d("LocalDataSource: updateLabel", label.toString())
         labelDao.update(label.toLocal())
+    }
+
+    override suspend fun updateLabelDeletedStatus(label: LabelEntity) {
+        labelDao.updateDeletedStatus(label.id, true)
     }
 
     override suspend fun deleteLabel(label: LabelEntity) {
