@@ -11,7 +11,8 @@ import com.umc.edison.local.room.dao.LabelDao
 
 @Database(
     entities = [BubbleLocal::class, LabelLocal::class, BubbleLabelLocal::class],
-    version = RoomConstant.ROOM_VERSION
+    version = RoomConstant.ROOM_VERSION,
+    exportSchema = true
 )
 @TypeConverters(DtoConverter::class)
 abstract class EdisonDatabase : RoomDatabase() {
