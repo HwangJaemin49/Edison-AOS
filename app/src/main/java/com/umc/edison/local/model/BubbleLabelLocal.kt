@@ -1,32 +1,35 @@
 package com.umc.edison.local.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    indices = [Index(value = ["bubbleId"]), Index(value = ["labelId"])],
+    indices = [Index(value = ["bubble_id"]), Index(value = ["label_id"])],
     foreignKeys = [
         ForeignKey(
             entity = BubbleLocal::class,
             parentColumns = ["id"],
-            childColumns = ["bubbleId"],
+            childColumns = ["bubble_id"],
             onDelete = ForeignKey.CASCADE // Bubble 삭제 시 관련 BubbleLabel도 삭제
         ),
         ForeignKey(
             entity = LabelLocal::class,
             parentColumns = ["id"],
-            childColumns = ["labelId"],
+            childColumns = ["label_id"],
             onDelete = ForeignKey.CASCADE // Label 삭제 시 관련 BubbleLabel도 삭제
         )
     ]
 )
 data class BubbleLabelLocal(
-    val bubbleId: Int,
-    val labelId: Int,
-    var isSynced: Boolean,
-) {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-}
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @ColumnInfo(name = "bubble_id") val bubbleId: Int,
+    @ColumnInfo(name = "label_id") val labelId: Int,
+    @ColumnInfo(name = "is_synced") override var isSynced: Boolean = false,
+    @ColumnInfo(name = "is_deleted") override var isDeleted: Boolean = false,
+    @ColumnInfo(name = "created_at") override var createdAt: Long? = null,
+    @ColumnInfo(name = "updated_at") override var updatedAt: Long? = null,
+    @ColumnInfo(name = "deleted_at") override var deletedAt: Long? = null,
+) : BaseLocal

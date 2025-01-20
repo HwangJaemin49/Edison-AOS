@@ -10,12 +10,6 @@ interface BubbleDao : BaseDao<BubbleLocal> {
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE}")
     fun getAllBubbles(): List<BubbleLocal>
 
-    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE isSynced = 0")
-    fun getNotSyncedBubbles(): List<BubbleLocal>
-
-    @Query("UPDATE ${RoomConstant.Table.BUBBLE} SET isSynced = 1 WHERE id IN (:ids)")
-    fun updateSyncedBubbles(ids: List<Int>)
-
-    @Query("SELECT COUNT(*) FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE labelId = :labelId")
+    @Query("SELECT COUNT(*) FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE label_id = :labelId")
     fun getBubbleCntByLabelId(labelId: Int): Int
 }

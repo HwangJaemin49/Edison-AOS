@@ -29,7 +29,7 @@ class LabelRepositoryImpl @Inject constructor(
     )
 
     override fun deleteLabel(label: Label): Flow<DataResource<Unit>> = flowDataResource (
-        dataAction = { labelLocalDataSource.updateLabelDeletedStatus(label.toEntity()) },
+        dataAction = { labelLocalDataSource.softDeleteLabel(label.toEntity()) },
     )
 
 }
