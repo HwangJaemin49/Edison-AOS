@@ -10,10 +10,7 @@ data class BubbleInputState(
     companion object {
         val DEFAULT = BubbleInputState(
             isLoading = false,
-            bubble = BubbleModel(
-                title = "",
-                content = "",
-            ),
+            bubble = BubbleModel(),
             error = null
         )
     }
