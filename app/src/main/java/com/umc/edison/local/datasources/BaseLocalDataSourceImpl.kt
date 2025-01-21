@@ -1,5 +1,6 @@
 package com.umc.edison.local.datasources
 
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.umc.edison.local.model.BaseLocal
 import com.umc.edison.local.room.dao.BaseDao
 
@@ -21,5 +22,15 @@ open class BaseLocalDataSourceImpl<T : BaseLocal>(
         entity.deletedAt = System.currentTimeMillis()
         entity.isDeleted = true
         baseDao.update(entity)
+    }
+
+    suspend fun getUnsyncedDatas(tableName: String): List<T> {
+        val query = SimpleSQLiteQuery("SELECT * FROM $tableName WHERE isSynced = 0")
+        return baseDao.getUnsyncedDatas(query)
+    }
+
+    suspend fun markAsSynced(tableName: String, id: Int) {
+        val query = SimpleSQLiteQuery("UPDATE $tableName SET isSynced = 1 WHERE id = $id")
+        baseDao.markAsSynced(query)
     }
 }

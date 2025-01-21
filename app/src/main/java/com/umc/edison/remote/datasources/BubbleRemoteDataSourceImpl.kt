@@ -9,4 +9,8 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
     private val apiService: BubbleSpaceApiService
 ) : BubbleRemoteDataSource {
     override suspend fun getAllBubbles(): List<BubbleEntity> = apiService.getAllBubbles().data.map { it.toData() }
+
+    override suspend fun syncBubble(bubble: BubbleEntity) {
+        TODO("Not yet implemented")
+    }
 }

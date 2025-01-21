@@ -104,8 +104,10 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
+
+    implementation(libs.androidx.work)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

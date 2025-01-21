@@ -11,4 +11,8 @@ class LabelRemoteDataSourceImpl @Inject constructor(
     override suspend fun getAllLabels(): List<LabelEntity> {
         return apiService.getAllLabels().data.map { it.toData() }
     }
+
+    override suspend fun syncLabel(label: LabelEntity) {
+        TODO("Not yet implemented")
+    }
 }

@@ -9,4 +9,7 @@ interface LabelLocalDataSource {
     suspend fun updateLabel(label: LabelEntity)
     suspend fun softDeleteLabel(label: LabelEntity)
     suspend fun deleteLabel(label: LabelEntity)
+
+    suspend fun getUnsyncedLabels(): List<LabelEntity>
+    suspend fun markAsSynced(label: LabelEntity)
 }

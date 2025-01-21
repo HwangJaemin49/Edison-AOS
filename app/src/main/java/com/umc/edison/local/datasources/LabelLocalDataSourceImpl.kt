@@ -6,6 +6,7 @@ import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.local.model.LabelLocal
 import com.umc.edison.local.model.toData
 import com.umc.edison.local.model.toLocal
+import com.umc.edison.local.room.RoomConstant
 import com.umc.edison.local.room.dao.BubbleDao
 import com.umc.edison.local.room.dao.LabelDao
 import javax.inject.Inject
@@ -14,6 +15,9 @@ class LabelLocalDataSourceImpl @Inject constructor(
     private val bubbleDao: BubbleDao,
     private val labelDao: LabelDao
 ) : LabelLocalDataSource, BaseLocalDataSourceImpl<LabelLocal>(labelDao) {
+
+    private val tableName = RoomConstant.getTableNameByClass(LabelLocal::class.java)
+
     override suspend fun getAllLabels(): List<LabelEntity> {
         val labels = labelDao.getAllLabels().toData()
 
@@ -50,6 +54,14 @@ class LabelLocalDataSourceImpl @Inject constructor(
 
     override suspend fun deleteLabel(label: LabelEntity) {
         labelDao.delete(label.toLocal())
+    }
+
+    override suspend fun getUnsyncedLabels(): List<LabelEntity> {
+        return getUnsyncedDatas(tableName).toData()
+    }
+
+    override suspend fun markAsSynced(label: LabelEntity) {
+        markAsSynced(tableName, label.id)
     }
 
 }
