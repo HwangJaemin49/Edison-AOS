@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.compose.ui.viewbinding)
 
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.foundation.layout.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
