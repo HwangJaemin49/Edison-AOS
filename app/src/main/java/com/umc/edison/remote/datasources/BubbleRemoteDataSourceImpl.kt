@@ -3,7 +3,6 @@ package com.umc.edison.remote.datasources
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.remote.api.BubbleSpaceApiService
-import com.umc.edison.remote.model.toRemote
 import javax.inject.Inject
 
 class BubbleRemoteDataSourceImpl @Inject constructor(
@@ -11,7 +10,7 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
 ) : BubbleRemoteDataSource {
     override suspend fun getAllBubbles(): List<BubbleEntity> = apiService.getAllBubbles().data.map { it.toData() }
 
-    override suspend fun syncBubbles(bubbles: List<BubbleEntity>) {
-        apiService.syncBubbles(bubbles.map { it.toRemote() })
+    override suspend fun syncBubble(bubble: BubbleEntity) {
+        TODO("Not yet implemented")
     }
 }

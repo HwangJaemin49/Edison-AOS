@@ -2,7 +2,6 @@ package com.umc.edison.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -16,28 +15,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,8 +54,6 @@ import com.umc.edison.ui.theme.White000
 import com.umc.edison.ui.theme.Yellow100
 import kotlin.math.cos
 import kotlin.math.sin
-
-
 
 @Composable
 fun BubbleInput(
@@ -232,7 +223,6 @@ fun BubbleDoor(
     val bubbleSize = BubbleType.BubbleDoor
     val interactionSource = remember { MutableInteractionSource() }
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -316,11 +306,8 @@ fun BubbleDoor(
                 }
             }
         }
-
-
     }
 }
-
 
 
 @Preview(showBackground = true)
@@ -353,7 +340,6 @@ fun BubbleDoorPreview() {
         onClick = onClick
     )
 }
-
 
 @Composable
 private fun TextContentBubble(
@@ -409,8 +395,6 @@ private fun ImageBubble(
 ) {
     // TODO: 이미지 관련 정리되면 개발
 }
-
-
 
 @Composable
 private fun SingleBubble(
@@ -667,7 +651,6 @@ private fun DrawScope.drawCircleWithBlur(
         canvas.drawCircle(center, radius, paint)
     }
 }
-
 
 object BubbleType {
     // TODO: 디자인 시스템 참고해서 수정

@@ -31,6 +31,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "$projectDir/schemas"
+            }
+        }
     }
 
     buildTypes {
@@ -82,7 +88,6 @@ dependencies {
     implementation(libs.compose.ui.viewbinding)
 
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.foundation.layout.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
@@ -99,8 +104,10 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
+
+    implementation(libs.androidx.work)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
