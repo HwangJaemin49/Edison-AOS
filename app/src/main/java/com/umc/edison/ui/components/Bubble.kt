@@ -2,29 +2,42 @@ package com.umc.edison.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,12 +54,15 @@ import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
+import com.umc.edison.ui.theme.Gray900
 import com.umc.edison.ui.theme.Pretendard
 import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
 import com.umc.edison.ui.theme.Yellow100
 import kotlin.math.cos
 import kotlin.math.sin
+
+
 
 @Composable
 fun BubbleInput(
@@ -91,8 +107,9 @@ fun Bubble(
     if (bubble.images.isNotEmpty() && bubbleSize == BubbleType.BubbleDoor) {
         BubbleDoor(
             bubble = bubble,
+            colors = bubble.labels.map { it.color },
             isEditable = false,
-            onClick = onClick
+            onClick = onClick,
         )
     } else {
         TextContentBubble(
@@ -124,22 +141,218 @@ fun BubblePreview(
     }
 }
 
+private fun DrawScope.drawOuterGradientBubbleDoor(
+    center: Offset,
+    width: Float,
+    height: Float,
+    colors: List<Color>
+) {
+    val combinedPath = Path().apply {
+        // 직사각형 부분
+        moveTo(center.x - width / 2, center.y) // 왼쪽 위
+        lineTo(center.x - width / 2, center.y + height * 2f) // 왼쪽 아래
+        lineTo(center.x + width / 2, center.y + height * 2f) // 오른쪽 아래
+        lineTo(center.x + width / 2, center.y) // 오른쪽 위
+
+        // 아치 부분
+        cubicTo(
+            x1 = center.x + width * 0.25f, y1 = center.y - height * 0.15f,
+            x2 = center.x - width * 0.25f, y2 = center.y - height * 0.15f,
+            x3 = center.x - width / 2, y3 = center.y
+        )
+        close()
+    }
+
+    val gradient = Brush.linearGradient(
+        colors = colors,
+        start = Offset(center.x - width / 2, center.y - height/2),
+        end = Offset(center.x + width / 2, center.y + height/2),
+    )
+
+    drawPath(
+        path = combinedPath,
+        brush = gradient
+    )
+}
+
+private fun DrawScope.drawBlurredOuterGradientBubbleDoor(
+    center: Offset,
+    width: Float,
+    height: Float,
+) {
+
+    val blurredPath = Path().apply {
+        // 직사각형 부분
+        moveTo(center.x - width, center.y) // 왼쪽 위
+        lineTo(center.x - width, center.y + height * 5f) // 왼쪽 아래
+        lineTo(center.x + width, center.y + height * 5f) // 오른쪽 아래
+        lineTo(center.x + width, center.y) // 오른쪽 위
+
+        // 아치 부분
+        cubicTo(
+            x1 = center.x + width * 0.1f, y1 = center.y - height * 0.2f,
+            x2 = center.x - width * 0.1f, y2 = center.y - height * 0.2f,
+            x3 = center.x - width / 2, y3 = center.y
+        )
+        close()
+    }
+
+    drawIntoCanvas { canvas ->
+        val paint = Paint().apply {
+            this.asFrameworkPaint().apply {
+                isAntiAlias = true
+                color = android.graphics.Color.WHITE
+                this.alpha = 100 // 투명도 설정
+                maskFilter = android.graphics.BlurMaskFilter(
+                    30f,
+                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                )
+            }
+        }
+        canvas.drawPath(blurredPath, paint)
+    }
+}
+
+
 @Composable
 fun BubbleDoor(
     bubble: BubbleModel,
+    colors: List<Color>,
     isEditable: Boolean = false,
     onClick: () -> Unit,
 ) {
-    // TODO: 버블 문 형태 개발 필요
-    when (bubble.labels.size) {
-    // 0 -> // TODO: color에 해당하는 door 컴포저블
-    // 1 -> // TODO: color에 해당하는 door 컴포저블
-    // 2 -> // TODO: color 2개에 해당하는 door 컴포저블
-    // 3 -> // TODO: color 3개에 해당하는 door 컴포저블
+    val outerColors = when (colors.size) {
+        0 -> listOf(Color.White, Color.Gray.copy(alpha = 1f))
+        1 -> listOf(Color.White, colors[0])
+        2 -> listOf(Color.White, colors[0], colors[1])
+        3 -> listOf(Color.White, colors[0], colors[1], colors[2])
+        else -> colors
     }
 
-    // 제목, 본문, 이미지 그려지는...? -> 보류
+    val bubbleSize = BubbleType.BubbleDoor
+    val interactionSource = remember { MutableInteractionSource() }
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                indication = null, // Ripple 효과 제거
+                interactionSource = interactionSource
+            ) {
+                onClick()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        // Outer Canvas
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(855.dp)
+                .align(Alignment.BottomCenter)
+        ) {
+            // Outer Layer
+            drawOuterGradientBubbleDoor(
+                center = Offset(size.width / 2, size.height * 0.3f),
+                width = size.width,
+                height = size.height,
+                colors = outerColors,
+            )
+
+            // Blur Layer
+            drawBlurredOuterGradientBubbleDoor(
+                center = Offset(size.width / 2, size.height * 0.3f),
+                width = size.width,
+                height = size.height,
+            )
+        }
+
+        // Text Box
+        Box(
+            modifier = Modifier
+                .size(
+                    bubbleSize.textBoxSize.first.dp,
+                    bubbleSize.textBoxSize.second.dp
+                )
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 60.dp),
+            contentAlignment = Alignment.TopStart
+        ) {
+
+            val scrollState = rememberScrollState()
+
+            // Title과 Content
+            Column(
+                horizontalAlignment = Alignment.Start, // 수평 정렬: 왼쪽
+                verticalArrangement = Arrangement.Top, // 수직 정렬: 상단
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+            ) {
+
+                // Title 출력
+                bubble.title?.let { title ->
+                    Text(
+                        text = title,
+                        style = bubbleSize.fontStyle.copy(
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        color = Gray900,
+                        textAlign = TextAlign.Start
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(50.dp)) // Title과 Content 사이 간격
+
+                // Content 출력
+                bubble.content?.let { content ->
+                    Text(
+                        text = content,
+                        style = bubbleSize.fontStyle,
+                        color = Gray900,
+                        textAlign = TextAlign.Start
+                    )
+                }
+            }
+        }
+
+
+    }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun BubbleDoorPreview() {
+    // 예시 BubbleModel 생성
+    val bubble = BubbleModel(
+        title = "제목",
+        content = "본문",
+        mainImage = null,
+        labels = listOf(
+            LabelModel(0, "Label", Aqua100),
+            LabelModel(1, "Label", Yellow100),
+            LabelModel(2, "Label", Red100),
+        ),
+        date = "2021-09-01"
+
+    )
+
+    // 클릭 리스너 정의
+    val onClick: () -> Unit = {}
+
+    // colors 리스트 생성
+    val colors = bubble.labels.map { it.color }
+
+    // BubbleDoor 컴포저블 호출
+    BubbleDoor(
+        bubble = bubble,
+        colors = colors,
+        onClick = onClick
+    )
+}
+
 
 @Composable
 private fun TextContentBubble(
@@ -195,6 +408,8 @@ private fun ImageBubble(
 ) {
     // TODO: 이미지 관련 정리되면 개발
 }
+
+
 
 @Composable
 private fun SingleBubble(
@@ -461,10 +676,10 @@ object BubbleType {
         fontStyle = TextStyle(
             fontFamily = Pretendard,
             fontWeight = FontWeight.Medium,
-            fontSize = 20.sp,
+            fontSize = 16.sp,
             lineHeight = 24.sp
         ), // headingSmall
-        textBoxSize = Pair(258, 144)
+        textBoxSize = Pair(300, 560)
     )
 
     val BubbleMain = BubbleSize(
