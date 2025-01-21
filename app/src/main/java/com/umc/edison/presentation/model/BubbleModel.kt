@@ -8,10 +8,10 @@ data class BubbleModel(
     val mainImage: String? = null,
     val images: List<String> = listOf(),
     val labels: List<LabelModel> = listOf(),
-    val date: String
+    val date: Long = System.currentTimeMillis()
 )
 
-fun Bubble.toPresentation(): BubbleModel =
-    BubbleModel(title, content, mainImage, images, labels.map { it.toPresentation() }, date)
-
-fun List<Bubble>.toPresentation(): List<BubbleModel> = map { it.toPresentation() }
+//fun Bubble.toPresentation(): BubbleModel =
+//    BubbleModel(title, content, mainImage, images, labels.map { it.toPresentation() }, date)
+//
+//fun List<Bubble>.toPresentation(): List<BubbleModel> = map { it.toPresentation() }
