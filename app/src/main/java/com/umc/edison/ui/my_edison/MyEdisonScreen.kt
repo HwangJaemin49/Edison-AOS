@@ -18,7 +18,8 @@ fun MyEdisonScreen() {
             .background(Color.White)
     ) {
         BubbleInput(
-            onClick = { /* */}
+            onClick = { /* */},
+            onSwipeUp = {/* */}
         )
     }
 }

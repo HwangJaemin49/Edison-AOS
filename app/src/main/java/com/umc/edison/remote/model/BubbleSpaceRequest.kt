@@ -9,8 +9,6 @@ data class BubbleRequest(
     val title: String?,
     @SerializedName("content")
     val content: String?,
-    @SerializedName("image_urls")
-    val images: List<String>,
     @SerializedName("main_image_url")
     val mainImage: String?,
     @SerializedName("labels")
@@ -20,7 +18,6 @@ data class BubbleRequest(
 fun BubbleEntity.toRemote(): BubbleRequest = BubbleRequest(
     title = title,
     content = content,
-    images = images,
     mainImage = mainImage,
     labels = labels.map { it.toRemote() },
 )

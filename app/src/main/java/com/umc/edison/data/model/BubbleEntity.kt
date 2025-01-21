@@ -2,7 +2,6 @@ package com.umc.edison.data.model
 
 import com.umc.edison.data.DataMapper
 import com.umc.edison.domain.model.Bubble
-import com.umc.edison.domain.model.ContentBlock
 import com.umc.edison.domain.model.ContentType
 
 data class BubbleEntity(
@@ -23,7 +22,7 @@ data class BubbleEntity(
                 else -> return@mapIndexed null
             }
             val content = s.substringAfter(">").substringBefore("%</")
-            ContentBlock(type, content, index)
+            Bubble.BubbleContentBlock(type, content, index)
         }?.filterNotNull() ?: emptyList()
 
         return Bubble(id, title, contentBlocks, mainImage, labels.map { it.toDomain() }, date)
