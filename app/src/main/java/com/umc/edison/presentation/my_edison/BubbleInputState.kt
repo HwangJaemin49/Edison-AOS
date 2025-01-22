@@ -5,7 +5,8 @@ import com.umc.edison.presentation.model.BubbleModel
 data class BubbleInputState(
     val isLoading: Boolean = false,
     val bubble: BubbleModel,
-    val error: Throwable? = null
+    val error: Throwable? = null,
+
 ) {
     companion object {
         val DEFAULT = BubbleInputState(

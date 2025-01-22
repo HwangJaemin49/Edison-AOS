@@ -12,9 +12,24 @@ data class Bubble(
         val type: ContentType,
         var content: String,
         var position: Int,
+        var contentStyles: MutableList<StyleRange> = mutableListOf()
+
     )
 }
 enum class ContentType {
     TEXT,
     IMAGE,
 }
+
+data class StyleRange(
+    val style: Style, // 스타일 종류 (BOLD, ITALICS 등)
+    val range: IntRange // 스타일 적용 범위
+)
+
+enum class Style {
+    BOLD,
+    ITALICS,
+    UNDERLINE,
+    HIGHLIGHT
+}
+
