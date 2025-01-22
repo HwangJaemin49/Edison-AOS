@@ -1,24 +1,33 @@
 package com.umc.edison.ui.components
 
-import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,22 +41,31 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.size.Scale
+import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.theme.Aqua100
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray400
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.Gray900
 import com.umc.edison.ui.theme.Pretendard
 import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
@@ -55,18 +73,48 @@ import com.umc.edison.ui.theme.Yellow100
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * 마이 에디슨 메인 화면의 버블 입력 컴포저블
+ */
 @Composable
 fun BubbleInput(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onSwipeUp: () -> Unit,
 ) {
     val bubbleSize = BubbleType.BubbleMain
     val canvasSize = bubbleSize.size
+
+    var offsetY by remember { mutableFloatStateOf(0f) }
+    val animatedOffsetY by animateFloatAsState(targetValue = offsetY)
 
     Box(
         modifier = Modifier
             .size(canvasSize)
             .clip(CircleShape)
-            .clickable { onClick() },
+            .pointerInput(Unit) {
+                detectVerticalDragGestures(
+                    onVerticalDrag = { change, dragAmount ->
+                        change.consume()
+                        if (dragAmount < 0) {
+                            offsetY += dragAmount
+                            if (offsetY < -200f) {
+                                onSwipeUp()
+                                offsetY = 0f
+                            }
+                        }
+                    },
+                    onDragEnd = {
+                        offsetY = 0f
+                    }
+                )
+            }
+            .clickable { onClick() }
+            .offset {
+                IntOffset(
+                    x = 0,
+                    y = animatedOffsetY.dp.roundToPx()
+                )
+            },
         contentAlignment = Alignment.Center
     ) {
         SingleBubble(bubbleSize = bubbleSize, color = Gray300)
@@ -88,6 +136,9 @@ fun BubbleInput(
     }
 }
 
+/**
+ * 버블 내용 확인 가능한 컴포저블
+ */
 @Composable
 fun Bubble(
     bubble: BubbleModel,
@@ -95,10 +146,9 @@ fun Bubble(
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
-    if (bubble.images.isNotEmpty() && bubbleSize == BubbleType.BubbleDoor) {
+    if (checkBubbleContainImage(bubble) && bubbleSize == BubbleType.BubbleMain) {
         BubbleDoor(
             bubble = bubble,
-            colors = bubble.labels.map { it.color },
             isEditable = false,
             onClick = onClick,
         )
@@ -112,6 +162,9 @@ fun Bubble(
     }
 }
 
+/**
+ * 버블 보관함 화면에서 사용되는 버블 미리보기 컴포저블
+ */
 @Composable
 fun BubblePreview(
     onClick: () -> Unit,
@@ -119,7 +172,7 @@ fun BubblePreview(
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
-    if (bubble.title != null || bubble.content != null) {
+    if (bubble.title != null || bubble.contentBlocks.firstOrNull()?.type == ContentType.TEXT) {
         TextContentBubble(
             bubble = bubble,
             colors = bubble.labels.map { it.color },
@@ -128,99 +181,28 @@ fun BubblePreview(
         )
     } else {
         // TODO: 이미지 1개를 배경으로 하는 버블 컴포저블
-        ImageBubble(bubbleSize = bubbleSize, imageUrl = bubble.mainImage ?: bubble.images[0])
-    }
-}
-
-private fun DrawScope.drawOuterGradientBubbleDoor(
-    center: Offset,
-    width: Float,
-    height: Float,
-    colors: List<Color>
-) {
-    val combinedPath = Path().apply {
-        // 직사각형 부분
-        moveTo(center.x - width / 2, center.y) // 왼쪽 위
-        lineTo(center.x - width / 2, center.y + height * 2f) // 왼쪽 아래
-        lineTo(center.x + width / 2, center.y + height * 2f) // 오른쪽 아래
-        lineTo(center.x + width / 2, center.y) // 오른쪽 위
-
-        // 아치 부분
-        cubicTo(
-            x1 = center.x + width * 0.25f, y1 = center.y - height * 0.15f,
-            x2 = center.x - width * 0.25f, y2 = center.y - height * 0.15f,
-            x3 = center.x - width / 2, y3 = center.y
+        ImageBubble(
+            bubbleSize = bubbleSize,
+            imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
         )
-        close()
-    }
-
-    val gradient = Brush.linearGradient(
-        colors = colors,
-        start = Offset(center.x - width / 2, center.y - height/2),
-        end = Offset(center.x + width / 2, center.y + height/2),
-    )
-
-    drawPath(
-        path = combinedPath,
-        brush = gradient
-    )
-}
-
-private fun DrawScope.drawBlurredOuterGradientBubbleDoor(
-    center: Offset,
-    width: Float,
-    height: Float,
-) {
-
-    val blurredPath = Path().apply {
-        // 직사각형 부분
-        moveTo(center.x - width, center.y) // 왼쪽 위
-        lineTo(center.x - width, center.y + height * 5f) // 왼쪽 아래
-        lineTo(center.x + width, center.y + height * 5f) // 오른쪽 아래
-        lineTo(center.x + width, center.y) // 오른쪽 위
-
-        // 아치 부분
-        cubicTo(
-            x1 = center.x + width * 0.1f, y1 = center.y - height * 0.2f,
-            x2 = center.x - width * 0.1f, y2 = center.y - height * 0.2f,
-            x3 = center.x - width / 2, y3 = center.y
-        )
-        close()
-    }
-
-    drawIntoCanvas { canvas ->
-        val paint = Paint().apply {
-            this.asFrameworkPaint().apply {
-                isAntiAlias = true
-                color = android.graphics.Color.WHITE
-                this.alpha = 100 // 투명도 설정
-                maskFilter = android.graphics.BlurMaskFilter(
-                    30f,
-                    android.graphics.BlurMaskFilter.Blur.NORMAL
-                )
-            }
-        }
-        canvas.drawPath(blurredPath, paint)
     }
 }
-
 
 @Composable
 fun BubbleDoor(
     bubble: BubbleModel,
-    colors: List<Color>,
     isEditable: Boolean = false,
     onClick: () -> Unit,
 ) {
+    val colors = bubble.labels.map { it.color }
     val outerColors = when (colors.size) {
-        0 -> listOf(Color.White, Color.Gray.copy(alpha = 1f))
+        0 -> listOf(Color.White, Gray400)
         1 -> listOf(Color.White, colors[0])
         2 -> listOf(Color.White, colors[0], colors[1])
         3 -> listOf(Color.White, colors[0], colors[1], colors[2])
         else -> colors
     }
 
-    val bubbleSize = BubbleType.BubbleDoor
     val interactionSource = remember { MutableInteractionSource() }
 
     Box(
@@ -237,8 +219,7 @@ fun BubbleDoor(
         // Outer Canvas
         Canvas(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(855.dp)
+                .fillMaxSize()
                 .align(Alignment.BottomCenter)
         ) {
             // Outer Layer
@@ -260,85 +241,136 @@ fun BubbleDoor(
         // Text Box
         Box(
             modifier = Modifier
-                .size(
-                    bubbleSize.textBoxSize.first.dp,
-                    bubbleSize.textBoxSize.second.dp
-                )
+                .fillMaxSize()
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 60.dp),
+                .padding(start = 23.dp, top = 260.dp, end = 23.dp, bottom = 20.dp),
             contentAlignment = Alignment.TopStart
         ) {
+            BubbleContent(bubble = bubble, isEditable = isEditable)
+        }
+    }
+}
 
-            val scrollState = rememberScrollState()
+@Composable
+private fun BubbleContent(
+    bubble: BubbleModel,
+    isEditable: Boolean = false,
+) {
+    var titleState by remember { mutableStateOf(bubble.title ?: "") }
+    var contentBlocksState by remember { mutableStateOf(bubble.contentBlocks) }
 
-            // Title과 Content
-            Column(
-                horizontalAlignment = Alignment.Start, // 수평 정렬: 왼쪽
-                verticalArrangement = Arrangement.Top, // 수직 정렬: 상단
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-            ) {
+    LazyColumn(
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Title
+        item {
+            if (isEditable) {
+                BasicTextField(
+                    value = titleState,
+                    onValueChange = { titleState = it },
+                    textStyle = MaterialTheme.typography.displayMedium.copy(color = Gray800),
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (titleState.isEmpty()) {
+                                Text(
+                                    text = "제목",
+                                    style = MaterialTheme.typography.displayMedium.copy(color = Gray500),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
 
-                // Title 출력
-                bubble.title?.let { title ->
-                    Text(
-                        text = title,
-                        style = bubbleSize.fontStyle.copy(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold
-                        ),
-                        color = Gray900,
-                        textAlign = TextAlign.Start
-                    )
+                            innerTextField()
+                        }
+                    }
+                )
+            } else {
+                Text(
+                    text = titleState,
+                    style = MaterialTheme.typography.displayMedium,
+                    color = Gray800,
+                    textAlign = TextAlign.Start
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+
+        // Content Blocks
+        itemsIndexed(
+            items = contentBlocksState,
+            key = { _, contentBlock -> contentBlock.position }
+        ) { index, contentBlock ->
+            when (contentBlock.type) {
+                ContentType.TEXT -> {
+                    if (isEditable) {
+                        BasicTextField(
+                            value = contentBlock.content,
+                            onValueChange = { newText ->
+                                val updatedBlocks = contentBlocksState.toMutableList()
+                                updatedBlocks[index] = contentBlock.copy(content = newText)
+                                contentBlocksState = updatedBlocks
+                            },
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                color = Gray800
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (contentBlock.content.isEmpty() && contentBlocksState.size == 1) {
+                                        Text(
+                                            text = "내용을 입력해주세요.",
+                                            style = MaterialTheme.typography.bodyMedium.copy(color = Gray500),
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+
+                                    innerTextField()
+                                }
+                            }
+                        )
+                    } else {
+                        Text(
+                            text = contentBlock.content,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Gray800,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(50.dp)) // Title과 Content 사이 간격
+                ContentType.IMAGE -> {
+                    val painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(contentBlock.content)
+                            .crossfade(true)
+                            .scale(Scale.FILL)
+                            .build()
+                    )
 
-                // Content 출력
-                bubble.content?.let { content ->
-                    Text(
-                        text = content,
-                        style = bubbleSize.fontStyle,
-                        color = Gray900,
-                        textAlign = TextAlign.Start
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.FillWidth
                     )
                 }
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun BubbleDoorPreview() {
-    // 예시 BubbleModel 생성
-    val bubble = BubbleModel(
-        title = "제목",
-        content = "도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문3입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 도어 버블 본문입니다. 마지막 문장입니다.",
-        mainImage = null,
-        labels = listOf(
-            LabelModel(0, "Label", Aqua100),
-            LabelModel(1, "Label", Yellow100),
-            LabelModel(2, "Label", Red100),
-        ),
-        date = "2021-09-01"
-
-    )
-
-    // 클릭 리스너 정의
-    val onClick: () -> Unit = {}
-
-    // colors 리스트 생성
-    val colors = bubble.labels.map { it.color }
-
-    // BubbleDoor 컴포저블 호출
-    BubbleDoor(
-        bubble = bubble,
-        colors = colors,
-        onClick = onClick
-    )
 }
 
 @Composable
@@ -375,8 +407,8 @@ private fun TextContentBubble(
             ),
             contentAlignment = Alignment.Center
         ) {
-            val text = if (bubbleSize == BubbleType.BubbleMain) bubble.content ?: bubble.title!!
-            else bubble.title ?: bubble.content!!
+            val text = if (bubbleSize == BubbleType.BubbleMain) bubble.contentBlocks[0].content
+            else bubble.title ?: bubble.contentBlocks[0].content
 
             Text(
                 text = text,
@@ -391,7 +423,7 @@ private fun TextContentBubble(
 @Composable
 private fun ImageBubble(
     bubbleSize: BubbleType.BubbleSize,
-    imageUrl: String,
+    imageUrl: String
 ) {
     // TODO: 이미지 관련 정리되면 개발
 }
@@ -502,10 +534,28 @@ private fun TripleBubble(
 }
 
 /**
+ * 버블 내용에 이미지가 포함되어 있는지 확인하는 함수
+ */
+private fun checkBubbleContainImage(bubble: BubbleModel): Boolean {
+    bubble.contentBlocks.forEach {
+        if (it.type == ContentType.IMAGE) {
+            return true
+        }
+    }
+    return false
+}
+
+/**
  * 버블 텍스트 길이에 따른 사이즈 계산 함수
  */
 private fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
-    val text = bubble.title ?: bubble.content ?: ""
+    var text = bubble.title ?: ""
+
+    if (text.isEmpty() && bubble.contentBlocks.firstOrNull()?.type == ContentType.IMAGE) {
+        return BubbleType.BubbleMain
+    } else if (text.isEmpty()) {
+        text = bubble.contentBlocks.firstOrNull()?.content ?: ""
+    }
 
     fun calculateLineCount(text: String, textBoxWidthDp: Int, fontSizeSp: Float): Int {
         val charPerLine = (textBoxWidthDp / (fontSizeSp * 0.57)).toInt()
@@ -524,23 +574,20 @@ private fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         BubbleType.Bubble160,
         BubbleType.Bubble230,
         BubbleType.Bubble300,
-        BubbleType.BubbleMain
     ).forEach { bubbleType ->
         val (textBoxWidth, _) = bubbleType.textBoxSize
         val fontSizeSp = bubbleType.fontStyle.fontSize.value
         val lineCount = calculateLineCount(text, textBoxWidth, fontSizeSp)
-        Log.d("BubbleDebug", "Text: $text, Calculated Line Count: $lineCount")
 
         when {
             text.length <= 5 && bubbleType == BubbleType.Bubble100 -> return BubbleType.Bubble100
             lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> return BubbleType.Bubble160
             lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> return BubbleType.Bubble230
             lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> return BubbleType.Bubble300
-            lineCount <= 6 && bubbleType == BubbleType.BubbleMain -> return BubbleType.BubbleMain
         }
     }
 
-    return BubbleType.Bubble300
+    return BubbleType.BubbleMain
 }
 
 /**
@@ -652,20 +699,79 @@ private fun DrawScope.drawCircleWithBlur(
     }
 }
 
-object BubbleType {
-    // TODO: 디자인 시스템 참고해서 수정
-    val BubbleDoor = BubbleSize(
-        size = 364.dp,
-        innerSize = 326.dp,
-        fontStyle = TextStyle(
-            fontFamily = Pretendard,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp,
-            lineHeight = 24.sp
-        ), // headingSmall
-        textBoxSize = Pair(300, 560)
+private fun DrawScope.drawOuterGradientBubbleDoor(
+    center: Offset,
+    width: Float,
+    height: Float,
+    colors: List<Color>
+) {
+    val combinedPath = Path().apply {
+        // 직사각형 부분
+        moveTo(center.x - width / 2, center.y) // 왼쪽 위
+        lineTo(center.x - width / 2, center.y + height * 2f) // 왼쪽 아래
+        lineTo(center.x + width / 2, center.y + height * 2f) // 오른쪽 아래
+        lineTo(center.x + width / 2, center.y) // 오른쪽 위
+
+        // 아치 부분
+        cubicTo(
+            x1 = center.x + width * 0.25f, y1 = center.y - height * 0.15f,
+            x2 = center.x - width * 0.25f, y2 = center.y - height * 0.15f,
+            x3 = center.x - width / 2, y3 = center.y
+        )
+        close()
+    }
+
+    val gradient = Brush.linearGradient(
+        colors = colors,
+        start = Offset(center.x - width / 2, center.y - height / 2),
+        end = Offset(center.x + width / 2, center.y + height / 2),
     )
 
+    drawPath(
+        path = combinedPath,
+        brush = gradient
+    )
+}
+
+private fun DrawScope.drawBlurredOuterGradientBubbleDoor(
+    center: Offset,
+    width: Float,
+    height: Float,
+) {
+
+    val blurredPath = Path().apply {
+        // 직사각형 부분
+        moveTo(center.x - width, center.y) // 왼쪽 위
+        lineTo(center.x - width, center.y + height * 5f) // 왼쪽 아래
+        lineTo(center.x + width, center.y + height * 5f) // 오른쪽 아래
+        lineTo(center.x + width, center.y) // 오른쪽 위
+
+        // 아치 부분
+        cubicTo(
+            x1 = center.x + width * 0.1f, y1 = center.y - height * 0.2f,
+            x2 = center.x - width * 0.1f, y2 = center.y - height * 0.2f,
+            x3 = center.x - width / 2, y3 = center.y
+        )
+        close()
+    }
+
+    drawIntoCanvas { canvas ->
+        val paint = Paint().apply {
+            this.asFrameworkPaint().apply {
+                isAntiAlias = true
+                color = android.graphics.Color.WHITE
+                this.alpha = 100 // 투명도 설정
+                maskFilter = android.graphics.BlurMaskFilter(
+                    30f,
+                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                )
+            }
+        }
+        canvas.drawPath(blurredPath, paint)
+    }
+}
+
+object BubbleType {
     val BubbleMain = BubbleSize(
         size = 364.dp,
         innerSize = 326.dp,
@@ -736,245 +842,24 @@ object BubbleType {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewBubbleInput() {
+fun PreviewBubbleDoor() {
     EdisonTheme {
-        BubbleInput(onClick = { })
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSingleBubble() {
-    EdisonTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "5글자끼지",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "14pt 2줄 가능\n160 버블크기",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100)
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "제목은  bold 서체 입니다. 3줄까지 가능합니다. 2번째로 큰 버블",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "나의 에디슨 페이지 가장 큰 버블입니다. 제목은 bold 서체 입니다. 최대 4줄까지 가능합니다.",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "메인 버블 2가지에 사용됩니다. 버블 입력 초기화면에 사용됩니다. 또, 해당 버블 클릭 시에 세부 내용 확인할 수 있는 버블입니다. 메인버블을 364px 크기입니다.",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewDoubleBubble() {
-    EdisonTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "5글자끼지",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "14pt 2줄 가능\n160 버블크기",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "제목은  bold 서체 입니다. 3줄까지 가능합니다. 2번째로 큰 버블",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "나의 에디슨 페이지 가장 큰 버블입니다. 제목은 bold 서체 입니다. 최대 4줄까지 가능합니다.",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "메인 버블 2가지에 사용됩니다. 버블 입력 초기화면에 사용됩니다. 또, 해당 버블 클릭 시에 세부 내용 확인할 수 있는 버블입니다. 메인버블을 364px 크기입니다.",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewTripleBubble() {
-    EdisonTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "5글자끼지",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                        LabelModel(2, "Label", Red100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "14pt 2줄 가능\n160 버블크기",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                        LabelModel(2, "Label", Red100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "제목은  bold 서체 입니다. 3줄까지 가능합니다. 2번째로 큰 버블",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                        LabelModel(2, "Label", Red100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "나의 에디슨 페이지 가장 큰 버블입니다. 제목은 bold 서체 입니다. 최대 4줄까지 가능합니다.",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                        LabelModel(2, "Label", Red100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-            BubblePreview(
-                onClick = {},
-                bubble = BubbleModel(
-                    title = "메인 버블 2가지에 사용됩니다. 버블 입력 초기화면에 사용됩니다. 또, 해당 버블 클릭 시에 세부 내용 확인할 수 있는 버블입니다. 메인버블을 364px 크기입니다.",
-                    content = "버블 내용",
-                    images = listOf(),
-                    labels = listOf(
-                        LabelModel(0, "Label", Aqua100),
-                        LabelModel(1, "Label", Yellow100),
-                        LabelModel(2, "Label", Red100),
-                    ),
-                    date = "2021-09-01"
-                )
-            )
-        }
+        BubbleDoor(
+            bubble = BubbleModel(
+                id = 0,
+                title = "버블 제목",
+                contentBlocks = listOf(
+                    BubbleModel.BubbleContentBlock(ContentType.TEXT, "버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 ", 0),
+                ),
+                labels = listOf(
+                    LabelModel(0, "라벨1", Aqua100),
+                    LabelModel(1, "라벨2", Yellow100),
+                    LabelModel(2, "라벨3", Red100),
+                ),
+                mainImage = null
+            ),
+            isEditable = true,
+            onClick = { }
+        )
     }
 }

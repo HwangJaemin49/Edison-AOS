@@ -7,8 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.viewinterop.AndroidViewBinding
-import com.umc.edison.databinding.FragmentMyEdisonBinding
+import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.theme.EdisonTheme
 
 @Composable
@@ -18,13 +17,10 @@ fun MyEdisonScreen() {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        AndroidViewBinding(FragmentMyEdisonBinding::inflate) {
-            titleTv.text = "Composable 함수에 AndroidViewBinding 사용하기"
-
-            titleTv.setOnClickListener {
-                titleTv.text = "클릭 리스너"
-            }
-        }
+        BubbleInput(
+            onClick = { /* */},
+            onSwipeUp = {/* */}
+        )
     }
 }
 
