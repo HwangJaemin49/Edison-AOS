@@ -11,12 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import com.umc.edison.R
-import com.umc.edison.ui.theme.EdisonTheme
 
 @Composable
-fun MyPageScreen() {
+fun MyPageScreen(navHostController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -29,13 +28,5 @@ fun MyPageScreen() {
             color = Color.Black,
             modifier = Modifier.align(Alignment.Center)
         )
-    }
-}
-
-@Preview(showBackground=true)
-@Composable
-fun BubbleSpaceScreenPreview() {
-    EdisonTheme {
-        MyPageScreen()
     }
 }

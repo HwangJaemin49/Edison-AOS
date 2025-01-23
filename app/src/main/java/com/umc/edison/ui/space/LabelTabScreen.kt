@@ -1,77 +1,242 @@
 package com.umc.edison.ui.space
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.umc.edison.R
+import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.presentation.space.LabelListViewModel
+import com.umc.edison.ui.components.BottomSheet
+import com.umc.edison.ui.components.BottomSheetPopUp
+import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray500
+import com.umc.edison.ui.theme.Gray800
+import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
 
-@Composable
-fun LabelTabScreen() {
-    // 플로팅 버튼 관련
-    var viewMode: ViewMode by remember { mutableStateOf(ViewMode.LIST) }
+enum class EditMode {
+    NONE, ADD, EDIT, DELETE
+}
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        if (viewMode == ViewMode.GRAPH) {
-            // TODO: 그래프 뷰
-        } else {
-            LabelListScreen()
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LabelTabScreen(
+    navHostController: NavHostController,
+    viewModel: LabelListViewModel = hiltViewModel()
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val uiState by viewModel.uiState.collectAsState()
+    val labelState = remember { mutableStateOf(LabelModel(name = "", color = Red100)) }
+
+    val draggedIndex = remember { mutableIntStateOf(-1) }
+
+    Scaffold(
+        modifier = Modifier
+            .clickable(
+                onClick = {
+                    draggedIndex.intValue = -1
+                },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            )
+    ) { innerPadding ->
+        if (uiState.editMode == EditMode.ADD || uiState.editMode == EditMode.EDIT) {
+            BottomSheet(
+                onDismiss = {
+                    viewModel.updateEditMode(EditMode.NONE)
+                },
+                sheetState = sheetState,
+            ) {
+                LabelModalContent(
+                    editMode = uiState.editMode,
+                    onDismiss = {
+                        viewModel.updateEditMode(EditMode.NONE)
+                    },
+                    onConfirm = { label ->
+                        labelState.value = label
+                        viewModel.confirmLabelModal(labelState.value)
+                    },
+                    label = labelState.value
+                )
+            }
         }
 
-        // 플로팅 버튼
-        Box(
+        if (uiState.editMode == EditMode.DELETE) {
+            BottomSheetPopUp(
+                title = "${labelState.value.name} 라벨을 삭제하시겠습니까?",
+                cancelText = "취소",
+                confirmText = "삭제",
+                onDismiss = {
+                    viewModel.updateEditMode(EditMode.NONE)
+                },
+                onConfirm = {
+                    viewModel.deleteLabel(labelState.value)
+                },
+                sheetState = sheetState,
+            )
+        }
+
+        Column(
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-                .offset(x = (-12).dp, y = (-12).dp)
-                .size(64.dp)
-                .clip(RoundedCornerShape(100.dp))
-                .border(1.dp, Gray300, RoundedCornerShape(100.dp))
                 .background(White000)
-                .shadow(15.dp, spotColor = Color(142f, 139f, 139f, 0.15f))
-                .clickable(onClick = {
-                    viewMode = if (viewMode == ViewMode.LIST) ViewMode.GRAPH else ViewMode.LIST
-                })
+                .padding(innerPadding)
+                .padding(start = 24.dp, top = 42.dp)
+                .fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(
-                    id =
-                    if (viewMode == ViewMode.LIST) R.drawable.ic_graph
-                    else R.drawable.ic_list
-                ),
-                contentDescription = "change label view mode",
-                modifier = Modifier
-                    .size(32.dp)
-                    .align(Alignment.Center)
+            AddLabelButton(
+                onClick = {
+                    labelState.value = LabelModel(name = "", color = Gray300)
+                    viewModel.updateEditMode(EditMode.ADD)
+                }
+            )
+
+            LabelList(
+                labels = uiState.labels,
+                draggedIndex = draggedIndex.intValue,
+                onLabelClick = { labelId ->
+                    navHostController.navigate(NavRoute.LabelDetail.createRoute(labelId))
+                },
+                onEditClick = { index ->
+                    labelState.value = uiState.labels[index]
+                    viewModel.updateEditMode(EditMode.EDIT)
+                },
+                onDeleteClick = { index ->
+                    labelState.value = uiState.labels[index]
+                    viewModel.updateEditMode(EditMode.DELETE)
+                },
+                onDrag = { index ->
+                    // 드래그된 아이템 인덱스 업데이트
+                    draggedIndex.intValue = index
+                },
+                resetDrag = {
+                    draggedIndex.intValue = -1
+                }
             )
         }
     }
 }
 
-enum class ViewMode {
-    LIST,
-    GRAPH
+@Composable
+fun LabelList(
+    labels: List<LabelModel>,
+    draggedIndex: Int,
+    onLabelClick: (Int) -> Unit,
+    onEditClick: (Int) -> Unit,
+    onDeleteClick: (Int) -> Unit,
+    onDrag: (Int) -> Unit,
+    resetDrag: () -> Unit
+) {
+    Column {
+        labels.forEachIndexed { index, label ->
+            LabelListItem(
+                labelColor = label.color,
+                labelText = label.name,
+                count = label.bubbleCnt,
+                isDragged = index == draggedIndex,
+                onClick = { onLabelClick(label.id!!) },
+                onEditClick = { onEditClick(index) },
+                onDeleteClick = { onDeleteClick(index) },
+                onDrag = { onDrag(index) },
+                resetDrag = resetDrag
+            )
+        }
+    }
+}
+
+@Composable
+fun AddLabelButton(
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .size(60.dp)
+                .background(color = Gray200, shape = RoundedCornerShape(15.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_plus),
+                contentDescription = "Add Label",
+                modifier = Modifier
+                    .size(42.dp),
+                tint = Gray500
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Row(
+                modifier = Modifier
+                    .weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "새로운 라벨 추가하기",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Gray800,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    contentDescription = "Add Label",
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(end = 16.dp),
+                    tint = Gray500
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Gray300)
+            )
+        }
+    }
 }
