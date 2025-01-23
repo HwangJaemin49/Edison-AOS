@@ -10,7 +10,7 @@ import com.umc.edison.ui.artboard.ArtBoardScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
-import com.umc.edison.ui.space.LabelDetailScreen
+import com.umc.edison.ui.label.LabelDetailScreen
 
 @Composable
 fun NavigationGraph(navHostController: NavHostController) {

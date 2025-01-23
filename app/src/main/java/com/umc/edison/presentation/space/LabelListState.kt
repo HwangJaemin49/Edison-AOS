@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.space
 
 import com.umc.edison.presentation.model.LabelModel
-import com.umc.edison.ui.space.EditMode
+import com.umc.edison.ui.label.EditMode
 
 data class LabelListState(
     val isLoading: Boolean,

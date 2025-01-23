@@ -1,4 +1,4 @@
-package com.umc.edison.ui.space
+package com.umc.edison.ui.label
 
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
