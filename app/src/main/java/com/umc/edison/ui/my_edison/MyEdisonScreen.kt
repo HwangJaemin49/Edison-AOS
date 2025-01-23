@@ -6,9 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.navigation.NavHostController
-import com.umc.edison.databinding.FragmentMyEdisonBinding
+import com.umc.edison.ui.components.BubbleInput
 
 @Composable
 fun MyEdisonScreen(navHostController: NavHostController) {
@@ -17,12 +16,9 @@ fun MyEdisonScreen(navHostController: NavHostController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        AndroidViewBinding(FragmentMyEdisonBinding::inflate) {
-            titleTv.text = "Composable 함수에 AndroidViewBinding 사용하기"
-
-            titleTv.setOnClickListener {
-                titleTv.text = "클릭 리스너"
-            }
-        }
+        BubbleInput(
+            onClick = { /* */},
+            onSwipeUp = {/* */}
+        )
     }
 }

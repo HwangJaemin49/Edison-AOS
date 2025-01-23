@@ -25,7 +25,7 @@ class BubbleSpaceViewModel @Inject constructor(
         collectDataResource(
             flow = getAllBubblesUseCase(),
             onSuccess = { bubbles ->
-                _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
+                _uiState.update { it.copy(bubbles = bubbles.map { it.toPresentation() }) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

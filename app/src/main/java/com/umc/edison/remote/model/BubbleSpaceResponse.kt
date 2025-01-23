@@ -12,8 +12,6 @@ data class BubbleResponse(
     val title: String,
     @SerializedName("content")
     val content: String,
-    @SerializedName("image_urls")
-    val images: List<String>,
     @SerializedName("main_image_url")
     val mainImage: String?,
     @SerializedName("labels")
@@ -27,10 +25,9 @@ data class BubbleResponse(
         id = id,
         title = title,
         content = content,
-        images = images,
         mainImage = mainImage,
         labels = labels.map { it.toData() },
-        date = updatedAt,
+        date = System.currentTimeMillis()
     )
 }
 
