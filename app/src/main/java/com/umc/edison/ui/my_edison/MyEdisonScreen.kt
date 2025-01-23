@@ -6,13 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.navigation.NavHostController
 import com.umc.edison.databinding.FragmentMyEdisonBinding
-import com.umc.edison.ui.theme.EdisonTheme
 
 @Composable
-fun MyEdisonScreen() {
+fun MyEdisonScreen(navHostController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -25,13 +24,5 @@ fun MyEdisonScreen() {
                 titleTv.text = "클릭 리스너"
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BubbleSpaceScreenPreview() {
-    EdisonTheme {
-        MyEdisonScreen()
     }
 }
