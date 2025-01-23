@@ -1,4 +1,4 @@
-package com.umc.edison.presentation.space
+package com.umc.edison.presentation.label
 
 import android.util.Log
 import com.umc.edison.domain.usecase.label.AddLabelUseCase

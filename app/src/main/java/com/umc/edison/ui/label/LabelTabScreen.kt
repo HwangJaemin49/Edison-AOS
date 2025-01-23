@@ -35,7 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
 import com.umc.edison.presentation.model.LabelModel
-import com.umc.edison.presentation.space.LabelListViewModel
+import com.umc.edison.presentation.label.LabelListViewModel
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.navigation.NavRoute

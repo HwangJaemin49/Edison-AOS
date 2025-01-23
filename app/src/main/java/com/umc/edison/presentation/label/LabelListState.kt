@@ -1,4 +1,4 @@
-package com.umc.edison.presentation.space
+package com.umc.edison.presentation.label
 
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.label.EditMode
