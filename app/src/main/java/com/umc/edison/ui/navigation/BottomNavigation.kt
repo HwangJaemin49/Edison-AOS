@@ -90,15 +90,24 @@ fun BottomNavigation(
         val currentRoute = navBackStackEntry?.destination?.route
 
         items.forEach { navItem ->
+            // 현재 라우트가 세부 화면일 경우 상위 라우트로 매핑
+            val isSelected = when (navItem) {
+                BottomNavItem.MyEdison -> currentRoute == NavRoute.MyEdison.route
+                BottomNavItem.Space -> currentRoute?.startsWith(NavRoute.Space.route) == true
+                BottomNavItem.ArtLetter -> currentRoute == NavRoute.ArtBoard.route
+                BottomNavItem.MyPage -> currentRoute == NavRoute.MyPage.route
+                BottomNavItem.Bubble -> false
+            }
+
             if (navItem == BottomNavItem.Bubble) {
                 NavigationBarItem(
                     icon = {
                         Image(
-                            painter = painterResource(id = if (currentRoute == navItem.route) navItem.selectedIcon else navItem.icon),
+                            painter = painterResource(id = if (isSelected) navItem.selectedIcon else navItem.icon),
                             contentDescription = navItem.route
                         )
                     },
-                    selected = false,
+                    selected = isSelected,
                     onClick = {
                         onBubbleClick()
                     },
@@ -112,7 +121,7 @@ fun BottomNavigation(
                 NavigationBarItem(
                     icon = {
                         Image(
-                            painter = painterResource(id = if (currentRoute == navItem.route) navItem.selectedIcon else navItem.icon),
+                            painter = painterResource(id = if (isSelected) navItem.selectedIcon else navItem.icon),
                             contentDescription = navItem.route
                         )
                     },
@@ -123,7 +132,7 @@ fun BottomNavigation(
                             style = MaterialTheme.typography.labelSmall
                         )
                     },
-                    selected = currentRoute == navItem.route,
+                    selected = isSelected,
                     onClick = {
                         navController.navigate(navItem.route!!)
                     },
