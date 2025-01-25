@@ -31,6 +31,7 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
+                labels.sortedByDescending { it.bubbles.size }
                 _uiState.update { it.copy(labels = labels.toLabelListPresentation()) }
             },
             onError = { error ->

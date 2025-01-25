@@ -15,6 +15,10 @@ class LabelRemoteDataSourceImpl @Inject constructor(
         return bubbleSpaceApiService.getAllLabels().data.map { it.toData() }
     }
 
+    override suspend fun getLabelDetail(labelId: Int): LabelEntity {
+        return bubbleSpaceApiService.getLabelDetail(labelId).data.toData()
+    }
+
     override suspend fun syncLabel(label: LabelEntity) {
         // 임시로 라벨 생성으로 구현해 둠
         syncApiService.addLabel(label.toAddLabelLocal())

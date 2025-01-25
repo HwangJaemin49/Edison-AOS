@@ -18,4 +18,7 @@ interface LabelDao : BaseDao<LabelLocal> {
                 ")"
     )
     fun getAllLabelsByBubbleId(bubbleId: Int): List<LabelLocal>
+
+    @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE id = :labelId")
+    fun getLabelById(labelId: Int): LabelLocal
 }

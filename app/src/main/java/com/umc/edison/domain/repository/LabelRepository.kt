@@ -9,5 +9,5 @@ interface LabelRepository {
     fun addLabel(label: Label): Flow<DataResource<Unit>>
     fun updateLabel(label: Label): Flow<DataResource<Unit>>
     fun deleteLabel(label: Label): Flow<DataResource<Unit>>
-    fun getLabelDetail(labelId: String): Flow<DataResource<Label>>
+    fun getLabelDetail(labelId: Int): Flow<DataResource<Label>>
 }

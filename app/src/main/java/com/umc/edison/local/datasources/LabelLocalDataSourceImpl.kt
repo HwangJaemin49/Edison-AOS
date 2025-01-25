@@ -56,6 +56,12 @@ class LabelLocalDataSourceImpl @Inject constructor(
         labelDao.delete(label.toLocal())
     }
 
+    override suspend fun getLabelDetail(labelId: Int): LabelEntity {
+        val label = labelDao.getLabelById(labelId).toData()
+        label.bubbles = bubbleDao.getBubblesByLabel(label.id).map { it.toData() }
+        return label
+    }
+
     override suspend fun getUnSyncedLabels(): List<LabelEntity> {
         return getUnsyncedDatas(tableName).toData()
     }

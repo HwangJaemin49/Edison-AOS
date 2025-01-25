@@ -6,5 +6,5 @@ import javax.inject.Inject
 class GetLabelDetailUseCase @Inject constructor(
     private val labelRepository: LabelRepository
 ) {
-    operator fun invoke(labelId: String) = labelRepository.getLabelDetail(labelId)
+    operator fun invoke(labelId: Int) = labelRepository.getLabelDetail(labelId)
 }

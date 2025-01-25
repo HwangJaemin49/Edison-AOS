@@ -42,7 +42,7 @@ class SyncTrigger(private val context: Context) {
 
         WorkManager.getInstance(context).enqueueUniqueWork(
             "DataSyncWork",
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.REPLACE,
             syncWorkRequest
         )
     }
