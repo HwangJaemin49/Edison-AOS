@@ -167,21 +167,20 @@ fun Bubble(
 @Composable
 fun BubblePreview(
     onClick: () -> Unit,
+    size: BubbleType.BubbleSize,
     bubble: BubbleModel
 ) {
-    val bubbleSize = calculateBubbleSize(bubble)
-
     if (bubble.title != null || bubble.contentBlocks.firstOrNull()?.type == ContentType.TEXT) {
         TextContentBubble(
             bubble = bubble,
             colors = bubble.labels.map { it.color },
             onClick = onClick,
-            bubbleSize = bubbleSize
+            bubbleSize = size
         )
     } else {
         // TODO: 이미지 1개를 배경으로 하는 버블 컴포저블
         ImageBubble(
-            bubbleSize = bubbleSize,
+            bubbleSize = size,
             imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
         )
     }
@@ -547,7 +546,7 @@ private fun checkBubbleContainImage(bubble: BubbleModel): Boolean {
 /**
  * 버블 텍스트 길이에 따른 사이즈 계산 함수
  */
-private fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
+fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
     var text = bubble.title ?: ""
 
     if (text.isEmpty() && bubble.contentBlocks.firstOrNull()?.type == ContentType.IMAGE) {

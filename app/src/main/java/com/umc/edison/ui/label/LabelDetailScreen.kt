@@ -1,8 +1,8 @@
 package com.umc.edison.ui.label
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -10,19 +10,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
 import com.umc.edison.presentation.label.LabelDetailModel
 import com.umc.edison.presentation.label.LabelDetailViewModel
 import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.ui.components.BubblePreview
+import com.umc.edison.ui.components.calculateBubbleSize
+import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
 @Composable
@@ -38,17 +40,18 @@ fun LabelDetailScreen(
                 label = uiState.label,
                 navHostController = navHostController
             )
-        }
+        },
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(White000),
-            contentAlignment = Alignment.Center
+                .background(White000)
         ) {
             if (uiState.isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             } else if (uiState.error != null) {
                 Text(
                     text = "Error loading data",
@@ -73,18 +76,19 @@ fun LabelTopAppBar(
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .size(24.dp)
                         .background(color = label.labelColor, shape = CircleShape)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+
+                Spacer(modifier = Modifier.width(12.dp))
+
                 Text(
-                    text = "${label.labelName} ${label.bubbles.size}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    text = "${label.labelName}  ${label.bubbles.size}",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Gray800
                 )
             }
         },
@@ -95,43 +99,87 @@ fun LabelTopAppBar(
                     contentDescription = "Back"
                 )
             }
-        }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = White000,
+            titleContentColor = Gray800,
+            navigationIconContentColor = Gray800
+        )
     )
 }
 
 @Composable
-fun BubblesLayout(bubbles: List<BubbleModel>) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        bubbles.forEachIndexed { index, bubble ->
-            val size = (100 + (index * 20)).dp // 각 버블의 크기
-            val offset = Offset(
-                x = (100 + (index * 60)).toFloat(),
-                y = (200 + (index * 80)).toFloat()
-            ) // 각 버블의 위치 (샘플)
-            Bubble(
-                text = bubble.title ?: bubble.contentBlocks.firstOrNull()?.content ?: "",
-                size = size,
-                offset = offset
-            )
+fun BubblesLayout(
+    bubbles: List<BubbleModel>,
+    onBubbleClick: (BubbleModel) -> Unit = {}
+) {
+    val previousOffsets = mutableListOf<Dp>()
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        items(bubbles.size) { index ->
+            val bubble = bubbles[index]
+            val bubbleSize = calculateBubbleSize(bubble)
+            val xOffset = calculateBubbleXOffset(index, bubbleSize.size, previousOffsets)
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = xOffset)
+                    .size(bubbleSize.size + 4.dp)
+            ) {
+                BubblePreview(
+                    bubble = bubble,
+                    size = bubbleSize,
+                    onClick = { onBubbleClick(bubble) }
+                )
+            }
         }
     }
 }
 
+/**
+ * Calculate X-axis offset for a bubble based on its index and size.
+ * Ensures no more than 2 consecutive increases or decreases.
+ */
 @Composable
-fun Bubble(text: String, size: androidx.compose.ui.unit.Dp, offset: Offset) {
-    Box(
-        modifier = Modifier
-            .size(size)
-            .offset(x = offset.x.dp, y = offset.y.dp)
-            .background(color = Color(0xFFE0F7FA), shape = CircleShape)
-            .clickable { },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            textAlign = TextAlign.Center,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold
-        )
+private fun calculateBubbleXOffset(
+    index: Int,
+    bubbleSize: Dp,
+    previousOffsets: MutableList<Dp>
+): Dp {
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    val padding = 8.dp
+
+    val maxXOffset = screenWidthDp - bubbleSize - padding
+
+    if (index == 0) {
+        val initialOffset = (padding.value.toInt()..maxXOffset.value.toInt()).random().dp
+        previousOffsets.add(initialOffset)
+        return initialOffset
     }
+
+    var newOffset: Dp
+    var attempts = 0
+
+    do {
+        newOffset = (padding.value.toInt()..maxXOffset.value.toInt()).random().dp
+        val lastOffset = previousOffsets.last()
+        val secondLastOffset =
+            if (previousOffsets.size > 1) previousOffsets[previousOffsets.size - 2] else null
+
+        val isIncreasing =
+            secondLastOffset != null && newOffset > lastOffset && lastOffset > secondLastOffset
+        val isDecreasing =
+            secondLastOffset != null && newOffset < lastOffset && lastOffset < secondLastOffset
+
+        attempts++
+
+    } while ((isIncreasing || isDecreasing) && attempts < 10)
+
+    previousOffsets.add(newOffset)
+    return newOffset
 }
