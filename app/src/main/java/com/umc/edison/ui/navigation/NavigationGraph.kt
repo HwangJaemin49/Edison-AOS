@@ -7,8 +7,6 @@ import androidx.navigation.compose.composable
 import com.umc.edison.ui.artboard.ArtBoardScreen
 import com.umc.edison.ui.my_edison.BubbleInputScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
-import com.umc.edison.ui.my_edison.PopupWindowDialog
-import com.umc.edison.ui.my_edison.RichTextEditorWithBoldToggle
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 

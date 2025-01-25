@@ -29,7 +29,6 @@ import com.umc.edison.ui.theme.Gray800
 @Composable
 fun CameraPopup(CameraExpanded : Boolean, onGalleryOpen: () -> Unit, onCameraOpen:()->Unit, onDismiss: () -> Unit){
 
-
     Box {
         val popupWidth = 150.dp
         val popupHeight = 136.dp

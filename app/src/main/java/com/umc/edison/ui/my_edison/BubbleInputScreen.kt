@@ -1,6 +1,5 @@
 package com.umc.edison.ui.my_edison
 
-import androidx.compose.material3.DropdownMenu
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -8,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,148 +23,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil3.compose.rememberAsyncImagePainter
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.ui.platform.LocalContext
-import coil3.request.ImageRequest
-import coil3.size.Size
 import android.net.Uri
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import androidx.core.content.FileProvider
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import com.umc.edison.R
-import com.umc.edison.domain.model.ContentType
-import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.my_edison.BubbleInputViewModel
 import com.umc.edison.ui.components.BubbleDoor
-import com.umc.edison.ui.theme.Gray800
 import java.io.File
-
-@Composable
-fun PopupWindowDialog() {
-    val openDialog = remember { mutableStateOf(false) }
-
-    Column(
-
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-
-
-        Button(
-            onClick = {
-                openDialog.value = !openDialog.value
-            }
-        ) {
-            Text(text = "Show Popup")
-        }
-
-
-    }
-}
-
-@Composable
-fun RichTextEditorWithBoldToggle() {
-    // RichTextEditor의 상태를 관리
-    val richTextState = rememberRichTextState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Bold 토글 버튼
-        Button(
-            onClick = {
-                richTextState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Text("Bold")
-        }
-
-        Button(
-            onClick = {
-                richTextState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                // Bold 스타일 토글
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Text("Bold")
-        }
-
-        Button(
-            onClick = {
-                richTextState.toggleOrderedList()
-                // Bold 스타일 토글
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Text("Bold")
-        }
-
-
-        // RichTextEditor
-        BasicRichTextEditor(
-            state = richTextState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-                .padding(8.dp)
-        )
-    }
-}
-
 
 @Composable
 fun BubbleInputScreen(
@@ -181,7 +47,11 @@ fun BubbleInputScreen(
     var cameraOpen by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var isBoldActive by remember { mutableStateOf(false) }
-    val richTextState = rememberRichTextState()
+    var isItalicActive by remember { mutableStateOf(false) }
+    var isUnderlineActive by remember { mutableStateOf(false) }
+    var isHighlightActive by remember { mutableStateOf(false) }
+    var isListActive by remember { mutableStateOf(false) }
+    var isOrderedListActive by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
 
@@ -190,7 +60,7 @@ fun BubbleInputScreen(
     ) { success ->
         if (success) {
             selectedImageUri?.let { uri ->
-                viewModel.addContentBlock(uri.toString()) // ViewModel에 URI 전달
+                viewModel.addContentBlock(uri.toString())
             }
         }
     }
@@ -261,7 +131,12 @@ fun BubbleInputScreen(
             onBubbleChange = { updatedBubble ->
                 viewModel.updateBubble(updatedBubble)
             },
-            richTextState = richTextState,
+            isBoldActive = isBoldActive,
+            isItalicActive=isItalicActive,
+            isUnderlineActive=isUnderlineActive,
+            isHighlightActive=isHighlightActive,
+            isListActive=isListActive,
+            isOrderedListActive=isOrderedListActive,
             bottomPadding = 56.dp
         )
         Row(
@@ -368,7 +243,7 @@ fun BubbleInputScreen(
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = 23.dp)
-                    .clickable { richTextState.toggleSpanStyle(SpanStyle(fontWeight = FontWeight.Bold)) }
+                    . clickable { isBoldActive = !isBoldActive }
             )
 
             Image(
@@ -377,7 +252,7 @@ fun BubbleInputScreen(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { listExpanded = true }
+                    .clickable {  isItalicActive=!isItalicActive}
             )
 
 
@@ -388,7 +263,7 @@ fun BubbleInputScreen(
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(24.dp)
-                        .clickable { cameraExpanded = true }
+                        .clickable { isUnderlineActive=!isUnderlineActive}
 
                 )
             }
@@ -400,9 +275,7 @@ fun BubbleInputScreen(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable {
-
-                    }
+                    .clickable { isHighlightActive=!isHighlightActive}
             )
 
             Image(
@@ -420,48 +293,48 @@ fun BubbleInputScreen(
         if (listExpanded) Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Blue)
+                .background(Color.White)
                 .imePadding()
                 .padding(vertical = 13.dp, horizontal = 16.dp)
                 .align(Alignment.BottomCenter),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_text_tool_off),
-                contentDescription = "Text Tool",
+                painter = painterResource(id = R.drawable.ic_list_add),
+                contentDescription = "list add",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = 23.dp)
-                    .clickable { textExpanded = true }
+                    .clickable { isListActive=!isListActive}
             )
 
             Image(
-                painter = painterResource(id = R.drawable.ic_list),
-                contentDescription = "List",
+                painter = painterResource(id = R.drawable.ic_list_num),
+                contentDescription = "List num",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { listExpanded = true }
+                    .clickable { isOrderedListActive=!isOrderedListActive}
             )
 
 
             Box() {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_camera),
-                    contentDescription = "Camera",
+                    painter = painterResource(id = R.drawable.ic_empty),
+                    contentDescription = "",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(24.dp)
-                        .clickable { cameraExpanded = true }
+                        .clickable { }
 
                 )
             }
 
 
             Image(
-                painter = painterResource(id = R.drawable.ic_link),
-                contentDescription = "Link",
+                painter = painterResource(id = R.drawable.ic_empty),
+                contentDescription = "",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
@@ -471,8 +344,8 @@ fun BubbleInputScreen(
             )
 
             Image(
-                painter = painterResource(id = R.drawable.ic_tag),
-                contentDescription = "List",
+                painter = painterResource(id = R.drawable.ic_close),
+                contentDescription = "close",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)

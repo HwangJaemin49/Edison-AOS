@@ -49,8 +49,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -147,32 +149,32 @@ fun BubbleInput(
 /**
  * 버블 내용 확인 가능한 컴포저블
  */
-@Composable
-fun Bubble(
-    bubble: BubbleModel,
-    onClick: () -> Unit,
-    richTextState: RichTextState// 편집 모드로 들어가는 클릭 리스너
-) {
-    val bubbleSize = calculateBubbleSize(bubble)
-
-    if (checkBubbleContainImage(bubble) && bubbleSize == BubbleType.BubbleMain) {
-        BubbleDoor(
-            bubble = bubble,
-            isEditable = false,
-            onClick = onClick,
-            onBubbleChange = {},
-            bottomPadding = 0.dp,
-            richTextState = richTextState
-        )
-    } else {
-        TextContentBubble(
-            bubble = bubble,
-            colors = bubble.labels.map { it.color },
-            onClick = onClick,
-            bubbleSize = BubbleType.BubbleMain
-        )
-    }
-}
+//@Composable
+//fun Bubble(
+//    bubble: BubbleModel,
+//    onClick: () -> Unit,
+//    richTextState: RichTextState// 편집 모드로 들어가는 클릭 리스너
+//) {
+//    val bubbleSize = calculateBubbleSize(bubble)
+//
+//    if (checkBubbleContainImage(bubble) && bubbleSize == BubbleType.BubbleMain) {
+//        BubbleDoor(
+//            bubble = bubble,
+//            isEditable = false,
+//            onClick = onClick,
+//            onBubbleChange = {},
+//            bottomPadding = 0.dp,
+//            richTextState = richTextState
+//        )
+//    } else {
+//        TextContentBubble(
+//            bubble = bubble,
+//            colors = bubble.labels.map { it.color },
+//            onClick = onClick,
+//            bubbleSize = BubbleType.BubbleMain
+//        )
+//    }
+//}
 
 /**
  * 버블 보관함 화면에서 사용되는 버블 미리보기 컴포저블
@@ -206,7 +208,12 @@ fun BubbleDoor(
     isEditable: Boolean = false,
     onClick: () -> Unit,
     onBubbleChange: (BubbleModel) -> Unit,
-    richTextState: RichTextState,
+    isBoldActive: Boolean,
+    isItalicActive:Boolean,
+    isUnderlineActive:Boolean,
+    isHighlightActive:Boolean,
+    isListActive:Boolean,
+    isOrderedListActive:Boolean,
     bottomPadding : Dp// 변경된 상태를 외부로 전달
 ) {
     val colors = bubble.labels.map { it.color }
@@ -266,7 +273,12 @@ fun BubbleDoor(
                 bubble = bubble,
                 isEditable = isEditable,
                 onBubbleChange = onBubbleChange, // 상태 변경을 외부로 전달
-                richTextState = richTextState
+                isBoldActive = isBoldActive,
+                isItalicActive=isItalicActive,
+                isUnderlineActive=isUnderlineActive,
+                isHighlightActive=isHighlightActive,
+                isListActive=isListActive,
+                isOrderedListActive=isOrderedListActive,
             )
         }
     }
@@ -281,7 +293,12 @@ private fun BubbleContent(
     bubble: BubbleModel,
     isEditable: Boolean = false,
     onBubbleChange: (BubbleModel) -> Unit,
-    richTextState: RichTextState
+    isBoldActive: Boolean,
+    isItalicActive:Boolean,
+    isUnderlineActive:Boolean,
+    isHighlightActive:Boolean,
+    isListActive:Boolean,
+    isOrderedListActive:Boolean
 ) {
 
 
@@ -343,9 +360,43 @@ private fun BubbleContent(
                 ContentType.TEXT -> {
                     if (isEditable) {
 
+                        val richTextState = rememberRichTextState()
 
+                        if (isBoldActive) {
+                            richTextState.addSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        }else {
+                            richTextState.removeSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        }
 
-                        val richTextState = richTextState
+                        if (isItalicActive) {
+                            richTextState.addSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
+                        }else {
+                            richTextState.removeSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
+                        }
+
+                        if (isUnderlineActive) {
+                            richTextState.addSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+                        }else {
+                            richTextState.removeSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
+                        }
+
+                        if (isHighlightActive) {
+                            richTextState.addSpanStyle(SpanStyle(background=Color(0xFFFEFBFF)))
+                        }else {
+                            richTextState.removeSpanStyle(SpanStyle(background=Color(0xFFFEFBFF)))
+                        }
+
+                        if (isListActive) {
+                            richTextState.addUnorderedList()
+                        }else {
+                            richTextState.removeUnorderedList()
+                        }
+
+                        if (isOrderedListActive) {
+                            richTextState.addOrderedList()
+                        }else {
+                            richTextState.removeOrderedList()
+                        }
 
 
                         BasicRichTextEditor(
