@@ -17,11 +17,12 @@ data class LabelLocal(
     @ColumnInfo(name = "created_at") override var createdAt: Long? = null,
     @ColumnInfo(name = "updated_at") override var updatedAt: Long? = null,
     @ColumnInfo(name = "deleted_at") override var deletedAt: Long? = null,
-) : LocalMapper<LabelEntity>, BaseLocal {
+) : LocalMapper<LabelEntity>, BaseSyncLocal {
     override fun toData(): LabelEntity = LabelEntity(
         id = id,
         name = name,
         color = Color(color),
+        bubbles = emptyList(),
     )
 }
 
@@ -29,6 +30,4 @@ fun LabelEntity.toLocal(): LabelLocal = LabelLocal(
     id = id,
     name = name,
     color = color.toArgb(),
-    isDeleted = false,
-    isSynced = false,
 )

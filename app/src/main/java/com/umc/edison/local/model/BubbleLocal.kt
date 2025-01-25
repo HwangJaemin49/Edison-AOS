@@ -16,7 +16,7 @@ data class BubbleLocal(
     @ColumnInfo(name = "created_at") override var createdAt: Long? = null,
     @ColumnInfo(name = "updated_at") override var updatedAt: Long? = null,
     @ColumnInfo(name = "deleted_at") override var deletedAt: Long? = null,
-) : LocalMapper<BubbleEntity>, BaseLocal {
+) : LocalMapper<BubbleEntity>, BaseSyncLocal {
 
     override fun toData(): BubbleEntity = BubbleEntity(
         id = id,

@@ -1,7 +1,7 @@
 package com.umc.edison.domain.model
 
 data class Bubble(
-    val id: Int,
+    val id: Int = 0,
     val title: String? = null,
     val contentBlocks: List<BubbleContentBlock> = listOf(),
     val mainImage: String? = null,

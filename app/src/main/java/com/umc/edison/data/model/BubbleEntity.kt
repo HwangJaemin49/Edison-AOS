@@ -17,8 +17,8 @@ data class BubbleEntity(
         // Image 타입의 경우 앞에 %<IMAGE>%와 뒤에 %</IMAGE>%가 붙어있음
         val contentBlocks = content?.split("%<")?.mapIndexed { index, s ->
             val type = when {
-                s.startsWith("TEXT>%") -> ContentType.TEXT
-                s.startsWith("IMAGE>%") -> ContentType.IMAGE
+                s.startsWith("${ContentType.TEXT}>%") -> ContentType.TEXT
+                s.startsWith("${ContentType.IMAGE}>%") -> ContentType.IMAGE
                 else -> return@mapIndexed null
             }
             val content = s.substringAfter(">").substringBefore("%</")
