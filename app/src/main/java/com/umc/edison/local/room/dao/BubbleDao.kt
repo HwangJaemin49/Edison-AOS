@@ -18,4 +18,7 @@ interface BubbleDao : BaseDao<BubbleLocal> {
 
     @Query("UPDATE ${RoomConstant.Table.BUBBLE} SET is_synced = 1 WHERE id = :bubbleId")
     fun markAsSynced(bubbleId: Int)
+
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE label_id = :labelId)")
+    fun getBubblesByLabel(labelId: Int): List<BubbleLocal>
 }

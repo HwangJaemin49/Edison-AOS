@@ -32,4 +32,8 @@ class LabelRepositoryImpl @Inject constructor(
         dataAction = { labelLocalDataSource.softDeleteLabel(label.toEntity()) },
     )
 
+    override fun getLabelDetail(labelId: String): Flow<DataResource<Label>> {
+        TODO("Not yet implemented")
+    }
+
 }

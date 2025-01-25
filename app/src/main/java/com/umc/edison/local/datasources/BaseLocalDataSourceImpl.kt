@@ -1,10 +1,10 @@
 package com.umc.edison.local.datasources
 
 import androidx.sqlite.db.SimpleSQLiteQuery
-import com.umc.edison.local.model.BaseLocal
+import com.umc.edison.local.model.BaseSyncLocal
 import com.umc.edison.local.room.dao.BaseDao
 
-open class BaseLocalDataSourceImpl<T : BaseLocal>(
+open class BaseLocalDataSourceImpl<T : BaseSyncLocal>(
     private val baseDao: BaseDao<T>
 ) {
     suspend fun insert(entity: T) {
@@ -25,12 +25,12 @@ open class BaseLocalDataSourceImpl<T : BaseLocal>(
     }
 
     suspend fun getUnsyncedDatas(tableName: String): List<T> {
-        val query = SimpleSQLiteQuery("SELECT * FROM $tableName WHERE isSynced = 0")
+        val query = SimpleSQLiteQuery("SELECT * FROM $tableName WHERE is_synced = 0")
         return baseDao.getUnsyncedDatas(query)
     }
 
     suspend fun markAsSynced(tableName: String, id: Int) {
-        val query = SimpleSQLiteQuery("UPDATE $tableName SET isSynced = 1 WHERE id = $id")
+        val query = SimpleSQLiteQuery("UPDATE $tableName SET is_synced = 1 WHERE id = $id")
         baseDao.markAsSynced(query)
     }
 }

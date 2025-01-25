@@ -32,7 +32,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.presentation.label.LabelEditMode
+import com.umc.edison.presentation.label.LabelListModel
 import com.umc.edison.ui.components.ColorPalette
 import com.umc.edison.ui.components.MiddleCancelButton
 import com.umc.edison.ui.components.MiddleConfirmButton
@@ -47,10 +48,10 @@ import com.umc.edison.ui.theme.Gray300
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelModalContent(
-    editMode: EditMode,
+    editMode: LabelEditMode,
     onDismiss: () -> Unit,
-    onConfirm: (LabelModel) -> Unit,
-    label: LabelModel,
+    onConfirm: (LabelListModel) -> Unit,
+    label: LabelListModel,
 ) {
     var selectedColor by remember { mutableStateOf(label.color) }
     val colors = ColorPickerList
@@ -132,7 +133,7 @@ fun LabelModalContent(
             )
 
             MiddleConfirmButton(
-                text = if (editMode == EditMode.ADD) "생성" else "확인",
+                text = if (editMode == LabelEditMode.ADD) "생성" else "확인",
                 onClick = {
                     if (text.length > 20) {
                         errorMessage = "라벨 이름은 20자 이하로 입력해주세요"
@@ -156,10 +157,10 @@ private fun validateLabelInfo(text: String, selectedColor: Color): Boolean {
 fun PreviewModalContent() {
     EdisonTheme {
         LabelModalContent(
-            editMode = EditMode.ADD,
+            editMode = LabelEditMode.ADD,
             onDismiss = { },
             onConfirm = { },
-            label = LabelModel(name = "라벨 이름", color = Yellow100),
+            label = LabelListModel(id = 0, name = "라벨 이름", color = Yellow100),
         )
     }
 }

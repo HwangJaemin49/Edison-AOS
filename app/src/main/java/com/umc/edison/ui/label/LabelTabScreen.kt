@@ -34,7 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
-import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.presentation.label.LabelEditMode
+import com.umc.edison.presentation.label.LabelListModel
 import com.umc.edison.presentation.label.LabelListViewModel
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetPopUp
@@ -46,10 +47,6 @@ import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
 
-enum class EditMode {
-    NONE, ADD, EDIT, DELETE
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelTabScreen(
@@ -59,7 +56,7 @@ fun LabelTabScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val uiState by viewModel.uiState.collectAsState()
-    val labelState = remember { mutableStateOf(LabelModel(name = "", color = Red100)) }
+    val labelState = remember { mutableStateOf(LabelListModel(id = 0, name = "", color = Red100)) }
 
     val draggedIndex = remember { mutableIntStateOf(-1) }
 
@@ -73,17 +70,17 @@ fun LabelTabScreen(
                 interactionSource = remember { MutableInteractionSource() }
             )
     ) { innerPadding ->
-        if (uiState.editMode == EditMode.ADD || uiState.editMode == EditMode.EDIT) {
+        if (uiState.labelEditMode == LabelEditMode.ADD || uiState.labelEditMode == LabelEditMode.EDIT) {
             BottomSheet(
                 onDismiss = {
-                    viewModel.updateEditMode(EditMode.NONE)
+                    viewModel.updateEditMode(LabelEditMode.NONE)
                 },
                 sheetState = sheetState,
             ) {
                 LabelModalContent(
-                    editMode = uiState.editMode,
+                    editMode = uiState.labelEditMode,
                     onDismiss = {
-                        viewModel.updateEditMode(EditMode.NONE)
+                        viewModel.updateEditMode(LabelEditMode.NONE)
                     },
                     onConfirm = { label ->
                         labelState.value = label
@@ -94,13 +91,13 @@ fun LabelTabScreen(
             }
         }
 
-        if (uiState.editMode == EditMode.DELETE) {
+        if (uiState.labelEditMode == LabelEditMode.DELETE) {
             BottomSheetPopUp(
                 title = "${labelState.value.name} 라벨을 삭제하시겠습니까?",
                 cancelText = "취소",
                 confirmText = "삭제",
                 onDismiss = {
-                    viewModel.updateEditMode(EditMode.NONE)
+                    viewModel.updateEditMode(LabelEditMode.NONE)
                 },
                 onConfirm = {
                     viewModel.deleteLabel(labelState.value)
@@ -118,8 +115,8 @@ fun LabelTabScreen(
         ) {
             AddLabelButton(
                 onClick = {
-                    labelState.value = LabelModel(name = "", color = Gray300)
-                    viewModel.updateEditMode(EditMode.ADD)
+                    labelState.value = LabelListModel(id = 0, name = "", color = Gray300)
+                    viewModel.updateEditMode(LabelEditMode.ADD)
                 }
             )
 
@@ -131,11 +128,11 @@ fun LabelTabScreen(
                 },
                 onEditClick = { index ->
                     labelState.value = uiState.labels[index]
-                    viewModel.updateEditMode(EditMode.EDIT)
+                    viewModel.updateEditMode(LabelEditMode.EDIT)
                 },
                 onDeleteClick = { index ->
                     labelState.value = uiState.labels[index]
-                    viewModel.updateEditMode(EditMode.DELETE)
+                    viewModel.updateEditMode(LabelEditMode.DELETE)
                 },
                 onDrag = { index ->
                     // 드래그된 아이템 인덱스 업데이트
@@ -151,7 +148,7 @@ fun LabelTabScreen(
 
 @Composable
 fun LabelList(
-    labels: List<LabelModel>,
+    labels: List<LabelListModel>,
     draggedIndex: Int,
     onLabelClick: (Int) -> Unit,
     onEditClick: (Int) -> Unit,
@@ -166,7 +163,7 @@ fun LabelList(
                 labelText = label.name,
                 count = label.bubbleCnt,
                 isDragged = index == draggedIndex,
-                onClick = { onLabelClick(label.id!!) },
+                onClick = { onLabelClick(label.id) },
                 onEditClick = { onEditClick(index) },
                 onDeleteClick = { onDeleteClick(index) },
                 onDrag = { onDrag(index) },

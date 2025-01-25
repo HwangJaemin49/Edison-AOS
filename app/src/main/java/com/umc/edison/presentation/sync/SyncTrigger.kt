@@ -22,6 +22,10 @@ class SyncTrigger(private val context: Context) {
         }
     }
 
+    fun triggerSync() {
+        scheduleSyncWork()
+    }
+
     private fun scheduleSyncWork() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.UNMETERED)

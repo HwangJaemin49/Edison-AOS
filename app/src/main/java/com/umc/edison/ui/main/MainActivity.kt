@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.umc.edison.presentation.sync.SyncTrigger
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.navigation.BottomNavigation
 import com.umc.edison.ui.navigation.NavigationGraph
@@ -26,13 +27,21 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var syncTrigger: SyncTrigger
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        syncTrigger = SyncTrigger(this)
         setContent {
             EdisonTheme {
                 MainScreen()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        syncTrigger.triggerSync()
     }
 }
 

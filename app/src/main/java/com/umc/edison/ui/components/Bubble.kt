@@ -58,7 +58,6 @@ import coil3.request.crossfade
 import coil3.size.Scale
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.theme.Aqua100
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
@@ -852,9 +851,9 @@ fun PreviewBubbleDoor() {
                     BubbleModel.BubbleContentBlock(ContentType.TEXT, "버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 ", 0),
                 ),
                 labels = listOf(
-                    LabelModel(0, "라벨1", Aqua100),
-                    LabelModel(1, "라벨2", Yellow100),
-                    LabelModel(2, "라벨3", Red100),
+                    BubbleModel.LabelModel(0, "라벨1", Aqua100),
+                    BubbleModel.LabelModel(1, "라벨2", Yellow100),
+                    BubbleModel.LabelModel(2, "라벨3", Red100),
                 ),
                 mainImage = null
             ),

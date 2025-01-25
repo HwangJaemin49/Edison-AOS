@@ -20,8 +20,8 @@ class SyncRepositoryImpl @Inject constructor(
 ) : SyncRepository {
     override suspend fun syncLabelData() {
         withContext(Dispatchers.IO) {
-            val unsyncedLocalLabels: List<LabelEntity> = labelLocalDataSource.getUnsyncedLabels()
-            unsyncedLocalLabels.forEach { label ->
+            val unSyncedLocalLabels: List<LabelEntity> = labelLocalDataSource.getUnSyncedLabels()
+            unSyncedLocalLabels.forEach { label ->
                 try {
                     labelRemoteDataSource.syncLabel(label)
                     labelLocalDataSource.markAsSynced(label)
@@ -34,9 +34,9 @@ class SyncRepositoryImpl @Inject constructor(
 
     override suspend fun syncBubbleData() {
         withContext(Dispatchers.IO) {
-            val unsyncedLocalBubbles: List<BubbleEntity> =
-                bubbleLocalDataSource.getUnsyncedBubbles()
-            unsyncedLocalBubbles.forEach { bubble ->
+            val unSyncedLocalBubbles: List<BubbleEntity> =
+                bubbleLocalDataSource.getUnSyncedBubbles()
+            unSyncedLocalBubbles.forEach { bubble ->
                 try {
                     bubbleRemoteDataSource.syncBubble(bubble)
                     bubbleLocalDataSource.markAsSynced(bubble)

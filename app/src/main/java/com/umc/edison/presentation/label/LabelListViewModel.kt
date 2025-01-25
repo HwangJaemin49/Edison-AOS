@@ -6,9 +6,6 @@ import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.UpdateLabelUseCase
 import com.umc.edison.presentation.base.BaseViewModel
-import com.umc.edison.presentation.model.LabelModel
-import com.umc.edison.presentation.model.toPresentation
-import com.umc.edison.ui.label.EditMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,7 +31,7 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                _uiState.update { it.copy(labels = labels.toPresentation()) }
+                _uiState.update { it.copy(labels = labels.toLabelListPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -48,16 +45,16 @@ class LabelListViewModel @Inject constructor(
         )
     }
 
-    fun updateEditMode(editMode: EditMode) {
-        _uiState.update { it.copy(editMode = editMode) }
+    fun updateEditMode(labelEditMode: LabelEditMode) {
+        _uiState.update { it.copy(labelEditMode = labelEditMode) }
     }
 
-    fun confirmLabelModal(label: LabelModel) {
-        if (uiState.value.editMode == EditMode.ADD) {
+    fun confirmLabelModal(label: LabelListModel) {
+        if (uiState.value.labelEditMode == LabelEditMode.ADD) {
             collectDataResource(
                 flow = addLabelUseCase(label.toDomain()),
                 onSuccess = {
-                    updateEditMode(EditMode.NONE)
+                    updateEditMode(LabelEditMode.NONE)
                 },
                 onError = { error ->
                     Log.e("addLabel", "onError: $error")
@@ -71,11 +68,11 @@ class LabelListViewModel @Inject constructor(
                     fetchLabels()
                 }
             )
-        } else if (uiState.value.editMode == EditMode.EDIT) {
+        } else if (uiState.value.labelEditMode == LabelEditMode.EDIT) {
             collectDataResource(
                 flow = updateLabelUseCase(label.toDomain()),
                 onSuccess = {
-                    updateEditMode(EditMode.NONE)
+                    updateEditMode(LabelEditMode.NONE)
                 },
                 onError = { error ->
                     _uiState.update { it.copy(error = error) }
@@ -90,11 +87,11 @@ class LabelListViewModel @Inject constructor(
         }
     }
 
-    fun deleteLabel(label: LabelModel) {
+    fun deleteLabel(label: LabelListModel) {
         collectDataResource(
             flow = deleteLabelUseCase(label.toDomain()),
             onSuccess = {
-                updateEditMode(EditMode.NONE)
+                updateEditMode(LabelEditMode.NONE)
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

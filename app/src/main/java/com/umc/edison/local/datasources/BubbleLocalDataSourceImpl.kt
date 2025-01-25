@@ -34,7 +34,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getUnsyncedBubbles(): List<BubbleEntity> {
+    override suspend fun getUnSyncedBubbles(): List<BubbleEntity> {
         return getUnsyncedDatas(tableName).toData()
     }
 

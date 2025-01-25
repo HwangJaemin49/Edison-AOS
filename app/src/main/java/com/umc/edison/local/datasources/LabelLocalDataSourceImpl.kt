@@ -22,7 +22,7 @@ class LabelLocalDataSourceImpl @Inject constructor(
         val labels = labelDao.getAllLabels().toData()
 
         labels.map { label ->
-            label.bubbleCnt = bubbleDao.getBubbleCntByLabelId(label.id)
+            label.bubbles = bubbleDao.getBubblesByLabel(label.id).map { it.toData() }
         }
 
         Log.d("LabelLocalDataSourceImplImpl", "getAllLabels: $labels")
@@ -56,7 +56,7 @@ class LabelLocalDataSourceImpl @Inject constructor(
         labelDao.delete(label.toLocal())
     }
 
-    override suspend fun getUnsyncedLabels(): List<LabelEntity> {
+    override suspend fun getUnSyncedLabels(): List<LabelEntity> {
         return getUnsyncedDatas(tableName).toData()
     }
 
