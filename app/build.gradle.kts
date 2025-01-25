@@ -88,6 +88,8 @@ dependencies {
     implementation(libs.compose.ui.viewbinding)
 
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
@@ -106,7 +108,9 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
-    implementation("io.coil-kt:coil-compose:2.2.2")
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc05")
+
+
 
     implementation(libs.androidx.work)
 

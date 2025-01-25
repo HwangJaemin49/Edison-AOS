@@ -1,38 +1,71 @@
 package com.umc.edison.ui.my_edison
 
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.umc.edison.R
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.components.BubbleStorageTopBar
-import com.umc.edison.ui.theme.EdisonTheme
 
 @Composable
 fun MyEdisonScreen(navController: NavHostController) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center // 중앙 정렬
-        ) {
-            BubbleInput(
-                onClick = {  navController.navigate("bubble_input_screen") },
-                onSwipeUp = { navController.navigate("bubble_input_screen") }
-            )
-        }
+
 
         BubbleStorageTopBar(
             onProfileClicked = { /* */ },
             onCompassClicked = { /* */ }
         )
+
+
+
+        Spacer(modifier = Modifier.weight(0.6f))
+
+
+        Image(
+            painter = painterResource(id = R.drawable.ic_up_slide),
+            contentDescription = "up slide",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .width(24.dp)
+                .height(44.dp)
+                .clickable { }
+        )
+
+        Spacer(modifier = Modifier.weight(0.4f))
+
+
+
+        BubbleInput(
+            onClick = { navController.navigate("bubble_input_screen") },
+            onSwipeUp = { navController.navigate("bubble_input_screen") },
+
+
+            )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+
     }
 }

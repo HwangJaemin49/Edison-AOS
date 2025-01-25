@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +24,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +47,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,7 +59,10 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import coil3.size.Scale
+import coil3.size.Size
+import com.mohamedrejeb.richeditor.model.RichTextState
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
@@ -80,6 +87,7 @@ import kotlin.math.sin
 fun BubbleInput(
     onClick: () -> Unit,
     onSwipeUp: () -> Unit,
+
 ) {
     val bubbleSize = BubbleType.BubbleMain
     val canvasSize = bubbleSize.size
@@ -142,7 +150,8 @@ fun BubbleInput(
 @Composable
 fun Bubble(
     bubble: BubbleModel,
-    onClick: () -> Unit, // 편집 모드로 들어가는 클릭 리스너
+    onClick: () -> Unit,
+    richTextState: RichTextState// 편집 모드로 들어가는 클릭 리스너
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
@@ -151,6 +160,9 @@ fun Bubble(
             bubble = bubble,
             isEditable = false,
             onClick = onClick,
+            onBubbleChange = {},
+            bottomPadding = 0.dp,
+            richTextState = richTextState
         )
     } else {
         TextContentBubble(
@@ -193,6 +205,9 @@ fun BubbleDoor(
     bubble: BubbleModel,
     isEditable: Boolean = false,
     onClick: () -> Unit,
+    onBubbleChange: (BubbleModel) -> Unit,
+    richTextState: RichTextState,
+    bottomPadding : Dp// 변경된 상태를 외부로 전달
 ) {
     val colors = bubble.labels.map { it.color }
     val outerColors = when (colors.size) {
@@ -208,6 +223,7 @@ fun BubbleDoor(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .padding(bottom = bottomPadding)
             .clickable(
                 indication = null, // Ripple 효과 제거
                 interactionSource = interactionSource
@@ -246,18 +262,28 @@ fun BubbleDoor(
                 .padding(start = 23.dp, top = 260.dp, end = 23.dp, bottom = 20.dp),
             contentAlignment = Alignment.TopStart
         ) {
-            BubbleContent(bubble = bubble, isEditable = isEditable)
+            BubbleContent(
+                bubble = bubble,
+                isEditable = isEditable,
+                onBubbleChange = onBubbleChange, // 상태 변경을 외부로 전달
+                richTextState = richTextState
+            )
         }
     }
 }
+
+
+
+
 
 @Composable
 private fun BubbleContent(
     bubble: BubbleModel,
     isEditable: Boolean = false,
+    onBubbleChange: (BubbleModel) -> Unit,
+    richTextState: RichTextState
 ) {
-    var titleState by remember { mutableStateOf(bubble.title ?: "") }
-    var contentBlocksState by remember { mutableStateOf(bubble.contentBlocks) }
+
 
     LazyColumn(
         horizontalAlignment = Alignment.Start,
@@ -268,8 +294,12 @@ private fun BubbleContent(
         item {
             if (isEditable) {
                 BasicTextField(
-                    value = titleState,
-                    onValueChange = { titleState = it },
+                    value = bubble.title ?: "",
+                    onValueChange = { newTitle ->
+                        onBubbleChange(
+                            bubble.copy(title = newTitle) // 제목 변경
+                        )
+                    },
                     textStyle = MaterialTheme.typography.displayMedium.copy(color = Gray800),
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -278,7 +308,7 @@ private fun BubbleContent(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.CenterStart
                         ) {
-                            if (titleState.isEmpty()) {
+                            if (bubble.title.isNullOrEmpty()) {
                                 Text(
                                     text = "제목",
                                     style = MaterialTheme.typography.displayMedium.copy(color = Gray500),
@@ -292,7 +322,7 @@ private fun BubbleContent(
                 )
             } else {
                 Text(
-                    text = titleState,
+                    text = bubble.title ?: "",
                     style = MaterialTheme.typography.displayMedium,
                     color = Gray800,
                     textAlign = TextAlign.Start
@@ -302,24 +332,25 @@ private fun BubbleContent(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
+
+
         // Content Blocks
         itemsIndexed(
-            items = contentBlocksState,
+            items = bubble.contentBlocks,
             key = { _, contentBlock -> contentBlock.position }
         ) { index, contentBlock ->
             when (contentBlock.type) {
                 ContentType.TEXT -> {
                     if (isEditable) {
-                        BasicTextField(
-                            value = contentBlock.content,
-                            onValueChange = { newText ->
-                                val updatedBlocks = contentBlocksState.toMutableList()
-                                updatedBlocks[index] = contentBlock.copy(content = newText)
-                                contentBlocksState = updatedBlocks
-                            },
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                                color = Gray800
-                            ),
+
+
+
+                        val richTextState = richTextState
+
+
+                        BasicRichTextEditor(
+                            state = richTextState,
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
                             modifier = Modifier
                                 .fillMaxWidth(),
                             decorationBox = { innerTextField ->
@@ -327,7 +358,7 @@ private fun BubbleContent(
                                     modifier = Modifier.fillMaxWidth(),
                                     contentAlignment = Alignment.CenterStart
                                 ) {
-                                    if (contentBlock.content.isEmpty() && contentBlocksState.size == 1) {
+                                    if (richTextState.toHtml() == "<br>" && bubble.contentBlocks.size == 1) {
                                         Text(
                                             text = "내용을 입력해주세요.",
                                             style = MaterialTheme.typography.bodyMedium.copy(color = Gray500),
@@ -339,6 +370,8 @@ private fun BubbleContent(
                                 }
                             }
                         )
+
+
                     } else {
                         Text(
                             text = contentBlock.content,
@@ -350,23 +383,37 @@ private fun BubbleContent(
                 }
 
                 ContentType.IMAGE -> {
+                    var aspectRatio by remember { mutableStateOf(1f) }
                     val painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(contentBlock.content)
                             .crossfade(true)
-                            .scale(Scale.FILL)
-                            .build()
+                            .size(Size.ORIGINAL)
+                            .build(),
+                        onSuccess = { result ->
+                            val width = result.painter.intrinsicSize.width
+                            val height = result.painter.intrinsicSize.height
+                            if (width > 0 && height > 0) {
+                                aspectRatio = width / height
+                            }
+                        }
                     )
 
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.FillWidth
-                    )
+                            .aspectRatio(aspectRatio)
+                    ) {
+
+
+                        Image(
+                            painter = painter,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                                               .clip(RoundedCornerShape(8.dp)),
+                        )
+                    }
                 }
             }
         }
@@ -839,27 +886,30 @@ object BubbleType {
         val textBoxSize: Pair<Int, Int>,
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewBubbleDoor() {
-    EdisonTheme {
-        BubbleDoor(
-            bubble = BubbleModel(
-                id = 0,
-                title = "버블 제목",
-                contentBlocks = listOf(
-                    BubbleModel.BubbleContentBlock(ContentType.TEXT, "버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 ", 0),
-                ),
-                labels = listOf(
-                    LabelModel(0, "라벨1", Aqua100),
-                    LabelModel(1, "라벨2", Yellow100),
-                    LabelModel(2, "라벨3", Red100),
-                ),
-                mainImage = null
-            ),
-            isEditable = true,
-            onClick = { }
-        )
-    }
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewBubbleDoor() {
+//    EdisonTheme {
+//        BubbleDoor(
+//            bubble = BubbleModel(
+//                id = 0,
+//                title = "버블 제목",
+//                contentBlocks = listOf(
+//                    BubbleModel.BubbleContentBlock(ContentType.TEXT, "버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 ", 0),
+//                ),
+//                labels = listOf(
+//                    LabelModel(0, "라벨1", Aqua100),
+//                    LabelModel(1, "라벨2", Yellow100),
+//                    LabelModel(2, "라벨3", Red100),
+//                ),
+//                mainImage = null
+//            ),
+//            isEditable = true,
+//            onClick = { },
+//            onBubbleChange= { },
+//            bottomPadding = 0.dp,
+//            isBoldActive = false
+//        )
+//    }
+//}
