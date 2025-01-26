@@ -5,6 +5,7 @@ import com.umc.edison.data.toDomain
 import com.umc.edison.domain.model.Bubble
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.model.Label
+import java.util.Date
 
 data class BubbleModel(
     val id: Int = 0,
@@ -12,7 +13,7 @@ data class BubbleModel(
     val contentBlocks: List<BubbleContentBlock> = listOf(),
     val mainImage: String? = null,
     val labels: List<LabelModel> = listOf(),
-    val date: Long = System.currentTimeMillis()
+    val date: Date = Date()
 ) {
     fun toDomain(): Bubble = Bubble(id, title, contentBlocks.map { it.toDomain() }, mainImage, labels.map { it.toDomain() }, date)
 

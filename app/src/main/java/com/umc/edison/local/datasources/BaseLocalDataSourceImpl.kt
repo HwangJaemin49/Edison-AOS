@@ -3,30 +3,31 @@ package com.umc.edison.local.datasources
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.umc.edison.local.model.BaseSyncLocal
 import com.umc.edison.local.room.dao.BaseDao
+import java.util.Date
 
 open class BaseLocalDataSourceImpl<T : BaseSyncLocal>(
     private val baseDao: BaseDao<T>
 ) {
     suspend fun insert(entity: T) {
-        entity.createdAt = System.currentTimeMillis()
-        entity.updatedAt = System.currentTimeMillis()
+        entity.createdAt = Date()
+        entity.updatedAt = Date()
         baseDao.insert(entity)
     }
 
     suspend fun update(entity: T) {
-        entity.updatedAt = System.currentTimeMillis()
+        entity.updatedAt = Date()
         baseDao.update(entity)
     }
 
     suspend fun softDelete(entity: T) {
-        entity.deletedAt = System.currentTimeMillis()
+        entity.deletedAt = Date()
         entity.isDeleted = true
         baseDao.update(entity)
     }
 
-    suspend fun getUnsyncedDatas(tableName: String): List<T> {
+    suspend fun getUnSyncedDatas(tableName: String): List<T> {
         val query = SimpleSQLiteQuery("SELECT * FROM $tableName WHERE is_synced = 0")
-        return baseDao.getUnsyncedDatas(query)
+        return baseDao.getUnSyncedDatas(query)
     }
 
     suspend fun markAsSynced(tableName: String, id: Int) {

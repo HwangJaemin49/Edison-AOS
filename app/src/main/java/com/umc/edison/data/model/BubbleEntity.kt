@@ -3,6 +3,7 @@ package com.umc.edison.data.model
 import com.umc.edison.data.DataMapper
 import com.umc.edison.domain.model.Bubble
 import com.umc.edison.domain.model.ContentType
+import java.util.Date
 
 data class BubbleEntity(
     val id: Int,
@@ -10,7 +11,7 @@ data class BubbleEntity(
     val content: String? = null,
     var mainImage: String? = null,
     var labels: List<LabelEntity>,
-    val date: Long,
+    val date: Date,
 ) : DataMapper<Bubble> {
     override fun toDomain(): Bubble {
         // Text 타입의 경우 앞에 %<TEXT>%와 뒤에 %</TEXT>%가 붙어있고

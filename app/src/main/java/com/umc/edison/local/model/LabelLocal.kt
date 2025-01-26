@@ -6,6 +6,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.umc.edison.data.model.LabelEntity
+import java.util.Date
 
 @Entity
 data class LabelLocal(
@@ -14,9 +15,9 @@ data class LabelLocal(
     val color: Int,
     @ColumnInfo(name = "is_synced") override var isSynced: Boolean = false,
     @ColumnInfo(name = "is_deleted") override var isDeleted: Boolean = false,
-    @ColumnInfo(name = "created_at") override var createdAt: Long? = null,
-    @ColumnInfo(name = "updated_at") override var updatedAt: Long? = null,
-    @ColumnInfo(name = "deleted_at") override var deletedAt: Long? = null,
+    @ColumnInfo(name = "created_at") override var createdAt: Date? = null,
+    @ColumnInfo(name = "updated_at") override var updatedAt: Date? = null,
+    @ColumnInfo(name = "deleted_at") override var deletedAt: Date? = null,
 ) : LocalMapper<LabelEntity>, BaseSyncLocal {
     override fun toData(): LabelEntity = LabelEntity(
         id = id,

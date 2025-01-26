@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.umc.edison.data.model.BubbleEntity
+import java.util.Date
 
 @Entity
 data class BubbleLocal(
@@ -13,9 +14,9 @@ data class BubbleLocal(
     @ColumnInfo(name = "main_image") val mainImage: String?,
     @ColumnInfo(name = "is_synced") override var isSynced: Boolean = false,
     @ColumnInfo(name = "is_deleted") override var isDeleted: Boolean = false,
-    @ColumnInfo(name = "created_at") override var createdAt: Long? = null,
-    @ColumnInfo(name = "updated_at") override var updatedAt: Long? = null,
-    @ColumnInfo(name = "deleted_at") override var deletedAt: Long? = null,
+    @ColumnInfo(name = "created_at") override var createdAt: Date? = null,
+    @ColumnInfo(name = "updated_at") override var updatedAt: Date? = null,
+    @ColumnInfo(name = "deleted_at") override var deletedAt: Date? = null,
 ) : LocalMapper<BubbleEntity>, BaseSyncLocal {
 
     override fun toData(): BubbleEntity = BubbleEntity(
@@ -24,6 +25,13 @@ data class BubbleLocal(
         content = content,
         mainImage = mainImage,
         labels = emptyList(),
-        date = updatedAt ?: System.currentTimeMillis()
+        date = updatedAt ?: Date()
     )
 }
+
+fun BubbleEntity.toLocal(): BubbleLocal = BubbleLocal(
+    id = id,
+    title = title,
+    content = content,
+    mainImage = mainImage,
+)

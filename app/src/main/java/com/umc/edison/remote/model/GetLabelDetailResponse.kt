@@ -41,7 +41,7 @@ data class GetBubbleResponse(
         content = content,
         mainImage = mainImageUrl,
         labels = labels.map { it.toData() },
-        date = parseIso8601ToMillis(updatedAt)
+        date = parseIso8601ToDate(updatedAt)
     )
 
     data class GetLabelResponse(
@@ -58,15 +58,14 @@ data class GetBubbleResponse(
     }
 
     companion object {
-        private fun parseIso8601ToMillis(isoDateTime: String): Long {
+        private fun parseIso8601ToDate(isoDateTime: String): Date {
             return try {
                 val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
                 simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-                val date: Date = simpleDateFormat.parse(isoDateTime)!!
-                date.time
+                simpleDateFormat.parse(isoDateTime)!!
             } catch (e: Exception) {
                 e.printStackTrace()
-                0L
+                Date()
             }
         }
     }
