@@ -24,7 +24,3 @@ data class LabelListState(
         )
     }
 }
-
-enum class LabelEditMode {
-    NONE, ADD, EDIT, DELETE
-}

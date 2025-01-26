@@ -24,6 +24,7 @@ import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.components.AddLabelButton
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetPopUp
+import com.umc.edison.ui.components.LabelModalContent
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.White000
 

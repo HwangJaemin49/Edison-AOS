@@ -1,4 +1,4 @@
-package com.umc.edison.ui.label
+package com.umc.edison.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.LabelModel
-import com.umc.edison.ui.components.ColorPalette
-import com.umc.edison.ui.components.MiddleCancelButton
-import com.umc.edison.ui.components.MiddleConfirmButton
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
