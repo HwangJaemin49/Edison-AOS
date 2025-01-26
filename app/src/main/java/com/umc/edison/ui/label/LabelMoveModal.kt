@@ -37,7 +37,9 @@ fun LabelMoveModalContent(
                 label = label,
                 selected = selectedLabel == label,
                 multiSelectMode = false,
-                updateSelectedLabel = { selectedLabel = it }
+                onClick = {
+                    selectedLabel = label
+                },
             )
         }
 

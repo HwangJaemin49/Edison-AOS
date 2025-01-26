@@ -153,13 +153,13 @@ fun LabelListItemForSelect(
     label: LabelModel,
     selected: Boolean,
     multiSelectMode: Boolean,
-    updateSelectedLabel: (LabelModel) -> Unit,
+    onClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
-            .clickable { updateSelectedLabel(label) },
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -191,12 +191,12 @@ fun LabelListItemForSelect(
                 if (multiSelectMode) {
                     CheckBoxButton(
                         selected = selected,
-                        onClick = { updateSelectedLabel(label) }
+                        onClick = { onClick() }
                     )
                 } else {
                     RadioButton(
                         selected = selected,
-                        onClick = { updateSelectedLabel(label) }
+                        onClick = { onClick() }
                     )
                 }
             }
@@ -224,7 +224,7 @@ fun LabelListItemForSelectPreview() {
             ),
             selected = false,
             multiSelectMode = false,
-            updateSelectedLabel = {}
+            onClick = {}
         )
 
 
@@ -237,7 +237,7 @@ fun LabelListItemForSelectPreview() {
             ),
             selected = true,
             multiSelectMode = false,
-            updateSelectedLabel = {}
+            onClick = {}
         )
 
     }
@@ -256,7 +256,7 @@ fun LabelListItemForSelectPreview2() {
             ),
             selected = false,
             multiSelectMode = true,
-            updateSelectedLabel = {}
+            onClick = {}
         )
 
         LabelListItemForSelect(
@@ -268,7 +268,7 @@ fun LabelListItemForSelectPreview2() {
             ),
             selected = true,
             multiSelectMode = true,
-            updateSelectedLabel = {}
+            onClick = {}
         )
     }
 }
