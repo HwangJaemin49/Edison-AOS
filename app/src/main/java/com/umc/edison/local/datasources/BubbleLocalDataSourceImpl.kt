@@ -30,10 +30,10 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     private suspend fun convertLocalBubblesToBubbles(localBubbles: List<BubbleLocal>): List<BubbleEntity> {
-        val bubbles: List<BubbleEntity> = emptyList()
+        val bubbles: MutableList<BubbleEntity> = mutableListOf()
 
         localBubbles.map {
-            bubbles.plus(getBubble(it.id))
+            bubbles += getBubble(it.id)
         }
 
         return bubbles

@@ -6,6 +6,8 @@ import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.UpdateLabelUseCase
 import com.umc.edison.presentation.base.BaseViewModel
+import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +34,7 @@ class LabelListViewModel @Inject constructor(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
                 labels.sortedByDescending { it.bubbles.size }
-                _uiState.update { it.copy(labels = labels.toLabelListPresentation()) }
+                _uiState.update { it.copy(labels = labels.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -50,11 +52,11 @@ class LabelListViewModel @Inject constructor(
         _uiState.update { it.copy(labelEditMode = labelEditMode) }
     }
 
-    fun updateSelectedLabel(label: LabelListModel) {
+    fun updateSelectedLabel(label: LabelModel) {
         _uiState.update { it.copy(selectedLabel = label) }
     }
 
-    fun confirmLabelModal(label: LabelListModel) {
+    fun confirmLabelModal(label: LabelModel) {
         if (uiState.value.labelEditMode == LabelEditMode.ADD) {
             collectDataResource(
                 flow = addLabelUseCase(label.toDomain()),

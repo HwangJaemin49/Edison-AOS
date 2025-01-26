@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.presentation.label.LabelEditMode
-import com.umc.edison.presentation.label.LabelListModel
+import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.components.ColorPalette
 import com.umc.edison.ui.components.MiddleCancelButton
 import com.umc.edison.ui.components.MiddleConfirmButton
@@ -50,8 +50,8 @@ import com.umc.edison.ui.theme.Gray300
 fun LabelModalContent(
     editMode: LabelEditMode,
     onDismiss: () -> Unit,
-    onConfirm: (LabelListModel) -> Unit,
-    label: LabelListModel,
+    onConfirm: (LabelModel) -> Unit,
+    label: LabelModel,
 ) {
     var selectedColor by remember { mutableStateOf(label.color) }
     val colors = ColorPickerList
@@ -160,7 +160,7 @@ fun PreviewModalContent() {
             editMode = LabelEditMode.ADD,
             onDismiss = { },
             onConfirm = { },
-            label = LabelListModel(id = 0, name = "라벨 이름", color = Yellow100),
+            label = LabelModel(id = 0, name = "라벨 이름", color = Yellow100, bubbles = listOf()),
         )
     }
 }

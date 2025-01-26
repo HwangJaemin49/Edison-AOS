@@ -34,8 +34,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
 import com.umc.edison.presentation.label.LabelEditMode
-import com.umc.edison.presentation.label.LabelListModel
 import com.umc.edison.presentation.label.LabelListViewModel
+import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.navigation.NavRoute
@@ -143,7 +143,7 @@ fun LabelTabScreen(
 
 @Composable
 fun LabelList(
-    labels: List<LabelListModel>,
+    labels: List<LabelModel>,
     draggedIndex: Int,
     onLabelClick: (Int) -> Unit,
     onEditClick: (Int) -> Unit,
@@ -156,7 +156,7 @@ fun LabelList(
             LabelListItem(
                 labelColor = label.color,
                 labelText = label.name,
-                count = label.bubbleCnt,
+                count = label.bubbles.size,
                 isDragged = index == draggedIndex,
                 onClick = { onLabelClick(label.id) },
                 onEditClick = { onEditClick(index) },
