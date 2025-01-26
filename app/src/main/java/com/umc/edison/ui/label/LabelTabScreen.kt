@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +43,6 @@ import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +54,6 @@ fun LabelTabScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val uiState by viewModel.uiState.collectAsState()
-    val labelState = remember { mutableStateOf(LabelListModel(id = 0, name = "", color = Red100)) }
 
     val draggedIndex = remember { mutableIntStateOf(-1) }
 
@@ -83,24 +80,23 @@ fun LabelTabScreen(
                         viewModel.updateEditMode(LabelEditMode.NONE)
                     },
                     onConfirm = { label ->
-                        labelState.value = label
-                        viewModel.confirmLabelModal(labelState.value)
+                        viewModel.confirmLabelModal(label)
                     },
-                    label = labelState.value
+                    label = uiState.selectedLabel
                 )
             }
         }
 
         if (uiState.labelEditMode == LabelEditMode.DELETE) {
             BottomSheetPopUp(
-                title = "${labelState.value.name} 라벨을 삭제하시겠습니까?",
+                title = "${uiState.selectedLabel.name} 라벨을 삭제하시겠습니까?",
                 cancelText = "취소",
                 confirmText = "삭제",
                 onDismiss = {
                     viewModel.updateEditMode(LabelEditMode.NONE)
                 },
                 onConfirm = {
-                    viewModel.deleteLabel(labelState.value)
+                    viewModel.deleteSelectedLabel()
                 },
                 sheetState = sheetState,
             )
@@ -115,7 +111,6 @@ fun LabelTabScreen(
         ) {
             AddLabelButton(
                 onClick = {
-                    labelState.value = LabelListModel(id = 0, name = "", color = Gray300)
                     viewModel.updateEditMode(LabelEditMode.ADD)
                 }
             )
@@ -127,12 +122,12 @@ fun LabelTabScreen(
                     navHostController.navigate(NavRoute.LabelDetail.createRoute(labelId))
                 },
                 onEditClick = { index ->
-                    labelState.value = uiState.labels[index]
                     viewModel.updateEditMode(LabelEditMode.EDIT)
+                    viewModel.updateSelectedLabel(uiState.labels[index])
                 },
                 onDeleteClick = { index ->
-                    labelState.value = uiState.labels[index]
                     viewModel.updateEditMode(LabelEditMode.DELETE)
+                    viewModel.updateSelectedLabel(uiState.labels[index])
                 },
                 onDrag = { index ->
                     // 드래그된 아이템 인덱스 업데이트

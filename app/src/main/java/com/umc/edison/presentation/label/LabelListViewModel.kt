@@ -50,12 +50,17 @@ class LabelListViewModel @Inject constructor(
         _uiState.update { it.copy(labelEditMode = labelEditMode) }
     }
 
+    fun updateSelectedLabel(label: LabelListModel) {
+        _uiState.update { it.copy(selectedLabel = label) }
+    }
+
     fun confirmLabelModal(label: LabelListModel) {
         if (uiState.value.labelEditMode == LabelEditMode.ADD) {
             collectDataResource(
                 flow = addLabelUseCase(label.toDomain()),
                 onSuccess = {
                     updateEditMode(LabelEditMode.NONE)
+                    _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
                 onError = { error ->
                     Log.e("addLabel", "onError: $error")
@@ -74,6 +79,7 @@ class LabelListViewModel @Inject constructor(
                 flow = updateLabelUseCase(label.toDomain()),
                 onSuccess = {
                     updateEditMode(LabelEditMode.NONE)
+                    _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
                 onError = { error ->
                     _uiState.update { it.copy(error = error) }
@@ -88,11 +94,15 @@ class LabelListViewModel @Inject constructor(
         }
     }
 
-    fun deleteLabel(label: LabelListModel) {
+    fun deleteSelectedLabel() {
         collectDataResource(
-            flow = deleteLabelUseCase(label.toDomain()),
+            flow = deleteLabelUseCase(_uiState.value.selectedLabel.toDomain()),
             onSuccess = {
                 updateEditMode(LabelEditMode.NONE)
+                _uiState.update { it.copy(
+                    labels = it.labels.filter { label -> label.id != it.selectedLabel.id },
+                    selectedLabel = LabelListState.DEFAULT.selectedLabel
+                ) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

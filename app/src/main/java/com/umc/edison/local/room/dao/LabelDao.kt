@@ -8,7 +8,7 @@ import com.umc.edison.local.room.RoomConstant
 @Dao
 interface LabelDao : BaseDao<LabelLocal> {
 
-    @Query("SELECT * FROM ${RoomConstant.Table.LABEL}")
+    @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE is_deleted = 0")
     fun getAllLabels(): List<LabelLocal>
 
     @Query(
