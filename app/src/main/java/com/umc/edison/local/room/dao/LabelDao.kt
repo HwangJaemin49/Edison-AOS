@@ -15,7 +15,7 @@ interface LabelDao : BaseDao<LabelLocal> {
         "SELECT * FROM ${RoomConstant.Table.LABEL} " +
                 "Where id IN (" +
                     "SELECT label_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId" +
-                ")"
+                ") AND is_deleted = 0"
     )
     fun getAllLabelsByBubbleId(bubbleId: Int): List<LabelLocal>
 

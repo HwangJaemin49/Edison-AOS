@@ -3,6 +3,7 @@ package com.umc.edison.presentation.label
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
 import com.umc.edison.presentation.base.BaseViewModel
@@ -22,6 +23,7 @@ class LabelDetailViewModel @Inject constructor(
     private val getLabelDetailUseCase: GetLabelDetailUseCase,
     private val addBubblesUseCase: AddBubblesUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
+    private val deleteBubblesUseCase: DeleteBubblesUseCase,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(LabelDetailState.DEFAULT)
@@ -33,6 +35,8 @@ class LabelDetailViewModel @Inject constructor(
     }
 
     private fun fetchBubbles(id: Int) {
+        _uiState.update { LabelDetailState.DEFAULT }
+
         collectDataResource(
             flow = getLabelDetailUseCase(id),
             onSuccess = { label ->
@@ -53,10 +57,12 @@ class LabelDetailViewModel @Inject constructor(
 
     fun updateEditMode(bubbleEditMode: BubbleEditMode) {
         if (bubbleEditMode == BubbleEditMode.NONE) {
-            _uiState.update { it.copy(
-                bubbleEditMode = bubbleEditMode,
-                selectedBubbles = listOf()
-            ) }
+            _uiState.update {
+                it.copy(
+                    bubbleEditMode = bubbleEditMode,
+                    selectedBubbles = listOf()
+                )
+            }
         } else {
             _uiState.update { it.copy(bubbleEditMode = bubbleEditMode) }
         }
@@ -88,13 +94,15 @@ class LabelDetailViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { allLabels ->
-                _uiState.update {
-                    it.copy(
-                        movableLabels = allLabels.toPresentation().filter { label ->
-                            !it.selectedBubbles.any { bubble -> bubble.labels.contains(label) }
+                val movableLabels = allLabels.toPresentation().filter { label ->
+                    _uiState.value.selectedBubbles.any { bubble ->
+                        bubble.labels.any { bubbleLabel ->
+                            bubbleLabel.id != label.id
                         }
-                    )
+                    }
                 }
+
+                _uiState.update { it.copy(movableLabels = movableLabels) }
                 updateEditMode(BubbleEditMode.MOVE)
             },
             onError = { error ->
@@ -110,14 +118,21 @@ class LabelDetailViewModel @Inject constructor(
     }
 
     fun deleteSelectedBubbles() {
-//        _uiState.update {
-//            it.copy(
-//                label = it.label.copy(
-//                    bubbles = it.label.bubbles - it.selectedBubbles
-//                ),
-//                selectedBubbles = listOf()
-//            )
-//        }
+        collectDataResource(
+            flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
+            onSuccess = {
+                fetchBubbles(_uiState.value.label.id)
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
     }
 
     // 임시 더미 데이터 추가 함수
@@ -133,7 +148,11 @@ class LabelDetailViewModel @Inject constructor(
             BubbleModel(
                 id = 1,
                 contentBlocks = listOf(
-                    ContentBlockModel(content = "새우간장볶음 밥 앤나 명란젓", type = ContentType.TEXT, position = 0),
+                    ContentBlockModel(
+                        content = "새우간장볶음 밥 앤나 명란젓",
+                        type = ContentType.TEXT,
+                        position = 0
+                    ),
                 ),
                 mainImage = null,
                 labels = listOf(label)
@@ -141,7 +160,11 @@ class LabelDetailViewModel @Inject constructor(
             BubbleModel(
                 id = 2,
                 contentBlocks = listOf(
-                    ContentBlockModel(content = "오늘 따뜻함 찾으러 나갔음. 생각보다 쉽게 찾았음. 따뜻함 한 스푼 더해서 커피 마셨는데 커피가 너무 맛있었음", type = ContentType.TEXT, position = 0),
+                    ContentBlockModel(
+                        content = "오늘 따뜻함 찾으러 나갔음. 생각보다 쉽게 찾았음. 따뜻함 한 스푼 더해서 커피 마셨는데 커피가 너무 맛있었음",
+                        type = ContentType.TEXT,
+                        position = 0
+                    ),
                 ),
                 mainImage = null,
                 labels = listOf(label)
@@ -161,7 +184,11 @@ class LabelDetailViewModel @Inject constructor(
             BubbleModel(
                 id = 4,
                 contentBlocks = listOf(
-                    ContentBlockModel(content = "새우간장볶음 밥 앤나 명란젓", type = ContentType.TEXT, position = 0),
+                    ContentBlockModel(
+                        content = "새우간장볶음 밥 앤나 명란젓",
+                        type = ContentType.TEXT,
+                        position = 0
+                    ),
                 ),
                 mainImage = null,
                 labels = listOf(label)
@@ -169,7 +196,11 @@ class LabelDetailViewModel @Inject constructor(
             BubbleModel(
                 id = 5,
                 contentBlocks = listOf(
-                    ContentBlockModel(content = "오늘 따뜻함 찾으러 나갔음. 생각보다 쉽게 찾았음. 따뜻함 한 스푼 더해서 커피 마셨는데 커피가 너무 맛있었음", type = ContentType.TEXT, position = 0),
+                    ContentBlockModel(
+                        content = "오늘 따뜻함 찾으러 나갔음. 생각보다 쉽게 찾았음. 따뜻함 한 스푼 더해서 커피 마셨는데 커피가 너무 맛있었음",
+                        type = ContentType.TEXT,
+                        position = 0
+                    ),
                 ),
                 mainImage = null,
                 labels = listOf(label)

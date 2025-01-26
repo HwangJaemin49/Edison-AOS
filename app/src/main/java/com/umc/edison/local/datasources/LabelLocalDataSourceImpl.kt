@@ -7,6 +7,7 @@ import com.umc.edison.local.model.LabelLocal
 import com.umc.edison.local.model.toLocal
 import com.umc.edison.local.room.RoomConstant
 import com.umc.edison.local.room.dao.LabelDao
+import com.umc.edison.ui.theme.White000
 import javax.inject.Inject
 
 class LabelLocalDataSourceImpl @Inject constructor(
@@ -17,10 +18,23 @@ class LabelLocalDataSourceImpl @Inject constructor(
     private val tableName = RoomConstant.getTableNameByClass(LabelLocal::class.java)
 
     override suspend fun getAllLabels(): List<LabelEntity> {
-        val labels = labelDao.getAllLabels().map { it.toData() }
+        val labels = labelDao.getAllLabels().map { it.toData() }.toMutableList()
 
         labels.map { label ->
             label.bubbles = bubbleLocalDataSource.getBubblesByLabel(label.id)
+        }
+
+        val defaultLabel = LabelEntity(
+            id = 0,
+            name = "-",
+            color = White000,
+            bubbles = listOf()
+        )
+
+        defaultLabel.bubbles = bubbleLocalDataSource.getBubblesByLabel(0)
+
+        if (defaultLabel.bubbles.isNotEmpty()) {
+            labels += defaultLabel
         }
 
         return labels

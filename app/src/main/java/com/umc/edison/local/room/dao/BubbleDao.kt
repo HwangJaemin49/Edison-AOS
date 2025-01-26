@@ -7,7 +7,7 @@ import com.umc.edison.local.room.RoomConstant
 
 @Dao
 interface BubbleDao : BaseDao<BubbleLocal> {
-    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE}")
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_deleted = 0")
     fun getAllBubbles(): List<BubbleLocal>
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id = :bubbleId")
@@ -17,11 +17,14 @@ interface BubbleDao : BaseDao<BubbleLocal> {
     fun getBubbleCntByLabelId(labelId: Int): Int
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_synced = 0")
-    fun getUnsyncedBubbles(): List<BubbleLocal>
+    fun getUnSyncedBubbles(): List<BubbleLocal>
 
     @Query("UPDATE ${RoomConstant.Table.BUBBLE} SET is_synced = 1 WHERE id = :bubbleId")
     fun markAsSynced(bubbleId: Int)
 
-    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE label_id = :labelId)")
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE label_id = :labelId) AND is_deleted = 0")
     fun getBubblesByLabel(labelId: Int): List<BubbleLocal>
+
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id NOT IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL}) AND is_deleted = 0")
+    fun getBubblesWithoutLabel(): List<BubbleLocal>
 }

@@ -18,4 +18,9 @@ interface BubbleLabelDao {
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     )
+
+    @Query(
+        "DELETE FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId"
+    )
+    fun deleteByBubbleId(bubbleId: Int)
 }

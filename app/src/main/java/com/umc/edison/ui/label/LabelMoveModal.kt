@@ -1,6 +1,7 @@
 package com.umc.edison.ui.label
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -28,26 +29,31 @@ fun LabelMoveModalContent(
             text = "라벨 선택",
             style = MaterialTheme.typography.displaySmall,
             color = Gray800,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 18.dp)
         )
 
         // 라벨 리스트
-        labels.forEach { label ->
-            LabelListItemForSelect(
-                label = label,
-                selected = selectedLabel == label,
-                multiSelectMode = false,
-                onClick = {
-                    selectedLabel = label
-                },
-            )
+        LazyColumn(
+            modifier = Modifier.height(450.dp)
+        ) {
+            items(labels.size) { index ->
+                val label = labels[index]
+                LabelListItemForSelect(
+                    label = label,
+                    selected = selectedLabel == label,
+                    multiSelectMode = false,
+                    onClick = {
+                        selectedLabel = label
+                    },
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // 하단 버튼들
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(top = 17.dp, end = 27.dp, bottom = 17.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             MiddleCancelButton(

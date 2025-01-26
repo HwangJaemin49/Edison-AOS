@@ -1,6 +1,5 @@
 package com.umc.edison.presentation.label
 
-import android.util.Log
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
@@ -29,12 +28,13 @@ class LabelListViewModel @Inject constructor(
         fetchLabels()
     }
 
-    private fun fetchLabels() {
+    fun fetchLabels() {
+        _uiState.update { LabelListState.DEFAULT }
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                labels.sortedByDescending { it.bubbles.size }
-                _uiState.update { it.copy(labels = labels.toPresentation()) }
+                val sortedLabels = labels.sortedByDescending { it.bubbles.size }
+                _uiState.update { it.copy(labels = sortedLabels.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -65,11 +65,9 @@ class LabelListViewModel @Inject constructor(
                     _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
                 onError = { error ->
-                    Log.e("addLabel", "onError: $error")
                     _uiState.update { it.copy(error = error) }
                 },
                 onLoading = {
-                    Log.d("addLabel", "onLoading")
                     _uiState.update { it.copy(isLoading = true) }
                 },
                 onComplete = {

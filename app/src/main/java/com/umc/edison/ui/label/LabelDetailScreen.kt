@@ -102,7 +102,7 @@ fun LabelDetailScreen(
 
                 Column(
                     modifier = Modifier.clickable(
-                        indication = null, // Ripple 효과 제거
+                        indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
                         if (uiState.bubbleEditMode == BubbleEditMode.EDIT) {
@@ -152,7 +152,7 @@ fun LabelDetailScreen(
                         LabelMoveModalContent(
                             labels = uiState.movableLabels,
                             onDismiss = {
-//                                viewModel.updateEditMode(BubbleEditMode.EDIT)
+                                viewModel.updateEditMode(BubbleEditMode.EDIT)
                             },
                             onConfirm = { label ->
 //                                viewModel.moveSelectedBubbles(label)
@@ -196,7 +196,7 @@ fun LabelTopAppBar(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().padding(top = 25.dp)
     ) {
         IconButton(onClick = { navHostController.popBackStack() }) {
             Icon(
@@ -204,8 +204,6 @@ fun LabelTopAppBar(
                 contentDescription = "Back"
             )
         }
-
-        Spacer(modifier = Modifier.width(4.dp))
 
         Box(
             modifier = Modifier

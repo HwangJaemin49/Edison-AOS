@@ -25,7 +25,11 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getBubblesByLabel(labelId: Int): List<BubbleEntity> {
-        val localBubbles: List<BubbleLocal> = bubbleDao.getBubblesByLabel(labelId)
+        val localBubbles: List<BubbleLocal> = if (labelId == 0) {
+            bubbleDao.getBubblesWithoutLabel()
+        } else {
+            bubbleDao.getBubblesByLabel(labelId)
+        }
         return convertLocalBubblesToBubbles(localBubbles)
     }
 
@@ -44,6 +48,18 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         bubble.labels = labelDao.getAllLabelsByBubbleId(bubbleId).map { it.toData() }
         return bubble
     }
+
+    override suspend fun deleteBubbles(bubbles: List<BubbleEntity>) {
+        bubbles.map { bubble ->
+            deleteBubble(bubble)
+        }
+    }
+
+    override suspend fun deleteBubble(bubble: BubbleEntity) {
+        softDelete(bubble.toLocal())
+        bubbleLabelDao.deleteByBubbleId(bubble.id)
+    }
+
 
     override suspend fun addBubbles(bubbles: List<BubbleEntity>) {
         bubbles.map { bubble ->

@@ -24,4 +24,8 @@ class BubbleRepositoryImpl @Inject constructor(
     override fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
         dataAction = { bubbleLocalDataSource.addBubbles(bubbles.toData()) }
     )
+
+    override fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.deleteBubbles(bubbles.toData()) }
+    )
 }
