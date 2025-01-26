@@ -1,18 +1,14 @@
 package com.umc.edison.ui.label
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.ui.components.LabelListItemForSelect
 import com.umc.edison.ui.components.MiddleCancelButton
 import com.umc.edison.ui.components.MiddleConfirmButton
-import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 
 @Composable
@@ -37,52 +33,12 @@ fun LabelMoveModalContent(
 
         // 라벨 리스트
         labels.forEach { label ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Max)
-                    .clickable { selectedLabel = label },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .size(60.dp)
-                        .background(color = label.color, shape = RoundedCornerShape(15.dp))
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .weight(1f),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = label.name,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = Gray800,
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        RadioButton(
-                            selected = selectedLabel == label,
-                            onClick = { selectedLabel = label }
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(Gray300)
-                    )
-                }
-            }
+            LabelListItemForSelect(
+                label = label,
+                selected = selectedLabel == label,
+                multiSelectMode = false,
+                updateSelectedLabel = { selectedLabel = it }
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))

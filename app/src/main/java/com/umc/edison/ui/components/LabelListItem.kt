@@ -1,4 +1,4 @@
-package com.umc.edison.ui.label
+package com.umc.edison.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,10 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.umc.edison.R
+import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray600
@@ -59,7 +57,6 @@ fun LabelListItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
-            .background(White000)
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -152,46 +149,126 @@ fun LabelListItem(
 }
 
 @Composable
-fun EditDeleteIcons(
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
+fun LabelListItemForSelect(
+    label: LabelModel,
+    selected: Boolean,
+    multiSelectMode: Boolean,
+    updateSelectedLabel: (LabelModel) -> Unit,
 ) {
     Row(
         modifier = Modifier
-            .fillMaxHeight()
-            .width(120.dp)
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .clickable { updateSelectedLabel(label) },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .fillMaxHeight()
-                .background(Gray800)
-                .weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_pencil),
-                contentDescription = "Edit Label",
-                modifier = Modifier
-                    .size(28.dp)
-                    .clickable(onClick = onEditClick),
-                tint = Gray100
-            )
-        }
-        Box(
+                .padding(vertical = 4.dp)
+                .size(60.dp)
+                .background(color = label.color, shape = RoundedCornerShape(15.dp))
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(
             modifier = Modifier
-                .fillMaxHeight()
-                .background(Color(0xFFFF0000))
-                .weight(1f),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_trash),
-                contentDescription = "Delete Label",
+            Row(
                 modifier = Modifier
-                    .size(28.dp)
-                    .clickable(onClick = onDeleteClick),
-                tint = Gray100
+                    .weight(1f)
+                    .padding(end = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = label.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Gray800,
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (multiSelectMode) {
+                    CheckBoxButton(
+                        selected = selected,
+                        onClick = { updateSelectedLabel(label) }
+                    )
+                } else {
+                    RadioButton(
+                        selected = selected,
+                        onClick = { updateSelectedLabel(label) }
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Gray300)
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LabelListItemForSelectPreview() {
+    Column {
+        LabelListItemForSelect(
+            label = LabelModel(
+                id = 1,
+                name = "Label 1",
+                color = Gray300,
+                bubbles = listOf()
+            ),
+            selected = false,
+            multiSelectMode = false,
+            updateSelectedLabel = {}
+        )
+
+
+        LabelListItemForSelect(
+            label = LabelModel(
+                id = 1,
+                name = "Label 1",
+                color = Gray300,
+                bubbles = listOf()
+            ),
+            selected = true,
+            multiSelectMode = false,
+            updateSelectedLabel = {}
+        )
+
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LabelListItemForSelectPreview2() {
+    Column {
+        LabelListItemForSelect(
+            label = LabelModel(
+                id = 1,
+                name = "Label 1",
+                color = Gray300,
+                bubbles = listOf()
+            ),
+            selected = false,
+            multiSelectMode = true,
+            updateSelectedLabel = {}
+        )
+
+        LabelListItemForSelect(
+            label = LabelModel(
+                id = 1,
+                name = "Label 1",
+                color = Gray300,
+                bubbles = listOf()
+            ),
+            selected = true,
+            multiSelectMode = true,
+            updateSelectedLabel = {}
+        )
     }
 }
