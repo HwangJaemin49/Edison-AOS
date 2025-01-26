@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
 import com.umc.edison.presentation.base.BaseViewModel
@@ -24,6 +25,7 @@ class LabelDetailViewModel @Inject constructor(
     private val addBubblesUseCase: AddBubblesUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     private val deleteBubblesUseCase: DeleteBubblesUseCase,
+    private val moveBubblesUseCase: MoveBubblesUseCase,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(LabelDetailState.DEFAULT)
@@ -40,7 +42,8 @@ class LabelDetailViewModel @Inject constructor(
         collectDataResource(
             flow = getLabelDetailUseCase(id),
             onSuccess = { label ->
-                _uiState.update { it.copy(label = label.toPresentation()) }
+                val shuffledBubbles = label.bubbles.shuffled().toPresentation()
+                _uiState.update { it.copy(label = label.toPresentation().copy(bubbles = shuffledBubbles)) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -103,7 +106,6 @@ class LabelDetailViewModel @Inject constructor(
                 }
 
                 _uiState.update { it.copy(movableLabels = movableLabels) }
-                updateEditMode(BubbleEditMode.MOVE)
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -117,10 +119,36 @@ class LabelDetailViewModel @Inject constructor(
         )
     }
 
-    fun deleteSelectedBubbles() {
+    fun moveSelectedBubbles(label: LabelModel, showBottomNav: (Boolean) -> Unit) {
+        collectDataResource(
+            flow = moveBubblesUseCase(
+                bubbles = _uiState.value.selectedBubbles.toSet().map { it.toDomain() },
+                moveFrom = _uiState.value.label.toDomain(),
+                moveTo = label.toDomain()
+            ),
+            onSuccess = {
+                updateEditMode(BubbleEditMode.NONE)
+                showBottomNav(true)
+                fetchBubbles(_uiState.value.label.id)
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
             flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
             onSuccess = {
+                updateEditMode(BubbleEditMode.NONE)
+                showBottomNav(true)
                 fetchBubbles(_uiState.value.label.id)
             },
             onError = { error ->

@@ -60,6 +60,19 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         bubbleLabelDao.deleteByBubbleId(bubble.id)
     }
 
+    override suspend fun updateBubbles(bubbles: List<BubbleEntity>) {
+        bubbles.map { bubble ->
+            updateBubble(bubble)
+        }
+    }
+
+    override suspend fun updateBubble(bubble: BubbleEntity) {
+        update(bubble.toLocal())
+
+        bubbleLabelDao.deleteByBubbleId(bubble.id)
+        addBubbleLabel(bubble)
+    }
+
 
     override suspend fun addBubbles(bubbles: List<BubbleEntity>) {
         bubbles.map { bubble ->
@@ -70,6 +83,18 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     override suspend fun addBubble(bubble: BubbleEntity) {
         insert(bubble.toLocal())
 
+        addBubbleLabel(bubble)
+    }
+
+    override suspend fun getUnSyncedBubbles(): List<BubbleEntity> {
+        return getUnSyncedDatas(tableName).map { it.toData() }
+    }
+
+    override suspend fun markAsSynced(bubble: BubbleEntity) {
+        markAsSynced(tableName, bubble.id)
+    }
+
+    private suspend fun addBubbleLabel(bubble: BubbleEntity) {
         bubble.labels.map { label ->
             val localLabel: LabelLocal? = labelDao.getLabelById(label.id)
             if (localLabel == null) {
@@ -79,13 +104,5 @@ class BubbleLocalDataSourceImpl @Inject constructor(
                 bubbleLabelDao.insert(bubble.id, localLabel.id)
             }
         }
-    }
-
-    override suspend fun getUnSyncedBubbles(): List<BubbleEntity> {
-        return getUnSyncedDatas(tableName).map { it.toData() }
-    }
-
-    override suspend fun markAsSynced(bubble: BubbleEntity) {
-        markAsSynced(tableName, bubble.id)
     }
 }

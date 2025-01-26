@@ -1,7 +1,6 @@
 package com.umc.edison.presentation.model
 
 import androidx.compose.ui.graphics.Color
-import com.umc.edison.data.toDomain
 import com.umc.edison.domain.model.Label
 
 data class LabelModel(
@@ -14,7 +13,7 @@ data class LabelModel(
         id = id,
         name = name,
         color = color,
-        bubbles = bubbles.toDomain()
+        bubbles = bubbles.map { it.toDomain() }
     )
 }
 

@@ -15,7 +15,7 @@ import com.umc.edison.ui.theme.Gray800
 @Composable
 fun LabelMoveModalContent(
     onDismiss: () -> Unit,
-    onConfirm: (LabelModel?) -> Unit,
+    onConfirm: (LabelModel) -> Unit,
     labels: List<LabelModel>
 ) {
     var selectedLabel by remember { mutableStateOf<LabelModel?>(null) }
@@ -65,7 +65,7 @@ fun LabelMoveModalContent(
             MiddleConfirmButton(
                 text = "선택하기",
                 onClick = {
-                    onConfirm(selectedLabel)
+                    onConfirm(selectedLabel!!)
                 },
                 enabled = selectedLabel != null,
                 modifier = Modifier.weight(1f)

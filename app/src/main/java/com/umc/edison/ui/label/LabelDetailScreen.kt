@@ -52,6 +52,7 @@ fun LabelDetailScreen(
                     showSelectedCnt = true,
                     onButtonClick = {
                         viewModel.getMovableLabels()
+                        viewModel.updateEditMode(BubbleEditMode.MOVE)
                     },
                     onDelete = {
                         viewModel.updateEditMode(BubbleEditMode.DELETE)
@@ -155,8 +156,7 @@ fun LabelDetailScreen(
                                 viewModel.updateEditMode(BubbleEditMode.EDIT)
                             },
                             onConfirm = { label ->
-//                                viewModel.moveSelectedBubbles(label)
-//                                viewModel.updateEditMode(BubbleEditMode.EDIT)
+                                viewModel.moveSelectedBubbles(label, showBottomNav = updateShowBottomNav)
                             }
                         )
                     }
@@ -170,7 +170,7 @@ fun LabelDetailScreen(
                             resetEditMode(viewModel, updateShowBottomNav)
                         },
                         onConfirm = {
-                            viewModel.deleteSelectedBubbles()
+                            viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
                             resetEditMode(viewModel, updateShowBottomNav)
                         },
                         sheetState = sheetState,
