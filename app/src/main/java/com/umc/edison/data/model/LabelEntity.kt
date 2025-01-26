@@ -18,11 +18,11 @@ data class LabelEntity(
     )
 }
 
-fun Label.toEntity(): LabelEntity = LabelEntity(
+fun Label.toData(): LabelEntity = LabelEntity(
     id = id,
     name = name,
     color = color,
-    bubbles = bubbles.map { it.toEntity() }
+    bubbles = bubbles.map { it.toData() }
 )
 
-fun List<Label>.toEntity(): List<LabelEntity> = map { it.toEntity() }
+fun List<Label>.toEntity(): List<LabelEntity> = map { it.toData() }

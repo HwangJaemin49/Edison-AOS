@@ -29,15 +29,15 @@ data class BubbleEntity(
     }
 }
 
-fun Bubble.toEntity(): BubbleEntity = BubbleEntity(
+fun Bubble.toData(): BubbleEntity = BubbleEntity(
     id = id,
     title = title,
     content = contentBlocks.joinToString(separator = "") {
         "%<${it.type}>${it.content}%</${it.type}>"
     },
     mainImage = mainImage,
-    labels = labels.map { it.toEntity() },
+    labels = labels.map { it.toData() },
     date = date
 )
 
-fun List<Bubble>.toEntity(): List<BubbleEntity> = map { it.toEntity() }
+fun List<Bubble>.toData(): List<BubbleEntity> = map { it.toData() }
