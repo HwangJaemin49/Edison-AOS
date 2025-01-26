@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,8 +70,6 @@ fun MiddleCancelButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = Gray100,
             contentColor = Gray600,
-            disabledContainerColor = Gray100,
-            disabledContentColor = Gray600,
         ),
         textStyle = MaterialTheme.typography.titleMedium
     )
@@ -93,6 +92,27 @@ fun MiddleConfirmButton(
             contentColor = Gray100,
             disabledContainerColor = Gray400,
             disabledContentColor = Gray700,
+        ),
+        textStyle = MaterialTheme.typography.titleMedium
+    )
+}
+
+@Composable
+fun MiddleDeleteButton(
+    modifier: Modifier = Modifier,
+    enabled: Boolean = false,
+    onClick: () -> Unit
+) {
+    BasicFullButton(
+        text = "삭제하기",
+        modifier = modifier,
+        enabled = enabled,
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFFFE2E5),
+            contentColor = Color(0xFFFF0000),
+            disabledContainerColor = Gray400,
+            disabledContentColor = Color(0xFFFF0000),
         ),
         textStyle = MaterialTheme.typography.titleMedium
     )

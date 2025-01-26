@@ -22,7 +22,7 @@ fun Label.toData(): LabelEntity = LabelEntity(
     id = id,
     name = name,
     color = color,
-    bubbles = bubbles.map { it.toData() }
+    bubbles = bubbles.toData()
 )
 
-fun List<Label>.toEntity(): List<LabelEntity> = map { it.toData() }
+fun List<Label>.toData(): List<LabelEntity> = map { it.toData() }

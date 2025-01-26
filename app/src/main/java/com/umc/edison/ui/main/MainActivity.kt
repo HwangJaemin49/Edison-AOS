@@ -49,16 +49,20 @@ class MainActivity : ComponentActivity() {
 fun MainScreen() {
     val navController = rememberNavController()
     var showInputBubble by remember { mutableStateOf(false) }
+    var showBottomNav by remember { mutableStateOf(true) }
+
     Scaffold(
         bottomBar = {
-            BottomNavigation(
-                navController = navController,
-                onBubbleClick = { showInputBubble = !showInputBubble }
-            )
+            if (showBottomNav) {
+                BottomNavigation(
+                    navController = navController,
+                    onBubbleClick = { showInputBubble = !showInputBubble }
+                )
+            }
         }
     ) {
         Box(Modifier.padding(it)) {
-            NavigationGraph(navController)
+            NavigationGraph(navController, updateShowBottomNav = { flag -> showBottomNav = flag })
 
             if (showInputBubble) {
                 Box(

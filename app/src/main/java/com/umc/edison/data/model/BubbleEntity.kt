@@ -38,7 +38,7 @@ fun Bubble.toData(): BubbleEntity = BubbleEntity(
         "%<${it.type}>${it.content}</${it.type}>%"
     },
     mainImage = mainImage,
-    labels = labels.map { it.toData() },
+    labels = labels.toData(),
     date = date
 )
 

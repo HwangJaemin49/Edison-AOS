@@ -11,17 +11,20 @@ open class BaseLocalDataSourceImpl<T : BaseSyncLocal>(
     suspend fun insert(entity: T) {
         entity.createdAt = Date()
         entity.updatedAt = Date()
+        entity.isSynced = false
         baseDao.insert(entity)
     }
 
     suspend fun update(entity: T) {
         entity.updatedAt = Date()
+        entity.isSynced = false
         baseDao.update(entity)
     }
 
     suspend fun softDelete(entity: T) {
         entity.deletedAt = Date()
         entity.isDeleted = true
+        entity.isSynced = false
         baseDao.update(entity)
     }
 

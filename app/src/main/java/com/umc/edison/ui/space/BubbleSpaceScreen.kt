@@ -3,6 +3,7 @@ package com.umc.edison.ui.space
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -71,7 +72,10 @@ fun BubbleSpaceScreen(navHostController: NavHostController) {
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(100.dp))
-                        .clickable {
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(index)
                                 selectedTabIndex = index

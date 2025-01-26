@@ -13,7 +13,10 @@ import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
 
 @Composable
-fun NavigationGraph(navHostController: NavHostController) {
+fun NavigationGraph(
+    navHostController: NavHostController,
+    updateShowBottomNav: (Boolean) -> Unit
+) {
     NavHost(navHostController, startDestination = NavRoute.MyEdison.route) {
         // bottom navigation
         composable(NavRoute.MyEdison.route) {
@@ -34,7 +37,7 @@ fun NavigationGraph(navHostController: NavHostController) {
             route = "${NavRoute.SpaceLabel.route}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
-            LabelDetailScreen(navHostController)
+            LabelDetailScreen(navHostController, updateShowBottomNav)
         }
     }
 }

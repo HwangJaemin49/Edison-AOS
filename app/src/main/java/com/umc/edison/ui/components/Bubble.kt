@@ -2,8 +2,10 @@ package com.umc.edison.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -57,7 +59,9 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Scale
 import com.umc.edison.domain.model.ContentType
+import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.theme.Aqua100
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
@@ -167,6 +171,7 @@ fun Bubble(
 @Composable
 fun BubblePreview(
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     size: BubbleType.BubbleSize,
     bubble: BubbleModel
 ) {
@@ -175,6 +180,7 @@ fun BubblePreview(
             bubble = bubble,
             colors = bubble.labels.map { it.color },
             onClick = onClick,
+            onLongClick = onLongClick,
             bubbleSize = size
         )
     } else {
@@ -371,11 +377,13 @@ private fun BubbleContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TextContentBubble(
     bubble: BubbleModel,
     colors: List<Color>,
     onClick: () -> Unit,
+    onLongClick: () -> Unit= {},
     bubbleSize: BubbleType.BubbleSize,
 ) {
     val canvasSize = bubbleSize.size
@@ -384,7 +392,12 @@ private fun TextContentBubble(
         modifier = Modifier
             .size(canvasSize)
             .clip(CircleShape)
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
         contentAlignment = Alignment.Center
     ) {
         if (bubble.mainImage != null) {
@@ -451,7 +464,7 @@ private fun SingleBubble(
 }
 
 @Composable
-fun DoubleBubble(
+private fun DoubleBubble(
     bubbleSize: BubbleType.BubbleSize,
     colors: List<Color>,
 ) {
@@ -847,12 +860,12 @@ fun PreviewBubbleDoor() {
                 id = 0,
                 title = "버블 제목",
                 contentBlocks = listOf(
-                    BubbleModel.BubbleContentBlock(ContentType.TEXT, "버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 ", 0),
+                    ContentBlockModel(ContentType.TEXT, "버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 ", 0),
                 ),
                 labels = listOf(
-                    BubbleModel.LabelModel(0, "라벨1", Aqua100),
-                    BubbleModel.LabelModel(1, "라벨2", Yellow100),
-                    BubbleModel.LabelModel(2, "라벨3", Red100),
+                    LabelModel(0, "라벨1", Aqua100, bubbles = listOf()),
+                    LabelModel(1, "라벨2", Yellow100, bubbles = listOf()),
+                    LabelModel(2, "라벨3", Red100, bubbles = listOf()),
                 ),
                 mainImage = null
             ),
