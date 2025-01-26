@@ -24,11 +24,10 @@ import com.umc.edison.presentation.label.LabelDetailViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.components.BottomSheet
+import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.BubblesLayout
-import com.umc.edison.ui.components.MiddleConfirmButton
-import com.umc.edison.ui.components.MiddleDeleteButton
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
@@ -48,30 +47,18 @@ fun LabelDetailScreen(
     Scaffold(
         bottomBar = {
             if (uiState.bubbleEditMode == BubbleEditMode.EDIT) {
-                Row(
-                    modifier = Modifier
-                        .background(White000)
-                        .padding(horizontal = 24.dp, vertical = 17.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    MiddleConfirmButton(
-                        text = "버블 이동",
-                        enabled = uiState.selectedBubbles.isNotEmpty(),
-                        onClick = {
-                            viewModel.getMovableLabels()
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    MiddleDeleteButton (
-                        enabled = uiState.selectedBubbles.isNotEmpty(),
-                        onClick = {
-                            viewModel.updateEditMode(BubbleEditMode.DELETE)
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                BottomSheetForDelete(
+                    selectedCnt = uiState.selectedBubbles.size,
+                    showSelectedCnt = true,
+                    onButtonClick = {
+                        viewModel.getMovableLabels()
+                    },
+                    onDelete = {
+                        viewModel.updateEditMode(BubbleEditMode.DELETE)
+                    },
+                    buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
+                    buttonText = "버블 이동",
+                )
             }
         }
     ) { innerPadding ->
