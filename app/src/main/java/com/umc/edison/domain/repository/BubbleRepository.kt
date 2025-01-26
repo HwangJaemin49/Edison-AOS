@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface BubbleRepository {
     fun getAllBubbles(): Flow<DataResource<List<Bubble>>>
+    fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
 }

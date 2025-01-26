@@ -3,6 +3,7 @@ package com.umc.edison.data.repository
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
+import com.umc.edison.data.model.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Bubble
 import com.umc.edison.domain.repository.BubbleRepository
@@ -18,5 +19,9 @@ class BubbleRepositoryImpl @Inject constructor(
         remoteDataAction = { bubbleRemoteDataSource.getAllBubbles() },
         localDataAction = { bubbleLocalDataSource.getAllBubbles() },
         saveCacheAction = { bubbleLocalDataSource.addBubbles(it)}
+    )
+
+    override fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.addBubbles(bubbles.toData()) }
     )
 }

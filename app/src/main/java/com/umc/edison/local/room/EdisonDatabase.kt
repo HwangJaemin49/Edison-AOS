@@ -7,6 +7,7 @@ import com.umc.edison.local.model.BubbleLabelLocal
 import com.umc.edison.local.model.BubbleLocal
 import com.umc.edison.local.model.LabelLocal
 import com.umc.edison.local.room.dao.BubbleDao
+import com.umc.edison.local.room.dao.BubbleLabelDao
 import com.umc.edison.local.room.dao.LabelDao
 
 @Database(
@@ -18,4 +19,5 @@ import com.umc.edison.local.room.dao.LabelDao
 abstract class EdisonDatabase : RoomDatabase() {
     abstract fun bubbleDao(): BubbleDao
     abstract fun labelDao(): LabelDao
+    abstract fun bubbleLabelDao(): BubbleLabelDao
 }
