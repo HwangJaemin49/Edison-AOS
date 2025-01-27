@@ -1,5 +1,6 @@
 package com.umc.edison.ui.label
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
-import com.umc.edison.presentation.label.BubbleEditMode
+import com.umc.edison.presentation.label.LabelDetailMode
 import com.umc.edison.presentation.label.LabelDetailViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
@@ -28,7 +29,6 @@ import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.BubblesLayout
-import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -42,20 +42,28 @@ fun LabelDetailScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val uiState by viewModel.uiState.collectAsState()
-    val isBlur = uiState.bubbleEditMode == BubbleEditMode.EDIT
+    val isBlur = uiState.labelDetailMode != LabelDetailMode.NONE
+
+    BackHandler(enabled = true) {
+        if (uiState.labelDetailMode == LabelDetailMode.NONE) {
+            navHostController.popBackStack()
+        } else {
+            resetEditMode(viewModel, updateShowBottomNav)
+        }
+    }
 
     Scaffold(
         bottomBar = {
-            if (uiState.bubbleEditMode == BubbleEditMode.EDIT) {
+            if (uiState.labelDetailMode == LabelDetailMode.EDIT) {
                 BottomSheetForDelete(
                     selectedCnt = uiState.selectedBubbles.size,
                     showSelectedCnt = true,
                     onButtonClick = {
                         viewModel.getMovableLabels()
-                        viewModel.updateEditMode(BubbleEditMode.MOVE)
+                        viewModel.updateEditMode(LabelDetailMode.MOVE)
                     },
                     onDelete = {
-                        viewModel.updateEditMode(BubbleEditMode.DELETE)
+                        viewModel.updateEditMode(LabelDetailMode.DELETE)
                     },
                     buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
                     buttonText = "버블 이동",
@@ -81,22 +89,21 @@ fun LabelDetailScreen(
                     textAlign = TextAlign.Center
                 )
             } else {
-                val onBubbleClick: (BubbleModel) -> Unit
-                val onBubbleLongClick: (BubbleModel) -> Unit
+                var onBubbleClick: (BubbleModel) -> Unit = {}
+                var onBubbleLongClick: (BubbleModel) -> Unit = {}
 
-                if (uiState.bubbleEditMode == BubbleEditMode.EDIT) {
+                if (uiState.labelDetailMode == LabelDetailMode.EDIT) {
                     onBubbleClick = { bubble ->
                         viewModel.toggleSelectBubble(bubble)
                     }
-                    onBubbleLongClick = {}
-                } else {
+                } else if (uiState.labelDetailMode == LabelDetailMode.NONE) {
                     onBubbleClick = { bubble ->
                         viewModel.selectBubble(bubble)
-                        viewModel.updateEditMode(BubbleEditMode.VIEW)
+                        viewModel.updateEditMode(LabelDetailMode.VIEW)
                     }
                     onBubbleLongClick = { bubble ->
                         viewModel.selectBubble(bubble)
-                        viewModel.updateEditMode(BubbleEditMode.EDIT)
+                        viewModel.updateEditMode(LabelDetailMode.EDIT)
                         updateShowBottomNav(false)
                     }
                 }
@@ -106,7 +113,7 @@ fun LabelDetailScreen(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
-                        if (uiState.bubbleEditMode == BubbleEditMode.EDIT) {
+                        if (uiState.labelDetailMode == LabelDetailMode.EDIT) {
                             resetEditMode(viewModel, updateShowBottomNav)
                         }
                     }
@@ -125,35 +132,36 @@ fun LabelDetailScreen(
                     )
                 }
 
-                if (uiState.bubbleEditMode == BubbleEditMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
+                if (uiState.labelDetailMode == LabelDetailMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
                     val bubble = uiState.selectedBubbles.first()
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Black.copy(alpha = 0.5f))
                             .clickable(onClick = {
-                                viewModel.updateEditMode(BubbleEditMode.NONE)
+                                viewModel.updateEditMode(LabelDetailMode.NONE)
                             }),
                         contentAlignment = Alignment.Center
                     ) {
                         Bubble(
                             bubble = bubble,
                             onClick = {
-                                navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
+                                // TODO: 버블 작성 화면 구현 완료되면 연결
+                                // navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
                             }
                         )
                     }
-                } else if (uiState.bubbleEditMode == BubbleEditMode.MOVE) {
+                } else if (uiState.labelDetailMode == LabelDetailMode.MOVE) {
                     BottomSheet(
                         onDismiss = {
-                            viewModel.updateEditMode(BubbleEditMode.EDIT)
+                            viewModel.updateEditMode(LabelDetailMode.EDIT)
                         },
                         sheetState = sheetState,
                     ) {
                         LabelMoveModalContent(
                             labels = uiState.movableLabels,
                             onDismiss = {
-                                viewModel.updateEditMode(BubbleEditMode.EDIT)
+                                viewModel.updateEditMode(LabelDetailMode.EDIT)
                             },
                             onConfirm = { label ->
                                 viewModel.moveSelectedBubbles(label, showBottomNav = updateShowBottomNav)
@@ -161,17 +169,16 @@ fun LabelDetailScreen(
                         )
                     }
 
-                } else if (uiState.bubbleEditMode == BubbleEditMode.DELETE) {
+                } else if (uiState.labelDetailMode == LabelDetailMode.DELETE) {
                     BottomSheetPopUp(
                         title = "${uiState.selectedBubbles.size} 개의 버블을 삭제하시겠습니까?",
                         cancelText = "취소",
                         confirmText = "삭제",
                         onDismiss = {
-                            resetEditMode(viewModel, updateShowBottomNav)
+                            viewModel.updateEditMode(LabelDetailMode.EDIT)
                         },
                         onConfirm = {
                             viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
-                            resetEditMode(viewModel, updateShowBottomNav)
                         },
                         sheetState = sheetState,
                     )
@@ -185,7 +192,7 @@ private fun resetEditMode(
     viewModel: LabelDetailViewModel,
     updateShowBottomNav: (Boolean) -> Unit
 ) {
-    viewModel.updateEditMode(BubbleEditMode.NONE)
+    viewModel.updateEditMode(LabelDetailMode.NONE)
     updateShowBottomNav(true)
 }
 

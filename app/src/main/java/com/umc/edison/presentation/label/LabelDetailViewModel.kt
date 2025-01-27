@@ -58,16 +58,16 @@ class LabelDetailViewModel @Inject constructor(
         )
     }
 
-    fun updateEditMode(bubbleEditMode: BubbleEditMode) {
-        if (bubbleEditMode == BubbleEditMode.NONE) {
+    fun updateEditMode(labelDetailMode: LabelDetailMode) {
+        if (labelDetailMode == LabelDetailMode.NONE) {
             _uiState.update {
                 it.copy(
-                    bubbleEditMode = bubbleEditMode,
+                    labelDetailMode = labelDetailMode,
                     selectedBubbles = listOf()
                 )
             }
         } else {
-            _uiState.update { it.copy(bubbleEditMode = bubbleEditMode) }
+            _uiState.update { it.copy(labelDetailMode = labelDetailMode) }
         }
     }
 
@@ -127,7 +127,7 @@ class LabelDetailViewModel @Inject constructor(
                 moveTo = label.toDomain()
             ),
             onSuccess = {
-                updateEditMode(BubbleEditMode.NONE)
+                updateEditMode(LabelDetailMode.NONE)
                 showBottomNav(true)
                 fetchBubbles(_uiState.value.label.id)
             },
@@ -147,7 +147,7 @@ class LabelDetailViewModel @Inject constructor(
         collectDataResource(
             flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
             onSuccess = {
-                updateEditMode(BubbleEditMode.NONE)
+                updateEditMode(LabelDetailMode.NONE)
                 showBottomNav(true)
                 fetchBubbles(_uiState.value.label.id)
             },

@@ -8,7 +8,7 @@ data class LabelDetailState(
     val isLoading: Boolean,
     val label: LabelModel,
     val selectedBubbles: List<BubbleModel> = listOf(),
-    val bubbleEditMode: BubbleEditMode,
+    val labelDetailMode: LabelDetailMode,
     val movableLabels: List<LabelModel> = listOf(),
     val error: Throwable? = null,
 ) {
@@ -21,11 +21,11 @@ data class LabelDetailState(
                 color = Gray300,
                 bubbles = listOf()
             ),
-            bubbleEditMode = BubbleEditMode.NONE
+            labelDetailMode = LabelDetailMode.NONE
         )
     }
 }
 
-enum class BubbleEditMode {
+enum class LabelDetailMode {
     NONE, VIEW, EDIT, MOVE, DELETE
 }
