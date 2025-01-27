@@ -15,10 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavHostController
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.umc.edison.R
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.components.BubbleStorageTopBar
@@ -65,7 +65,13 @@ fun MyEdisonScreen(navController: NavHostController) {
             )
 
         Spacer(modifier = Modifier.weight(1f))
-
-
     }
 }
+
+//@Preview(showBackground = true)
+//@Composable
+//fun BubbleSpaceScreenPreview() {
+//    EdisonTheme {
+//        MyEdisonScreen()
+//    }
+//}

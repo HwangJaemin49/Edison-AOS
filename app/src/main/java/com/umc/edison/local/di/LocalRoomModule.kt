@@ -41,6 +41,10 @@ internal object LocalRoomModule {
     @Provides
     @Singleton
     fun provideLabelDao(database: EdisonDatabase) = database.labelDao()
+
+    @Provides
+    @Singleton
+    fun provideBubbleLabelDao(database: EdisonDatabase) = database.bubbleLabelDao()
 }
 
 private fun copyDatabaseFromAssets(context: Context) {

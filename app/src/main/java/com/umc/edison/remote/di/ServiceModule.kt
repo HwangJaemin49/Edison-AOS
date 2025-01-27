@@ -1,6 +1,7 @@
 package com.umc.edison.remote.di
 
 import com.umc.edison.remote.api.BubbleSpaceApiService
+import com.umc.edison.remote.api.SyncApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,4 +17,10 @@ internal object ServiceModule {
     fun provideBubbleSpaceService(
         @NetworkModule.MainRetrofit retrofit: Retrofit
     ): BubbleSpaceApiService = retrofit.create(BubbleSpaceApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSyncService(
+        @NetworkModule.MainRetrofit retrofit: Retrofit
+    ): SyncApiService = retrofit.create(SyncApiService::class.java)
 }

@@ -2,34 +2,42 @@ package com.umc.edison.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.umc.edison.ui.artboard.ArtBoardScreen
-import com.umc.edison.ui.my_edison.BubbleInputScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
+import com.umc.edison.ui.label.LabelDetailScreen
 
 @Composable
-fun NavigationGraph(navHostController: NavHostController) {
-    NavHost(navHostController, startDestination = BottomNavItem.MyEdison.route) {
-        composable(BottomNavItem.MyEdison.route) {
-            MyEdisonScreen(navController = navHostController)
+fun NavigationGraph(
+    navHostController: NavHostController,
+    updateShowBottomNav: (Boolean) -> Unit
+) {
+    NavHost(navHostController, startDestination = NavRoute.MyEdison.route) {
+        // bottom navigation
+        composable(NavRoute.MyEdison.route) {
+            MyEdisonScreen(navHostController)
         }
-        composable("bubble_input_screen") { // BubbleInputScreen 경로 추가
-            BubbleInputScreen()
+        composable(NavRoute.Space.route) {
+            BubbleSpaceScreen(navHostController)
         }
-        composable(BottomNavItem.Space.route) {
-            BubbleSpaceScreen()
+        composable(NavRoute.ArtBoard.route) {
+            ArtBoardScreen(navHostController)
         }
-        composable(BottomNavItem.Bubble.route) {
-//            BubbleScreen()
+        composable(NavRoute.MyPage.route) {
+            MyPageScreen(navHostController)
         }
-        composable(BottomNavItem.ArtLetter.route) {
-            ArtBoardScreen()
-        }
-        composable(BottomNavItem.MyPage.route) {
-            MyPageScreen()
+
+        // space screen
+        composable(
+            route = "${NavRoute.SpaceLabel.route}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) {
+            LabelDetailScreen(navHostController, updateShowBottomNav)
         }
     }
 }

@@ -2,8 +2,10 @@ package com.umc.edison.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -66,6 +68,7 @@ import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
 import com.umc.edison.domain.model.ContentType
+import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.theme.Aqua100
@@ -182,21 +185,22 @@ fun BubbleInput(
 @Composable
 fun BubblePreview(
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    size: BubbleType.BubbleSize,
     bubble: BubbleModel
 ) {
-    val bubbleSize = calculateBubbleSize(bubble)
-
     if (bubble.title != null || bubble.contentBlocks.firstOrNull()?.type == ContentType.TEXT) {
         TextContentBubble(
             bubble = bubble,
             colors = bubble.labels.map { it.color },
             onClick = onClick,
-            bubbleSize = bubbleSize
+            onLongClick = onLongClick,
+            bubbleSize = size
         )
     } else {
         // TODO: 이미지 1개를 배경으로 하는 버블 컴포저블
         ImageBubble(
-            bubbleSize = bubbleSize,
+            bubbleSize = size,
             imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
         )
     }
@@ -421,8 +425,6 @@ private fun BubbleContent(
                                 }
                             }
                         )
-
-
                     } else {
                         Text(
                             text = contentBlock.content,
@@ -471,11 +473,13 @@ private fun BubbleContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TextContentBubble(
     bubble: BubbleModel,
     colors: List<Color>,
     onClick: () -> Unit,
+    onLongClick: () -> Unit= {},
     bubbleSize: BubbleType.BubbleSize,
 ) {
     val canvasSize = bubbleSize.size
@@ -484,7 +488,12 @@ private fun TextContentBubble(
         modifier = Modifier
             .size(canvasSize)
             .clip(CircleShape)
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
         contentAlignment = Alignment.Center
     ) {
         if (bubble.mainImage != null) {
@@ -551,7 +560,7 @@ private fun SingleBubble(
 }
 
 @Composable
-fun DoubleBubble(
+private fun DoubleBubble(
     bubbleSize: BubbleType.BubbleSize,
     colors: List<Color>,
 ) {
@@ -646,7 +655,7 @@ private fun checkBubbleContainImage(bubble: BubbleModel): Boolean {
 /**
  * 버블 텍스트 길이에 따른 사이즈 계산 함수
  */
-private fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
+fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
     var text = bubble.title ?: ""
 
     if (text.isEmpty() && bubble.contentBlocks.firstOrNull()?.type == ContentType.IMAGE) {

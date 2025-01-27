@@ -3,6 +3,7 @@ package com.umc.edison.ui.space
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,18 +28,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.umc.edison.ui.theme.EdisonTheme
+import androidx.navigation.NavHostController
+import com.umc.edison.ui.label.LabelTabScreen
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
+import com.umc.edison.ui.theme.White000
 import kotlinx.coroutines.launch
 
 @Composable
-fun BubbleSpaceScreen() {
+fun BubbleSpaceScreen(navHostController: NavHostController) {
     // 탭 & 페이지 관련
     val tabs = listOf("스페이스", "라벨")
     var selectedTabIndex by remember { mutableIntStateOf(0) }
@@ -57,7 +58,7 @@ fun BubbleSpaceScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(White000)
     ) {
         Spacer(modifier = Modifier.height(33.dp))
 
@@ -71,7 +72,10 @@ fun BubbleSpaceScreen() {
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(100.dp))
-                        .clickable {
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(index)
                                 selectedTabIndex = index
@@ -124,18 +128,10 @@ fun BubbleSpaceScreen() {
             ) { page ->
                 selectedTabIndex = pagerState.currentPage
                 when (page) {
-                    0 -> SpaceTabScreen()
-                    1 -> LabelTabScreen()
+                    0 -> SpaceTabScreen(navHostController)
+                    1 -> LabelTabScreen(navHostController)
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BubbleSpaceScreenPreview() {
-    EdisonTheme {
-        BubbleSpaceScreen()
     }
 }

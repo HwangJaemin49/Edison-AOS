@@ -8,21 +8,21 @@ data class LabelEntity(
     val id: Int,
     val name: String,
     val color: Color,
-    var bubbleCnt: Int = 0,
+    var bubbles: List<BubbleEntity>
 ) : DataMapper<Label> {
     override fun toDomain(): Label = Label(
         id = id,
         name = name,
         color = color,
-        bubbleCnt = bubbleCnt
+        bubbles = bubbles.map { it.toDomain() }
     )
 }
 
-fun Label.toEntity(): LabelEntity = LabelEntity(
-    id = id ?: 0,
+fun Label.toData(): LabelEntity = LabelEntity(
+    id = id,
     name = name,
     color = color,
-    bubbleCnt = bubbleCnt
+    bubbles = bubbles.toData()
 )
 
-fun List<Label>.toEntity(): List<LabelEntity> = map { it.toEntity() }
+fun List<Label>.toData(): List<LabelEntity> = map { it.toData() }

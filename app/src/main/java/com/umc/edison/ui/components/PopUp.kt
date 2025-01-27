@@ -1,5 +1,6 @@
 package com.umc.edison.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -95,6 +96,52 @@ private fun BottomSheetPopUpContent(
             )
         }
     }
+}
+
+@Composable
+fun BottomSheetForDelete(
+    selectedCnt: Int,
+    showSelectedCnt: Boolean,
+    onButtonClick: () -> Unit,
+    onDelete: () -> Unit,
+    buttonEnabled: Boolean,
+    buttonText: String,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(White000)
+            .padding(horizontal = 24.dp, vertical = 8.dp),
+    ) {
+        if (showSelectedCnt) {
+            Text(
+                text = "선택 ${selectedCnt}개",
+                style = MaterialTheme.typography.labelLarge,
+                color = Gray800,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+        Row(
+            modifier = Modifier
+                .padding(vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(17.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            MiddleConfirmButton(
+                text = buttonText,
+                enabled = buttonEnabled,
+                onClick = { onButtonClick() },
+                modifier = Modifier.weight(1f)
+            )
+
+            MiddleDeleteButton (
+                enabled = buttonEnabled,
+                onClick = { onDelete() },
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+
 }
 
 @Preview(showBackground = true)

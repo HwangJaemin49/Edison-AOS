@@ -1,16 +1,15 @@
 package com.umc.edison.remote.api
 
-import com.umc.edison.remote.model.BubbleResponse
-import com.umc.edison.remote.model.LabelResponse
+import com.umc.edison.remote.model.GetLabelDetailResponse
+import com.umc.edison.remote.model.GetLabelResponse
 import com.umc.edison.remote.model.ResponseWithData
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface BubbleSpaceApiService {
+    @GET("labels")
+    suspend fun getAllLabels(): ResponseWithData<List<GetLabelResponse>>
 
-    // TODO: 사용 예시로 추후 버블 스페이스 관련 명세가 완료되면 수정 필요
-    @GET("bubbles")
-    suspend fun getAllBubbles(): ResponseWithData<List<BubbleResponse>>
-
-    @GET("/labels")
-    suspend fun getAllLabels(): ResponseWithData<List<LabelResponse>>
+    @GET("labels/{labelId}")
+    suspend fun getLabelDetail(@Path("labelId") labelId: Int): ResponseWithData<GetLabelDetailResponse>
 }
