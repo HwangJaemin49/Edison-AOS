@@ -1,9 +1,8 @@
 package com.umc.edison.local.model
 
+import java.util.Date
+
 interface BaseLocal {
-    var isSynced: Boolean
-    var isDeleted: Boolean
-    var createdAt: Long?
-    var updatedAt: Long?
-    var deletedAt: Long?
+    var createdAt: Date?
+    var updatedAt: Date?
 }

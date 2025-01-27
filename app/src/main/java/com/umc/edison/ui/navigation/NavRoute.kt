@@ -13,4 +13,10 @@ sealed class NavRoute(val route: String) {
             fun createRoute(labelId: Int): String = "${SpaceLabel.route}/${labelId}"
         }
     }
+
+    data class BubbleEdit(val id: Int = 0) : NavRoute("${MyEdison.route}/bubbles/${id}") {
+        companion object {
+            fun createRoute(bubbleId: Int): String = "${MyEdison.route}/bubbles/${bubbleId}"
+        }
+    }
 }

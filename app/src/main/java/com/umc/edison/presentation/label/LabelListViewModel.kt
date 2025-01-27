@@ -1,6 +1,5 @@
-package com.umc.edison.presentation.space
+package com.umc.edison.presentation.label
 
-import android.util.Log
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
@@ -8,7 +7,6 @@ import com.umc.edison.domain.usecase.label.UpdateLabelUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
-import com.umc.edison.ui.space.EditMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,11 +28,13 @@ class LabelListViewModel @Inject constructor(
         fetchLabels()
     }
 
-    private fun fetchLabels() {
+    fun fetchLabels() {
+        _uiState.update { LabelListState.DEFAULT }
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                _uiState.update { it.copy(labels = labels.toPresentation()) }
+                val sortedLabels = labels.sortedByDescending { it.bubbles.size }
+                _uiState.update { it.copy(labels = sortedLabels.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -48,34 +48,38 @@ class LabelListViewModel @Inject constructor(
         )
     }
 
-    fun updateEditMode(editMode: EditMode) {
-        _uiState.update { it.copy(editMode = editMode) }
+    fun updateEditMode(labelEditMode: LabelEditMode) {
+        _uiState.update { it.copy(labelEditMode = labelEditMode) }
+    }
+
+    fun updateSelectedLabel(label: LabelModel) {
+        _uiState.update { it.copy(selectedLabel = label) }
     }
 
     fun confirmLabelModal(label: LabelModel) {
-        if (uiState.value.editMode == EditMode.ADD) {
+        if (uiState.value.labelEditMode == LabelEditMode.ADD) {
             collectDataResource(
                 flow = addLabelUseCase(label.toDomain()),
                 onSuccess = {
-                    updateEditMode(EditMode.NONE)
+                    updateEditMode(LabelEditMode.NONE)
+                    _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
                 onError = { error ->
-                    Log.e("addLabel", "onError: $error")
                     _uiState.update { it.copy(error = error) }
                 },
                 onLoading = {
-                    Log.d("addLabel", "onLoading")
                     _uiState.update { it.copy(isLoading = true) }
                 },
                 onComplete = {
                     fetchLabels()
                 }
             )
-        } else if (uiState.value.editMode == EditMode.EDIT) {
+        } else if (uiState.value.labelEditMode == LabelEditMode.EDIT) {
             collectDataResource(
                 flow = updateLabelUseCase(label.toDomain()),
                 onSuccess = {
-                    updateEditMode(EditMode.NONE)
+                    updateEditMode(LabelEditMode.NONE)
+                    _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
                 onError = { error ->
                     _uiState.update { it.copy(error = error) }
@@ -90,11 +94,15 @@ class LabelListViewModel @Inject constructor(
         }
     }
 
-    fun deleteLabel(label: LabelModel) {
+    fun deleteSelectedLabel() {
         collectDataResource(
-            flow = deleteLabelUseCase(label.toDomain()),
+            flow = deleteLabelUseCase(_uiState.value.selectedLabel.toDomain()),
             onSuccess = {
-                updateEditMode(EditMode.NONE)
+                updateEditMode(LabelEditMode.NONE)
+                _uiState.update { it.copy(
+                    labels = it.labels.filter { label -> label.id != it.selectedLabel.id },
+                    selectedLabel = LabelListState.DEFAULT.selectedLabel
+                ) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

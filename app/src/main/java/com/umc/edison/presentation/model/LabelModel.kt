@@ -4,14 +4,19 @@ import androidx.compose.ui.graphics.Color
 import com.umc.edison.domain.model.Label
 
 data class LabelModel(
-    val id: Int? = null,
+    val id: Int,
     val name: String,
     val color: Color,
-    val bubbleCnt: Int = 0,
+    val bubbles: List<BubbleModel>
 ) {
-    fun toDomain(): Label = Label(id, name, color, bubbleCnt)
+    fun toDomain(): Label = Label(
+        id = id,
+        name = name,
+        color = color,
+        bubbles = bubbles.map { it.toDomain() }
+    )
 }
 
-fun Label.toPresentation(): LabelModel = LabelModel(id, name, color, bubbleCnt)
+fun Label.toPresentation(): LabelModel = LabelModel(id, name, color, bubbles.toPresentation())
 
 fun List<Label>.toPresentation(): List<LabelModel> = map { it.toPresentation() }

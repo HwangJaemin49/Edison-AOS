@@ -10,10 +10,13 @@ import com.umc.edison.ui.artboard.ArtBoardScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
-import com.umc.edison.ui.space.LabelDetailScreen
+import com.umc.edison.ui.label.LabelDetailScreen
 
 @Composable
-fun NavigationGraph(navHostController: NavHostController) {
+fun NavigationGraph(
+    navHostController: NavHostController,
+    updateShowBottomNav: (Boolean) -> Unit
+) {
     NavHost(navHostController, startDestination = NavRoute.MyEdison.route) {
         // bottom navigation
         composable(NavRoute.MyEdison.route) {
@@ -33,9 +36,8 @@ fun NavigationGraph(navHostController: NavHostController) {
         composable(
             route = "${NavRoute.SpaceLabel.route}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id")
-            LabelDetailScreen(navHostController, id)
+        ) {
+            LabelDetailScreen(navHostController, updateShowBottomNav)
         }
     }
 }

@@ -1,31 +1,41 @@
 package com.umc.edison.local.datasources
 
-import android.util.Log
+import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.LabelLocalDataSource
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.local.model.LabelLocal
-import com.umc.edison.local.model.toData
 import com.umc.edison.local.model.toLocal
 import com.umc.edison.local.room.RoomConstant
-import com.umc.edison.local.room.dao.BubbleDao
 import com.umc.edison.local.room.dao.LabelDao
+import com.umc.edison.ui.theme.White000
 import javax.inject.Inject
 
 class LabelLocalDataSourceImpl @Inject constructor(
-    private val bubbleDao: BubbleDao,
-    private val labelDao: LabelDao
+    private val labelDao: LabelDao,
+    private val bubbleLocalDataSource: BubbleLocalDataSource,
 ) : LabelLocalDataSource, BaseLocalDataSourceImpl<LabelLocal>(labelDao) {
 
     private val tableName = RoomConstant.getTableNameByClass(LabelLocal::class.java)
 
     override suspend fun getAllLabels(): List<LabelEntity> {
-        val labels = labelDao.getAllLabels().toData()
+        val labels = labelDao.getAllLabels().map { it.toData() }.toMutableList()
 
         labels.map { label ->
-            label.bubbleCnt = bubbleDao.getBubbleCntByLabelId(label.id)
+            label.bubbles = bubbleLocalDataSource.getBubblesByLabel(label.id)
         }
 
-        Log.d("LabelLocalDataSourceImplImpl", "getAllLabels: $labels")
+        val defaultLabel = LabelEntity(
+            id = 0,
+            name = "-",
+            color = White000,
+            bubbles = listOf()
+        )
+
+        defaultLabel.bubbles = bubbleLocalDataSource.getBubblesByLabel(0)
+
+        if (defaultLabel.bubbles.isNotEmpty()) {
+            labels += defaultLabel
+        }
 
         return labels
     }
@@ -37,18 +47,14 @@ class LabelLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun addLabel(label: LabelEntity) {
-        Log.d("LocalDataSource: addLabel", label.toString())
-        Log.d("label color", label.toLocal().color.toString())
         insert(label.toLocal())
     }
 
     override suspend fun updateLabel(label: LabelEntity) {
-        Log.d("LocalDataSource: updateLabel", label.toString())
         update(label.toLocal())
     }
 
     override suspend fun softDeleteLabel(label: LabelEntity) {
-        Log.d("LocalDataSource: softDeleteLabel", label.toString())
         softDelete(label.toLocal())
     }
 
@@ -56,8 +62,17 @@ class LabelLocalDataSourceImpl @Inject constructor(
         labelDao.delete(label.toLocal())
     }
 
-    override suspend fun getUnsyncedLabels(): List<LabelEntity> {
-        return getUnsyncedDatas(tableName).toData()
+    override suspend fun getLabelDetail(labelId: Int): LabelEntity {
+        val localLabel = labelDao.getLabelById(labelId) ?: throw Exception("Label not found")
+
+        val label = localLabel.toData()
+        label.bubbles = bubbleLocalDataSource.getBubblesByLabel(labelId)
+
+        return label
+    }
+
+    override suspend fun getUnSyncedLabels(): List<LabelEntity> {
+        return getUnSyncedDatas(tableName).map { it.toData() }
     }
 
     override suspend fun markAsSynced(label: LabelEntity) {

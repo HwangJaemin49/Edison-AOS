@@ -4,7 +4,7 @@ internal interface DataMapper<DomainModel> {
     fun toDomain(): DomainModel
 }
 
-internal fun <EntityModel, DomainModel> EntityModel.toDomain(): DomainModel {
+internal fun <DataModel, DomainModel> DataModel.toDomain(): DomainModel {
     @Suppress("UNCHECKED_CAST")
     return when (this) {
         is DataMapper<*> -> toDomain()
@@ -27,6 +27,6 @@ internal fun <EntityModel, DomainModel> EntityModel.toDomain(): DomainModel {
     } as DomainModel
 }
 
-internal fun <EntityModel : DataMapper<DomainModel>, DomainModel> List<EntityModel>.toDomain(): List<DomainModel> {
+internal fun <DataModel : DataMapper<DomainModel>, DomainModel> List<DataModel>.toDomain(): List<DomainModel> {
     return map(DataMapper<DomainModel>::toDomain)
 }
