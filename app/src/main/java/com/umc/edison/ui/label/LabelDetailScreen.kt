@@ -120,7 +120,9 @@ fun LabelDetailScreen(
                 ) {
                     LabelTopAppBar(
                         label = uiState.label,
-                        navHostController = navHostController
+                        navHostController = navHostController,
+                        viewModel = viewModel,
+                        updateShowBottomNav = updateShowBottomNav
                     )
 
                     BubblesLayout(
@@ -199,13 +201,18 @@ private fun resetEditMode(
 @Composable
 fun LabelTopAppBar(
     label: LabelModel,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    viewModel: LabelDetailViewModel,
+    updateShowBottomNav: (Boolean) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth().padding(top = 25.dp)
     ) {
-        IconButton(onClick = { navHostController.popBackStack() }) {
+        IconButton(onClick = {
+            resetEditMode(viewModel, updateShowBottomNav)
+            navHostController.popBackStack()
+        }) {
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_down),
                 contentDescription = "Back"
