@@ -50,7 +50,7 @@ fun CameraPopup(CameraExpanded : Boolean, onGalleryOpen: () -> Unit, onCameraOpe
                         .size(popupWidth, popupHeight)
                         .padding(top = 5.dp)
                         .background(Color.White, RoundedCornerShape(cornerSize))
-                        .border(1.dp, color = Color(0xFF8E9398), RoundedCornerShape(cornerSize))
+                        .border(1.dp, color = Gray800, RoundedCornerShape(cornerSize))
 
                 ) {
                     Column(
@@ -64,7 +64,7 @@ fun CameraPopup(CameraExpanded : Boolean, onGalleryOpen: () -> Unit, onCameraOpe
                             fontSize = 16.sp,
                             color = Gray800
                         )
-                        HorizontalDivider(modifier = Modifier.border(1.dp, Color.Black))
+                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
                         Text(
                             text = "갤러리",
                             modifier = Modifier.padding(vertical = 13.dp, horizontal = 42.dp)
@@ -73,7 +73,7 @@ fun CameraPopup(CameraExpanded : Boolean, onGalleryOpen: () -> Unit, onCameraOpe
                             fontSize = 16.sp,
                             color = Gray800
                         )
-                        HorizontalDivider(modifier = Modifier.border(1.dp, Color.Black))
+                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
                         Text(
                             text = "배경 설정하기",
                             modifier = Modifier.padding(vertical = 13.dp, horizontal =  22.dp)

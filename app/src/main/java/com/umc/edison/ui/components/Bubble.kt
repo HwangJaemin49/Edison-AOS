@@ -214,7 +214,7 @@ fun BubbleDoor(
     isHighlightActive:Boolean,
     isListActive:Boolean,
     isOrderedListActive:Boolean,
-    bottomPadding : Dp// 변경된 상태를 외부로 전달
+    bottomPadding : Dp
 ) {
     val colors = bubble.labels.map { it.color }
     val outerColors = when (colors.size) {

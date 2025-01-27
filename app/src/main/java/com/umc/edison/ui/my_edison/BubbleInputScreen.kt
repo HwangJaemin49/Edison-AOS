@@ -28,15 +28,30 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.umc.edison.R
+import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.my_edison.BubbleInputViewModel
 import com.umc.edison.ui.components.BubbleDoor
+import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray900
+import com.umc.edison.ui.theme.Pink400
+import com.umc.edison.ui.theme.White000
+import com.umc.edison.ui.theme.Yellow100
 import java.io.File
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BubbleInputScreen(
+
     viewModel: BubbleInputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -53,7 +68,12 @@ fun BubbleInputScreen(
     var isListActive by remember { mutableStateOf(false) }
     var isOrderedListActive by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var isBottomSheetOpen by remember { mutableStateOf(false) }
+    var currentLabel by remember { mutableStateOf(LabelModel(name = "", color = Yellow100)) }
+    var selectedLabels by remember { mutableStateOf(mutableSetOf<LabelModel>()) }
 
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, )
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -139,6 +159,35 @@ fun BubbleInputScreen(
             isOrderedListActive=isOrderedListActive,
             bottomPadding = 56.dp
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.BottomCenter)
+                .offset(y=-56.dp)
+                .imePadding(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            uiState.bubble.labels.forEach { label ->
+                Box(
+                    modifier = Modifier
+                        .height(41.dp)
+                        .background(label.color, RoundedCornerShape(20.dp))
+                        .padding(horizontal = 16.dp)
+
+                ) {
+                    Text(
+                        text = label.name,
+                        color = Gray900,
+                        fontSize = 14.sp,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -219,12 +268,35 @@ fun BubbleInputScreen(
 
             Image(
                 painter = painterResource(id = R.drawable.ic_tag),
-                contentDescription = "List",
+                contentDescription = "Label",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = -23.dp)
+                    .clickable{  isBottomSheetOpen = true}
             )
+        }
+
+        if (isBottomSheetOpen) {
+            ModalBottomSheet(
+                onDismissRequest = { isBottomSheetOpen = false },
+                sheetState = sheetState,
+                containerColor = White000,
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            ) {
+                LabelSelectModal(
+                    labels = uiState.labels, // Room에서 가져온 데이터를 전달
+                    selectedLabels = uiState.bubble.labels, // 이미 선택된 라벨
+                    onConfirm = { selectedLabelsFromModal ->
+                        viewModel.updateLabel(selectedLabelsFromModal)
+                        println("Selected Labels: $selectedLabels")
+
+                    },
+                    onDismiss = {
+                        isBottomSheetOpen = false
+                    }
+                )
+            }
         }
 
         if (textExpanded) Row(
@@ -354,6 +426,10 @@ fun BubbleInputScreen(
             )
 
         }
+
+
+
+
     }
 
 }

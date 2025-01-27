@@ -125,7 +125,6 @@ fun LabelListScreen(
                     viewModel.updateEditMode(EditMode.DELETE)
                 },
                 onDrag = { index ->
-                    // 드래그된 아이템 인덱스 업데이트
                     draggedIndex.intValue = index
                 },
                 resetDrag = {
