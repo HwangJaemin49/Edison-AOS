@@ -4,22 +4,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ripple.LocalRippleTheme
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.umc.edison.R
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray400
 import com.umc.edison.ui.theme.Gray800
@@ -79,45 +81,27 @@ fun BottomNavigation(
         BottomNavItem.MyPage
     )
 
-    NavigationBar(
-        modifier = Modifier
-            .background(color = White000)
-            .border(width = 1.dp, color = Gray100)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        containerColor = White000,
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+    CompositionLocalProvider(LocalRippleTheme provides NoRippleTheme) {
+        NavigationBar(
+            modifier = Modifier
+                .background(color = White000)
+                .border(width = 1.dp, color = Gray100)
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            containerColor = White000,
+        ) {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
 
-        items.forEach { navItem ->
-            // 현재 라우트가 세부 화면일 경우 상위 라우트로 매핑
-            val isSelected = when (navItem) {
-                BottomNavItem.MyEdison -> currentRoute == NavRoute.MyEdison.route
-                BottomNavItem.Space -> currentRoute?.startsWith(NavRoute.Space.route) == true
-                BottomNavItem.ArtLetter -> currentRoute == NavRoute.ArtBoard.route
-                BottomNavItem.MyPage -> currentRoute == NavRoute.MyPage.route
-                BottomNavItem.Bubble -> false
-            }
+            items.forEach { navItem ->
+                // 현재 라우트가 세부 화면일 경우 상위 라우트로 매핑
+                val isSelected = when (navItem) {
+                    BottomNavItem.MyEdison -> currentRoute == NavRoute.MyEdison.route
+                    BottomNavItem.Space -> currentRoute?.startsWith(NavRoute.Space.route) == true
+                    BottomNavItem.ArtLetter -> currentRoute == NavRoute.ArtBoard.route
+                    BottomNavItem.MyPage -> currentRoute == NavRoute.MyPage.route
+                    BottomNavItem.Bubble -> false
+                }
 
-            if (navItem == BottomNavItem.Bubble) {
-                NavigationBarItem(
-                    icon = {
-                        Image(
-                            painter = painterResource(id = if (isSelected) navItem.selectedIcon else navItem.icon),
-                            contentDescription = navItem.route
-                        )
-                    },
-                    selected = isSelected,
-                    onClick = {
-                        onBubbleClick()
-                    },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Gray800,
-                        unselectedIconColor = Gray400,
-                        indicatorColor = White000
-                    )
-                )
-            } else {
                 NavigationBarItem(
                     icon = {
                         Image(
@@ -126,19 +110,23 @@ fun BottomNavigation(
                         )
                     },
                     label = {
-                        Text(
-                            text = LocalContext.current.getString(navItem.title),
-                            color = if (currentRoute == navItem.route) Gray800 else Gray400,
-                            style = MaterialTheme.typography.labelSmall
-                        )
+                        if (navItem != BottomNavItem.Bubble) {
+                            Text(
+                                text = LocalContext.current.getString(navItem.title),
+                                color = if (isSelected) Gray800 else Gray400,
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
                     },
                     selected = isSelected,
                     onClick = {
-                        navController.navigate(navItem.route!!)
+                        if (navItem == BottomNavItem.Bubble) {
+                            onBubbleClick()
+                        } else {
+                            navController.navigate(navItem.route!!)
+                        }
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Gray800,
-                        unselectedIconColor = Gray400,
                         indicatorColor = White000
                     )
                 )
@@ -147,10 +135,10 @@ fun BottomNavigation(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun BottomNavigationPreview() {
-    EdisonTheme {
-        BottomNavigation(navController = NavHostController(LocalContext.current))
-    }
+private object NoRippleTheme : RippleTheme {
+    @Composable
+    override fun defaultColor() = White000
+
+    @Composable
+    override fun rippleAlpha() = RippleAlpha(0F, 0F, 0F, 0F)
 }
