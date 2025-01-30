@@ -29,6 +29,8 @@ import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.BubblesLayout
+import com.umc.edison.ui.components.MyEdisonNavBar
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.White000
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +55,7 @@ fun BubbleStorageScreen(
     }
 
     Scaffold(
+
         bottomBar = {
             if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
                 BottomSheetForDelete(
@@ -72,11 +75,13 @@ fun BubbleStorageScreen(
         }
     ) { innerPadding ->
         Box(
+
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(White000)
-        ) {
+        )
+        {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
@@ -126,6 +131,10 @@ fun BubbleStorageScreen(
                         onBubbleLongClick = onBubbleLongClick,
                         isBlur = isBlur,
                         selectedBubble = uiState.selectedBubbles,
+                    )
+                    MyEdisonNavBar(
+                        onProfileClicked = { /* */ },
+                        onCompassClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) }
                     )
                 }
 

@@ -54,9 +54,7 @@ fun ConfirmBottomSheetPopUp(
     ) {
         BottomSheetPopUpContent(
             title = title,
-            cancelText = cancelText,
             confirmText = confirmText,
-            onDismiss = onDismiss,
             onConfirm = onConfirm
         )
     }
@@ -65,9 +63,7 @@ fun ConfirmBottomSheetPopUp(
 @Composable
 private fun BottomSheetPopUpContent(
     title: String,
-    cancelText: String,
     confirmText: String,
-    onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
     Column(
@@ -101,9 +97,7 @@ fun ConfirmBottomSheetPreview() {
     EdisonTheme {
         BottomSheetPopUpContent(
             title = "텍스트 입력",
-            cancelText = "텍스트 입력",
             confirmText = "텍스트 입력",
-            onDismiss = {},
             onConfirm = {}
         )
 

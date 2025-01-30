@@ -106,26 +106,6 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
-    fun deleteBubbles(bubblesToDelete: List<BubbleModel>) {
-        collectDataResource(
-            flow = deleteBubblesUseCase(bubblesToDelete.map { it.toDomain() }),
-            onSuccess = {
-                _uiState.update {
-                    it.copy(bubbles = it.bubbles - bubblesToDelete)
-                }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
-    }
-
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
             flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
