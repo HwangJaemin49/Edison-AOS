@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.umc.edison.ui.artboard.ArtBoardScreen
+import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
@@ -30,6 +31,10 @@ fun NavigationGraph(
         }
         composable(NavRoute.MyPage.route) {
             MyPageScreen(navHostController)
+        }
+
+        composable(NavRoute.BubbleStorage.route) {
+            BubbleStorageScreen(navHostController, updateShowBottomNav)
         }
 
         // space screen
