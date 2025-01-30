@@ -8,7 +8,7 @@ import java.util.Date
 
 @Entity
 data class BubbleLocal(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @PrimaryKey(autoGenerate = true) override val id: Int = 0,
     val title: String?,
     val content: String?,
     @ColumnInfo(name = "main_image") val mainImage: String?,

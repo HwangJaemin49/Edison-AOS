@@ -51,7 +51,7 @@ class LabelLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun updateLabel(label: LabelEntity) {
-        update(label.toLocal())
+        update(label.toLocal(),tableName)
     }
 
     override suspend fun softDeleteLabel(label: LabelEntity) {

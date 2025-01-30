@@ -25,7 +25,7 @@ import java.util.Date
     ]
 )
 data class BubbleLabelLocal(
-    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @PrimaryKey(autoGenerate = true) override val id: Int = 0,
     @ColumnInfo(name = "bubble_id") val bubbleId: Int,
     @ColumnInfo(name = "label_id") val labelId: Int,
     @ColumnInfo(name = "created_at") override var createdAt: Date? = null,
