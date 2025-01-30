@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -114,12 +115,21 @@ fun BottomSheetForDelete(
             .padding(horizontal = 24.dp, vertical = 8.dp),
     ) {
         if (showSelectedCnt) {
-            Text(
-                text = "선택 ${selectedCnt}개",
-                style = MaterialTheme.typography.labelLarge,
-                color = Gray800,
-                modifier = Modifier.padding(start = 8.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = "선택 ${selectedCnt}개",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Gray800,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
         }
         Row(
             modifier = Modifier
@@ -134,27 +144,26 @@ fun BottomSheetForDelete(
                 modifier = Modifier.weight(1f)
             )
 
-            MiddleDeleteButton (
+            MiddleDeleteButton(
                 enabled = buttonEnabled,
                 onClick = { onDelete() },
                 modifier = Modifier.weight(1f)
             )
         }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetPreview() {
     EdisonTheme {
-        BottomSheetPopUpContent(
-            title = "텍스트 입력",
-            cancelText = "텍스트 입력",
-            confirmText = "텍스트 입력",
-            onDismiss = {},
-            onConfirm = {}
+        BottomSheetForDelete(
+            selectedCnt = 3,
+            showSelectedCnt = true,
+            onButtonClick = {},
+            onDelete = {},
+            buttonEnabled = true,
+            buttonText = "버블 이동"
         )
-
     }
 }
