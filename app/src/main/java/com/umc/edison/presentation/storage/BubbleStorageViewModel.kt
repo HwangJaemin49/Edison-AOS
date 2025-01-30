@@ -47,7 +47,7 @@ class BubbleStorageViewModel @Inject constructor(
                 val someLabel =
                     LabelModel(0, "라벨1", Aqua100, bubbles = listOf())
 
-                insertBubbles(label = someLabel)
+                if (_uiState.value.bubbles.isEmpty()) insertBubbles(label = someLabel)
             }
         )
     }
