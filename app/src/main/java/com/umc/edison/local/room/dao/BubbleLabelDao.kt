@@ -12,7 +12,7 @@ interface BubbleLabelDao {
                 "(bubble_id, label_id, created_at, updated_at) " +
                 "VALUES (:bubbleId, :labelId, :createdAt, :updatedAt)"
     )
-    fun insert(
+    suspend fun insert(
         bubbleId: Int,
         labelId: Int,
         createdAt: Date = Date(),
@@ -22,5 +22,5 @@ interface BubbleLabelDao {
     @Query(
         "DELETE FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId"
     )
-    fun deleteByBubbleId(bubbleId: Int)
+    suspend fun deleteByBubbleId(bubbleId: Int)
 }

@@ -10,7 +10,7 @@ import java.util.Date
 
 @Entity
 data class LabelLocal(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) override val id: Int = 0,
     val name: String,
     val color: Int,
     @ColumnInfo(name = "is_synced") override var isSynced: Boolean = false,
