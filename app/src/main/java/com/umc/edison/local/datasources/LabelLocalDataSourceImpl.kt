@@ -55,7 +55,8 @@ class LabelLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun softDeleteLabel(label: LabelEntity) {
-        softDelete(label.toLocal())
+        softDelete(label.toLocal(), tableName)
+        bubbleLocalDataSource.updateBubbles(label.bubbles)
     }
 
     override suspend fun deleteLabel(label: LabelEntity) {
