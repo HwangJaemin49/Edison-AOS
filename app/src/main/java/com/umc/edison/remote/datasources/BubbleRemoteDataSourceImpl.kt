@@ -12,7 +12,9 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
     private val myPageApiService: MyPageApiService,
 ) : BubbleRemoteDataSource {
     override suspend fun getAllBubbles(): List<BubbleEntity> {
-        TODO("Not yet implemented")
+        val response = bubbleSpaceApiService.getAllBubbles().data
+
+        return response.map { it.toData() }
     }
 
     override suspend fun getDeletedBubbles(): List<BubbleEntity> {

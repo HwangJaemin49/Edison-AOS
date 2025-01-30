@@ -2,6 +2,7 @@ package com.umc.edison.presentation.space
 
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
+import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +25,7 @@ class BubbleSpaceViewModel @Inject constructor(
         collectDataResource(
             flow = getAllBubblesUseCase(),
             onSuccess = { bubbles ->
-//                _uiState.update { it.copy(bubbles = bubbles.map { it.toPresentation() }) }
+                _uiState.update { it.copy(bubbles = bubbles.map { bubble -> bubble.toPresentation() }) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
