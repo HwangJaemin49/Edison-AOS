@@ -2,10 +2,12 @@ package com.umc.edison.ui.label
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,6 +31,7 @@ import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.BubblesLayout
+import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -223,6 +226,11 @@ fun LabelTopAppBar(
             modifier = Modifier
                 .size(24.dp)
                 .background(color = label.color, shape = CircleShape)
+                .border(
+                    width = 3.dp,
+                    color = if (label.color != White000) label.color else Gray100,
+                    shape = RoundedCornerShape(16.dp)
+                )
         )
 
         Spacer(modifier = Modifier.width(12.dp))

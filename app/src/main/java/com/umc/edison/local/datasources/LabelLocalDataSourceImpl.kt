@@ -64,6 +64,15 @@ class LabelLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getLabelDetail(labelId: Int): LabelEntity {
+        if (labelId == 0) {
+            return LabelEntity(
+                id = 0,
+                name = "-",
+                color = White000,
+                bubbles = bubbleLocalDataSource.getBubblesByLabel(0)
+            )
+        }
+
         val localLabel = labelDao.getLabelById(labelId) ?: throw Exception("Label not found")
 
         val label = localLabel.toData()
