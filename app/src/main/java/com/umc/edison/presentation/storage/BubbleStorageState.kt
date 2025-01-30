@@ -4,6 +4,8 @@ import com.umc.edison.presentation.model.BubbleModel
 
 data class BubbleStorageState(
     val bubbles: List<BubbleModel> = emptyList(),
+    val selectedBubbles: List<BubbleModel> = emptyList(),
+    val bubbleStorageMode: BubbleStorageMode = BubbleStorageMode.NONE,
     val isLoading: Boolean,
     val error: Throwable?,
 ) {
@@ -14,4 +16,8 @@ data class BubbleStorageState(
             error = null
         )
     }
+}
+
+enum class BubbleStorageMode {
+    NONE, VIEW, EDIT, SHARE, DELETE
 }

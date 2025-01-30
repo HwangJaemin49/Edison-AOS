@@ -5,6 +5,7 @@ sealed class NavRoute(val route: String) {
     data object Space : NavRoute("space")
     data object ArtBoard : NavRoute("art-board")
     data object MyPage : NavRoute("my-page")
+    data object BubbleStorage: NavRoute("my-edison/bubble-storage")
 
     data object SpaceLabel : NavRoute("space/labels")
 

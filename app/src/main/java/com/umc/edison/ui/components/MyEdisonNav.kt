@@ -35,7 +35,7 @@ import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Gray500
 
 @Composable
-fun BubbleStorageTopBar(
+fun MyEdisonNavBar(
     onProfileClicked: () -> Unit,
     onCompassClicked: () -> Unit
 ) {
@@ -118,7 +118,10 @@ fun BubbleStorageTopBar(
                     }
 
                     IconButton(
-                        onClick = { isSearchActive = false },
+                        onClick = {
+                            isSearchActive = false
+                            onCompassClicked()
+                        },
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
@@ -159,7 +162,10 @@ fun BubbleStorageTopBar(
                     }
 
                     IconButton(
-                        onClick = { isSearchActive = false },
+                        onClick = {
+                            isSearchActive = false
+                            onCompassClicked()
+                        },
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
@@ -182,7 +188,7 @@ fun BubbleStorageTopBarPreview() {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        BubbleStorageTopBar(
+        MyEdisonNavBar(
             onProfileClicked = { /* 클릭 로직 */ },
             onCompassClicked = { /* 클릭 로직 */ }
         )

@@ -10,8 +10,6 @@ import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
 import com.umc.edison.ui.theme.Aqua100
-import com.umc.edison.ui.theme.Red100
-import com.umc.edison.ui.theme.Yellow100
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,6 +52,41 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
+    fun updateEditMode(mode: BubbleStorageMode) {
+        if (mode == BubbleStorageMode.NONE) {
+            _uiState.update {
+                it.copy(
+                    bubbleStorageMode = mode,
+                    selectedBubbles = emptyList()
+                )
+            }
+        } else {
+            _uiState.update { it.copy(bubbleStorageMode = mode) }
+        }
+    }
+
+    fun selectBubble(bubble: BubbleModel) {
+        _uiState.update {
+            it.copy(
+                selectedBubbles = listOf(bubble)
+            )
+        }
+    }
+
+    fun toggleSelectBubble(bubble: BubbleModel) {
+        _uiState.update {
+            if (it.selectedBubbles.contains(bubble)) {
+                it.copy(
+                    selectedBubbles = it.selectedBubbles - bubble
+                )
+            } else {
+                it.copy(
+                    selectedBubbles = it.selectedBubbles + bubble
+                )
+            }
+        }
+    }
+
 
     fun addBubbles(newBubbles: List<BubbleModel>) {
         collectDataResource(
@@ -80,6 +113,26 @@ class BubbleStorageViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(bubbles = it.bubbles - bubblesToDelete)
                 }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
+        collectDataResource(
+            flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
+            onSuccess = {
+                updateEditMode(BubbleStorageMode.NONE)
+                showBottomNav(true)
+                fetchAllBubbles()
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

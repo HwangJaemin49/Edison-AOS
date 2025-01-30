@@ -1,151 +1,175 @@
+package com.umc.edison.ui.bubblestorage
+
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.presentation.model.ContentBlockModel
+import com.umc.edison.presentation.storage.BubbleStorageMode
 import com.umc.edison.presentation.storage.BubbleStorageViewModel
-import com.umc.edison.ui.components.BubblePreview
-import com.umc.edison.ui.components.calculateBubbleSize
+import com.umc.edison.ui.components.BottomSheet
+import com.umc.edison.ui.components.BottomSheetForDelete
+import com.umc.edison.ui.components.BottomSheetPopUp
+import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.theme.White000
-import kotlin.random.Random
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BubbleStorageScreen(viewModel: BubbleStorageViewModel = hiltViewModel()) {
+fun BubbleStorageScreen(
+    navHostController: NavHostController,
+    updateShowBottomNav: (Boolean) -> Unit,
+    viewModel: BubbleStorageViewModel = hiltViewModel(),
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     val uiState by viewModel.uiState.collectAsState()
+    val isBlur =
+        uiState.bubbleStorageMode != BubbleStorageMode.NONE && uiState.bubbleStorageMode != BubbleStorageMode.VIEW
 
-    val (selectedBubble, setSelectedBubble) = remember { mutableStateOf<BubbleModel?>(null) }
-    val (longClickedBubble, setLongClickedBubble) = remember { mutableStateOf<BubbleModel?>(null) }
-    val highlightedBubbles = remember { mutableStateListOf<BubbleModel>() } // 강조된 버블 리스트
+    BackHandler(enabled = true) {
+        if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
+            navHostController.popBackStack()
+        } else {
+            resetEditMode(viewModel, updateShowBottomNav)
+        }
+    }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        when {
-            uiState.isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+    Scaffold(
+        bottomBar = {
+            if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
+                BottomSheetForDelete(
+                    selectedCnt = uiState.selectedBubbles.size,
+                    showSelectedCnt = true,
+                    onButtonClick = {
+                        // 공유하기 버튼 눌렀을 때 동작
+                        viewModel.updateEditMode(BubbleStorageMode.SHARE)
+                    },
+                    onDelete = {
+                        viewModel.updateEditMode(BubbleStorageMode.DELETE)
+                    },
+                    buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
+                    buttonText = "공유하기",
+                )
             }
-            uiState.error != null -> {
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(White000)
+        ) {
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else if (uiState.error != null) {
                 Text(
                     text = "Error loading data",
                     color = Color.Red,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier.padding(16.dp),
+                    textAlign = TextAlign.Center
                 )
-            }
-            else -> {
-                BubblesLayout(
-                    bubbles = uiState.bubbles,
+            } else {
+                var onBubbleClick: (BubbleModel) -> Unit = {}
+                var onBubbleLongClick: (BubbleModel) -> Unit = {}
+
+                if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
                     onBubbleClick = { bubble ->
-                        if (longClickedBubble != null) {
-                            // 강조 리스트에 추가
-                            if (!highlightedBubbles.contains(bubble)) {
-                                highlightedBubbles.add(bubble)
-                            }
-                        } else {
-                            setSelectedBubble(bubble) // 일반 클릭 시 동작
-                        }
-                    },
+                        viewModel.toggleSelectBubble(bubble)
+                    }
+                } else if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
+                    onBubbleClick = { bubble ->
+                        viewModel.selectBubble(bubble)
+                        viewModel.updateEditMode(BubbleStorageMode.VIEW)
+                    }
                     onBubbleLongClick = { bubble ->
-                        setLongClickedBubble(bubble) // 길게 클릭 시 해당 버블 설정
-                        highlightedBubbles.clear() // 강조된 버블 초기화
-                    },
-                    isBlur = longClickedBubble != null, // 블러 처리 여부
-                    selectedBubble = highlightedBubbles // 강조된 버블 리스트
-                )
-            }
-        }
+                        viewModel.selectBubble(bubble)
+                        viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                        updateShowBottomNav(false)
+                    }
+                }
 
-        // 선택된 Bubble 컴포넌트 표시
-        if (selectedBubble != null) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .clickable { setSelectedBubble(null) } // 클릭 시 닫기
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Bubble(
-                    bubble = selectedBubble,
-                    onClick = { setSelectedBubble(null) }
-                )
-            }
-        }
-    }
-}
+                Box(
+                    modifier = Modifier
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
+                                resetEditMode(viewModel, updateShowBottomNav)
+                            }
+                        }
+                        .fillMaxSize()
+                ) {
+                    BubblesLayout(
+                        bubbles = uiState.bubbles,
+                        onBubbleClick = onBubbleClick,
+                        onBubbleLongClick = onBubbleLongClick,
+                        isBlur = isBlur,
+                        selectedBubble = uiState.selectedBubbles,
+                    )
+                }
 
-
-@Composable
-fun BubblesLayout(
-    bubbles: List<BubbleModel>,
-    onBubbleClick: (BubbleModel) -> Unit,
-    onBubbleLongClick: (BubbleModel) -> Unit,
-    isBlur: Boolean = false,
-    selectedBubble: List<BubbleModel>,
-) {
-    val bubbleOffsets = remember { mutableStateMapOf<BubbleModel, Dp>() }
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(bubbles.size) { index ->
-            val bubble = bubbles[index]
-
-            val xOffset = bubbleOffsets.getOrPut(bubble) {
-                calculateInitialBubbleXOffset(bubble)
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = xOffset)
-                    .size(calculateBubbleSize(bubble).size + 4.dp)
-            ) {
-                BubblePreview(
-                    bubble = bubble,
-                    size = calculateBubbleSize(bubble),
-                    onClick = { onBubbleClick(bubble) },
-                    onLongClick = { onBubbleLongClick(bubble) }
-                )
-
-                if (isBlur && !selectedBubble.contains(bubble)) {
+                if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
+                    val bubble = uiState.selectedBubbles.first()
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(White000.copy(alpha = 0.5f))
-                            .graphicsLayer {
-                                renderEffect = BlurEffect(
-                                    radiusX = 16.dp.toPx(),
-                                    radiusY = 16.dp.toPx()
-                                )
+                            .background(Color.Black.copy(alpha = 0.5f))
+                            .clickable(onClick = {
+                                viewModel.updateEditMode(BubbleStorageMode.NONE)
+                            }),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Bubble(
+                            bubble = bubble,
+                            onClick = {
+                                // TODO: 버블 작성 화면 구현 완료되면 연결
+                                // navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
                             }
+                        )
+                    }
+                } else if (uiState.bubbleStorageMode == BubbleStorageMode.SHARE) {
+                    BottomSheet(
+                        onDismiss = {
+                            viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                        },
+                        sheetState = sheetState,
+                    ) {
+                        // TODO: 이미지로 공유하기, 텍스트로 공유하기 리스트 아이템
+                    }
+
+                } else if (uiState.bubbleStorageMode == BubbleStorageMode.DELETE) {
+                    BottomSheetPopUp(
+                        title = "${uiState.selectedBubbles.size} 개의 버블을 삭제하시겠습니까?",
+                        cancelText = "취소",
+                        confirmText = "삭제",
+                        onDismiss = {
+                            viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                        },
+                        onConfirm = {
+                             viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
+                        },
+                        sheetState = sheetState,
                     )
                 }
             }
@@ -153,21 +177,10 @@ fun BubblesLayout(
     }
 }
 
-@Composable
-private fun calculateInitialBubbleXOffset(bubble: BubbleModel): Dp {
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
-    val padding = 8.dp
-
-    val maxXOffset = screenWidthDp - calculateBubbleSize(bubble).size - padding
-
-    // 랜덤 초기 오프셋 계산
-    return (padding.value.toInt()..maxXOffset.value.toInt()).random().dp
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun BubbleStorageScreenPreview() {
-    BubbleStorageScreen()
+private fun resetEditMode(
+    viewModel: BubbleStorageViewModel,
+    updateShowBottomNav: (Boolean) -> Unit
+) {
+    viewModel.updateEditMode(BubbleStorageMode.NONE)
+    updateShowBottomNav(true)
 }
