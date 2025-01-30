@@ -44,10 +44,7 @@ class BubbleStorageViewModel @Inject constructor(
             },
             onComplete = {
                 _uiState.update { it.copy(isLoading = false) }
-                val someLabel =
-                    LabelModel(0, "라벨1", Aqua100, bubbles = listOf())
-
-                if (_uiState.value.bubbles.isEmpty()) insertBubbles(label = someLabel)
+                if (_uiState.value.bubbles.isEmpty()) insertBubbles()
             }
         )
     }
@@ -126,7 +123,7 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
-    private fun insertBubbles(label: LabelModel) {
+    private fun insertBubbles() {
         val dummyBubbles = listOf(
             BubbleModel(
                 id = 1,
@@ -138,7 +135,7 @@ class BubbleStorageViewModel @Inject constructor(
                     ),
                 ),
                 mainImage = null,
-                labels = listOf(label) // ✅ 여기에 label 추가
+                labels = emptyList() // ✅ 여기에 label 추가
             ),
             BubbleModel(
                 id = 2,
@@ -150,7 +147,7 @@ class BubbleStorageViewModel @Inject constructor(
                     ),
                 ),
                 mainImage = null,
-                labels = listOf(label) // ✅ 여기에 label 추가
+                labels = emptyList() // ✅ 여기에 label 추가
             ),
         )
 

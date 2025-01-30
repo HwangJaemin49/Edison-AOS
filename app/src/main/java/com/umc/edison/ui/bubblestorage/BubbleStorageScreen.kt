@@ -6,9 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -164,8 +166,39 @@ fun BubbleStorageScreen(
                         },
                         sheetState = sheetState,
                     ) {
-                        // TODO: 이미지로 공유하기, 텍스트로 공유하기 리스트 아이템
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp)
+                        ) {
+                            TextButton(
+                                onClick = { /* TODO: 이미지 공유 로직 추가 */ },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                            ) {
+                                Text(
+                                    text = "이미지로 공유하기",
+                                    color = Color.Black
+                                )
+                            }
+
+                            Divider(color = Color.LightGray, thickness = 1.dp)
+
+                            TextButton(
+                                onClick = { /* TODO: 텍스트 공유 로직 추가 */ },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                            ) {
+                                Text(
+                                    text = "텍스트로 공유하기",
+                                    color = Color.Black
+                                )
+                            }
+                        }
                     }
+
 
                 } else if (uiState.bubbleStorageMode == BubbleStorageMode.DELETE) {
                     BottomSheetPopUp(
