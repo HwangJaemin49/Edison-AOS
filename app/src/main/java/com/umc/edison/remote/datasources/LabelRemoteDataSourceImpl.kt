@@ -4,7 +4,7 @@ import com.umc.edison.data.datasources.LabelRemoteDataSource
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.remote.api.BubbleSpaceApiService
 import com.umc.edison.remote.api.SyncApiService
-import com.umc.edison.remote.model.toAddLabelLocal
+import com.umc.edison.remote.model.toSyncLabelRequest
 import javax.inject.Inject
 
 class LabelRemoteDataSourceImpl @Inject constructor(
@@ -21,6 +21,6 @@ class LabelRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun syncLabel(label: LabelEntity) {
         // 임시로 라벨 생성으로 구현해 둠
-        syncApiService.addLabel(label.toAddLabelLocal())
+        syncApiService.syncLabel(label.toSyncLabelRequest())
     }
 }
