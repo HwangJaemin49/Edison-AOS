@@ -12,7 +12,6 @@ data class BubbleStorageState(
     companion object {
         val DEFAULT = BubbleStorageState(
             isLoading = false,
-//            bubbles = emptyList(),
             error = null
         )
     }

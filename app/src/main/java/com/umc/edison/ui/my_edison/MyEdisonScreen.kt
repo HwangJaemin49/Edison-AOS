@@ -20,11 +20,6 @@ fun MyEdisonScreen(navHostController: NavHostController) {
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        MyEdisonNavBar(
-            onProfileClicked = { /* */ },
-            onCompassClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) }
-        )
-
         BubbleInput(
             onClick = { /* */},
             onSwipeUp = {/* */}

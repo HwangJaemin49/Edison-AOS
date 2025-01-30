@@ -30,7 +30,7 @@ class BubbleStorageViewModel @Inject constructor(
         fetchAllBubbles()
     }
 
-    private fun fetchAllBubbles() {
+    private fun fetchAllBubbles() { // TODO: 사용하는 비즈니스 로직이 7일간의 버블만 갖고오는 로직이라 이 부분은 UI 구현이 끝난 이후에 수정
         collectDataResource(
             flow = getAllBubblesUseCase(),
             onSuccess = { bubbles ->
@@ -84,25 +84,6 @@ class BubbleStorageViewModel @Inject constructor(
         }
     }
 
-
-    fun addBubbles(newBubbles: List<BubbleModel>) {
-        collectDataResource(
-            flow = addBubblesUseCase(newBubbles.map { it.toDomain() }),
-            onSuccess = {
-                _uiState.update { it.copy(bubbles = _uiState.value.bubbles + newBubbles) }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
-    }
-
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
             flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
@@ -135,7 +116,7 @@ class BubbleStorageViewModel @Inject constructor(
                     ),
                 ),
                 mainImage = null,
-                labels = emptyList() // ✅ 여기에 label 추가
+                labels = emptyList()
             ),
             BubbleModel(
                 id = 2,
@@ -147,7 +128,7 @@ class BubbleStorageViewModel @Inject constructor(
                     ),
                 ),
                 mainImage = null,
-                labels = emptyList() // ✅ 여기에 label 추가
+                labels = emptyList()
             ),
         )
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,8 +32,8 @@ import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.BubblesLayout
-import com.umc.edison.ui.components.MyEdisonNavBar
-import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray900
 import com.umc.edison.ui.theme.White000
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,10 +135,6 @@ fun BubbleStorageScreen(
                         isBlur = isBlur,
                         selectedBubble = uiState.selectedBubbles,
                     )
-                    MyEdisonNavBar(
-                        onProfileClicked = { /* */ },
-                        onCompassClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) }
-                    )
                 }
 
                 if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
@@ -175,29 +172,52 @@ fun BubbleStorageScreen(
                                 onClick = { /* TODO: 이미지 공유 로직 추가 */ },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
+                                    .padding(horizontal = 16.dp, vertical = 10.dp)
                             ) {
-                                Text(
-                                    text = "이미지로 공유하기",
-                                    color = Color.Black
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "이미지로 공유하기",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = Gray900
+                                    )
+                                }
                             }
 
-                            Divider(color = Color.LightGray, thickness = 1.dp)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentWidth(Alignment.CenterHorizontally)
+                            ) {
+                                Divider(
+                                    color = Gray300,
+                                    thickness = 1.dp,
+                                    modifier = Modifier.width(326.dp)
+                                )
+                            }
 
                             TextButton(
                                 onClick = { /* TODO: 텍스트 공유 로직 추가 */ },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
+                                    .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 10.dp)
+
                             ) {
-                                Text(
-                                    text = "텍스트로 공유하기",
-                                    color = Color.Black
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "텍스트로 공유하기",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = Gray900
+                                    )
+                                }
                             }
                         }
-                    }
+
+
+                }
 
 
                 } else if (uiState.bubbleStorageMode == BubbleStorageMode.DELETE) {
