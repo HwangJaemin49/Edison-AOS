@@ -13,15 +13,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,9 +33,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
+import com.umc.edison.presentation.model.KeywordModel
+import com.umc.edison.presentation.mypage.MyPageViewModel
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
@@ -53,7 +59,7 @@ fun MyPageScreen(
                 .padding(innerPadding)
                 .background(Color.White)
         ) {
-            MyPageDefaultContent()
+            MyPageContent()
         }
     }
 
@@ -65,37 +71,45 @@ private fun HamburgerMenu() {
         modifier = Modifier
             .fillMaxWidth()
             .background(White000)
+            .padding(start = 24.dp, top = 12.dp, end = 24.dp)
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_hamburger),
             contentDescription = "Hamburger Menu",
-            modifier = Modifier
-                .size(24.dp)
-                .padding(16.dp),
+            modifier = Modifier.align(Alignment.End),
             tint = Gray800
         )
     }
 }
 
 @Composable
-private fun MyPageDefaultContent() {
+private fun MyPageContent(
+    viewModel: MyPageViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .background(White000)
-            .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 12.dp),
+            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        ProfileInfo()
+        ProfileInfo(
+            imageUrl = uiState.profileImage,
+            name = uiState.nickname
+        )
 
         GrayContainerSection(
             title = "Identity",
-            items = listOf("나를 설명하는 단어를 골라주세요!", "지금 혹은 미래의 나는 어떤 필드에 있나요?", "나에게 가장 영감을 주는 환경은?")
+            items = uiState.identity.map { Pair(it.category.question, it.keywords) }
         )
 
         GrayContainerSection(
             title = "나의 관심사",
-            items = listOf("나의 상상력을 자극하는 분야는?")
+            items = listOf(Pair(uiState.interest.category.question, uiState.interest.keywords))
         )
 
         Spacer(
@@ -109,7 +123,10 @@ private fun MyPageDefaultContent() {
 }
 
 @Composable
-private fun ProfileInfo() {
+private fun ProfileInfo(
+    imageUrl: String?,
+    name: String,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,16 +135,15 @@ private fun ProfileInfo() {
         horizontalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         AsyncImage(
-            model = R.drawable.ic_profile_default_small,
+            model = imageUrl ?: R.drawable.ic_profile_default_small,
             contentDescription = "Profile Image",
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Gray300), // TODO: 임시 보여지는 용
         )
 
         Text(
-            text = "Name",
+            text = name,
             style = MaterialTheme.typography.titleMedium,
             color = Gray800
         )
@@ -137,7 +153,7 @@ private fun ProfileInfo() {
 @Composable
 private fun GrayContainerSection(
     title: String,
-    items: List<String>
+    items: List<Pair<String, List<KeywordModel>>>,
 ) {
     Column(
         modifier = Modifier
@@ -155,8 +171,8 @@ private fun GrayContainerSection(
 
         items.forEach {
             WhiteContainerItem(
-                title = it,
-                keyword = listOf("Android", "iOS", "Web", "UI/UX")
+                title = it.first,
+                keyword = it.second.map { keyword -> keyword.name }
             )
         }
     }
@@ -240,18 +256,39 @@ private fun ArtLetterScrap() {
             )
         }
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(6) {
-                ArtLetterContent()
+        ArtLetterGrid()
+    }
+}
+
+@Composable
+private fun ArtLetterGrid() {
+    val items = List(6) { it }
+    val columns = 2
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items.chunked(columns).forEach { rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                rowItems.forEach { _ ->
+                    Box(modifier = Modifier.weight(1f)) {
+                        ArtLetterContent()
+                    }
+                }
+
+                if (rowItems.size < columns) {
+                    Spacer(modifier = Modifier.weight(columns - rowItems.size.toFloat()))
+                }
             }
         }
     }
 }
+
 
 @Composable
 private fun ArtLetterContent() {
@@ -283,6 +320,6 @@ private fun ArtLetterContent() {
 @Composable
 fun MyPageScreenPreview() {
     EdisonTheme {
-        MyPageDefaultContent()
+        MyPageContent()
     }
 }

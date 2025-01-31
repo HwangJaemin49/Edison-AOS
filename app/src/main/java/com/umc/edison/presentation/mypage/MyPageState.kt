@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.mypage
 
+import com.umc.edison.presentation.model.IdentityCategory
 import com.umc.edison.presentation.model.IdentityModel
 import com.umc.edison.presentation.model.InterestCategory
 import com.umc.edison.presentation.model.InterestModel
@@ -20,7 +21,20 @@ data class MyPageState(
             isLoading = false,
             isLoggedIn = false,
             nickname = "닉네임",
-            identity = listOf(),
+            identity = listOf(
+                IdentityModel(
+                    category = IdentityCategory.EXPLAIN,
+                    keywords = listOf()
+                ),
+                IdentityModel(
+                    category = IdentityCategory.FIELD,
+                    keywords = listOf()
+                ),
+                IdentityModel(
+                    category = IdentityCategory.ENVIRONMENT,
+                    keywords = listOf()
+                )
+            ),
             interest = InterestModel(
                 category = InterestCategory.INSPIRATION,
                 keywords = listOf()

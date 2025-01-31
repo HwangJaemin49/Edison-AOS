@@ -14,6 +14,6 @@ fun InterestKeyword.toPresentation(): InterestModel {
     )
 }
 
-enum class InterestCategory(name: String) {
+enum class InterestCategory(val question: String) {
     INSPIRATION("나의 상상력을 자극하는 분야는?"),
 }
