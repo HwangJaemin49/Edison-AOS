@@ -11,6 +11,7 @@ sealed class NavRoute(val route: String) {
 
     data object ProfileEdit: NavRoute("my-page/profile-edit")
     data object Menu : NavRoute("my-page/menu")
+    data object Trash : NavRoute("my-page/trash")
 
     data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/${id}") {
         companion object {

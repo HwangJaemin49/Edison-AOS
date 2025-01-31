@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.umc.edison.R
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
@@ -72,7 +73,7 @@ fun MenuScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             SettingItem(title = "휴지통") {
-                // TODO: 휴지통 화면으로 이동
+                navHostController.navigate(NavRoute.Trash.route)
             }
 
             SettingItem(title = "계정 관리") {

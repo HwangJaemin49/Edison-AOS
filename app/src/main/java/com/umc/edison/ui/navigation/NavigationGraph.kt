@@ -14,6 +14,7 @@ import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.MenuScreen
+import com.umc.edison.ui.mypage.TrashScreen
 
 @Composable
 fun NavigationGraph(
@@ -55,6 +56,10 @@ fun NavigationGraph(
 
         composable(NavRoute.Menu.route) {
             MenuScreen(navHostController, updateShowBottomNav)
+        }
+
+        composable(NavRoute.Trash.route) {
+            TrashScreen(navHostController, updateShowBottomNav)
         }
     }
 }
