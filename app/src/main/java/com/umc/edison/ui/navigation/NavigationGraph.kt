@@ -12,6 +12,7 @@ import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
+import com.umc.edison.ui.mypage.EditProfileScreen
 
 @Composable
 fun NavigationGraph(
@@ -23,26 +24,32 @@ fun NavigationGraph(
         composable(NavRoute.MyEdison.route) {
             MyEdisonScreen(navHostController)
         }
-        composable(NavRoute.Space.route) {
-            BubbleSpaceScreen(navHostController)
-        }
-        composable(NavRoute.ArtBoard.route) {
-            ArtBoardScreen(navHostController)
-        }
-        composable(NavRoute.MyPage.route) {
-            MyPageScreen(navHostController)
-        }
 
         composable(NavRoute.BubbleStorage.route) {
             BubbleStorageScreen(navHostController, updateShowBottomNav)
         }
 
-        // space screen
+        composable(NavRoute.Space.route) {
+            BubbleSpaceScreen(navHostController)
+        }
+
         composable(
             route = "${NavRoute.SpaceLabel.route}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
             LabelDetailScreen(navHostController, updateShowBottomNav)
+        }
+
+        composable(NavRoute.ArtBoard.route) {
+            ArtBoardScreen(navHostController)
+        }
+
+        composable(NavRoute.MyPage.route) {
+            MyPageScreen(navHostController)
+        }
+
+        composable(NavRoute.ProfileEdit.route) {
+            EditProfileScreen(navHostController)
         }
     }
 }

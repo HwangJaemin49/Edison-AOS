@@ -95,10 +95,10 @@ fun BottomNavigation(
             items.forEach { navItem ->
                 // 현재 라우트가 세부 화면일 경우 상위 라우트로 매핑
                 val isSelected = when (navItem) {
-                    BottomNavItem.MyEdison -> currentRoute == NavRoute.MyEdison.route
+                    BottomNavItem.MyEdison -> currentRoute?.startsWith(NavRoute.MyEdison.route) == true
                     BottomNavItem.Space -> currentRoute?.startsWith(NavRoute.Space.route) == true
-                    BottomNavItem.ArtLetter -> currentRoute == NavRoute.ArtBoard.route
-                    BottomNavItem.MyPage -> currentRoute == NavRoute.MyPage.route
+                    BottomNavItem.ArtLetter -> currentRoute?.startsWith(NavRoute.ArtBoard.route) == true
+                    BottomNavItem.MyPage -> currentRoute?.startsWith(NavRoute.MyPage.route) == true
                     BottomNavItem.Bubble -> false
                 }
 

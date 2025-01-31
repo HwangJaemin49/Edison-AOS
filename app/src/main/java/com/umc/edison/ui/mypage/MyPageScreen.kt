@@ -32,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -41,7 +40,7 @@ import com.umc.edison.R
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.mypage.MyPageViewModel
 import com.umc.edison.ui.components.PopUpMulti
-import com.umc.edison.ui.theme.EdisonTheme
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
@@ -61,7 +60,7 @@ fun MyPageScreen(
                 .padding(innerPadding)
                 .background(Color.White)
         ) {
-            MyPageContent()
+            MyPageContent(navHostController)
         }
     }
 
@@ -86,6 +85,7 @@ private fun HamburgerMenu() {
 
 @Composable
 private fun MyPageContent(
+    navHostController: NavHostController,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -100,7 +100,8 @@ private fun MyPageContent(
     ) {
         ProfileInfo(
             imageUrl = uiState.profileImage,
-            name = uiState.nickname
+            name = uiState.nickname,
+            navHostController = navHostController,
         )
 
         Box(
@@ -155,10 +156,15 @@ private fun MyPageContent(
 private fun ProfileInfo(
     imageUrl: String?,
     name: String,
+    navHostController: NavHostController,
 ) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                navHostController.navigate(NavRoute.ProfileEdit.route)
+            }
             .padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(18.dp)
@@ -351,13 +357,5 @@ private fun ArtLetterContent(
             style = MaterialTheme.typography.titleSmall,
             color = Gray800
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MyPageScreenPreview() {
-    EdisonTheme {
-        MyPageContent()
     }
 }

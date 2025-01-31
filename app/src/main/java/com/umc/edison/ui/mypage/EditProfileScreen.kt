@@ -17,18 +17,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
 @Composable
-fun EditProfileScreen() {
+fun EditProfileScreen(
+    navHostController: NavHostController,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,13 +86,5 @@ private fun EditProfileImage(
                 .border(1.dp, Gray200, CircleShape),
 
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewEditProfileScreen() {
-    EdisonTheme {
-        EditProfileScreen()
     }
 }
