@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -115,21 +114,12 @@ fun BottomSheetForDelete(
             .padding(horizontal = 24.dp, vertical = 8.dp),
     ) {
         if (showSelectedCnt) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Spacer(modifier = Modifier.weight(1f))
-
-                Text(
-                    text = "선택 ${selectedCnt}개",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Gray800,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-            }
+            Text(
+                text = "선택 ${selectedCnt}개",
+                style = MaterialTheme.typography.labelLarge,
+                color = Gray800,
+                modifier = Modifier.align(Alignment.End).padding(end = 8.dp)
+            )
         }
         Row(
             modifier = Modifier
