@@ -1,9 +1,18 @@
 package com.umc.edison.presentation.model
 
+import com.umc.edison.domain.model.IdentityKeyword
+
 data class IdentityModel(
     val category: IdentityCategory,
     val keywords: List<KeywordModel>
 )
+
+fun IdentityKeyword.toPresentation(): IdentityModel {
+    return IdentityModel(
+        category = IdentityCategory.valueOf(question),
+        keywords = keywords.map { it.toPresentation() }
+    )
+}
 
 enum class IdentityCategory(name: String) {
     EXPLAIN("나를 설명하는 단어를 골라주세요!"),
