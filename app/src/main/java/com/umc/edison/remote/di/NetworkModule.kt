@@ -1,7 +1,9 @@
 package com.umc.edison.remote.di
 
 import com.umc.edison.BuildConfig
+import com.umc.edison.remote.api.RefreshTokenApiService
 import com.umc.edison.remote.token.AccessTokenInterceptor
+import com.umc.edison.remote.token.TokenAuthenticator
 import com.umc.edison.remote.token.TokenManager
 import dagger.Module
 import dagger.Provides
@@ -25,6 +27,10 @@ object NetworkModule {
     @Retention(AnnotationRetention.BINARY)
     annotation class MainRetrofit
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class RefreshRetrofit
+
     @Provides
     @Singleton
     fun provideConverterFactory(): GsonConverterFactory = GsonConverterFactory.create()
@@ -43,15 +49,27 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideTokenAuthenticator(
+        tokenManager: TokenManager,
+        @RefreshRetrofit retrofit: Retrofit
+    ): TokenAuthenticator {
+        val refreshTokenApiService = retrofit.create(RefreshTokenApiService::class.java)
+        return TokenAuthenticator(tokenManager, refreshTokenApiService)
+    }
+
+    @Provides
+    @Singleton
     fun provideOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        accessTokenInterceptor: AccessTokenInterceptor
+        accessTokenInterceptor: AccessTokenInterceptor,
+        tokenAuthenticator: TokenAuthenticator,
     ) : OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
         .readTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
         .writeTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
         .addInterceptor(httpLoggingInterceptor)
         .addInterceptor(accessTokenInterceptor)
+        .authenticator(tokenAuthenticator)
         .build()
 
     @MainRetrofit
@@ -59,10 +77,31 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
-        gsonConverterFactory: GsonConverterFactory
+        gsonConverterFactory: GsonConverterFactory,
     ) : Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.BASE_URL)
         .addConverterFactory(gsonConverterFactory)
         .client(okHttpClient)
-        .baseUrl(BuildConfig.BASE_URL)
         .build()
+
+    @RefreshRetrofit
+    @Provides
+    @Singleton
+    fun provideRefreshRetrofit(
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        gsonConverterFactory: GsonConverterFactory
+    ): Retrofit {
+        val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
+            .readTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
+            .writeTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
+            .addInterceptor(httpLoggingInterceptor)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(gsonConverterFactory)
+            .client(okHttpClient)
+            .build()
+    }
 }

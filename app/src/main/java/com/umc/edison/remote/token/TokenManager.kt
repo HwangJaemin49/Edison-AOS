@@ -12,6 +12,7 @@ class TokenManager @Inject constructor(
 ) {
     companion object {
         private var ACCESS_TOKEN: String? = null
+        private var REFRESH_TOKEN: String? = null
     }
 
     fun loadAccessToken(): String? {
@@ -21,11 +22,21 @@ class TokenManager @Inject constructor(
         return ACCESS_TOKEN
     }
 
-    fun setToken(token: String) {
-        ACCESS_TOKEN = token
+    fun loadRefreshToken(): String? {
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
+        REFRESH_TOKEN = sharedPreferences.getString("refresh_token", null)
+
+        return REFRESH_TOKEN
+    }
+
+    fun setToken(accessToken: String, refreshToken: String? = null) {
+        ACCESS_TOKEN = accessToken
+        REFRESH_TOKEN = refreshToken
+
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("access_token", token)
+        editor.putString("access_token", ACCESS_TOKEN)
+        if (REFRESH_TOKEN != null) editor.putString("refresh_token", REFRESH_TOKEN)
         editor.apply()
     }
 }

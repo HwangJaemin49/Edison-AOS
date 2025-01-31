@@ -11,7 +11,7 @@ data class BubbleEntity(
     val title: String? = null,
     val content: String? = null,
     var mainImage: String? = null,
-    var labels: List<LabelEntity>,
+    var labels: List<LabelEntity> = emptyList(),
     val date: Date,
 ) : DataMapper<Bubble> {
     override fun toDomain(): Bubble {
