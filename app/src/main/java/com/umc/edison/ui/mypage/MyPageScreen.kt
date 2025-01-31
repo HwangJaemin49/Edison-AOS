@@ -13,13 +13,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavHostController
 import com.umc.edison.R
+import com.umc.edison.ui.theme.White000
 
 @Composable
 fun MyPageScreen(navHostController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(White000)
     ) {
         Text(
             text = stringResource(id = R.string.my),

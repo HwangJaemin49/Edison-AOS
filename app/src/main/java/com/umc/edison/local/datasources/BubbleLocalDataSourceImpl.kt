@@ -56,7 +56,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun deleteBubble(bubble: BubbleEntity) {
-        softDelete(bubble.toLocal())
+        softDelete(bubble.toLocal(), tableName)
         bubbleLabelDao.deleteByBubbleId(bubble.id)
     }
 
@@ -67,7 +67,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun updateBubble(bubble: BubbleEntity) {
-        update(bubble.toLocal())
+        update(bubble.toLocal(), tableName)
 
         bubbleLabelDao.deleteByBubbleId(bubble.id)
         addBubbleLabel(bubble)

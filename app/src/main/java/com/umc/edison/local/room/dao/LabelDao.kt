@@ -9,7 +9,7 @@ import com.umc.edison.local.room.RoomConstant
 interface LabelDao : BaseDao<LabelLocal> {
 
     @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE is_deleted = 0")
-    fun getAllLabels(): List<LabelLocal>
+    suspend fun getAllLabels(): List<LabelLocal>
 
     @Query(
         "SELECT * FROM ${RoomConstant.Table.LABEL} " +
@@ -17,8 +17,8 @@ interface LabelDao : BaseDao<LabelLocal> {
                     "SELECT label_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId" +
                 ") AND is_deleted = 0"
     )
-    fun getAllLabelsByBubbleId(bubbleId: Int): List<LabelLocal>
+    suspend fun getAllLabelsByBubbleId(bubbleId: Int): List<LabelLocal>
 
     @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE id = :labelId")
-    fun getLabelById(labelId: Int): LabelLocal?
+    suspend fun getLabelById(labelId: Int): LabelLocal?
 }

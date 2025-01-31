@@ -3,7 +3,7 @@ name: "\bDiscussion request"
 about: Suggest an disccussion for this project
 title: ":bulb: [DISCUSSION] "
 labels: ":bulb: discussion"
-assignees: ''
+assignees: SuHyeon00
 
 ---
 
