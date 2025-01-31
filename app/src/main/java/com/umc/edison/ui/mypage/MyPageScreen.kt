@@ -27,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -39,6 +40,7 @@ import coil3.compose.AsyncImage
 import com.umc.edison.R
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.mypage.MyPageViewModel
+import com.umc.edison.ui.components.PopUpMulti
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
@@ -93,8 +95,7 @@ private fun MyPageContent(
             .fillMaxWidth()
             .wrapContentHeight()
             .background(White000)
-            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         ProfileInfo(
@@ -102,23 +103,51 @@ private fun MyPageContent(
             name = uiState.nickname
         )
 
-        GrayContainerSection(
-            title = "Identity",
-            items = uiState.identity.map { Pair(it.category.question, it.keywords) }
-        )
-
-        GrayContainerSection(
-            title = "나의 관심사",
-            items = listOf(Pair(uiState.interest.category.question, uiState.interest.keywords))
-        )
-
-        Spacer(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .size(16.dp)
-        )
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .let {
+                        if (!uiState.isLoggedIn) it.blur(5.dp) else it
+                    }
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                GrayContainerSection(
+                    title = "Identity",
+                    items = uiState.identity.map { Pair(it.category.question, it.keywords) }
+                )
 
-        ArtLetterScrap()
+                GrayContainerSection(
+                    title = "나의 관심사",
+                    items = listOf(Pair(uiState.interest.category.question, uiState.interest.keywords))
+                )
+
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .size(16.dp)
+                )
+
+                ArtLetterScrap()
+            }
+
+            if (!uiState.isLoggedIn) {
+                PopUpMulti(
+                    title = "로그인이 필요한 페이지입니다",
+                    detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
+                    hintText = "스페이스 자동 시각화 기능 지원\n" +
+                            "맞춤형 레터 추천과 북마크 기능 지원",
+                    buttonText = "구글 로그인",
+                    onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
+                )
+            }
+        }
     }
 }
 
@@ -291,20 +320,31 @@ private fun ArtLetterGrid() {
 
 
 @Composable
-private fun ArtLetterContent() {
+private fun ArtLetterContent(
+    thumbnail: String? = null,
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        AsyncImage(
-            model = R.drawable.ic_profile_default_small,
-            contentDescription = "ArtLetter Image",
+        Box(
             modifier = Modifier
                 .height(120.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
-                .background(Gray300), // TODO: 임시 보여지는 용
-        )
+                .background(Gray300),
+            contentAlignment = Alignment.Center
+        ) {
+            if (thumbnail != null) {
+                AsyncImage(
+                    model = thumbnail,
+                    contentDescription = "ArtLetter Image",
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clip(RoundedCornerShape(10.dp))
+                )
+            }
+        }
 
         Text(
             text = "현대미술",
@@ -312,8 +352,6 @@ private fun ArtLetterContent() {
             color = Gray800
         )
     }
-
-
 }
 
 @Preview(showBackground = true)
