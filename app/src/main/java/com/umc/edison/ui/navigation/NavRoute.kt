@@ -10,6 +10,7 @@ sealed class NavRoute(val route: String) {
     data object SpaceLabel : NavRoute("space/labels")
 
     data object ProfileEdit: NavRoute("my-page/profile-edit")
+    data object Menu : NavRoute("my-page/menu")
 
     data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/${id}") {
         companion object {

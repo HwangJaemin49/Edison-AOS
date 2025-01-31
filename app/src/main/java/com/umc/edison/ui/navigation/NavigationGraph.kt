@@ -13,6 +13,7 @@ import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
+import com.umc.edison.ui.mypage.MenuScreen
 
 @Composable
 fun NavigationGraph(
@@ -50,6 +51,10 @@ fun NavigationGraph(
 
         composable(NavRoute.ProfileEdit.route) {
             EditProfileScreen(navHostController)
+        }
+
+        composable(NavRoute.Menu.route) {
+            MenuScreen(navHostController, updateShowBottomNav)
         }
     }
 }

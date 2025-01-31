@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,7 +53,9 @@ fun MyPageScreen(
     navHostController: NavHostController,
 ) {
     Scaffold(
-        topBar = { HamburgerMenu() }
+        topBar = { HamburgerMenu(
+            onClick = { navHostController.navigate(NavRoute.Menu.route) }
+        ) }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -63,23 +66,28 @@ fun MyPageScreen(
             MyPageContent(navHostController)
         }
     }
-
 }
 
 @Composable
-private fun HamburgerMenu() {
+private fun HamburgerMenu(
+    onClick: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(White000)
             .padding(start = 24.dp, top = 12.dp, end = 24.dp)
     ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_hamburger),
-            contentDescription = "Hamburger Menu",
+        IconButton(
+            onClick = onClick,
             modifier = Modifier.align(Alignment.End),
-            tint = Gray800
-        )
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_hamburger),
+                contentDescription = "Hamburger Menu",
+                tint = Gray800
+            )
+        }
     }
 }
 
