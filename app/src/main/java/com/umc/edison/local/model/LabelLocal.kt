@@ -15,8 +15,8 @@ data class LabelLocal(
     val color: Int,
     @ColumnInfo(name = "is_synced") override var isSynced: Boolean = false,
     @ColumnInfo(name = "is_deleted") override var isDeleted: Boolean = false,
-    @ColumnInfo(name = "created_at") override var createdAt: Date? = null,
-    @ColumnInfo(name = "updated_at") override var updatedAt: Date? = null,
+    @ColumnInfo(name = "created_at") override var createdAt: Date = Date(),
+    @ColumnInfo(name = "updated_at") override var updatedAt: Date = Date(),
     @ColumnInfo(name = "deleted_at") override var deletedAt: Date? = null,
 ) : LocalMapper<LabelEntity>, BaseSyncLocal {
     override fun toData(): LabelEntity = LabelEntity(
@@ -24,6 +24,10 @@ data class LabelLocal(
         name = name,
         color = Color(color),
         bubbles = emptyList(),
+        isDeleted = isDeleted,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        deletedAt = deletedAt,
     )
 }
 
@@ -31,4 +35,8 @@ fun LabelEntity.toLocal(): LabelLocal = LabelLocal(
     id = id,
     name = name,
     color = color.toArgb(),
+    isDeleted = isDeleted,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    deletedAt = deletedAt,
 )

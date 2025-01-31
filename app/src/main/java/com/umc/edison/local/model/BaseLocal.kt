@@ -4,6 +4,6 @@ import java.util.Date
 
 interface BaseLocal {
     val id: Int
-    var createdAt: Date?
-    var updatedAt: Date?
+    var createdAt: Date
+    var updatedAt: Date
 }

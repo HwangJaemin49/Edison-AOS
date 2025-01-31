@@ -27,6 +27,7 @@ class SyncRepositoryImpl @Inject constructor(
                     labelLocalDataSource.markAsSynced(label)
                 } catch (e: Exception) {
                     Log.e("SyncRepositoryImpl", "Failed to sync label with id: ${label.id}", e)
+                    throw e
                 }
             }
         }
@@ -42,6 +43,7 @@ class SyncRepositoryImpl @Inject constructor(
                     bubbleLocalDataSource.markAsSynced(bubble)
                 } catch (e: Exception) {
                     Log.e("SyncRepositoryImpl", "Failed to sync bubble with id: ${bubble.id}", e)
+                    throw e
                 }
             }
         }
