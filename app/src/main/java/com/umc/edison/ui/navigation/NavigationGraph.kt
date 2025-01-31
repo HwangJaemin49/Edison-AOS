@@ -12,6 +12,7 @@ import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
+import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.MenuScreen
 import com.umc.edison.ui.mypage.TrashScreen
@@ -60,6 +61,10 @@ fun NavigationGraph(
 
         composable(NavRoute.Trash.route) {
             TrashScreen(navHostController, updateShowBottomNav)
+        }
+
+        composable(NavRoute.AccountManagement.route) {
+            AccountManagementScreen(navHostController, updateShowBottomNav)
         }
     }
 }

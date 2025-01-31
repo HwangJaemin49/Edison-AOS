@@ -77,7 +77,7 @@ fun MenuScreen(
             }
 
             SettingItem(title = "계정 관리") {
-                // TODO: 계정 관리 화면으로 이동
+                navHostController.navigate(NavRoute.AccountManagement.route)
             }
         }
     }
