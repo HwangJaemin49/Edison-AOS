@@ -46,7 +46,7 @@ fun AccountManagementScreen(
         updateShowBottomNav(false)
     }
 
-    val isConnected by remember { mutableStateOf(false) }
+    val isConnected by remember { mutableStateOf(true) }
     val email by remember { mutableStateOf("edison@gmail.com") }
 
     Column(
