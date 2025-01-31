@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val userRemoteDataSource: UserRemoteDataSource,
 ) : UserRepository {
     override fun getMyIdentityKeywords(): Flow<DataResource<List<IdentityKeyword>>> = flowDataResource(
         dataAction = { userRemoteDataSource.getMyIdentityKeywords() }
@@ -18,5 +18,9 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getMyInterestKeyword(): Flow<DataResource<InterestKeyword>>  = flowDataResource(
         dataAction = { userRemoteDataSource.getMyInterestKeyword() }
+    )
+
+    override fun getLogInState(): Flow<DataResource<Boolean>> = flowDataResource(
+        dataAction = { userRemoteDataSource.getLogInState() }
     )
 }

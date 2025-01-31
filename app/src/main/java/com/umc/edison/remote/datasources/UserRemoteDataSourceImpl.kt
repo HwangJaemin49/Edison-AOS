@@ -6,10 +6,12 @@ import com.umc.edison.data.model.InterestKeywordEntity
 import com.umc.edison.data.model.KeywordEntity
 import com.umc.edison.remote.api.MyPageApiService
 import com.umc.edison.remote.model.mypage.getCategoryQuestion
+import com.umc.edison.remote.token.TokenManager
 import javax.inject.Inject
 
 class UserRemoteDataSourceImpl @Inject constructor(
     private val myPageApiService: MyPageApiService,
+    private val tokenManager: TokenManager,
 ) : UserRemoteDataSource {
     override suspend fun getMyIdentityKeywords(): List<IdentityKeywordEntity> {
         val categories = myPageApiService.getMemberIdentityKeyword().data.categories
@@ -67,5 +69,9 @@ class UserRemoteDataSourceImpl @Inject constructor(
                 )
             }
         )
+    }
+
+    override suspend fun getLogInState(): Boolean {
+        return tokenManager.loadAccessToken() != null
     }
 }

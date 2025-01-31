@@ -8,4 +8,5 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
     fun getMyIdentityKeywords(): Flow<DataResource<List<IdentityKeyword>>>
     fun getMyInterestKeyword(): Flow<DataResource<InterestKeyword>>
+    fun getLogInState(): Flow<DataResource<Boolean>>
 }

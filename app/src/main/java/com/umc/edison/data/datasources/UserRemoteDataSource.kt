@@ -6,4 +6,5 @@ import com.umc.edison.data.model.InterestKeywordEntity
 interface UserRemoteDataSource {
     suspend fun getMyIdentityKeywords(): List<IdentityKeywordEntity>
     suspend fun getMyInterestKeyword(): InterestKeywordEntity
+    suspend fun getLogInState(): Boolean
 }

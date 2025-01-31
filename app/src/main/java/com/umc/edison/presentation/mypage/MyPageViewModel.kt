@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.mypage
 
+import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
 import com.umc.edison.domain.usecase.mypage.GetMyIdentityKeywordsUseCase
 import com.umc.edison.domain.usecase.mypage.GetMyInterestKeywordUseCase
 import com.umc.edison.presentation.base.BaseViewModel
@@ -13,14 +14,37 @@ import javax.inject.Inject
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
 //    private val getProfileInfoUseCase: GetProfileInfoUseCase,
+    private val getLogInStateUseCase: GetLogInStateUseCase,
     private val getMyIdentityKeywordsUseCase: GetMyIdentityKeywordsUseCase,
-    private val getMyInterestKeywordUseCase: GetMyInterestKeywordUseCase
+    private val getMyInterestKeywordUseCase: GetMyInterestKeywordUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MyPageState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     init {
-        initMyPage()
+        fetchLoginState()
+    }
+
+    private fun fetchLoginState() {
+        collectDataResource(
+            flow = getLogInStateUseCase(),
+            onSuccess = { isLoggedIn ->
+                _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
+
+                if (isLoggedIn) {
+                    initMyPage()
+                }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
     }
 
     private fun initMyPage() {
