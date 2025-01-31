@@ -48,7 +48,7 @@ fun NavigationGraph(
         }
 
         composable(NavRoute.MyPage.route) {
-            MyPageScreen(navHostController)
+            MyPageScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.ProfileEdit.route) {
