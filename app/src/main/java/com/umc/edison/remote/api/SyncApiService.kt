@@ -1,8 +1,8 @@
 package com.umc.edison.remote.api
 
-import com.umc.edison.remote.model.SyncLabelRequest
+import com.umc.edison.remote.model.sync.SyncLabelRequest
 import com.umc.edison.remote.model.ResponseWithData
-import com.umc.edison.remote.model.SyncLabelResponse
+import com.umc.edison.remote.model.sync.SyncLabelResponse
 import retrofit2.http.Body
 import retrofit2.http.POST
 

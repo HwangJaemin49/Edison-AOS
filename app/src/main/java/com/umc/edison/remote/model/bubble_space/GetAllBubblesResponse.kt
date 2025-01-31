@@ -1,9 +1,11 @@
-package com.umc.edison.remote.model
+package com.umc.edison.remote.model.bubble_space
 
 import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
+import com.umc.edison.remote.model.RemoteMapper
+import com.umc.edison.remote.model.toDate
 
 data class GetAllBubblesResponse(
     @SerializedName("bubbleId") val bubbleId: Int,

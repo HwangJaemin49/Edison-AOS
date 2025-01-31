@@ -1,8 +1,8 @@
 package com.umc.edison.remote.api
 
-import com.umc.edison.remote.model.GetAllBubblesResponse
-import com.umc.edison.remote.model.GetLabelDetailResponse
-import com.umc.edison.remote.model.GetLabelResponse
+import com.umc.edison.remote.model.bubble_space.GetAllBubblesResponse
+import com.umc.edison.remote.model.bubble_space.GetLabelDetailResponse
+import com.umc.edison.remote.model.bubble_space.GetLabelResponse
 import com.umc.edison.remote.model.ResponseWithData
 import com.umc.edison.remote.model.ResponseWithPagination
 import retrofit2.http.GET

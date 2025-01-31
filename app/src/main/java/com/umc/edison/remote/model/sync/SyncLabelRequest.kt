@@ -1,9 +1,12 @@
-package com.umc.edison.remote.model
+package com.umc.edison.remote.model.sync
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.LabelEntity
+import com.umc.edison.remote.model.RemoteMapper
+import com.umc.edison.remote.model.toDate
+import com.umc.edison.remote.model.toIso8601String
 
 data class SyncLabelRequest(
     @SerializedName("labelId") val id: Int,
