@@ -31,7 +31,10 @@ abstract class BaseViewModel : ViewModel() {
                     }
                     is DataResource.Error -> {
                         Log.e(TAG, "onError: ${dataResource.throwable}")
-                        onError(dataResource.throwable)
+                        // throwable이 HttpException이면 에러 메시지를 보여주지 않는다.
+                        if (dataResource.throwable !is retrofit2.HttpException) {
+                            onError(dataResource.throwable)
+                        }
                     }
                     is DataResource.Loading -> {
                         Log.d(TAG, "onLoading")

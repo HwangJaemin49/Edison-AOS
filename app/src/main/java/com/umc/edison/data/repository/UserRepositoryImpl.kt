@@ -9,7 +9,6 @@ import com.umc.edison.data.model.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.ArtLetter
 import com.umc.edison.domain.model.ArtLetterCategory
-import com.umc.edison.domain.model.Bubble
 import com.umc.edison.domain.model.Identity
 import com.umc.edison.domain.model.IdentityCategory
 import com.umc.edison.domain.model.Interest
@@ -21,7 +20,6 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserRemoteDataSource,
-    private val bubbleLocalDataSource: BubbleLocalDataSource
 ) : UserRepository {
 
     override fun getLogInState(): Flow<DataResource<Boolean>> = flowDataResource(
@@ -79,10 +77,4 @@ class UserRepositoryImpl @Inject constructor(
                 userRemoteDataSource.getMyIdentityResult(categoryNumber)
             }
         )
-
-    override fun getDeletedBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
-        remoteDataAction = { userRemoteDataSource.getDeletedBubbles() },
-        localDataAction = { bubbleLocalDataSource.getDeletedBubbles() },
-        saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
-    )
 }

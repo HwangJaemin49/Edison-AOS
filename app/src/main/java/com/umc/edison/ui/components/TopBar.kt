@@ -1,6 +1,7 @@
 package com.umc.edison.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,7 +57,8 @@ fun BackButtonTopBar(
             .background(White000)
             .padding(start = 24.dp, top = 12.dp, end = 24.dp)
             .height(32.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         androidx.compose.material3.IconButton(
             onClick = { onBack() },

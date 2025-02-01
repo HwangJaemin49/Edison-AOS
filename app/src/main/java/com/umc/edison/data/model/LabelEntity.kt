@@ -22,6 +22,13 @@ data class LabelEntity(
     )
 }
 
+fun LabelEntity.same(other: LabelEntity): Boolean {
+    return id == other.id &&
+        name == other.name &&
+        color == other.color &&
+        isDeleted == other.isDeleted
+}
+
 fun Label.toData(): LabelEntity = LabelEntity(
     id = id,
     name = name,

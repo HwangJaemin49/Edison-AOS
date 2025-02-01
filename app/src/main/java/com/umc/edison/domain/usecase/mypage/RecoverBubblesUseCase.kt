@@ -6,8 +6,8 @@ import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetDeletedBubblesUseCase @Inject constructor(
+class RecoverBubblesUseCase @Inject constructor(
     private val bubbleRepository: BubbleRepository
 ) {
-    operator fun invoke(): Flow<DataResource<List<Bubble>>> = bubbleRepository.getDeletedBubbles()
+    operator fun invoke(bubbles: List<Bubble>): Flow<DataResource<Unit>> = bubbleRepository.recoverBubbles(bubbles)
 }

@@ -7,6 +7,7 @@ import com.umc.edison.data.datasources.LabelLocalDataSource
 import com.umc.edison.data.datasources.LabelRemoteDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
+import com.umc.edison.data.model.same
 import com.umc.edison.domain.repository.SyncRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,8 +24,18 @@ class SyncRepositoryImpl @Inject constructor(
             val unSyncedLocalLabels: List<LabelEntity> = labelLocalDataSource.getUnSyncedLabels()
             unSyncedLocalLabels.forEach { label ->
                 try {
-                    labelRemoteDataSource.syncLabel(label)
-                    labelLocalDataSource.markAsSynced(label)
+                    val syncedLabel = labelRemoteDataSource.syncLabel(label)
+
+                    if (syncedLabel.same(label)) {
+                        Log.d("SyncRepositoryImpl", "Label with id: ${label.id} is synced")
+                        labelLocalDataSource.markAsSynced(label)
+
+                        if (syncedLabel.isDeleted) {
+                            labelLocalDataSource.deleteLabel(label)
+                        }
+                    } else {
+                        Log.e("SyncRepositoryImpl", "Label with id: ${label.id} is not synced")
+                    }
                 } catch (e: Exception) {
                     Log.e("SyncRepositoryImpl", "Failed to sync label with id: ${label.id}", e)
                     throw e

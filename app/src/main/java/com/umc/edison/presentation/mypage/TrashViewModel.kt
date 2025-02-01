@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.mypage
 
 import com.umc.edison.domain.usecase.mypage.GetDeletedBubblesUseCase
+import com.umc.edison.domain.usecase.mypage.RecoverBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.toPresentation
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TrashViewModel @Inject constructor(
-    private val getDeletedBubblesUseCase: GetDeletedBubblesUseCase
+    private val getDeletedBubblesUseCase: GetDeletedBubblesUseCase,
+    private val recoverBubblesUseCase: RecoverBubblesUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(TrashState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -21,12 +23,7 @@ class TrashViewModel @Inject constructor(
         collectDataResource(
             flow = getDeletedBubblesUseCase(),
             onSuccess = { bubbles ->
-                if (bubbles.isEmpty()) {
-                    val tempBubbles = getTempBubbles()
-                    _uiState.update { it.copy(bubbles = tempBubbles) }
-                } else {
-                    _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
-                }
+                _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update {
@@ -59,7 +56,11 @@ class TrashViewModel @Inject constructor(
     }
 
     fun selectAllBubbles() {
-        _uiState.update { it.copy(selectedBubbles = uiState.value.bubbles) }
+        if (uiState.value.selectedBubbles.size == uiState.value.bubbles.size) {
+            _uiState.update { it.copy(selectedBubbles = emptyList()) }
+        } else {
+            _uiState.update { it.copy(selectedBubbles = uiState.value.bubbles) }
+        }
     }
 
     fun deleteBubbles() {
@@ -67,18 +68,32 @@ class TrashViewModel @Inject constructor(
     }
 
     fun recoverBubbles() {
-
-    }
-
-    private fun getTempBubbles(): List<BubbleModel> {
-        // 10개의 임시 버블 생성
-        return List(20) {
-            BubbleModel(
-                id = it,
-                title = "임시 버블 $it",
-                contentBlocks = emptyList(),
-            )
-        }
+        collectDataResource(
+            flow = recoverBubblesUseCase(uiState.value.selectedBubbles.map { it.toDomain() }),
+            onSuccess = {
+                _uiState.update {
+                    it.copy(
+                        toastMessage = "버블이 복원되었습니다.",
+                        mode = BubbleRecoverMode.NONE,
+                    )
+                }
+                fetchDeletedBubbles()
+            },
+            onError = { error ->
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
     }
 
     override fun clearError() {
