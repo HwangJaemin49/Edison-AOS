@@ -8,7 +8,7 @@ data class IdentityEditState(
     override val isLoading: Boolean,
     val identity: IdentityModel,
     override val error: Throwable? = null,
-    override val errorMessage: String? = null
+    override val toastMessage: String? = null
 ) : BaseState {
     companion object {
         val DEFAULT = IdentityEditState(

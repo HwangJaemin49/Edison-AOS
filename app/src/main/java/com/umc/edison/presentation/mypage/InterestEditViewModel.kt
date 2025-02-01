@@ -41,7 +41,7 @@ class InterestEditViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         error = error,
-                        errorMessage = error.message
+                        toastMessage = error.message
                     )
                 }
             },
@@ -69,7 +69,7 @@ class InterestEditViewModel @Inject constructor(
                     val error = Throwable("최대 5개의 키워드를 선택할 수 있습니다.")
                     it.copy(
                         error = error,
-                        errorMessage = error.message
+                        toastMessage = error.message
                     )
                 }
             } else {
@@ -94,7 +94,7 @@ class InterestEditViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         error = error,
-                        errorMessage = error.message
+                        toastMessage = error.message
                     )
                 }
             },
@@ -108,6 +108,6 @@ class InterestEditViewModel @Inject constructor(
     }
 
     override fun clearError() {
-        _uiState.update { it.copy(error = null, errorMessage = null) }
+        _uiState.update { it.copy(error = null, toastMessage = null) }
     }
 }

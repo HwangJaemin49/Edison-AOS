@@ -16,7 +16,7 @@ data class MyPageState(
     val interest: InterestModel,
     val myArtLetterCategories: List<ArtLetterCategoryModel>,
     override val error: Throwable? = null,
-    override val errorMessage: String? = null,
+    override val toastMessage: String? = null,
 ) : BaseState {
     companion object {
         val DEFAULT = MyPageState(

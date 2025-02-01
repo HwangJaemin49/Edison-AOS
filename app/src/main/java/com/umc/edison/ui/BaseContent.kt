@@ -25,11 +25,11 @@ fun BaseContent(
         } else {
             content()
 
-            uiState.error?.let {
-                 ErrorScreen(
-                        message = uiState.errorMessage ?: it.message ?: "알 수 없는 오류가 발생했습니다.",
-                        onDismiss = { onDismiss() }
-                 )
+            if (uiState.toastMessage != null) {
+                 ToastScreen(
+                    message = uiState.toastMessage!!,
+                    onDismiss = { onDismiss() }
+                )
             }
         }
     }

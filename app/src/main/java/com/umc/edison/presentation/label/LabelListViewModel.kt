@@ -40,7 +40,7 @@ class LabelListViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         error = error,
-                        errorMessage = error.message
+                        toastMessage = error.message
                     )
                 }
             },
@@ -73,7 +73,7 @@ class LabelListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             error = error,
-                            errorMessage = error.message
+                            toastMessage = error.message
                         )
                     }
                 },
@@ -95,7 +95,7 @@ class LabelListViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             error = error,
-                            errorMessage = error.message
+                            toastMessage = error.message
                         )
                     }
                 },
@@ -123,7 +123,7 @@ class LabelListViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         error = error,
-                        errorMessage = error.message
+                        toastMessage = error.message
                     )
                 }
             },
@@ -137,6 +137,6 @@ class LabelListViewModel @Inject constructor(
     }
 
     override fun clearError() {
-        _uiState.update { it.copy(error = null, errorMessage = null) }
+        _uiState.update { it.copy(error = null, toastMessage = null) }
     }
 }

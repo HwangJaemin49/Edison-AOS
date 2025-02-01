@@ -94,6 +94,10 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         markAsSynced(tableName, bubble.id)
     }
 
+    override suspend fun getDeletedBubbles(): List<BubbleEntity> {
+        return bubbleDao.getDeletedBubbles().map { it.toData() }
+    }
+
     private suspend fun addBubbleLabel(bubble: BubbleEntity) {
         bubble.labels.map { label ->
             val localLabel: LabelLocal? = labelDao.getLabelById(label.id)

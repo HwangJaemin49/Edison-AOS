@@ -3,6 +3,7 @@ package com.umc.edison.domain.repository
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.ArtLetter
 import com.umc.edison.domain.model.ArtLetterCategory
+import com.umc.edison.domain.model.Bubble
 import com.umc.edison.domain.model.Identity
 import com.umc.edison.domain.model.IdentityCategory
 import com.umc.edison.domain.model.Interest
@@ -20,6 +21,8 @@ interface UserRepository {
     fun getScrapArtLettersByCategory(categoryId: Int): Flow<DataResource<List<ArtLetter>>>
 
     fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>>
+
+    fun getDeletedBubbles(): Flow<DataResource<List<Bubble>>>
 
     fun updateProfileInfo(user: User): Flow<DataResource<Unit>>
     fun updateIdentity(identity: Identity): Flow<DataResource<Unit>>

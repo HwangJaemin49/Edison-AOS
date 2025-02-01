@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import com.umc.edison.ui.components.ToastMessage
 
 @Composable
-internal fun ErrorScreen(
+internal fun ToastScreen(
     message: String,
     onDismiss: () -> Unit
 ) {

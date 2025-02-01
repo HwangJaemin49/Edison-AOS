@@ -2,10 +2,12 @@ package com.umc.edison.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -15,9 +17,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -31,9 +32,16 @@ fun BottomSheet(
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss,
-        containerColor = White000
+        containerColor = White000,
     ) {
-        content()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(bottom = 20.dp)
+        ) {
+            content()
+        }
     }
 }
 
@@ -76,7 +84,12 @@ private fun BottomSheetPopUpContent(
         verticalArrangement = Arrangement.spacedBy(11.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = title, style = MaterialTheme.typography.displaySmall, color = Gray800)
+        Text(
+            text = title,
+            style = MaterialTheme.typography.displaySmall,
+            color = Gray800,
+            textAlign = TextAlign.Center
+        )
 
         Row(
             modifier = Modifier.padding(vertical = 17.dp),
@@ -100,12 +113,12 @@ private fun BottomSheetPopUpContent(
 
 @Composable
 fun BottomSheetForDelete(
-    selectedCnt: Int,
-    showSelectedCnt: Boolean,
     onButtonClick: () -> Unit,
     onDelete: () -> Unit,
     buttonEnabled: Boolean,
     buttonText: String,
+    selectedCnt: Int = 0,
+    showSelectedCnt: Boolean = false,
 ) {
     Column(
         modifier = Modifier
@@ -118,7 +131,9 @@ fun BottomSheetForDelete(
                 text = "선택 ${selectedCnt}개",
                 style = MaterialTheme.typography.labelLarge,
                 color = Gray800,
-                modifier = Modifier.align(Alignment.End).padding(end = 8.dp)
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 8.dp)
             )
         }
         Row(
@@ -140,20 +155,5 @@ fun BottomSheetForDelete(
                 modifier = Modifier.weight(1f)
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BottomSheetPreview() {
-    EdisonTheme {
-        BottomSheetForDelete(
-            selectedCnt = 3,
-            showSelectedCnt = true,
-            onButtonClick = {},
-            onDelete = {},
-            buttonEnabled = true,
-            buttonText = "버블 이동"
-        )
     }
 }

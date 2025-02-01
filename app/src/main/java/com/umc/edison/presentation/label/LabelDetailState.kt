@@ -12,7 +12,7 @@ data class LabelDetailState(
     val labelDetailMode: LabelDetailMode,
     val movableLabels: List<LabelModel> = listOf(),
     override val error: Throwable? = null,
-    override val errorMessage: String? = null
+    override val toastMessage: String? = null
 ) : BaseState {
     companion object {
         val DEFAULT = LabelDetailState(

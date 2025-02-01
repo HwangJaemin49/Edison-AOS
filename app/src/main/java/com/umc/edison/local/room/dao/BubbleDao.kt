@@ -27,4 +27,7 @@ interface BubbleDao : BaseDao<BubbleLocal> {
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id NOT IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL}) AND is_deleted = 0")
     suspend fun getBubblesWithoutLabel(): List<BubbleLocal>
+
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_deleted = 1")
+    suspend fun getDeletedBubbles(): List<BubbleLocal>
 }

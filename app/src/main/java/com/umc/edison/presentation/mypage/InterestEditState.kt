@@ -8,7 +8,7 @@ data class InterestEditState(
     override val isLoading: Boolean,
     val interest: InterestModel,
     override val error: Throwable?,
-    override val errorMessage: String?
+    override val toastMessage: String?
 ) : BaseState {
     companion object {
         val DEFAULT = InterestEditState(
@@ -23,7 +23,7 @@ data class InterestEditState(
                 selectedKeywords = emptyList()
             ),
             error = null,
-            errorMessage = null
+            toastMessage = null
         )
     }
 }

@@ -10,7 +10,7 @@ data class LabelListState(
     val selectedLabel: LabelModel,
     val labelEditMode: LabelEditMode,
     override val error: Throwable? = null,
-    override val errorMessage: String? = null,
+    override val toastMessage: String? = null,
 ) : BaseState {
     companion object {
         val DEFAULT = LabelListState(
