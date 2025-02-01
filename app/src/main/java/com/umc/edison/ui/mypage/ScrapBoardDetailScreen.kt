@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,15 +21,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.umc.edison.R
-import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.artboard.ArtBoardCard
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
 @Composable
-fun ScrapBoardScreen(
+fun ScrapBoardDetailScreen(
     navHostController: NavHostController
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,16 +54,32 @@ fun ScrapBoardScreen(
             }
 
             Text(
-                text = "스크랩 보드",
+                text = "[주제 카테고리]",
                 style = MaterialTheme.typography.titleLarge,
                 color = Gray800,
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
 
-        ScrapBoardGrid(
-            spaceSize = 24,
-            onScrapCategoryClick = { navHostController.navigate(NavRoute.ScrapBoardDetail.route) }
-        )
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val items = List(4) { it }
+            items.chunked(2).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    rowItems.forEach { _ ->
+                        ArtBoardCard(modifier = Modifier.weight(1f))
+                    }
+                    if (rowItems.size < 2) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+
     }
 }

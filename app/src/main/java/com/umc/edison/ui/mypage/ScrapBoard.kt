@@ -1,6 +1,7 @@
 package com.umc.edison.ui.mypage
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,7 +25,8 @@ import com.umc.edison.ui.theme.Gray800
 
 @Composable
 fun ScrapBoardGrid(
-    spaceSize: Int = 12
+    spaceSize: Int = 12,
+    onScrapCategoryClick: () -> Unit = {}
 ) {
     val items = List(6) { it }
     val columns = 2
@@ -40,7 +43,9 @@ fun ScrapBoardGrid(
             ) {
                 rowItems.forEach { _ ->
                     Box(modifier = Modifier.weight(1f)) {
-                        ScrapBoardContent()
+                        ScrapBoardContent(
+                            onClick = onScrapCategoryClick
+                        )
                     }
                 }
 
@@ -54,11 +59,15 @@ fun ScrapBoardGrid(
 
 @Composable
 fun ScrapBoardContent(
+    onClick: () -> Unit,
     thumbnail: String? = null,
-    categoryName: String = "현대미술"
+    categoryName: String = "현대미술",
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable(onClick = onClick),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(

@@ -15,6 +15,7 @@ import com.umc.edison.ui.label.LabelDetailScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.MenuScreen
+import com.umc.edison.ui.mypage.ScrapBoardDetailScreen
 import com.umc.edison.ui.mypage.ScrapBoardScreen
 import com.umc.edison.ui.mypage.TrashScreen
 
@@ -70,6 +71,10 @@ fun NavigationGraph(
 
         composable(NavRoute.ScrapBoard.route) {
             ScrapBoardScreen(navHostController)
+        }
+
+        composable(NavRoute.ScrapBoardDetail.route) {
+            ScrapBoardDetailScreen(navHostController)
         }
     }
 }
