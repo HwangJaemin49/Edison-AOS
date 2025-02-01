@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.presentation.mypage.IdentityEditViewModel
-import com.umc.edison.ui.LoadingScreen
+import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.GrayColumnContainer
 import com.umc.edison.ui.components.KeywordChip
@@ -38,6 +38,7 @@ import com.umc.edison.ui.theme.White000
 fun IdentityScreen(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit,
+    viewModel: IdentityEditViewModel = hiltViewModel()
 ) {
 
     LaunchedEffect(Unit) {
@@ -48,7 +49,10 @@ fun IdentityScreen(
         topBar = {
             BackButtonTopBar(
                 title = "Identity 고르기",
-                onBack = { navHostController.popBackStack() }
+                onBack = {
+                    viewModel.updateIdentity()
+                    navHostController.popBackStack()
+                }
             )
         }
     ) { innerPadding ->
@@ -58,7 +62,7 @@ fun IdentityScreen(
                 .background(White000)
                 .padding(innerPadding)
         ) {
-            IdentityContent()
+            IdentityContent(viewModel)
         }
     }
 }
@@ -66,14 +70,15 @@ fun IdentityScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun IdentityContent(
-    viewModel: IdentityEditViewModel = hiltViewModel()
+    viewModel: IdentityEditViewModel
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
 
-    if (uiState.isLoading) {
-        LoadingScreen()
-    } else {
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearError() },
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -86,7 +91,7 @@ private fun IdentityContent(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = uiState.identityCategory.question,
+                text = uiState.identity.question,
                 style = MaterialTheme.typography.displayLarge,
                 color = Gray800,
                 softWrap = true,
@@ -98,7 +103,7 @@ private fun IdentityContent(
                 space = 20.dp
             ) {
                 Text(
-                    text = uiState.identityCategory.descriptionFirst,
+                    text = uiState.identity.descriptionFirst,
                     style = MaterialTheme.typography.titleMedium,
                     color = Gray800
                 )
@@ -107,7 +112,7 @@ private fun IdentityContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    uiState.selectedKeywords.forEach { keyword ->
+                    uiState.identity.selectedKeywords.forEach { keyword ->
                         KeywordChip(
                             keyword = keyword.name,
                             isSelected = true,
@@ -116,7 +121,7 @@ private fun IdentityContent(
                     }
                 }
 
-                uiState.identityCategory.descriptionSecond?.let {
+                uiState.identity.descriptionSecond?.let {
                     Text(
                         text = it,
                         style = MaterialTheme.typography.titleMedium,
@@ -141,10 +146,10 @@ private fun IdentityContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    uiState.options.forEach { keyword ->
+                    uiState.identity.options.forEach { keyword ->
                         KeywordChip(
                             keyword = keyword.name,
-                            isSelected = uiState.selectedKeywords.contains(keyword),
+                            isSelected = uiState.identity.selectedKeywords.contains(keyword),
                             onClick = { viewModel.toggleKeyword(keyword) }
                         )
                     }

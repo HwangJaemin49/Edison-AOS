@@ -1,21 +1,26 @@
 package com.umc.edison.presentation.mypage
 
 import com.umc.edison.domain.model.IdentityCategory
-import com.umc.edison.presentation.model.KeywordModel
+import com.umc.edison.presentation.base.BaseState
+import com.umc.edison.presentation.model.IdentityModel
 
 data class IdentityEditState(
-    val isLoading: Boolean,
-    val identityCategory: IdentityCategory,
-    val selectedKeywords: List<KeywordModel> = listOf(),
-    val options: List<KeywordModel> = listOf(),
-    val error: Throwable? = null,
-) {
+    override val isLoading: Boolean,
+    val identity: IdentityModel,
+    override val error: Throwable? = null,
+    override val errorMessage: String? = null
+) : BaseState {
     companion object {
         val DEFAULT = IdentityEditState(
             isLoading = false,
-            identityCategory = IdentityCategory.NONE,
-            selectedKeywords = listOf(),
-            options = listOf()
+            identity = IdentityModel(
+                id = IdentityCategory.NONE.ordinal,
+                question = IdentityCategory.NONE.question,
+                descriptionFirst = IdentityCategory.NONE.descriptionFirst,
+                descriptionSecond = IdentityCategory.NONE.descriptionSecond,
+                selectedKeywords = emptyList(),
+                options = emptyList()
+            )
         )
     }
 }

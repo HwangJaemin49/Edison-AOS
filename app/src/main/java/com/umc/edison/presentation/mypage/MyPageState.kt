@@ -2,20 +2,22 @@ package com.umc.edison.presentation.mypage
 
 import com.umc.edison.domain.model.IdentityCategory
 import com.umc.edison.domain.model.InterestCategory
+import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.IdentityModel
 import com.umc.edison.presentation.model.InterestModel
 import com.umc.edison.presentation.model.ArtLetterCategoryModel
 import com.umc.edison.presentation.model.UserModel
 
 data class MyPageState(
-    val isLoading: Boolean,
+    override val isLoading: Boolean,
     val isLoggedIn: Boolean,
     val user: UserModel,
     val identities: List<IdentityModel> = listOf(),
     val interest: InterestModel,
     val myArtLetterCategories: List<ArtLetterCategoryModel>,
-    val error: Throwable? = null,
-) {
+    override val error: Throwable? = null,
+    override val errorMessage: String? = null,
+) : BaseState {
     companion object {
         val DEFAULT = MyPageState(
             isLoading = false,

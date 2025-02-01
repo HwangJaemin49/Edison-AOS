@@ -13,3 +13,10 @@ data class KeywordEntity(
         )
     }
 }
+
+fun Keyword.toData(): KeywordEntity {
+    return KeywordEntity(
+        id = id,
+        name = name
+    )
+}

@@ -48,6 +48,10 @@ class UserRepositoryImpl @Inject constructor(
         dataAction = { userRemoteDataSource.updateProfileInfo(user.toData()) }
     )
 
+    override fun updateIdentity(identity: Identity): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = { userRemoteDataSource.updateIdentity(identity.toData()) }
+    )
+
     override fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>> =
         flowDataResource(
             dataAction = {

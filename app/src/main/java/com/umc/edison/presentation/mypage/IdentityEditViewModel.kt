@@ -3,6 +3,7 @@ package com.umc.edison.presentation.mypage
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.IdentityCategory
 import com.umc.edison.domain.usecase.mypage.GetMyIdentityResultUseCase
+import com.umc.edison.domain.usecase.mypage.UpdateIdentityUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.model.toPresentation
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class IdentityEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getMyIdentityResultUseCase: GetMyIdentityResultUseCase
+    private val getMyIdentityResultUseCase: GetMyIdentityResultUseCase,
+    private val updateIdentityUseCase: UpdateIdentityUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(IdentityEditState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -32,15 +34,16 @@ class IdentityEditViewModel @Inject constructor(
             flow = getMyIdentityResultUseCase(category),
             onSuccess = { identity ->
                 _uiState.update {
-                    it.copy(
-                        identityCategory = identity.category,
-                        selectedKeywords = identity.selectedKeywords.map { keyword -> keyword.toPresentation() },
-                        options = identity.options.map { keyword -> keyword.toPresentation() }
-                    )
+                    it.copy(identity = identity.toPresentation())
                 }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -52,16 +55,59 @@ class IdentityEditViewModel @Inject constructor(
     }
 
     fun toggleKeyword(keyword: KeywordModel) {
-        _uiState.update {
-            if (it.selectedKeywords.contains(keyword)) {
+        if (uiState.value.identity.selectedKeywords.contains(keyword)) {
+            _uiState.update {
                 it.copy(
-                    selectedKeywords = it.selectedKeywords - keyword
-                )
-            } else {
-                it.copy(
-                    selectedKeywords = it.selectedKeywords + keyword
+                    identity = it.identity.copy(
+                        selectedKeywords = it.identity.selectedKeywords - keyword
+                    )
                 )
             }
+        } else {
+            if (uiState.value.identity.selectedKeywords.size >= 5) {
+                _uiState.update {
+                    val error = Throwable("최대 5개의 키워드를 선택할 수 있습니다.")
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        identity = it.identity.copy(
+                            selectedKeywords = it.identity.selectedKeywords + keyword
+                        )
+                    )
+                }
+            }
         }
+    }
+
+    fun updateIdentity() {
+        collectDataResource(
+            flow = updateIdentityUseCase(_uiState.value.identity.toDomain()),
+            onSuccess = {
+                _uiState.update { it.copy(identity = it.identity.copy(options = it.identity.selectedKeywords)) }
+            },
+            onError = { error ->
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    override fun clearError() {
+        _uiState.update { it.copy(error = null, errorMessage = null) }
     }
 }

@@ -14,6 +14,7 @@ interface UserRemoteDataSource {
     suspend fun getScrapArtLettersByCategory(categoryId: Int): List<ArtLetterCategoryEntity>
 
     suspend fun updateProfileInfo(user: UserEntity)
+    suspend fun updateIdentity(identity: IdentityEntity)
 
     suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity
 }

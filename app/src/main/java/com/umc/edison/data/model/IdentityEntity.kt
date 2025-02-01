@@ -17,6 +17,14 @@ data class IdentityEntity(
     }
 }
 
+fun Identity.toData(): IdentityEntity {
+    return IdentityEntity(
+        categoryNumber = IdentityCategoryMapper.entries.first { it.category == category }.categoryNumber,
+        keywords = selectedKeywords.map { it.toData() },
+        options = options.map { it.toData() }
+    )
+}
+
 enum class IdentityCategoryMapper(
     val categoryNumber: String,
     val category: IdentityCategory

@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.model
 
 import com.umc.edison.domain.model.Identity
+import com.umc.edison.domain.model.IdentityCategory
 
 data class IdentityModel(
     val id: Int,
@@ -9,7 +10,15 @@ data class IdentityModel(
     val descriptionSecond: String? = null,
     val options: List<KeywordModel>,
     val selectedKeywords: List<KeywordModel>,
-)
+) {
+    fun toDomain(): Identity {
+        return Identity(
+            category = IdentityCategory.entries[id],
+            selectedKeywords = selectedKeywords.map { it.toDomain() },
+            options = options.map { it.toDomain() }
+        )
+    }
+}
 
 fun Identity.toPresentation(): IdentityModel {
     return IdentityModel(

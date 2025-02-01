@@ -18,6 +18,7 @@ interface UserRepository {
     fun getScrapArtLettersByCategory(categoryId: Int): Flow<DataResource<List<ArtLetter>>>
 
     fun updateProfileInfo(user: User): Flow<DataResource<Unit>>
+    fun updateIdentity(identity: Identity): Flow<DataResource<Unit>>
 
     fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>>
 

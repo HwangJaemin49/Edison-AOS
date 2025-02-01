@@ -9,6 +9,7 @@ import com.umc.edison.data.model.InterestEntity
 import com.umc.edison.data.model.KeywordEntity
 import com.umc.edison.data.model.UserEntity
 import com.umc.edison.remote.api.MyPageApiService
+import com.umc.edison.remote.model.mypage.toUpdateIdentityRequest
 import com.umc.edison.remote.model.mypage.toUpdateProfileRequest
 import com.umc.edison.remote.token.TokenManager
 import javax.inject.Inject
@@ -104,6 +105,10 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun updateProfileInfo(user: UserEntity) {
         myPageApiService.updateProfile(user.toUpdateProfileRequest())
+    }
+
+    override suspend fun updateIdentity(identity: IdentityEntity) {
+        myPageApiService.updateIdentity(identity.toUpdateIdentityRequest())
     }
 
     override suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity {
