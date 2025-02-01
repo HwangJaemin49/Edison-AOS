@@ -245,7 +245,10 @@ private fun ArtLetterScrap(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(White000)
-            .clickable(onClick = onClick)
+            .clickable(
+                enabled = scrapItems.isNotEmpty(),
+                onClick = onClick
+            )
             .border(1.dp, Gray200, RoundedCornerShape(16.dp))
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
