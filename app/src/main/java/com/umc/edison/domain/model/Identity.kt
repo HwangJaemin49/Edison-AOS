@@ -1,6 +1,6 @@
 package com.umc.edison.domain.model
 
-data class IdentityKeyword(
+data class Identity(
     val category: IdentityCategory,
     val selectedKeywords: List<Keyword> = emptyList(),
     val options: List<Keyword>

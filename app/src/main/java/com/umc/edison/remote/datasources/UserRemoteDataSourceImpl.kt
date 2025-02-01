@@ -3,9 +3,9 @@ package com.umc.edison.remote.datasources
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.ArtLetterCategoryEntity
 import com.umc.edison.data.model.IdentityCategoryMapper
-import com.umc.edison.data.model.IdentityKeywordEntity
+import com.umc.edison.data.model.IdentityEntity
 import com.umc.edison.data.model.InterestCategoryMapper
-import com.umc.edison.data.model.InterestKeywordEntity
+import com.umc.edison.data.model.InterestEntity
 import com.umc.edison.data.model.KeywordEntity
 import com.umc.edison.data.model.UserEntity
 import com.umc.edison.remote.api.MyPageApiService
@@ -17,13 +17,13 @@ class UserRemoteDataSourceImpl @Inject constructor(
     private val myPageApiService: MyPageApiService,
     private val tokenManager: TokenManager,
 ) : UserRemoteDataSource {
-    override suspend fun getAllMyIdentityResults(): List<IdentityKeywordEntity> {
+    override suspend fun getAllMyIdentityResults(): List<IdentityEntity> {
         val categories = myPageApiService.getAllMyTestResults().data.categories
 
-        val result: MutableList<IdentityKeywordEntity> = mutableListOf()
+        val result: MutableList<IdentityEntity> = mutableListOf()
 
         result.add(
-            IdentityKeywordEntity(
+            IdentityEntity(
                 categoryNumber = IdentityCategoryMapper.EXPLAIN.categoryNumber,
                 keywords = categories.category1.map {
                     KeywordEntity(
@@ -36,7 +36,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
         )
 
         result.add(
-            IdentityKeywordEntity(
+            IdentityEntity(
                 categoryNumber = IdentityCategoryMapper.FIELD.categoryNumber,
                 keywords = categories.category2.map {
                     KeywordEntity(
@@ -49,7 +49,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
         )
 
         result.add(
-            IdentityKeywordEntity(
+            IdentityEntity(
                 categoryNumber = IdentityCategoryMapper.ENVIRONMENT.categoryNumber,
                 keywords = categories.category3.map {
                     KeywordEntity(
@@ -64,10 +64,10 @@ class UserRemoteDataSourceImpl @Inject constructor(
         return result
     }
 
-    override suspend fun getMyInterestKeyword(): InterestKeywordEntity {
+    override suspend fun getMyInterestKeyword(): InterestEntity {
         val categories = myPageApiService.getAllMyTestResults().data.categories
 
-        return InterestKeywordEntity(
+        return InterestEntity(
             categoryNumber = InterestCategoryMapper.INSPIRATION.categoryNumber,
             keywords = categories.category4.map {
                 KeywordEntity(
@@ -92,7 +92,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
         // TODO: api 명세 확인 후 구현
         return UserEntity(
             email = "",
-            nickname = "",
+            nickname = "닉네임",
             profileImage = ""
         )
     }
@@ -104,5 +104,29 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun updateProfileInfo(user: UserEntity) {
         myPageApiService.updateProfile(user.toUpdateProfileRequest())
+    }
+
+    override suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity {
+        val categories = myPageApiService.getAllMyTestResults().data.categories
+
+        val category = when (categoryNumber) {
+            IdentityCategoryMapper.EXPLAIN.categoryNumber -> categories.category1
+            IdentityCategoryMapper.FIELD.categoryNumber -> categories.category2
+            IdentityCategoryMapper.ENVIRONMENT.categoryNumber -> categories.category3
+            else -> throw IllegalArgumentException("Invalid categoryNumber")
+        }
+
+        val options = myPageApiService.getIdentityKeyword(categoryNumber).data
+
+        return IdentityEntity(
+            categoryNumber = categoryNumber,
+            keywords = category.map {
+                KeywordEntity(
+                    id = it.id,
+                    name = it.name
+                )
+            },
+            options = options.map { it.toData() }
+        )
     }
 }

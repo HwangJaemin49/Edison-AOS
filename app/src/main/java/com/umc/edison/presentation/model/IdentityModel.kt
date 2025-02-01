@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.IdentityKeyword
+import com.umc.edison.domain.model.Identity
 
 data class IdentityModel(
     val id: Int,
@@ -11,7 +11,7 @@ data class IdentityModel(
     val selectedKeywords: List<KeywordModel>,
 )
 
-fun IdentityKeyword.toPresentation(): IdentityModel {
+fun Identity.toPresentation(): IdentityModel {
     return IdentityModel(
         id = category.ordinal,
         question = category.question,

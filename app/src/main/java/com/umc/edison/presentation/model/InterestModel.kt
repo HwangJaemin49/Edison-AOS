@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.InterestKeyword
+import com.umc.edison.domain.model.Interest
 import com.umc.edison.domain.model.Keyword
 
 data class InterestModel(
@@ -13,7 +13,7 @@ data class InterestModel(
     val selectedKeywords: List<KeywordModel>
 )
 
-fun InterestKeyword.toPresentation(): InterestModel {
+fun Interest.toPresentation(): InterestModel {
     return InterestModel(
         id = category.ordinal,
         question = category.question,

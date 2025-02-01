@@ -1,6 +1,6 @@
 package com.umc.edison.domain.model
 
-data class InterestKeyword(
+data class Interest(
     val category: InterestCategory,
     val keywords: List<Keyword>,
     val options: List<Keyword>,

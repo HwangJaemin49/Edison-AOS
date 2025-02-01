@@ -29,7 +29,7 @@ interface MyPageApiService {
     suspend fun updateProfile(@Body profile: UpdateProfileRequest): ResponseWithData<UpdateProfileResponse>
 
     @GET("identity/{category}")
-    suspend fun getIdentityKeyword(@Path("category") category: String): ResponseWithData<GetIdentityKeywordResponse>
+    suspend fun getIdentityKeyword(@Path("category") category: String): ResponseWithData<List<GetIdentityKeywordResponse>>
 
     @GET("members/identity")
     suspend fun getAllMyTestResults(): ResponseWithData<GetAllMyTestResultsResponse>
