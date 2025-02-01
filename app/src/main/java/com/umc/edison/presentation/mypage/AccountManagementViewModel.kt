@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.mypage
 
+import android.util.Log
 import com.umc.edison.domain.usecase.mypage.DeleteAccountUseCase
 import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
 import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
@@ -68,6 +69,10 @@ class AccountManagementViewModel @Inject constructor(
 
     fun updateMode(mode: AccountManagementMode) {
         _uiState.update { it.copy(mode = mode) }
+    }
+
+    fun updateEmail(email: String) {
+        Log.d("AccountManagementViewModel", "updateEmail: $email")
     }
 
     fun logOut() {

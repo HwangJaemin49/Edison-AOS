@@ -33,6 +33,7 @@ import com.umc.edison.presentation.mypage.AccountManagementViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.PopUpDecision
+import com.umc.edison.ui.components.PopUpMultiDecision
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
@@ -131,7 +132,7 @@ private fun AccountManagementContent(
                             .wrapContentSize()
                             .clip(RoundedCornerShape(20.dp))
                             .background(Gray100)
-                            .clickable { /* TODO: 업데이트 기능 */ }
+                            .clickable { viewModel.updateMode(AccountManagementMode.EMAIL_CHANGE) }
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Text(
@@ -228,7 +229,14 @@ private fun AccountManagementContent(
                         onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
                     )
                 } else if (uiState.mode == AccountManagementMode.EMAIL_CHANGE) {
-                    // TODO: 이메일 변경 팝업
+                    PopUpMultiDecision(
+                        question = "이메일 주소를 업데이트하시겠습니까?",
+                        positiveButtonText = "업데이트",
+                        negativeButtonText = "취소",
+                        onPositiveClick = { email -> viewModel.updateEmail(email) },
+                        onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) },
+                        placeholderText = uiState.user?.email ?: "",
+                    )
                 }
             }
         }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,7 +41,6 @@ import com.umc.edison.ui.theme.Yellow100
 import com.umc.edison.ui.theme.ColorPickerList
 import com.umc.edison.ui.theme.Gray300
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LabelModalContent(
     editMode: LabelEditMode,
@@ -83,12 +81,17 @@ fun LabelModalContent(
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .wrapContentHeight(),
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = White000,
-                    focusedTextColor = Gray800,
+                    .wrapContentHeight()
+                    .background(White000),
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    cursorColor = Gray800,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = Gray800,
+                    unfocusedTextColor = Gray800
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
