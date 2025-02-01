@@ -37,7 +37,7 @@ data class MyPageState(
             ),
             interest = InterestModel(
                 category = InterestCategory.INSPIRATION,
-                keywords = listOf()
+                selectedKeywords = listOf()
             ),
             artLetter = listOf()
         )

@@ -147,7 +147,7 @@ private fun MyPageContent(
 
                 GrayContainerSection(
                     title = "나의 관심사",
-                    items = listOf(Pair(uiState.interest.category.question, uiState.interest.keywords)),
+                    items = listOf(Pair(uiState.interest.category.question, uiState.interest.selectedKeywords)),
                     onItemClick = { _ ->
                         navHostController.navigate(NavRoute.InterestEdit.createRoute(
                             InterestCategory.INSPIRATION
