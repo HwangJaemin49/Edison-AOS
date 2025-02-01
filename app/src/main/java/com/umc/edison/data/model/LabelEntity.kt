@@ -1,7 +1,6 @@
 package com.umc.edison.data.model
 
 import androidx.compose.ui.graphics.Color
-import com.umc.edison.data.DataMapper
 import com.umc.edison.domain.model.Label
 import java.util.Date
 

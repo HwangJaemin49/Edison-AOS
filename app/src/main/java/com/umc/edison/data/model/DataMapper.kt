@@ -1,4 +1,4 @@
-package com.umc.edison.data
+package com.umc.edison.data.model
 
 internal interface DataMapper<DomainModel> {
     fun toDomain(): DomainModel

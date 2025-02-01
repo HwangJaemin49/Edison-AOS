@@ -1,7 +1,7 @@
 package com.umc.edison.data.bound
 
 import android.util.Log
-import com.umc.edison.data.toDomain
+import com.umc.edison.data.model.toDomain
 import com.umc.edison.domain.DataResource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector

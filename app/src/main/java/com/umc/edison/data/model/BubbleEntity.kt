@@ -1,6 +1,5 @@
 package com.umc.edison.data.model
 
-import com.umc.edison.data.DataMapper
 import com.umc.edison.domain.model.Bubble
 import com.umc.edison.domain.model.ContentBlock
 import com.umc.edison.domain.model.ContentType
