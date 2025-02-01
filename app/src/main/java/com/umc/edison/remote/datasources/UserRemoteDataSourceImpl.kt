@@ -9,7 +9,7 @@ import com.umc.edison.data.model.InterestEntity
 import com.umc.edison.data.model.KeywordEntity
 import com.umc.edison.data.model.UserEntity
 import com.umc.edison.remote.api.MyPageApiService
-import com.umc.edison.remote.model.mypage.toUpdateIdentityRequest
+import com.umc.edison.remote.model.mypage.toUpdateTestRequest
 import com.umc.edison.remote.model.mypage.toUpdateProfileRequest
 import com.umc.edison.remote.token.TokenManager
 import javax.inject.Inject
@@ -65,18 +65,25 @@ class UserRemoteDataSourceImpl @Inject constructor(
         return result
     }
 
-    override suspend fun getMyInterestKeyword(): InterestEntity {
+    override suspend fun getMyInterestResult(categoryNumber: String): InterestEntity {
         val categories = myPageApiService.getAllMyTestResults().data.categories
 
+        val category = when (categoryNumber) {
+            InterestCategoryMapper.INSPIRATION.categoryNumber -> categories.category4
+            else -> throw IllegalArgumentException("Invalid categoryNumber")
+        }
+
+        val options = myPageApiService.getTestKeyword(categoryNumber).data
+
         return InterestEntity(
-            categoryNumber = InterestCategoryMapper.INSPIRATION.categoryNumber,
-            keywords = categories.category4.map {
+            categoryNumber = categoryNumber,
+            keywords = category.map {
                 KeywordEntity(
                     id = it.id,
                     name = it.name
                 )
             },
-            options = emptyList()
+            options = options.map { it.toData() }
         )
     }
 
@@ -108,7 +115,11 @@ class UserRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun updateIdentity(identity: IdentityEntity) {
-        myPageApiService.updateIdentity(identity.toUpdateIdentityRequest())
+        myPageApiService.updateTest(identity.toUpdateTestRequest())
+    }
+
+    override suspend fun updateInterest(interest: InterestEntity) {
+        myPageApiService.updateTest(interest.toUpdateTestRequest())
     }
 
     override suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity {
@@ -121,7 +132,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
             else -> throw IllegalArgumentException("Invalid categoryNumber")
         }
 
-        val options = myPageApiService.getIdentityKeyword(categoryNumber).data
+        val options = myPageApiService.getTestKeyword(categoryNumber).data
 
         return IdentityEntity(
             categoryNumber = categoryNumber,

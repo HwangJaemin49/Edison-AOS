@@ -7,7 +7,7 @@ import com.umc.edison.data.model.UserEntity
 
 interface UserRemoteDataSource {
     suspend fun getAllMyIdentityResults(): List<IdentityEntity>
-    suspend fun getMyInterestKeyword(): InterestEntity
+    suspend fun getMyInterestResult(categoryNumber: String): InterestEntity
     suspend fun getLogInState(): Boolean
     suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity>
     suspend fun getProfileInfo(): UserEntity
@@ -15,6 +15,7 @@ interface UserRemoteDataSource {
 
     suspend fun updateProfileInfo(user: UserEntity)
     suspend fun updateIdentity(identity: IdentityEntity)
+    suspend fun updateInterest(interest: InterestEntity)
 
     suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity
 }

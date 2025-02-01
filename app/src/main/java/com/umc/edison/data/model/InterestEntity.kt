@@ -17,12 +17,20 @@ data class InterestEntity(
     }
 }
 
+fun Interest.toData(): InterestEntity {
+    return InterestEntity(
+        categoryNumber = InterestCategoryMapper.entries.first { it.category == category }.categoryNumber,
+        keywords = keywords.map { it.toData() },
+        options = options.map { it.toData() }
+    )
+}
+
 enum class InterestCategoryMapper(
     val categoryNumber: String,
     val category: InterestCategory
 ) {
     INSPIRATION(
-        categoryNumber = "CATEGORY1",
+        categoryNumber = "CATEGORY4",
         category = InterestCategory.INSPIRATION
     ),
 }

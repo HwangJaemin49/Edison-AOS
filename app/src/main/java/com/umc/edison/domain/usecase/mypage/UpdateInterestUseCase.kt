@@ -6,8 +6,9 @@ import com.umc.edison.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetMyInterestKeywordUseCase @Inject constructor(
+class UpdateInterestUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    operator fun invoke(): Flow<DataResource<Interest>> = userRepository.getMyInterestKeyword()
+    operator fun invoke(interest: Interest): Flow<DataResource<Unit>> =
+        userRepository.updateInterest(interest)
 }

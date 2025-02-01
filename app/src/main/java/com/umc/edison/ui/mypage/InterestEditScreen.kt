@@ -26,19 +26,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.umc.edison.presentation.mypage.IdentityEditViewModel
+import com.umc.edison.presentation.mypage.InterestEditViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.GrayColumnContainer
 import com.umc.edison.ui.components.KeywordChip
+import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
 @Composable
-fun IdentityEditScreen(
+fun InterestEditScreen(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit,
-    viewModel: IdentityEditViewModel = hiltViewModel()
+    viewModel: InterestEditViewModel = hiltViewModel()
 ) {
 
     LaunchedEffect(Unit) {
@@ -62,15 +63,15 @@ fun IdentityEditScreen(
                 .background(White000)
                 .padding(innerPadding)
         ) {
-            IdentityContent(viewModel)
+            InterestContent(viewModel)
         }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun IdentityContent(
-    viewModel: IdentityEditViewModel
+private fun InterestContent(
+    viewModel: InterestEditViewModel
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -90,10 +91,16 @@ private fun IdentityContent(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = uiState.identity.question,
+                text = uiState.interest.question,
                 style = MaterialTheme.typography.displayLarge,
                 color = Gray800,
                 softWrap = true,
+            )
+
+            Text(
+                text = uiState.interest.questionTip,
+                style = MaterialTheme.typography.titleSmall,
+                color = Gray500,
             )
 
             GrayColumnContainer(
@@ -102,7 +109,7 @@ private fun IdentityContent(
                 space = 20.dp
             ) {
                 Text(
-                    text = uiState.identity.descriptionFirst,
+                    text = uiState.interest.descriptionFirst,
                     style = MaterialTheme.typography.titleMedium,
                     color = Gray800
                 )
@@ -111,7 +118,7 @@ private fun IdentityContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    uiState.identity.selectedKeywords.forEach { keyword ->
+                    uiState.interest.selectedKeywords.forEach { keyword ->
                         KeywordChip(
                             keyword = keyword.name,
                             isSelected = true,
@@ -120,7 +127,7 @@ private fun IdentityContent(
                     }
                 }
 
-                uiState.identity.descriptionSecond?.let {
+                uiState.interest.descriptionSecond?.let {
                     Text(
                         text = it,
                         style = MaterialTheme.typography.titleMedium,
@@ -145,10 +152,10 @@ private fun IdentityContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    uiState.identity.options.forEach { keyword ->
+                    uiState.interest.options.forEach { keyword ->
                         KeywordChip(
                             keyword = keyword.name,
-                            isSelected = uiState.identity.selectedKeywords.contains(keyword),
+                            isSelected = uiState.interest.selectedKeywords.contains(keyword),
                             onClick = { viewModel.toggleKeyword(keyword) }
                         )
                     }

@@ -12,6 +12,12 @@ enum class InterestCategory(
     val descriptionFirst: String,
     val descriptionSecond: String? = null,
 ) {
+    NONE(
+        question = "",
+        questionTip = "",
+        descriptionFirst = "",
+        descriptionSecond = null,
+    ),
     INSPIRATION(
         question = "나의 상상력을\n자극하는 분야는?",
         questionTip = "잘 알지 못해도 관심있는 분야일수록 좋아요.",

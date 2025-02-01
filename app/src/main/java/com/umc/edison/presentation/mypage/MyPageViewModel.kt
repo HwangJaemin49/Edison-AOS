@@ -1,8 +1,9 @@
 package com.umc.edison.presentation.mypage
 
+import com.umc.edison.domain.model.InterestCategory
 import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
 import com.umc.edison.domain.usecase.mypage.GetAllMyIdentityResultsUseCase
-import com.umc.edison.domain.usecase.mypage.GetMyInterestKeywordUseCase
+import com.umc.edison.domain.usecase.mypage.GetMyInterestResultUseCase
 import com.umc.edison.domain.usecase.mypage.GetMyScrapArtLettersUseCase
 import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
 import com.umc.edison.presentation.base.BaseViewModel
@@ -18,7 +19,7 @@ class MyPageViewModel @Inject constructor(
     private val getLogInStateUseCase: GetLogInStateUseCase,
     private val getProfileInfoUseCase: GetProfileInfoUseCase,
     private val getAllMyIdentityResultsUseCase: GetAllMyIdentityResultsUseCase,
-    private val getMyInterestKeywordUseCase: GetMyInterestKeywordUseCase,
+    private val getMyInterestResultUseCase: GetMyInterestResultUseCase,
     private val getMyScrapArtLettersUseCase: GetMyScrapArtLettersUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MyPageState.DEFAULT)
@@ -108,7 +109,7 @@ class MyPageViewModel @Inject constructor(
 
     private fun fetchInterestKeyword() {
         collectDataResource(
-            flow = getMyInterestKeywordUseCase(),
+            flow = getMyInterestResultUseCase(InterestCategory.INSPIRATION),
             onSuccess = { interestKeyword ->
                 _uiState.update { it.copy(interest = interestKeyword.toPresentation()) }
             },

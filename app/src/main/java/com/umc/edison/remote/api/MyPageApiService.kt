@@ -7,8 +7,8 @@ import com.umc.edison.remote.model.mypage.GetDeletedBubbleListResponse
 import com.umc.edison.remote.model.mypage.GetIdentityKeywordResponse
 import com.umc.edison.remote.model.mypage.GetAllMyTestResultsResponse
 import com.umc.edison.remote.model.mypage.GetMyScrapArtLettersResponse
-import com.umc.edison.remote.model.mypage.UpdateIdentityRequest
-import com.umc.edison.remote.model.mypage.UpdateIdentityResponse
+import com.umc.edison.remote.model.mypage.UpdateTestRequest
+import com.umc.edison.remote.model.mypage.UpdateTestResponse
 import com.umc.edison.remote.model.mypage.UpdateProfileRequest
 import com.umc.edison.remote.model.mypage.UpdateProfileResponse
 import retrofit2.http.Body
@@ -29,7 +29,7 @@ interface MyPageApiService {
     suspend fun updateProfile(@Body profile: UpdateProfileRequest): ResponseWithData<UpdateProfileResponse>
 
     @GET("identity/{category}")
-    suspend fun getIdentityKeyword(@Path("category") category: String): ResponseWithData<List<GetIdentityKeywordResponse>>
+    suspend fun getTestKeyword(@Path("category") category: String): ResponseWithData<List<GetIdentityKeywordResponse>>
 
     @GET("members/identity")
     suspend fun getAllMyTestResults(): ResponseWithData<GetAllMyTestResultsResponse>
@@ -38,7 +38,7 @@ interface MyPageApiService {
     suspend fun getMyScrapArtLetters(): ResponseWithPagination<GetMyScrapArtLettersResponse>
 
     @PATCH("members/identity")
-    suspend fun updateIdentity(@Body identity: UpdateIdentityRequest): ResponseWithData<UpdateIdentityResponse>
+    suspend fun updateTest(@Body identity: UpdateTestRequest): ResponseWithData<UpdateTestResponse>
 
     @POST("members/logout")
     suspend fun logout() : BaseResponse

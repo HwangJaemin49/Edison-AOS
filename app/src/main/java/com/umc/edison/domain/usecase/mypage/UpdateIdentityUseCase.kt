@@ -9,5 +9,6 @@ import javax.inject.Inject
 class UpdateIdentityUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    operator fun invoke(identity: Identity): Flow<DataResource<Unit>> = userRepository.updateIdentity(identity)
+    operator fun invoke(identity: Identity): Flow<DataResource<Unit>> =
+        userRepository.updateIdentity(identity)
 }

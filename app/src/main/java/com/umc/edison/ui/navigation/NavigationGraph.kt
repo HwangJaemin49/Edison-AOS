@@ -14,8 +14,8 @@ import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
-import com.umc.edison.ui.mypage.IdentityScreen
-import com.umc.edison.ui.mypage.InterestScreen
+import com.umc.edison.ui.mypage.IdentityEditScreen
+import com.umc.edison.ui.mypage.InterestEditScreen
 import com.umc.edison.ui.mypage.MenuScreen
 import com.umc.edison.ui.mypage.ScrapBoardDetailScreen
 import com.umc.edison.ui.mypage.ScrapBoardScreen
@@ -83,14 +83,14 @@ fun NavigationGraph(
             route = "${NavRoute.MyPage.route}/identity/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
-            IdentityScreen(navHostController, updateShowBottomNav)
+            IdentityEditScreen(navHostController, updateShowBottomNav)
         }
 
         composable(
             route = "${NavRoute.MyPage.route}/interest/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
-            InterestScreen(navHostController)
+            InterestEditScreen(navHostController, updateShowBottomNav)
         }
     }
 }
