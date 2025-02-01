@@ -14,6 +14,8 @@ sealed class NavRoute(val route: String) {
     data object Trash : NavRoute("my-page/trash")
     data object AccountManagement : NavRoute("my-page/account-management")
 
+    data object ScrapBoard : NavRoute("my-page/scrap-board")
+
     data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/${id}") {
         companion object {
             fun createRoute(labelId: Int): String = "${SpaceLabel.route}/${labelId}"

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -45,7 +44,6 @@ import com.umc.edison.ui.components.PopUpMulti
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
-import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -110,7 +108,7 @@ private fun MyPageContent(
             .fillMaxWidth()
             .wrapContentHeight()
             .background(White000)
-            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
+            .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         ProfileInfo(
@@ -121,7 +119,8 @@ private fun MyPageContent(
 
         Box(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(bottom = 12.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -147,10 +146,12 @@ private fun MyPageContent(
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(16.dp)
+                        .size(8.dp)
                 )
 
-                ArtLetterScrap()
+                ArtLetterScrap(
+                    onClick = { navHostController.navigate(NavRoute.ScrapBoard.route) }
+                )
             }
 
             if (!uiState.isLoggedIn) {
@@ -222,7 +223,8 @@ private fun GrayContainerSection(
         items.forEach {
             WhiteContainerItem(
                 title = it.first,
-                keyword = it.second.map { keyword -> keyword.name }
+                keyword = it.second.map { keyword -> keyword.name },
+                onClick = { /* TODO: 키워드 선택 화면으로 이동 */ }
             )
         }
     }
@@ -277,12 +279,15 @@ private fun WhiteContainerItem(
 }
 
 @Composable
-private fun ArtLetterScrap() {
+private fun ArtLetterScrap(
+    onClick: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(White000)
+            .clickable(onClick = onClick)
             .border(1.dp, Gray200, RoundedCornerShape(16.dp))
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -306,71 +311,6 @@ private fun ArtLetterScrap() {
             )
         }
 
-        ArtLetterGrid()
-    }
-}
-
-@Composable
-private fun ArtLetterGrid() {
-    val items = List(6) { it }
-    val columns = 2
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items.chunked(columns).forEach { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                rowItems.forEach { _ ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        ArtLetterContent()
-                    }
-                }
-
-                if (rowItems.size < columns) {
-                    Spacer(modifier = Modifier.weight(columns - rowItems.size.toFloat()))
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-private fun ArtLetterContent(
-    thumbnail: String? = null,
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .height(120.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Gray300),
-            contentAlignment = Alignment.Center
-        ) {
-            if (thumbnail != null) {
-                AsyncImage(
-                    model = thumbnail,
-                    contentDescription = "ArtLetter Image",
-                    modifier = Modifier
-                        .matchParentSize()
-                        .clip(RoundedCornerShape(10.dp))
-                )
-            }
-        }
-
-        Text(
-            text = "현대미술",
-            style = MaterialTheme.typography.titleSmall,
-            color = Gray800
-        )
+        ScrapBoardGrid()
     }
 }
