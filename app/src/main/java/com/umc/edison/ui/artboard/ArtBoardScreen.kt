@@ -1,6 +1,7 @@
 package com.umc.edison.ui.artboard
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,10 +33,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.umc.edison.R
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
@@ -51,7 +54,7 @@ fun ArtBoardScreen(navHostController: NavHostController) {
     ) {
         TopBar()
         EditorPickSection()
-        ArtboardSection()
+        ArtboardSection(navHostController)
     }
 }
 
@@ -109,9 +112,11 @@ fun EditorPickSection() {
                         .background(Gray300),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Banner ${page + 1}",
-                        style = MaterialTheme.typography.headlineLarge
+                    Image(
+                        painter = painterResource(id = R.drawable.artletter_banner2),
+                        contentDescription = "Banner Image",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop // 이미지가 박스 크기에 맞게 조정됨
                     )
                 }
             }
@@ -140,7 +145,7 @@ fun EditorPickSection() {
 
 
 @Composable
-fun ArtboardSection() {
+fun ArtboardSection(navHostController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -162,7 +167,9 @@ fun ArtboardSection() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     rowItems.forEach { _ ->
-                        ArtBoardCard(modifier = Modifier.weight(1f))
+                        ArtBoardCard(
+                            modifier = Modifier.weight(1f),
+                            navHostController = navHostController)
                     }
                     if (rowItems.size < 2) {
                         Spacer(modifier = Modifier.weight(1f))
@@ -175,21 +182,31 @@ fun ArtboardSection() {
 }
 
 @Composable
-fun ArtBoardCard(modifier: Modifier = Modifier) {
+fun ArtBoardCard(
+    modifier: Modifier = Modifier,
+    navHostController: NavHostController) {
     var isBookmarked by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
             .aspectRatio(174f / 240f)
-            .background(Gray300, shape = RoundedCornerShape(8.dp))
-            .padding(8.dp)
+            .clickable { navHostController.navigate(NavRoute.ArtBoardDetail.route) }
+            .clip(RoundedCornerShape(10.dp))
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.delivery),
+            contentDescription = "Thumbnail Image",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop // 이미지가 박스 크기에 맞게 조정됨
+        )
+
         Icon(
             painter = painterResource(id = if (isBookmarked) R.drawable.ic_bookmark else R.drawable.ic_empty_bookmark),
             contentDescription = "Bookmark",
             tint = Color.Unspecified,
             modifier = Modifier
                 .align(Alignment.TopEnd)
+                .padding(8.dp)
                 .size(24.dp)
                 .clickable { isBookmarked = !isBookmarked }
         )
@@ -199,7 +216,7 @@ fun ArtBoardCard(modifier: Modifier = Modifier) {
             color = Color.White,
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(bottom = 8.dp)
+                .padding(8.dp)
         )
     }
 }

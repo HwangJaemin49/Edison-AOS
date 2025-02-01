@@ -71,7 +71,8 @@ fun ScrapBoardDetailScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     rowItems.forEach { _ ->
-                        ArtBoardCard(modifier = Modifier.weight(1f))
+                        ArtBoardCard(modifier = Modifier.weight(1f),
+                            navHostController = navHostController)
                     }
                     if (rowItems.size < 2) {
                         Spacer(modifier = Modifier.weight(1f))

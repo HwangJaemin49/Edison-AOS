@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.umc.edison.presentation.model.IdentityCategory
 import com.umc.edison.presentation.model.InterestCategory
 import com.umc.edison.ui.artboard.ArtBoardScreen
+import com.umc.edison.ui.artboard.ArtBoardDetailScreen
 import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
@@ -51,6 +52,10 @@ fun NavigationGraph(
 
         composable(NavRoute.ArtBoard.route) {
             ArtBoardScreen(navHostController)
+        }
+
+        composable(NavRoute.ArtBoardDetail.route) {
+            ArtBoardDetailScreen(navHostController)
         }
 
         composable(NavRoute.MyPage.route) {

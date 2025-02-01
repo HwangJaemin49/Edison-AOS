@@ -7,6 +7,7 @@ sealed class NavRoute(val route: String) {
     data object MyEdison : NavRoute("my-edison")
     data object Space : NavRoute("space")
     data object ArtBoard : NavRoute("art-board")
+    data object ArtBoardDetail : NavRoute("art-board/art-letter") // TODO: 경로 art-board/detail/${id} 형식으로 수정
     data object MyPage : NavRoute("my-page")
 
     data object BubbleStorage: NavRoute("my-edison/bubble-storage")
