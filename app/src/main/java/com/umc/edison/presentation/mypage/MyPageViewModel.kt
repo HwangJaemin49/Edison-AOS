@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.mypage
 
 import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
-import com.umc.edison.domain.usecase.mypage.GetMyIdentityKeywordsUseCase
+import com.umc.edison.domain.usecase.mypage.GetAllMyIdentityResultsUseCase
 import com.umc.edison.domain.usecase.mypage.GetMyInterestKeywordUseCase
 import com.umc.edison.domain.usecase.mypage.GetMyScrapArtLettersUseCase
 import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class MyPageViewModel @Inject constructor(
     private val getLogInStateUseCase: GetLogInStateUseCase,
     private val getProfileInfoUseCase: GetProfileInfoUseCase,
-    private val getMyIdentityKeywordsUseCase: GetMyIdentityKeywordsUseCase,
+    private val getAllMyIdentityResultsUseCase: GetAllMyIdentityResultsUseCase,
     private val getMyInterestKeywordUseCase: GetMyInterestKeywordUseCase,
     private val getMyScrapArtLettersUseCase: GetMyScrapArtLettersUseCase,
 ) : BaseViewModel() {
@@ -77,7 +77,7 @@ class MyPageViewModel @Inject constructor(
 
     private fun fetchMyIdentityKeyword() {
         collectDataResource(
-            flow = getMyIdentityKeywordsUseCase(),
+            flow = getAllMyIdentityResultsUseCase(),
             onSuccess = { identityKeywords ->
                 _uiState.update { state ->
                     state.copy(identities = identityKeywords.map { it.toPresentation() })

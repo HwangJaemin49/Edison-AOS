@@ -5,7 +5,7 @@ import com.umc.edison.remote.model.ResponseWithData
 import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.mypage.GetDeletedBubbleListResponse
 import com.umc.edison.remote.model.mypage.GetIdentityKeywordResponse
-import com.umc.edison.remote.model.mypage.GetMemberIdentityKeywordResponse
+import com.umc.edison.remote.model.mypage.GetAllMyTestResultsResponse
 import com.umc.edison.remote.model.mypage.GetMyScrapArtLettersResponse
 import com.umc.edison.remote.model.mypage.UpdateMemberIdentityKeywordRequest
 import com.umc.edison.remote.model.mypage.UpdateMemberIdentityKeywordResponse
@@ -32,7 +32,7 @@ interface MyPageApiService {
     suspend fun getIdentityKeyword(@Path("category") category: String): ResponseWithData<GetIdentityKeywordResponse>
 
     @GET("members/identity")
-    suspend fun getMemberIdentityKeyword(): ResponseWithData<GetMemberIdentityKeywordResponse>
+    suspend fun getAllMyTestResults(): ResponseWithData<GetAllMyTestResultsResponse>
 
     @GET("artletters/myscrap")
     suspend fun getMyScrapArtLetters(): ResponseWithPagination<GetMyScrapArtLettersResponse>

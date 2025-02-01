@@ -17,8 +17,8 @@ class UserRemoteDataSourceImpl @Inject constructor(
     private val myPageApiService: MyPageApiService,
     private val tokenManager: TokenManager,
 ) : UserRemoteDataSource {
-    override suspend fun getMyIdentityKeywords(): List<IdentityKeywordEntity> {
-        val categories = myPageApiService.getMemberIdentityKeyword().data.categories
+    override suspend fun getAllMyIdentityResults(): List<IdentityKeywordEntity> {
+        val categories = myPageApiService.getAllMyTestResults().data.categories
 
         val result: MutableList<IdentityKeywordEntity> = mutableListOf()
 
@@ -65,7 +65,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getMyInterestKeyword(): InterestKeywordEntity {
-        val categories = myPageApiService.getMemberIdentityKeyword().data.categories
+        val categories = myPageApiService.getAllMyTestResults().data.categories
 
         return InterestKeywordEntity(
             categoryNumber = InterestCategoryMapper.INSPIRATION.categoryNumber,

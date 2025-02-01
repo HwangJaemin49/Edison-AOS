@@ -265,7 +265,7 @@ private fun ArtLetterScrap(
         GridLayout(
             columns = 2,
             items = scrapItems,
-        ) { 
+        ) {
             ArtLetterCategoryContent(it as ArtLetterCategoryModel)
         }
     }

@@ -2,7 +2,7 @@ package com.umc.edison.remote.model.mypage
 
 import com.google.gson.annotations.SerializedName
 
-data class GetMemberIdentityKeywordResponse(
+data class GetAllMyTestResultsResponse(
     @SerializedName("categories") val categories: CategoryType,
 ) {
     data class CategoryType(

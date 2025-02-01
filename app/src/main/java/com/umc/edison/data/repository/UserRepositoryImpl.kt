@@ -16,8 +16,8 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserRemoteDataSource,
 ) : UserRepository {
-    override fun getMyIdentityKeywords(): Flow<DataResource<List<IdentityKeyword>>> = flowDataResource(
-        dataAction = { userRemoteDataSource.getMyIdentityKeywords() }
+    override fun getAllMyIdentityResults(): Flow<DataResource<List<IdentityKeyword>>> = flowDataResource(
+        dataAction = { userRemoteDataSource.getAllMyIdentityResults() }
     )
 
     override fun getMyInterestKeyword(): Flow<DataResource<InterestKeyword>>  = flowDataResource(
