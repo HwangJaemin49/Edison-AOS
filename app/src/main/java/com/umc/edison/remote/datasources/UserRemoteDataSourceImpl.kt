@@ -1,11 +1,14 @@
 package com.umc.edison.remote.datasources
 
 import com.umc.edison.data.datasources.UserRemoteDataSource
+import com.umc.edison.data.model.ArtLetterCategoryEntity
 import com.umc.edison.data.model.IdentityKeywordEntity
 import com.umc.edison.data.model.InterestKeywordEntity
 import com.umc.edison.data.model.KeywordEntity
+import com.umc.edison.data.model.UserEntity
 import com.umc.edison.remote.api.MyPageApiService
 import com.umc.edison.remote.model.mypage.getCategoryQuestion
+import com.umc.edison.remote.model.mypage.toUpdateProfileRequest
 import com.umc.edison.remote.token.TokenManager
 import javax.inject.Inject
 
@@ -73,5 +76,21 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getLogInState(): Boolean {
         return tokenManager.loadAccessToken() != null
+    }
+
+    override suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getProfileInfo(): UserEntity {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getScrapArtLettersByCategory(categoryId: Int): List<ArtLetterCategoryEntity> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateProfileInfo(user: UserEntity) {
+        myPageApiService.updateProfile(user.toUpdateProfileRequest())
     }
 }
