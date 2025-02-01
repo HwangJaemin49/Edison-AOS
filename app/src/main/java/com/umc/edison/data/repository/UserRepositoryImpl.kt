@@ -1,7 +1,6 @@
 package com.umc.edison.data.repository
 
 import com.umc.edison.data.bound.flowDataResource
-import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.IdentityCategoryMapper
 import com.umc.edison.data.model.InterestCategoryMapper

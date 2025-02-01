@@ -18,7 +18,7 @@ data class UserModel(
 
 fun User.toPresentation(): UserModel {
     return UserModel(
-        nickname = nickname,
+        nickname = nickname.ifEmpty { UserModel.DEFAULT.nickname },
         profileImage = profileImage,
         email = email,
     )

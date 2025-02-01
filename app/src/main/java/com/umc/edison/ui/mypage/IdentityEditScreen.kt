@@ -1,6 +1,5 @@
 package com.umc.edison.ui.mypage
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.GrayColumnContainer
 import com.umc.edison.ui.components.KeywordChip
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.White000
 
 @Composable
 fun IdentityEditScreen(
@@ -59,7 +57,6 @@ fun IdentityEditScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(White000)
                 .padding(innerPadding)
         ) {
             IdentityContent(viewModel)

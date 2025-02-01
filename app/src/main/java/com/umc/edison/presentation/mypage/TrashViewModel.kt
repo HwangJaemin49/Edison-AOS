@@ -64,7 +64,7 @@ class TrashViewModel @Inject constructor(
     }
 
     fun deleteBubbles() {
-
+        // TODO: 영구 삭제 기능 구현
     }
 
     fun recoverBubbles() {
