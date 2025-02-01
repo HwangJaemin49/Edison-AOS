@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.ui.theme.EdisonTheme
@@ -50,13 +51,15 @@ fun PopUpMulti(
         Text(
             text = title,
             style = MaterialTheme.typography.displaySmall,
-            color = Gray800
+            color = Gray800,
+            textAlign = TextAlign.Center
         )
 
         Text(
             text = detail,
             style = MaterialTheme.typography.bodySmall,
-            color = Gray600
+            color = Gray600,
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -74,6 +77,7 @@ fun PopUpMulti(
                 text = hintText,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Gray600,
+                textAlign = TextAlign.Center
             )
         }
 
@@ -93,9 +97,9 @@ fun PopUpMulti(
                 text = buttonText,
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray800,
+                textAlign = TextAlign.Center
             )
         }
-
     }
 }
 
@@ -106,11 +110,12 @@ fun PopUpMulti(
 fun PopUpMultiPreview() {
     EdisonTheme {
         PopUpMulti(
-            title = "타이틀",
-            detail = "상세 설명",
-            hintText = "힌트",
-            buttonText = "버튼",
-            onButtonClick = {}
+            title = "로그인이 필요한 페이지입니다",
+            detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
+            hintText = "스페이스 자동 시각화 기능 지원\n" +
+                    "맞춤형 레터 추천과 북마크 기능 지원",
+            buttonText = "구글 로그인",
+            onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
         )
     }
 }

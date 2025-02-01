@@ -6,8 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.umc.edison.presentation.model.IdentityCategory
-import com.umc.edison.presentation.model.InterestCategory
 import com.umc.edison.ui.artboard.ArtBoardScreen
 import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
@@ -84,21 +82,15 @@ fun NavigationGraph(
         composable(
             route = "${NavRoute.MyPage.route}/identity/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 0
-            val category = IdentityCategory.entries.getOrNull(id) ?: IdentityCategory.EXPLAIN
-
-            IdentityScreen(navHostController, category)
+        ) {
+            IdentityScreen(navHostController, updateShowBottomNav)
         }
 
         composable(
             route = "${NavRoute.MyPage.route}/interest/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 0
-            val category = InterestCategory.entries.getOrNull(id) ?: InterestCategory.INSPIRATION
-
-            InterestScreen(navHostController, category)
+        ) {
+            InterestScreen(navHostController)
         }
     }
 }
