@@ -40,7 +40,7 @@ import com.umc.edison.presentation.model.ArtLetterCategoryModel
 import com.umc.edison.presentation.model.IdentityModel
 import com.umc.edison.presentation.model.InterestModel
 import com.umc.edison.presentation.mypage.MyPageViewModel
-import com.umc.edison.ui.LoadingScreen
+import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.GrayColumnContainer
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.components.HamburgerMenu
@@ -63,6 +63,7 @@ fun MyPageScreen(
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
+        viewModel.fetchLoginState()
     }
 
     Scaffold(
@@ -73,17 +74,18 @@ fun MyPageScreen(
             )
         }
     ) { innerPadding ->
-        if (uiState.isLoading) {
-            LoadingScreen()
-        } else {
+        BaseContent(
+            uiState = uiState,
+            onDismiss = { viewModel.clearError() },
+            modifier = Modifier.padding(innerPadding)
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         color = if (uiState.isLoggedIn) White000 else White000.copy(alpha = 0.5f)
                     )
-                    .blur(if (uiState.isLoggedIn) 0.dp else 10.dp)
-                    .padding(innerPadding),
+                    .blur(if (uiState.isLoggedIn) 0.dp else 10.dp),
             ) {
                 MyPageContent(navHostController, viewModel)
             }

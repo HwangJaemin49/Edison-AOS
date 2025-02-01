@@ -1,17 +1,19 @@
 package com.umc.edison.presentation.label
 
+import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.theme.Gray300
 
 data class LabelDetailState(
-    val isLoading: Boolean,
+    override val isLoading: Boolean,
     val label: LabelModel,
     val selectedBubbles: List<BubbleModel> = listOf(),
     val labelDetailMode: LabelDetailMode,
     val movableLabels: List<LabelModel> = listOf(),
-    val error: Throwable? = null,
-) {
+    override val error: Throwable? = null,
+    override val errorMessage: String? = null
+) : BaseState {
     companion object {
         val DEFAULT = LabelDetailState(
             isLoading = false,

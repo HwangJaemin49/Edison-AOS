@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
-open class BaseViewModel : ViewModel() {
+abstract class BaseViewModel : ViewModel() {
     /**
      * 공통적으로 DataResource를 처리하는 함수
      */
@@ -41,4 +41,6 @@ open class BaseViewModel : ViewModel() {
             }
         }
     }
+
+    abstract fun clearError()
 }

@@ -1,5 +1,8 @@
 package com.umc.edison.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,18 +19,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray600
+import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
+import kotlinx.coroutines.delay
 
 @Composable
 fun PopUpMulti(
@@ -103,19 +107,36 @@ fun PopUpMulti(
     }
 }
 
-
-
-@Preview(showBackground = true)
 @Composable
-fun PopUpMultiPreview() {
-    EdisonTheme {
-        PopUpMulti(
-            title = "로그인이 필요한 페이지입니다",
-            detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
-            hintText = "스페이스 자동 시각화 기능 지원\n" +
-                    "맞춤형 레터 추천과 북마크 기능 지원",
-            buttonText = "구글 로그인",
-            onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
-        )
+fun ToastMessage(
+    message: String,
+    isVisible: Boolean,
+    onDismiss: () -> Unit
+) {
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .background(Gray700.copy(alpha = 0.7f), shape = RoundedCornerShape(20.dp))
+                .padding(20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = White000
+            )
+        }
+    }
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            delay(2000)
+            onDismiss()
+        }
     }
 }

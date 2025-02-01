@@ -47,8 +47,8 @@ fun HamburgerMenu(
 
 @Composable
 fun BackButtonTopBar(
-    title: String,
     onBack: () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -69,6 +69,18 @@ fun BackButtonTopBar(
             )
         }
 
+        content()
+    }
+}
+
+@Composable
+fun BackButtonTopBar(
+    title: String,
+    onBack: () -> Unit,
+) {
+    BackButtonTopBar(
+        onBack = onBack,
+    ) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,

@@ -30,6 +30,9 @@ class BubbleInputViewModel @Inject constructor(
 
     }
 
+    override fun clearError() {
+        TODO("Not yet implemented")
+    }
 
 
 }

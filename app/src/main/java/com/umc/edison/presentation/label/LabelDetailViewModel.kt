@@ -43,10 +43,19 @@ class LabelDetailViewModel @Inject constructor(
             flow = getLabelDetailUseCase(id),
             onSuccess = { label ->
                 val shuffledBubbles = label.bubbles.shuffled().toPresentation()
-                _uiState.update { it.copy(label = label.toPresentation().copy(bubbles = shuffledBubbles)) }
+                _uiState.update {
+                    it.copy(
+                        label = label.toPresentation().copy(bubbles = shuffledBubbles)
+                    )
+                }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -108,7 +117,12 @@ class LabelDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(movableLabels = movableLabels) }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -132,7 +146,12 @@ class LabelDetailViewModel @Inject constructor(
                 fetchBubbles(_uiState.value.label.id)
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -145,14 +164,20 @@ class LabelDetailViewModel @Inject constructor(
 
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
-            flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
+            flow = deleteBubblesUseCase(
+                _uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
             onSuccess = {
                 updateEditMode(LabelDetailMode.NONE)
                 showBottomNav(true)
                 fetchBubbles(_uiState.value.label.id)
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -259,7 +284,12 @@ class LabelDetailViewModel @Inject constructor(
                 }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        errorMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -268,5 +298,9 @@ class LabelDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
+    }
+
+    override fun clearError() {
+        _uiState.update { it.copy(error = null, errorMessage = null) }
     }
 }
