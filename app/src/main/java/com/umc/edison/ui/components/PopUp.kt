@@ -9,10 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +45,8 @@ fun PopUpMulti(
 ) {
     Column(
         modifier = Modifier
-            .wrapContentSize()
+            .width(364.dp)
+            .wrapContentHeight()
             .clip(RoundedCornerShape(16.dp))
             .shadow(16.dp)
             .background(White000)
@@ -138,5 +141,54 @@ fun ToastMessage(
             delay(2000)
             onDismiss()
         }
+    }
+}
+
+@Composable
+fun PopUpDecision(
+    question: String,
+    positiveButtonText: String,
+    negativeButtonText: String,
+    onPositiveClick: () -> Unit,
+    onNegativeClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .width(364.dp)
+            .wrapContentHeight()
+            .clip(RoundedCornerShape(16.dp))
+            .background(White000)
+            .padding(start = 8.dp, top = 32.dp, end = 8.dp, bottom = 24.dp),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(36.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = question,
+                style = MaterialTheme.typography.displaySmall,
+                color = Gray800,
+                textAlign = TextAlign.Center
+            )
+
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                MiddleCancelButton(
+                    text = negativeButtonText,
+                    onClick = onNegativeClick,
+                    modifier = Modifier.weight(1f)
+                )
+
+                MiddleConfirmButton(
+                    text = positiveButtonText,
+                    enabled = true,
+                    onClick = onPositiveClick,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
     }
 }

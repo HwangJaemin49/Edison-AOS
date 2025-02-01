@@ -6,7 +6,8 @@ import com.umc.edison.presentation.model.UserModel
 data class AccountManagementState(
     override val isLoading: Boolean,
     val isLoggedIn: Boolean,
-    val user: UserModel,
+    val user: UserModel? = null,
+    val mode: AccountManagementMode = AccountManagementMode.NONE,
     override val error: Throwable?,
     override val toastMessage: String?
 ) : BaseState {
@@ -14,9 +15,12 @@ data class AccountManagementState(
         val DEFAULT = AccountManagementState(
             isLoading = false,
             isLoggedIn = false,
-            user = UserModel.DEFAULT,
             error = null,
             toastMessage = null
         )
     }
+}
+
+enum class AccountManagementMode {
+    NONE, LOGOUT, EMAIL_CHANGE, DELETE_ACCOUNT
 }

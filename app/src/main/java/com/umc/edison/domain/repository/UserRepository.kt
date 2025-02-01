@@ -24,4 +24,7 @@ interface UserRepository {
     fun updateProfileInfo(user: User): Flow<DataResource<Unit>>
     fun updateIdentity(identity: Identity): Flow<DataResource<Unit>>
     fun updateInterest(interest: Interest): Flow<DataResource<Unit>>
+
+    fun logOut(): Flow<DataResource<Unit>>
+    fun deleteAccount(): Flow<DataResource<Unit>>
 }

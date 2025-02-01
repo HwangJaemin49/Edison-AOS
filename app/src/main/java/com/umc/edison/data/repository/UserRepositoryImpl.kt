@@ -66,6 +66,14 @@ class UserRepositoryImpl @Inject constructor(
         dataAction = { userRemoteDataSource.updateInterest(interest.toData()) }
     )
 
+    override fun logOut(): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = { userRemoteDataSource.logOut() }
+    )
+
+    override fun deleteAccount(): Flow<DataResource<Unit>> {
+        TODO("Not yet implemented")
+    }
+
     override fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>> =
         flowDataResource(
             dataAction = {

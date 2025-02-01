@@ -100,7 +100,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
     override suspend fun getProfileInfo(): UserEntity {
         // TODO: api 명세 확인 후 구현
         return UserEntity(
-            email = "",
+            email = "edison@gmail.com",
             nickname = "닉네임",
             profileImage = ""
         )
@@ -149,5 +149,15 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getDeletedBubbles(): List<BubbleEntity> {
         return myPageApiService.getDeletedBubbles().data.map { it.toData() }
+    }
+
+    override suspend fun logOut() {
+        myPageApiService.logout()
+        tokenManager.deleteToken()
+    }
+
+    override suspend fun deleteAccount() {
+        myPageApiService.deleteAccount()
+        tokenManager.deleteToken()
     }
 }

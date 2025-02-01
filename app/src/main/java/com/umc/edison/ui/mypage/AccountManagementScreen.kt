@@ -24,16 +24,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.umc.edison.presentation.mypage.AccountManagementMode
+import com.umc.edison.presentation.mypage.AccountManagementState
 import com.umc.edison.presentation.mypage.AccountManagementViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
+import com.umc.edison.ui.components.PopUpDecision
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
+import com.umc.edison.ui.theme.White000
 
 @Composable
 fun AccountManagementScreen(
@@ -41,6 +44,8 @@ fun AccountManagementScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: AccountManagementViewModel = hiltViewModel()
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
@@ -52,7 +57,10 @@ fun AccountManagementScreen(
                 title = "계정 관리",
                 onBack = {
                     navHostController.popBackStack()
-                }
+                },
+                backgroundColor = if (uiState.mode != AccountManagementMode.NONE) {
+                    Color(0xFF3E3E3E).copy(alpha = 0.5f)
+                } else White000
             )
         }
     ) { innerPadding ->
@@ -61,17 +69,16 @@ fun AccountManagementScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            AccountManagementContent(viewModel)
+            AccountManagementContent(viewModel, uiState)
         }
     }
 }
 
 @Composable
 private fun AccountManagementContent(
-    viewModel: AccountManagementViewModel
+    viewModel: AccountManagementViewModel,
+    uiState: AccountManagementState
 ) {
-
-    val uiState by viewModel.uiState.collectAsState()
 
     BaseContent(
         uiState = uiState,
@@ -112,7 +119,7 @@ private fun AccountManagementContent(
                     modifier = Modifier.weight(1f)
                 )
 
-                if (uiState.isLoggedIn) {
+                if (uiState.isLoggedIn && uiState.user != null) {
                     Text(
                         text = uiState.user.email,
                         style = MaterialTheme.typography.bodySmall,
@@ -145,7 +152,7 @@ private fun AccountManagementContent(
                             .wrapContentSize()
                             .clip(RoundedCornerShape(20.dp))
                             .background(Gray100)
-                            .clickable { /* TODO: 업데이트 기능 */ }
+                            .clickable { /* TODO: 로그인하기 기능 */ }
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Text(
@@ -171,7 +178,7 @@ private fun AccountManagementContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Text(
                         text = "로그아웃",
@@ -179,21 +186,49 @@ private fun AccountManagementContent(
                         color = Color.Red,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(32.dp)
-                            .clickable { /* TODO: 로그아웃 기능 */ },
-                        textAlign = TextAlign.Center
+                            .clickable { viewModel.updateMode(AccountManagementMode.LOGOUT) }
+                            .padding(vertical = 6.dp),
                     )
 
                     Text(
-                        text = "회원 탈퇴",
+                        text = "회원탈퇴",
                         style = MaterialTheme.typography.bodySmall,
                         color = Gray800,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(32.dp)
-                            .clickable { /* TODO: 회원 탈퇴 기능 */ },
-                        textAlign = TextAlign.Center
+                            .clickable { viewModel.updateMode(AccountManagementMode.DELETE_ACCOUNT) }
+                            .padding(vertical = 6.dp),
                     )
+                }
+            }
+        }
+
+        if (uiState.mode != AccountManagementMode.NONE) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF3E3E3E).copy(alpha = 0.5f))
+                    .clickable { viewModel.updateMode(AccountManagementMode.NONE) },
+                contentAlignment = Alignment.Center
+            ) {
+                if (uiState.mode == AccountManagementMode.DELETE_ACCOUNT) {
+                    PopUpDecision(
+                        question = "회원탈퇴 하시겠습니까?",
+                        positiveButtonText = "회원탈퇴",
+                        negativeButtonText = "취소",
+                        onPositiveClick = { viewModel.deleteAccount() },
+                        onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
+                    )
+                } else if (uiState.mode == AccountManagementMode.LOGOUT) {
+                    PopUpDecision(
+                        question = "로그아웃 하시겠습니까?",
+                        positiveButtonText = "로그아웃",
+                        negativeButtonText = "취소",
+                        onPositiveClick = { viewModel.logOut() },
+                        onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
+                    )
+                } else if (uiState.mode == AccountManagementMode.EMAIL_CHANGE) {
+                    // TODO: 이메일 변경 팝업
                 }
             }
         }

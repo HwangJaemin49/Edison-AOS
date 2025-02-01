@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -49,12 +50,13 @@ fun HamburgerMenu(
 @Composable
 fun BackButtonTopBar(
     onBack: () -> Unit,
+    backgroundColor: Color = White000,
     content: @Composable () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(White000)
+            .background(backgroundColor)
             .padding(start = 24.dp, top = 12.dp, end = 24.dp)
             .height(32.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -79,9 +81,11 @@ fun BackButtonTopBar(
 fun BackButtonTopBar(
     title: String,
     onBack: () -> Unit,
+    backgroundColor: Color = White000
 ) {
     BackButtonTopBar(
         onBack = onBack,
+        backgroundColor = backgroundColor
     ) {
         Text(
             text = title,

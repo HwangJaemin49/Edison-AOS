@@ -21,4 +21,7 @@ interface UserRemoteDataSource {
     suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity
 
     suspend fun getDeletedBubbles(): List<BubbleEntity>
+
+    suspend fun logOut()
+    suspend fun deleteAccount()
 }
