@@ -13,7 +13,7 @@ data class IdentityEditState(
     companion object {
         val DEFAULT = IdentityEditState(
             isLoading = false,
-            identityCategory = IdentityCategory.EXPLAIN,
+            identityCategory = IdentityCategory.NONE,
             selectedKeywords = listOf(),
             options = listOf()
         )

@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +27,7 @@ import com.umc.edison.ui.components.Bubble
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.storage.BubbleStorageMode
 import com.umc.edison.presentation.storage.BubbleStorageViewModel
+import com.umc.edison.ui.LoadingScreen
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
@@ -86,9 +86,7 @@ fun BubbleStorageScreen(
         )
         {
             if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                LoadingScreen()
             } else if (uiState.error != null) {
                 Text(
                     text = "Error loading data",

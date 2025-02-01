@@ -26,6 +26,7 @@ import com.umc.edison.presentation.label.LabelDetailMode
 import com.umc.edison.presentation.label.LabelDetailViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.ui.LoadingScreen
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
@@ -81,9 +82,7 @@ fun LabelDetailScreen(
                 .background(White000)
         ) {
             if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                LoadingScreen()
             } else if (uiState.error != null) {
                 Text(
                     text = "Error loading data",
