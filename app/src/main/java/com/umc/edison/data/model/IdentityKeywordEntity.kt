@@ -10,7 +10,7 @@ data class IdentityKeywordEntity(
     override fun toDomain(): IdentityKeyword {
         return IdentityKeyword(
             question = question,
-            keywords = keywords.map { it.toDomain() }
+            selectedKeywords = keywords.map { it.toDomain() }
         )
     }
 }

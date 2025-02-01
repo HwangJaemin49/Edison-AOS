@@ -24,15 +24,15 @@ data class MyPageState(
             identity = listOf(
                 IdentityModel(
                     category = IdentityCategory.EXPLAIN,
-                    keywords = listOf()
+                    selectedKeywords = listOf()
                 ),
                 IdentityModel(
                     category = IdentityCategory.FIELD,
-                    keywords = listOf()
+                    selectedKeywords = listOf()
                 ),
                 IdentityModel(
                     category = IdentityCategory.ENVIRONMENT,
-                    keywords = listOf()
+                    selectedKeywords = listOf()
                 )
             ),
             interest = InterestModel(

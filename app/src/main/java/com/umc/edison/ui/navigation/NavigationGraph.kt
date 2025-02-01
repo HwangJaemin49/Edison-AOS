@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.umc.edison.presentation.model.IdentityCategory
 import com.umc.edison.ui.artboard.ArtBoardScreen
 import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
@@ -14,6 +15,7 @@ import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
+import com.umc.edison.ui.mypage.IdentityScreen
 import com.umc.edison.ui.mypage.MenuScreen
 import com.umc.edison.ui.mypage.ScrapBoardDetailScreen
 import com.umc.edison.ui.mypage.ScrapBoardScreen
@@ -75,6 +77,16 @@ fun NavigationGraph(
 
         composable(NavRoute.ScrapBoardDetail.route) {
             ScrapBoardDetailScreen(navHostController)
+        }
+
+        composable(
+            route = "${NavRoute.MyPage.route}/identity/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            val category = IdentityCategory.entries.getOrNull(id) ?: IdentityCategory.EXPLAIN
+
+            IdentityScreen(navHostController, category)
         }
     }
 }

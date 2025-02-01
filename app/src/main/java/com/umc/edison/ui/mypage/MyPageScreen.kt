@@ -38,6 +38,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
+import com.umc.edison.presentation.model.IdentityCategory
+import com.umc.edison.presentation.model.InterestCategory
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.mypage.MyPageViewModel
 import com.umc.edison.ui.components.PopUpMulti
@@ -119,14 +121,14 @@ private fun MyPageContent(
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 12.dp),
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
+                    .padding(bottom = 12.dp)
                     .let {
                         if (!uiState.isLoggedIn) it.blur(5.dp) else it
                     }
@@ -135,12 +137,22 @@ private fun MyPageContent(
             ) {
                 GrayContainerSection(
                     title = "Identity",
-                    items = uiState.identity.map { Pair(it.category.question, it.keywords) }
+                    items = uiState.identity.map { Pair(it.category.question, it.selectedKeywords) },
+                    onItemClick = { question ->
+                        navHostController.navigate(NavRoute.IdentityEdit.createRoute(
+                            IdentityCategory.entries.find { it.question == question }!!
+                        ))
+                    }
                 )
 
                 GrayContainerSection(
                     title = "나의 관심사",
-                    items = listOf(Pair(uiState.interest.category.question, uiState.interest.keywords))
+                    items = listOf(Pair(uiState.interest.category.question, uiState.interest.keywords)),
+                    onItemClick = { _ ->
+                        navHostController.navigate(NavRoute.InterestEdit.createRoute(
+                            InterestCategory.INSPIRATION
+                        ))
+                    }
                 )
 
                 Spacer(
@@ -205,6 +217,7 @@ private fun ProfileInfo(
 private fun GrayContainerSection(
     title: String,
     items: List<Pair<String, List<KeywordModel>>>,
+    onItemClick: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -224,7 +237,7 @@ private fun GrayContainerSection(
             WhiteContainerItem(
                 title = it.first,
                 keyword = it.second.map { keyword -> keyword.name },
-                onClick = { /* TODO: 키워드 선택 화면으로 이동 */ }
+                onClick = { onItemClick(it.first) }
             )
         }
     }
@@ -240,6 +253,7 @@ private fun WhiteContainerItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() }
             .background(White000)
             .padding(start = 16.dp, top = 12.dp, end = 10.dp, bottom = 12.dp),
     ) {
@@ -248,7 +262,7 @@ private fun WhiteContainerItem(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = title,
+                text = title.replace("\n", " "),
                 style = MaterialTheme.typography.headlineLarge,
                 color = Gray800
             )
@@ -271,7 +285,6 @@ private fun WhiteContainerItem(
             contentDescription = "more",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .clickable { onClick() }
                 .size(16.dp),
             tint = Gray800
         )
