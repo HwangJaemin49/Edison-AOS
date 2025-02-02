@@ -39,4 +39,15 @@ class TokenManager @Inject constructor(
         if (REFRESH_TOKEN != null) editor.putString("refresh_token", REFRESH_TOKEN)
         editor.apply()
     }
+
+    fun deleteToken() {
+        ACCESS_TOKEN = null
+        REFRESH_TOKEN = null
+
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.remove("access_token")
+        editor.remove("refresh_token")
+        editor.apply()
+    }
 }

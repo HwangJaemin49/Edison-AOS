@@ -1,5 +1,6 @@
 package com.umc.edison.local.datasources
 
+import android.util.Log
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.local.model.BubbleLocal
@@ -57,7 +58,6 @@ class BubbleLocalDataSourceImpl @Inject constructor(
 
     override suspend fun deleteBubble(bubble: BubbleEntity) {
         softDelete(bubble.toLocal(), tableName)
-        bubbleLabelDao.deleteByBubbleId(bubble.id)
     }
 
     override suspend fun updateBubbles(bubbles: List<BubbleEntity>) {
@@ -92,6 +92,30 @@ class BubbleLocalDataSourceImpl @Inject constructor(
 
     override suspend fun markAsSynced(bubble: BubbleEntity) {
         markAsSynced(tableName, bubble.id)
+    }
+
+    override suspend fun getDeletedBubbles(): List<BubbleEntity> {
+        val deletedBubbles = bubbleDao.getDeletedBubbles().map { it.toData() }
+
+        deletedBubbles.map { bubble ->
+            bubble.labels = labelDao.getAllLabelsByBubbleId(bubble.id).map { it.toData() }
+        }
+
+        return deletedBubbles
+    }
+
+    override suspend fun recoverBubbles(bubbles: List<BubbleEntity>) {
+        bubbles.map { bubble ->
+            recoverBubble(bubble)
+        }
+    }
+
+    override suspend fun recoverBubble(bubble: BubbleEntity) {
+        val id = recover(bubble.toLocal(), tableName)
+
+        Log.i("BubbleLocalDataSourceImpl", "recoverBubble: $id, bubble: $bubble")
+
+        addBubbleLabel(bubble)
     }
 
     private suspend fun addBubbleLabel(bubble: BubbleEntity) {

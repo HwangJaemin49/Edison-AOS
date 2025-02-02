@@ -1,11 +1,8 @@
 package com.umc.edison.remote.model.sync
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.LabelEntity
-import com.umc.edison.remote.model.RemoteMapper
-import com.umc.edison.remote.model.toDate
 import com.umc.edison.remote.model.toIso8601String
 
 data class SyncLabelRequest(
@@ -16,20 +13,7 @@ data class SyncLabelRequest(
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String,
     @SerializedName("deletedAt") val deletedAt: String?
-) : RemoteMapper<LabelEntity> {
-    override fun toData(): LabelEntity {
-        return LabelEntity(
-            id = id,
-            name = name,
-            color = Color(color),
-            bubbles = emptyList(),
-            isDeleted = isDeleted,
-            createdAt = createdAt.toDate() ?: throw IllegalArgumentException("createdAt is null"),
-            updatedAt = updatedAt.toDate() ?: throw IllegalArgumentException("updatedAt is null"),
-            deletedAt = deletedAt?.toDate()
-        )
-    }
-}
+)
 
 fun LabelEntity.toSyncLabelRequest(): SyncLabelRequest = SyncLabelRequest(
     id = id,

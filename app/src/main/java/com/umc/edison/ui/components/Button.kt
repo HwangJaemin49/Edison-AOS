@@ -2,11 +2,8 @@ package com.umc.edison.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,21 +19,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.R
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray400
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
+import com.umc.edison.ui.theme.Gray900
 import com.umc.edison.ui.theme.White000
 
 @Composable
@@ -222,101 +219,24 @@ private fun IconButton(
     )
 }
 
-
-@Preview(showBackground = true)
 @Composable
-fun BasicFullButtonPreview() {
-    EdisonTheme {
-        Column(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            BasicFullButton(
-                text = "텍스트 입력",
-                enabled = false,
-                onClick = {}
-            )
-
-            Spacer(modifier = Modifier.padding(5.dp))
-
-            BasicFullButton(
-                text = "텍스트 입력",
-                enabled = true,
-                onClick = {}
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BasicButtonPreview2() {
-    EdisonTheme {
-        Column(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            BasicFullButton(
-                text = "텍스트 입력",
-                enabled = false,
-                onClick = {},
-                textStyle = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.padding(5.dp))
-
-            BasicFullButton(
-                text = "텍스트 입력",
-                enabled = true,
-                onClick = {},
-                textStyle = MaterialTheme.typography.titleMedium
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MiddleCancelButtonPreview() {
-    EdisonTheme {
-        Row(
-            modifier = Modifier.padding(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            MiddleCancelButton(
-                text = "텍스트 입력",
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-
-            MiddleCancelButton(
-                text = "텍스트 입력",
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MiddleConfirmButtonPreview() {
-    EdisonTheme {
-        Row(
-            modifier = Modifier.padding(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            MiddleConfirmButton(
-                text = "텍스트 입력",
-                enabled = false,
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-
-            MiddleConfirmButton(
-                text = "텍스트 입력",
-                enabled = true,
-                onClick = {},
-                modifier = Modifier.weight(1f)
-            )
-        }
+fun KeywordChip(
+    keyword: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(100.dp))
+            .background(if (isSelected) Gray700 else Gray100)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = keyword,
+            color = if (isSelected) Gray100 else Gray900,
+            style = MaterialTheme.typography.labelLarge
+        )
     }
 }

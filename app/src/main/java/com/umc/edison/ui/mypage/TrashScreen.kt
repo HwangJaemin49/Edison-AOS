@@ -1,8 +1,11 @@
 package com.umc.edison.ui.mypage
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,187 +13,260 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.umc.edison.R
+import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.presentation.mypage.BubbleRecoverMode
+import com.umc.edison.presentation.mypage.TrashState
+import com.umc.edison.presentation.mypage.TrashViewModel
+import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.components.BackButtonTopBar
+import com.umc.edison.ui.components.BottomSheetForDelete
+import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.CheckBoxButton
-import com.umc.edison.ui.components.MiddleCancelButton
-import com.umc.edison.ui.components.MiddleConfirmButton
 import com.umc.edison.ui.components.RadioButton
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray500
-import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
 @Composable
 fun TrashScreen(
     navHostController: NavHostController,
-    updateShowBottomNav: (Boolean) -> Unit
+    updateShowBottomNav: (Boolean) -> Unit,
+    viewModel: TrashViewModel = hiltViewModel()
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
+        viewModel.fetchDeletedBubbles()
     }
 
-    var selectedItems by remember { mutableStateOf(setOf<Int>()) }
-    val items = List(10) { "오늘 한 새벽 통화" }
-    val allSelected = selectedItems.size == items.size
+    BackHandler {
+        if (uiState.mode == BubbleRecoverMode.SELECT) {
+            viewModel.updateBubbleRecoverMode(BubbleRecoverMode.NONE)
+        } else {
+            navHostController.popBackStack()
+        }
+    }
 
+    Scaffold(
+        topBar = {
+            BackButtonTopBar(
+                onBack = { navHostController.popBackStack() },
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "휴지통",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Gray800,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .weight(1f)
+                    )
+
+                    Text(
+                        text = "삭제된 버블은 30일간 보관됩니다.",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Gray500
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            if (uiState.mode == BubbleRecoverMode.SELECT) {
+                BottomSheetForDelete(
+                    onButtonClick = { viewModel.recoverBubbles() },
+                    onDelete = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.DELETE) },
+                    buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
+                    buttonText = if (uiState.selectedBubbles.size == uiState.bubbles.size) {
+                        "모두 복원"
+                    } else {
+                        "복원"
+                    },
+                )
+            }
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White000)
+                .padding(innerPadding)
+        ) {
+            TrashContent(viewModel, uiState)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TrashContent(
+    viewModel: TrashViewModel,
+    uiState: TrashState,
+) {
+
+    var onBubbleClick: (BubbleModel) -> Unit = {}
+    var onBubbleLongClick: (BubbleModel) -> Unit = {}
+
+    if (uiState.mode == BubbleRecoverMode.SELECT) {
+        onBubbleClick = { viewModel.toggleBubbleSelection(it) }
+    } else if (uiState.mode == BubbleRecoverMode.NONE) {
+        onBubbleClick = { /* TODO: 버블 보는 화면으로 전환 */ }
+        onBubbleLongClick = {
+            viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT)
+            viewModel.toggleBubbleSelection(it)
+        }
+    }
+
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearError() },
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentHeight()
+                .padding(top = 36.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            if (uiState.mode != BubbleRecoverMode.NONE) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(32.dp)
+                        .padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    RadioButton(
+                        selected = uiState.selectedBubbles.size == uiState.bubbles.size,
+                        onClick = { viewModel.selectAllBubbles() }
+                    )
+
+                    Text(
+                        text = "전체",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray800
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = "버블 선택",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray800
+                    )
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = if (uiState.mode == BubbleRecoverMode.NONE) {
+                    Arrangement.spacedBy(0.dp)
+                } else {
+                    Arrangement.spacedBy(8.dp)
+                }
+            ) {
+                items(uiState.bubbles) { bubble ->
+                    TrashItem(
+                        bubble = bubble,
+                        uiState = uiState,
+                        onBubbleClick = onBubbleClick,
+                        onBubbleLongClick = onBubbleLongClick
+                    )
+                }
+            }
+        }
+
+        if (uiState.mode == BubbleRecoverMode.DELETE) {
+            BottomSheetPopUp(
+                title = "클라우드와 모든 기기에서 완전히 삭제됩니다.",
+                cancelText = "취소",
+                confirmText = "삭제",
+                onDismiss = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT) },
+                onConfirm = { viewModel.deleteBubbles() }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun TrashItem(
+    bubble: BubbleModel,
+    uiState: TrashState,
+    onBubbleClick: (BubbleModel) -> Unit,
+    onBubbleLongClick: (BubbleModel) -> Unit
+) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(White000)
-            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(32.dp),
+                .height(48.dp)
+                .padding(horizontal = 24.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    if (uiState.mode == BubbleRecoverMode.SELECT && uiState.selectedBubbles.contains(bubble)) {
+                        Gray100
+                    } else {
+                        Color.Transparent
+                    }
+                )
+                .combinedClickable(
+                    onClick = { onBubbleClick(bubble) },
+                    onLongClick = { onBubbleLongClick(bubble) }
+                )
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = { navHostController.popBackStack() },
-                modifier = Modifier.size(18.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_chevron_left),
-                    contentDescription = "뒤로가기",
-                    tint = Gray800
+            Text(
+                text = bubble.title ?: "제목 없음",
+                style = MaterialTheme.typography.bodySmall,
+                color = Gray800,
+                modifier = Modifier.weight(1f)
+            )
+
+            if (uiState.mode != BubbleRecoverMode.NONE) {
+                CheckBoxButton(
+                    selected = uiState.selectedBubbles.contains(bubble),
+                    onClick = { onBubbleClick(bubble) }
                 )
             }
-
-            Text(
-                text = "휴지통",
-                style = MaterialTheme.typography.titleLarge,
-                color = Gray800,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = "삭제된 버블은 30일간 보관됩니다.",
-                style = MaterialTheme.typography.titleSmall,
-                color = Gray500
-            )
         }
 
-        Spacer(modifier = Modifier.height(36.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(32.dp)
-                .clickable {
-                    selectedItems = if (allSelected) emptySet() else items.indices.toSet()
-                },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(
-                selected = allSelected,
-                onClick = {
-                    selectedItems = if (allSelected) emptySet() else items.indices.toSet()
-                }
-            )
-            Text(
-                text = "전체",
-                style = MaterialTheme.typography.bodySmall,
-                color = Gray800,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                text = "버블 선택",
-                style = MaterialTheme.typography.bodySmall,
-                color = Gray600
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(items.indices.toList()) { index ->
-                val isSelected = selectedItems.contains(index)
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable {
-                            selectedItems = if (isSelected) {
-                                selectedItems - index
-                            } else {
-                                selectedItems + index
-                            }
-                        }
-                        .background(if (isSelected) Gray100 else Color.Transparent)
-                        .padding(horizontal = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = items[index],
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray800,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    CheckBoxButton(
-                        selected = isSelected,
-                        onClick = {
-                            selectedItems = if (isSelected) {
-                                selectedItems - index
-                            } else {
-                                selectedItems + index
-                            }
-                        }
-                    )
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 17.dp),
-            horizontalArrangement = Arrangement.spacedBy(9.dp)
-        ) {
-            MiddleCancelButton(
-                text = "복원",
-                onClick = { /* TODO */ },
-                modifier = Modifier.weight(1f)
-            )
-
-            MiddleConfirmButton(
-                text = "삭제",
-                enabled = selectedItems.isNotEmpty(),
-                onClick = { /* TODO */ },
-                modifier = Modifier.weight(1f)
+        if (uiState.mode == BubbleRecoverMode.NONE) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Gray100)
             )
         }
     }

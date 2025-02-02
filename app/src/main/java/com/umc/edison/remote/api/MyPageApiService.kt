@@ -5,10 +5,10 @@ import com.umc.edison.remote.model.ResponseWithData
 import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.mypage.GetDeletedBubbleListResponse
 import com.umc.edison.remote.model.mypage.GetIdentityKeywordResponse
-import com.umc.edison.remote.model.mypage.GetMemberIdentityKeywordResponse
+import com.umc.edison.remote.model.mypage.GetAllMyTestResultsResponse
 import com.umc.edison.remote.model.mypage.GetMyScrapArtLettersResponse
-import com.umc.edison.remote.model.mypage.UpdateMemberIdentityKeywordRequest
-import com.umc.edison.remote.model.mypage.UpdateMemberIdentityKeywordResponse
+import com.umc.edison.remote.model.mypage.UpdateTestRequest
+import com.umc.edison.remote.model.mypage.UpdateTestResponse
 import com.umc.edison.remote.model.mypage.UpdateProfileRequest
 import com.umc.edison.remote.model.mypage.UpdateProfileResponse
 import retrofit2.http.Body
@@ -29,16 +29,16 @@ interface MyPageApiService {
     suspend fun updateProfile(@Body profile: UpdateProfileRequest): ResponseWithData<UpdateProfileResponse>
 
     @GET("identity/{category}")
-    suspend fun getIdentityKeyword(@Path("category") category: String): ResponseWithData<GetIdentityKeywordResponse>
+    suspend fun getTestKeyword(@Path("category") category: String): ResponseWithData<List<GetIdentityKeywordResponse>>
 
     @GET("members/identity")
-    suspend fun getMemberIdentityKeyword(): ResponseWithData<GetMemberIdentityKeywordResponse>
+    suspend fun getAllMyTestResults(): ResponseWithData<GetAllMyTestResultsResponse>
 
     @GET("artletters/myscrap")
     suspend fun getMyScrapArtLetters(): ResponseWithPagination<GetMyScrapArtLettersResponse>
 
     @PATCH("members/identity")
-    suspend fun updateMemberIdentityKeyword(@Body identity: UpdateMemberIdentityKeywordRequest): ResponseWithData<UpdateMemberIdentityKeywordResponse>
+    suspend fun updateTest(@Body identity: UpdateTestRequest): ResponseWithData<UpdateTestResponse>
 
     @POST("members/logout")
     suspend fun logout() : BaseResponse

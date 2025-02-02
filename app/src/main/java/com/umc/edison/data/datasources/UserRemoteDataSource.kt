@@ -1,10 +1,27 @@
 package com.umc.edison.data.datasources
 
-import com.umc.edison.data.model.IdentityKeywordEntity
-import com.umc.edison.data.model.InterestKeywordEntity
+import com.umc.edison.data.model.ArtLetterCategoryEntity
+import com.umc.edison.data.model.BubbleEntity
+import com.umc.edison.data.model.IdentityEntity
+import com.umc.edison.data.model.InterestEntity
+import com.umc.edison.data.model.UserEntity
 
 interface UserRemoteDataSource {
-    suspend fun getMyIdentityKeywords(): List<IdentityKeywordEntity>
-    suspend fun getMyInterestKeyword(): InterestKeywordEntity
+    suspend fun getAllMyIdentityResults(): List<IdentityEntity>
+    suspend fun getMyInterestResult(categoryNumber: String): InterestEntity
     suspend fun getLogInState(): Boolean
+    suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity>
+    suspend fun getProfileInfo(): UserEntity
+    suspend fun getScrapArtLettersByCategory(categoryId: Int): List<ArtLetterCategoryEntity>
+
+    suspend fun updateProfileInfo(user: UserEntity)
+    suspend fun updateIdentity(identity: IdentityEntity)
+    suspend fun updateInterest(interest: InterestEntity)
+
+    suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity
+
+    suspend fun getDeletedBubbles(): List<BubbleEntity>
+
+    suspend fun logOut()
+    suspend fun deleteAccount()
 }

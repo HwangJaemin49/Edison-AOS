@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -38,11 +36,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
-import com.umc.edison.presentation.model.IdentityCategory
-import com.umc.edison.presentation.model.InterestCategory
-import com.umc.edison.presentation.model.KeywordModel
+import com.umc.edison.presentation.model.ArtLetterCategoryModel
+import com.umc.edison.presentation.model.IdentityModel
+import com.umc.edison.presentation.model.InterestModel
 import com.umc.edison.presentation.mypage.MyPageViewModel
+import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.components.GrayColumnContainer
+import com.umc.edison.ui.components.GridLayout
+import com.umc.edison.ui.components.HamburgerMenu
 import com.umc.edison.ui.components.PopUpMulti
+import com.umc.edison.ui.components.WhiteContainerItem
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
@@ -52,48 +55,58 @@ import com.umc.edison.ui.theme.White000
 @Composable
 fun MyPageScreen(
     navHostController: NavHostController,
-    updateShowBottomNav: (Boolean) -> Unit
+    updateShowBottomNav: (Boolean) -> Unit,
+    viewModel: MyPageViewModel = hiltViewModel()
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
+        viewModel.fetchLoginState()
     }
 
     Scaffold(
-        topBar = { HamburgerMenu(
-            onClick = { navHostController.navigate(NavRoute.Menu.route) }
-        ) }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .background(Color.White)
-        ) {
-            MyPageContent(navHostController)
-        }
-    }
-}
-
-@Composable
-private fun HamburgerMenu(
-    onClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(White000)
-            .padding(start = 24.dp, top = 12.dp, end = 24.dp)
-    ) {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier.align(Alignment.End),
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_hamburger),
-                contentDescription = "Hamburger Menu",
-                tint = Gray800
+        topBar = {
+            HamburgerMenu(
+                onClick = { navHostController.navigate(NavRoute.Menu.route) },
+                alignment = Alignment.End
             )
+        }
+    ) { innerPadding ->
+        BaseContent(
+            uiState = uiState,
+            onDismiss = { viewModel.clearError() },
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = if (uiState.isLoggedIn) White000 else White000.copy(alpha = 0.5f)
+                    )
+                    .blur(if (uiState.isLoggedIn) 0.dp else 10.dp),
+            ) {
+                MyPageContent(navHostController, viewModel)
+            }
+
+            if (!uiState.isLoggedIn) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 18.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    PopUpMulti(
+                        title = "로그인이 필요한 페이지입니다",
+                        detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
+                        hintText = "스페이스 자동 시각화 기능 지원\n" +
+                                "맞춤형 레터 추천과 북마크 기능 지원",
+                        buttonText = "구글 로그인",
+                        onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
+                    )
+                }
+            }
         }
     }
 }
@@ -101,7 +114,7 @@ private fun HamburgerMenu(
 @Composable
 private fun MyPageContent(
     navHostController: NavHostController,
-    viewModel: MyPageViewModel = hiltViewModel()
+    viewModel: MyPageViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -109,74 +122,47 @@ private fun MyPageContent(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(White000)
-            .padding(horizontal = 24.dp),
+            .verticalScroll(
+                state = rememberScrollState(),
+                enabled = uiState.isLoggedIn
+            )
+            .padding(start = 24.dp, end = 24.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         ProfileInfo(
-            imageUrl = uiState.profileImage,
-            name = uiState.nickname,
+            imageUrl = uiState.user.profileImage,
+            name = uiState.user.nickname,
             navHostController = navHostController,
         )
 
-        Box(
+        IdentityTestResultContainer(
+            identities = uiState.identities,
+            onItemClick = { id ->
+                navHostController.navigate(
+                    NavRoute.IdentityEdit.createRoute(id)
+                )
+            }
+        )
+
+        InterestResultContainer(
+            interest = uiState.interest,
+            onItemClick = { id ->
+                navHostController.navigate(
+                    NavRoute.InterestEdit.createRoute(id)
+                )
+            }
+        )
+
+        Spacer(
             modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(bottom = 12.dp)
-                    .let {
-                        if (!uiState.isLoggedIn) it.blur(5.dp) else it
-                    }
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                GrayContainerSection(
-                    title = "Identity",
-                    items = uiState.identity.map { Pair(it.category.question, it.selectedKeywords) },
-                    onItemClick = { question ->
-                        navHostController.navigate(NavRoute.IdentityEdit.createRoute(
-                            IdentityCategory.entries.find { it.question == question }!!
-                        ))
-                    }
-                )
+                .fillMaxWidth()
+                .size(8.dp)
+        )
 
-                GrayContainerSection(
-                    title = "나의 관심사",
-                    items = listOf(Pair(uiState.interest.category.question, uiState.interest.selectedKeywords)),
-                    onItemClick = { _ ->
-                        navHostController.navigate(NavRoute.InterestEdit.createRoute(
-                            InterestCategory.INSPIRATION
-                        ))
-                    }
-                )
-
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .size(8.dp)
-                )
-
-                ArtLetterScrap(
-                    onClick = { navHostController.navigate(NavRoute.ScrapBoard.route) }
-                )
-            }
-
-            if (!uiState.isLoggedIn) {
-                PopUpMulti(
-                    title = "로그인이 필요한 페이지입니다",
-                    detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
-                    hintText = "스페이스 자동 시각화 기능 지원\n" +
-                            "맞춤형 레터 추천과 북마크 기능 지원",
-                    buttonText = "구글 로그인",
-                    onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
-                )
-            }
-        }
+        ArtLetterScrap(
+            scrapItems = uiState.myArtLetterCategories,
+            onClick = { navHostController.navigate(NavRoute.ScrapBoard.route) }
+        )
     }
 }
 
@@ -186,7 +172,6 @@ private fun ProfileInfo(
     name: String,
     navHostController: NavHostController,
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,6 +188,7 @@ private fun ProfileInfo(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
+                .background(Gray100)
         )
 
         Text(
@@ -214,85 +200,44 @@ private fun ProfileInfo(
 }
 
 @Composable
-private fun GrayContainerSection(
-    title: String,
-    items: List<Pair<String, List<KeywordModel>>>,
-    onItemClick: (String) -> Unit,
+private fun IdentityTestResultContainer(
+    identities: List<IdentityModel>,
+    onItemClick: (Int) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Gray100)
-            .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    GrayColumnContainer(
+        padding = 12.dp,
+        title = "Identity",
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = Gray800
-        )
-
-        items.forEach {
+        identities.forEach {
             WhiteContainerItem(
-                title = it.first,
-                keyword = it.second.map { keyword -> keyword.name },
-                onClick = { onItemClick(it.first) }
+                title = it.question,
+                description = it.selectedKeywords.joinToString { keyword -> keyword.name },
+                onClick = { onItemClick(it.id) }
             )
         }
     }
 }
 
 @Composable
-private fun WhiteContainerItem(
-    title: String,
-    keyword: List<String>,
-    onClick: () -> Unit = {}
+private fun InterestResultContainer(
+    interest: InterestModel,
+    onItemClick: (Int) -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-            .background(White000)
-            .padding(start = 16.dp, top = 12.dp, end = 10.dp, bottom = 12.dp),
+    GrayColumnContainer(
+        padding = 12.dp,
+        title = "나의 관심사",
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = title.replace("\n", " "),
-                style = MaterialTheme.typography.headlineLarge,
-                color = Gray800
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                keyword.forEach {
-                    Text(
-                        text = if (it == keyword.last()) it else "$it, ",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Gray800
-                    )
-                }
-            }
-        }
-
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_right),
-            contentDescription = "more",
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .size(16.dp),
-            tint = Gray800
+        WhiteContainerItem(
+            title = interest.question,
+            description = interest.selectedKeywords.joinToString { keyword -> keyword.name },
+            onClick = { onItemClick(interest.id) }
         )
     }
 }
 
 @Composable
 private fun ArtLetterScrap(
+    scrapItems: List<ArtLetterCategoryModel>,
     onClick: () -> Unit = {}
 ) {
     Column(
@@ -300,7 +245,10 @@ private fun ArtLetterScrap(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(White000)
-            .clickable(onClick = onClick)
+            .clickable(
+                enabled = scrapItems.isNotEmpty(),
+                onClick = onClick
+            )
             .border(1.dp, Gray200, RoundedCornerShape(16.dp))
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -324,6 +272,11 @@ private fun ArtLetterScrap(
             )
         }
 
-        ScrapBoardGrid()
+        GridLayout(
+            columns = 2,
+            items = scrapItems,
+        ) {
+            ArtLetterCategoryContent(it as ArtLetterCategoryModel)
+        }
     }
 }

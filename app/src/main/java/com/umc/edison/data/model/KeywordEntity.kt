@@ -1,6 +1,5 @@
 package com.umc.edison.data.model
 
-import com.umc.edison.data.DataMapper
 import com.umc.edison.domain.model.Keyword
 
 data class KeywordEntity(
@@ -13,4 +12,11 @@ data class KeywordEntity(
             name = name
         )
     }
+}
+
+fun Keyword.toData(): KeywordEntity {
+    return KeywordEntity(
+        id = id,
+        name = name
+    )
 }

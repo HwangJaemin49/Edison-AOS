@@ -1,8 +1,11 @@
 package com.umc.edison.presentation.mypage
 
+import com.umc.edison.domain.model.InterestCategory
 import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
-import com.umc.edison.domain.usecase.mypage.GetMyIdentityKeywordsUseCase
-import com.umc.edison.domain.usecase.mypage.GetMyInterestKeywordUseCase
+import com.umc.edison.domain.usecase.mypage.GetAllMyIdentityResultsUseCase
+import com.umc.edison.domain.usecase.mypage.GetMyInterestResultUseCase
+import com.umc.edison.domain.usecase.mypage.GetMyScrapArtLettersUseCase
+import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,19 +16,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
-//    private val getProfileInfoUseCase: GetProfileInfoUseCase,
     private val getLogInStateUseCase: GetLogInStateUseCase,
-    private val getMyIdentityKeywordsUseCase: GetMyIdentityKeywordsUseCase,
-    private val getMyInterestKeywordUseCase: GetMyInterestKeywordUseCase,
+    private val getProfileInfoUseCase: GetProfileInfoUseCase,
+    private val getAllMyIdentityResultsUseCase: GetAllMyIdentityResultsUseCase,
+    private val getMyInterestResultUseCase: GetMyInterestResultUseCase,
+    private val getMyScrapArtLettersUseCase: GetMyScrapArtLettersUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MyPageState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-    init {
-        fetchLoginState()
-    }
-
-    private fun fetchLoginState() {
+    fun fetchLoginState() {
         collectDataResource(
             flow = getLogInStateUseCase(),
             onSuccess = { isLoggedIn ->
@@ -36,7 +36,12 @@ class MyPageViewModel @Inject constructor(
                 }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -55,19 +60,43 @@ class MyPageViewModel @Inject constructor(
     }
 
     private fun fetchProfileInfo() {
-
+        collectDataResource(
+            flow = getProfileInfoUseCase(),
+            onSuccess = { user ->
+//                _uiState.update { it.copy(user = user.toPresentation()) }
+            },
+            onError = { error ->
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
     }
 
     private fun fetchMyIdentityKeyword() {
         collectDataResource(
-            flow = getMyIdentityKeywordsUseCase(),
+            flow = getAllMyIdentityResultsUseCase(),
             onSuccess = { identityKeywords ->
                 _uiState.update { state ->
-                    state.copy(identity = identityKeywords.map { it.toPresentation() })
+                    state.copy(identities = identityKeywords.map { it.toPresentation() })
                 }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -80,12 +109,17 @@ class MyPageViewModel @Inject constructor(
 
     private fun fetchInterestKeyword() {
         collectDataResource(
-            flow = getMyInterestKeywordUseCase(),
+            flow = getMyInterestResultUseCase(InterestCategory.INSPIRATION),
             onSuccess = { interestKeyword ->
                 _uiState.update { it.copy(interest = interestKeyword.toPresentation()) }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -97,6 +131,35 @@ class MyPageViewModel @Inject constructor(
     }
 
     private fun fetchScrapBoard() {
+        collectDataResource(
+            flow = getMyScrapArtLettersUseCase(),
+            onSuccess = { scrapArtLetters ->
+                _uiState.update {
+                    it.copy(
+                        myArtLetterCategories = scrapArtLetters.map { artLetterCategory ->
+                            artLetterCategory.toPresentation()
+                        }
+                    )
+                }
+            },
+            onError = { error ->
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
 
+    override fun clearError() {
+        _uiState.update { it.copy(error = null, toastMessage = null) }
     }
 }

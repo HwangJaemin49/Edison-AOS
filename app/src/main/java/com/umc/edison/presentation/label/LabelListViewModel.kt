@@ -37,7 +37,12 @@ class LabelListViewModel @Inject constructor(
                 _uiState.update { it.copy(labels = sortedLabels.toPresentation()) }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -65,7 +70,12 @@ class LabelListViewModel @Inject constructor(
                     _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
                 onError = { error ->
-                    _uiState.update { it.copy(error = error) }
+                    _uiState.update {
+                        it.copy(
+                            error = error,
+                            toastMessage = error.message
+                        )
+                    }
                 },
                 onLoading = {
                     _uiState.update { it.copy(isLoading = true) }
@@ -82,7 +92,12 @@ class LabelListViewModel @Inject constructor(
                     _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
                 onError = { error ->
-                    _uiState.update { it.copy(error = error) }
+                    _uiState.update {
+                        it.copy(
+                            error = error,
+                            toastMessage = error.message
+                        )
+                    }
                 },
                 onLoading = {
                     _uiState.update { it.copy(isLoading = true) }
@@ -105,7 +120,12 @@ class LabelListViewModel @Inject constructor(
                 ) }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(
+                        error = error,
+                        toastMessage = error.message
+                    )
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -114,5 +134,9 @@ class LabelListViewModel @Inject constructor(
                 fetchLabels()
             }
         )
+    }
+
+    override fun clearError() {
+        _uiState.update { it.copy(error = null, toastMessage = null) }
     }
 }

@@ -24,4 +24,7 @@ interface BaseDao<T> {
 
     @androidx.room.RawQuery
     suspend fun getById(query: SupportSQLiteQuery): T?
+
+    @androidx.room.RawQuery
+    suspend fun recover(query: SupportSQLiteQuery): Int
 }

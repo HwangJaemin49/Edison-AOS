@@ -1,7 +1,6 @@
 package com.umc.edison.data.model
 
 import androidx.compose.ui.graphics.Color
-import com.umc.edison.data.DataMapper
 import com.umc.edison.domain.model.Label
 import java.util.Date
 
@@ -21,6 +20,13 @@ data class LabelEntity(
         color = color,
         bubbles = bubbles.map { it.toDomain() }
     )
+}
+
+fun LabelEntity.same(other: LabelEntity): Boolean {
+    return id == other.id &&
+        name == other.name &&
+        color == other.color &&
+        isDeleted == other.isDeleted
 }
 
 fun Label.toData(): LabelEntity = LabelEntity(

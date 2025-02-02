@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
-open class BaseViewModel : ViewModel() {
+abstract class BaseViewModel : ViewModel() {
     /**
      * 공통적으로 DataResource를 처리하는 함수
      */
@@ -31,7 +31,10 @@ open class BaseViewModel : ViewModel() {
                     }
                     is DataResource.Error -> {
                         Log.e(TAG, "onError: ${dataResource.throwable}")
-                        onError(dataResource.throwable)
+                        // throwable이 HttpException이면 에러 메시지를 보여주지 않는다.
+                        if (dataResource.throwable !is retrofit2.HttpException) {
+                            onError(dataResource.throwable)
+                        }
                     }
                     is DataResource.Loading -> {
                         Log.d(TAG, "onLoading")
@@ -41,4 +44,6 @@ open class BaseViewModel : ViewModel() {
             }
         }
     }
+
+    abstract fun clearError()
 }

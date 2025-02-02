@@ -6,5 +6,5 @@ interface LabelRemoteDataSource {
     suspend fun getAllLabels(): List<LabelEntity>
     suspend fun getLabelDetail(labelId: Int): LabelEntity
 
-    suspend fun syncLabel(label: LabelEntity)
+    suspend fun syncLabel(label: LabelEntity): LabelEntity
 }

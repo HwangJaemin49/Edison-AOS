@@ -1,45 +1,64 @@
 package com.umc.edison.presentation.mypage
 
-import com.umc.edison.presentation.model.IdentityCategory
+import com.umc.edison.domain.model.IdentityCategory
+import com.umc.edison.domain.model.InterestCategory
+import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.IdentityModel
-import com.umc.edison.presentation.model.InterestCategory
 import com.umc.edison.presentation.model.InterestModel
-import com.umc.edison.presentation.model.ScrapBoardModel
+import com.umc.edison.presentation.model.ArtLetterCategoryModel
+import com.umc.edison.presentation.model.UserModel
 
 data class MyPageState(
-    val isLoading: Boolean,
+    override val isLoading: Boolean,
     val isLoggedIn: Boolean,
-    val profileImage: String? = null,
-    val nickname: String,
-    val identity: List<IdentityModel> = listOf(),
+    val user: UserModel,
+    val identities: List<IdentityModel> = listOf(),
     val interest: InterestModel,
-    val artLetter: List<ScrapBoardModel>,
-    val error: Throwable? = null,
-) {
+    val myArtLetterCategories: List<ArtLetterCategoryModel>,
+    override val error: Throwable? = null,
+    override val toastMessage: String? = null,
+) : BaseState {
     companion object {
         val DEFAULT = MyPageState(
             isLoading = false,
             isLoggedIn = false,
-            nickname = "닉네임",
-            identity = listOf(
+            user = UserModel.DEFAULT,
+            identities = listOf(
                 IdentityModel(
-                    category = IdentityCategory.EXPLAIN,
+                    id = IdentityCategory.EXPLAIN.ordinal,
+                    question = IdentityCategory.EXPLAIN.question,
+                    descriptionFirst = IdentityCategory.EXPLAIN.descriptionFirst,
+                    descriptionSecond = IdentityCategory.EXPLAIN.descriptionSecond,
+                    options = listOf(),
                     selectedKeywords = listOf()
                 ),
                 IdentityModel(
-                    category = IdentityCategory.FIELD,
+                    id = IdentityCategory.FIELD.ordinal,
+                    question = IdentityCategory.FIELD.question,
+                    descriptionFirst = IdentityCategory.FIELD.descriptionFirst,
+                    descriptionSecond = IdentityCategory.FIELD.descriptionSecond,
+                    options = listOf(),
                     selectedKeywords = listOf()
                 ),
                 IdentityModel(
-                    category = IdentityCategory.ENVIRONMENT,
+                    id = IdentityCategory.ENVIRONMENT.ordinal,
+                    question = IdentityCategory.ENVIRONMENT.question,
+                    descriptionFirst = IdentityCategory.ENVIRONMENT.descriptionFirst,
+                    descriptionSecond = IdentityCategory.ENVIRONMENT.descriptionSecond,
+                    options = listOf(),
                     selectedKeywords = listOf()
                 )
             ),
             interest = InterestModel(
-                category = InterestCategory.INSPIRATION,
+                id = InterestCategory.INSPIRATION.ordinal,
+                question = InterestCategory.INSPIRATION.question,
+                questionTip = InterestCategory.INSPIRATION.questionTip,
+                descriptionFirst = InterestCategory.INSPIRATION.descriptionFirst,
+                descriptionSecond = InterestCategory.INSPIRATION.descriptionSecond,
+                options = listOf(),
                 selectedKeywords = listOf()
             ),
-            artLetter = listOf()
+            myArtLetterCategories = listOf()
         )
     }
 }

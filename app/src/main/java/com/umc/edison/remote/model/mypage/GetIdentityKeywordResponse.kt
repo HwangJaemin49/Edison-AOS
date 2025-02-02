@@ -1,7 +1,11 @@
 package com.umc.edison.remote.model.mypage
 
 import com.google.gson.annotations.SerializedName
+import com.umc.edison.data.model.KeywordEntity
 
 data class GetIdentityKeywordResponse(
-    @SerializedName("categories") val categories: String, // TODO 명세서 수정 이후에 반영
-)
+    @SerializedName("keywordId") val id: Int,
+    @SerializedName("keywordName") val keyword: String,
+) {
+    fun toData() = KeywordEntity(id, keyword)
+}

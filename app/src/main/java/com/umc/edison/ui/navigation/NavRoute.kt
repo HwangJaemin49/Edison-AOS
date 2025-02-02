@@ -1,8 +1,5 @@
 package com.umc.edison.ui.navigation
 
-import com.umc.edison.presentation.model.IdentityCategory
-import com.umc.edison.presentation.model.InterestCategory
-
 sealed class NavRoute(val route: String) {
     data object MyEdison : NavRoute("my-edison")
     data object Space : NavRoute("space")
@@ -33,15 +30,15 @@ sealed class NavRoute(val route: String) {
         }
     }
 
-    data class IdentityEdit(val identity: IdentityCategory) : NavRoute("${MyPage.route}/identity/${identity.ordinal}") {
+    data class IdentityEdit(val id: Int) : NavRoute("${MyPage.route}/identity/${id}") {
         companion object {
-            fun createRoute(identity: IdentityCategory): String = "${MyPage.route}/identity/${identity.ordinal}"
+            fun createRoute(identityId: Int): String = "${MyPage.route}/identity/${identityId}"
         }
     }
 
-    data class InterestEdit(val interest: InterestCategory) : NavRoute("${MyPage.route}/interest/${interest.ordinal}") {
+    data class InterestEdit(val id: Int) : NavRoute("${MyPage.route}/interest/${id}") {
         companion object {
-            fun createRoute(interest: InterestCategory): String = "${MyPage.route}/interest/${interest.ordinal}"
+            fun createRoute(interestId: Int): String = "${MyPage.route}/interest/${interestId}"
         }
     }
 }

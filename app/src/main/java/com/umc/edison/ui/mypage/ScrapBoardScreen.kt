@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.umc.edison.R
-import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -61,9 +61,12 @@ fun ScrapBoardScreen(
             )
         }
 
-        ScrapBoardGrid(
-            spaceSize = 24,
-            onScrapCategoryClick = { navHostController.navigate(NavRoute.ScrapBoardDetail.route) }
-        )
+        GridLayout(
+            columns = 2,
+            spaceSize = 24.dp,
+            items = emptyList()
+        ) {
+
+        }
     }
 }
