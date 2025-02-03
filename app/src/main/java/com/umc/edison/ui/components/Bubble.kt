@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -144,6 +145,26 @@ fun BubbleInput(
  */
 @Composable
 fun Bubble(
+    onBackScreenClick: () -> Unit,
+    bubble: BubbleModel,
+    onBubbleClick: (BubbleModel) -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable(onClick = onBackScreenClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Bubble(
+            bubble = bubble,
+            onClick = { onBubbleClick(bubble) }
+        )
+    }
+}
+
+@Composable
+private fun Bubble(
     bubble: BubbleModel,
     onClick: () -> Unit, // 편집 모드로 들어가는 클릭 리스너
 ) {

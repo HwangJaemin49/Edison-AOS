@@ -63,6 +63,14 @@ class TrashViewModel @Inject constructor(
         }
     }
 
+    fun clearSelection() {
+        _uiState.update { it.copy(selectedBubbles = emptyList()) }
+    }
+
+    fun selectBubble(bubble: BubbleModel) {
+        _uiState.update { it.copy(selectedBubbles = listOf(bubble)) }
+    }
+
     fun deleteBubbles() {
         // TODO: 영구 삭제 기능 구현
     }

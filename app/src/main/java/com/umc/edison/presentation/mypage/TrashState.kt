@@ -24,5 +24,5 @@ data class TrashState(
 }
 
 enum class BubbleRecoverMode {
-    NONE, SELECT, DELETE
+    NONE, SELECT, DELETE, VIEW
 }

@@ -137,23 +137,15 @@ fun BubbleStorageScreen(
 
                 if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
                     val bubble = uiState.selectedBubbles.first()
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.5f))
-                            .clickable(onClick = {
-                                viewModel.updateEditMode(BubbleStorageMode.NONE)
-                            }),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Bubble(
-                            bubble = bubble,
-                            onClick = {
-                                // TODO: 버블 작성 화면 구현 완료되면 연결
-                                // navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
-                            }
-                        )
-                    }
+                    Bubble(
+                        bubble = bubble,
+                        onBackScreenClick = {
+                            viewModel.updateEditMode(BubbleStorageMode.NONE)
+                        },
+                        onBubbleClick = {
+                            // TODO: 버블 클릭 시 동작 추가
+                        },
+                    )
                 } else if (uiState.bubbleStorageMode == BubbleStorageMode.SHARE) {
                     BottomSheet(
                         onDismiss = {
