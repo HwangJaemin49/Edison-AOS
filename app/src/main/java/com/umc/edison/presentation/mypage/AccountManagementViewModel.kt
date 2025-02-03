@@ -131,7 +131,7 @@ class AccountManagementViewModel @Inject constructor(
         )
     }
 
-    override fun clearError() {
-        _uiState.update { it.copy(error = null, toastMessage = null) }
+    override fun clearToastMessage() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
 }

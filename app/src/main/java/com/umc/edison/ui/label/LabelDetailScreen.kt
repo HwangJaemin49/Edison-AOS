@@ -71,7 +71,7 @@ fun LabelDetailScreen(
     ) { innerPadding ->
         BaseContent(
             uiState = uiState,
-            onDismiss = { viewModel.clearError() },
+            onDismiss = { viewModel.clearToastMessage() },
             modifier = Modifier.padding(innerPadding),
         ) {
             var onBubbleClick: (BubbleModel) -> Unit = {}

@@ -51,12 +51,7 @@ class LabelDetailViewModel @Inject constructor(
                 }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -118,12 +113,7 @@ class LabelDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(movableLabels = movableLabels) }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -147,12 +137,7 @@ class LabelDetailViewModel @Inject constructor(
                 fetchBubbles(_uiState.value.label.id)
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -173,12 +158,7 @@ class LabelDetailViewModel @Inject constructor(
                 fetchBubbles(_uiState.value.label.id)
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -285,12 +265,7 @@ class LabelDetailViewModel @Inject constructor(
                 }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -301,7 +276,7 @@ class LabelDetailViewModel @Inject constructor(
         )
     }
 
-    override fun clearError() {
-        _uiState.update { it.copy(error = null, toastMessage = null) }
+    override fun clearToastMessage() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
 }
