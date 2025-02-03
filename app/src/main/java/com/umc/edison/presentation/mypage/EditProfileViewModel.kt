@@ -42,6 +42,8 @@ class EditProfileViewModel @Inject constructor(
     }
 
     fun updateUserProfile() {
+        // TODO: 이미지가 수정되었으면 내부 저장소에 이미지 저장
+
         collectDataResource(
             flow = updateUserProfileUseCase(_uiState.value.user.toDomain()),
             onSuccess = {

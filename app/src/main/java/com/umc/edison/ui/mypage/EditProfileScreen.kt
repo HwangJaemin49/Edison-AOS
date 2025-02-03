@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,6 +21,7 @@ import coil3.compose.AsyncImage
 import com.umc.edison.R
 import com.umc.edison.presentation.model.UserModel
 import com.umc.edison.presentation.mypage.EditProfileViewModel
+import com.umc.edison.ui.components.ImageGallery
 import com.umc.edison.ui.theme.*
 
 @Composable
@@ -29,6 +31,7 @@ fun EditProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var nickname by remember { mutableStateOf(TextFieldValue(uiState.user.nickname)) }
+    var showGallery by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -52,7 +55,8 @@ fun EditProfileScreen(
 
         EditProfileImage(
             user = uiState.user,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onImageClick = { showGallery = true }
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -61,6 +65,16 @@ fun EditProfileScreen(
             nickname = it
             viewModel.updateUserNickname(nickname.text)
         }
+
+        if (showGallery) {
+            ImageGallery(
+                onImageSelected = { uriList ->
+                    viewModel.updateUserProfileImage(uriList[0].toString())
+                },
+                onClose = { showGallery = false },
+                multiSelectMode = false
+            )
+        }
     }
 }
 
@@ -68,6 +82,7 @@ fun EditProfileScreen(
 private fun EditProfileImage(
     user: UserModel,
     modifier: Modifier,
+    onImageClick: () -> Unit
 ) {
     Box(
         modifier = modifier.width(120.dp).height(125.dp)
@@ -77,7 +92,8 @@ private fun EditProfileImage(
             contentDescription = "Profile Image",
             modifier = Modifier
                 .size(120.dp)
-                .clip(CircleShape)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
         )
 
         Box(
@@ -86,7 +102,8 @@ private fun EditProfileImage(
                 .align(Alignment.BottomEnd)
                 .clip(CircleShape)
                 .background(White000)
-                .border(1.dp, Gray200, CircleShape),
+                .border(1.dp, Gray200, CircleShape)
+                .clickable { onImageClick() },
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
@@ -103,7 +120,6 @@ private fun EditProfileNameInput(
     nickname: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit
 ) {
-
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
