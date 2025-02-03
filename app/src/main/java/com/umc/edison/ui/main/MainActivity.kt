@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import com.umc.edison.presentation.sync.SyncTrigger
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.navigation.BottomNavigation
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.navigation.NavigationGraph
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray800
@@ -65,12 +66,13 @@ fun MainScreen() {
                 )
             }
         },
-        contentWindowInsets = WindowInsets(
-            left = 0.dp,
-            top = 25.dp,
-            right = 0.dp,
-            bottom = 0.dp
-        )
+
+//        contentWindowInsets = WindowInsets(
+//            left = 0.dp,
+//            top = 25.dp,
+//            right = 0.dp,
+//            bottom = 0.dp
+//        )
 
     ) {
         Box(Modifier.padding(it)) {
@@ -84,7 +86,7 @@ fun MainScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     BubbleInput(
-                        onClick = { },
+                        onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0))},
                         onSwipeUp = { }
                     )
                 }

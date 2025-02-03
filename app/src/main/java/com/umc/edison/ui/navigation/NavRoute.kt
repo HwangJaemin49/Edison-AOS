@@ -8,9 +8,9 @@ sealed class NavRoute(val route: String) {
 
     data object SpaceLabel : NavRoute("space/labels")
 
-    data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/${id}") {
+    data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/labels/${id}") {
         companion object {
-            fun createRoute(labelId: Int): String = "${SpaceLabel.route}/${labelId}"
+            fun createRoute(labelId: Int): String = "${SpaceLabel.route}/labels/${labelId}"
         }
     }
 

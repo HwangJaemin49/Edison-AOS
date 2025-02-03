@@ -2,6 +2,7 @@ package com.umc.edison.domain.repository
 
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Bubble
+import com.umc.edison.domain.model.Label
 import kotlinx.coroutines.flow.Flow
 
 interface BubbleRepository {
@@ -9,4 +10,5 @@ interface BubbleRepository {
     fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
     fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
     fun updateBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
+    fun getBubbleDetail(bubbleId: Int): Flow<DataResource<Bubble>>
 }

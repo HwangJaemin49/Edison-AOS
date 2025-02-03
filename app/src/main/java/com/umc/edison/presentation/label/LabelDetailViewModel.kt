@@ -177,6 +177,7 @@ class LabelDetailViewModel @Inject constructor(
                 id = 1,
                 contentBlocks = listOf(
                     ContentBlockModel(
+
                         content = "새우간장볶음 밥 앤나 명란젓",
                         type = ContentType.TEXT,
                         position = 0

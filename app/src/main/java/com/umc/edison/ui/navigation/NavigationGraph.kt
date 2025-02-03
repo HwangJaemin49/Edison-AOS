@@ -11,6 +11,7 @@ import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
+import com.umc.edison.ui.my_edison.BubbleInputScreen
 
 @Composable
 fun NavigationGraph(
@@ -34,10 +35,19 @@ fun NavigationGraph(
 
         // space screen
         composable(
-            route = "${NavRoute.SpaceLabel.route}/{id}",
+            route = "${NavRoute.SpaceLabel.route}/labels/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
             LabelDetailScreen(navHostController, updateShowBottomNav)
         }
+
+        composable(
+            route = "${NavRoute.MyEdison.route}/bubbles/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) {
+            BubbleInputScreen(navHostController,updateShowBottomNav)
+
+        }
     }
+
 }

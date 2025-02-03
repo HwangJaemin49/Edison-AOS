@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,14 +40,13 @@ fun CameraPopup(CameraExpanded : Boolean, onGalleryOpen: () -> Unit, onCameraOpe
                 alignment = Alignment.BottomCenter,
                 offset = IntOffset(30, -100),
                 properties = PopupProperties(
-                    dismissOnClickOutside = true, // 팝업 외부 클릭 시 닫히도록 설정
-                    //focusable = true
+                    dismissOnClickOutside = true
                 ),
                 onDismissRequest = { onDismiss() }
             ) {
                 Box(
                     Modifier
-                        .shadow(12.dp,shape = RoundedCornerShape(cornerSize))
+                        .shadow(6.dp,shape = RoundedCornerShape(cornerSize))
                         .size(popupWidth, popupHeight)
                         .padding(top = 5.dp)
                         .background(Color.White, RoundedCornerShape(cornerSize))
@@ -56,32 +56,125 @@ fun CameraPopup(CameraExpanded : Boolean, onGalleryOpen: () -> Unit, onCameraOpe
                     Column(
                         modifier = Modifier.padding(horizontal = 10.dp)
                     ) {
-                        Text(
-                            text = "사진 촬영",
-                            modifier = Modifier.padding(vertical = 13.dp, horizontal = 35.dp)
-                                                .weight(1f)
-                                                .clickable{onCameraOpen()},
-                            fontSize = 16.sp,
-                            color = Gray800
-                        )
-                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
-                        Text(
-                            text = "갤러리",
-                            modifier = Modifier.padding(vertical = 13.dp, horizontal = 42.dp)
-                                               .weight(1f)
-                                               .clickable{onGalleryOpen()},
-                            fontSize = 16.sp,
-                            color = Gray800
-                        )
-                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
-                        Text(
-                            text = "배경 설정하기",
-                            modifier = Modifier.padding(vertical = 13.dp, horizontal =  22.dp)
-                                .clickable{ println("clicked!") }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
                                 .weight(1f),
-                            fontSize = 16.sp,
-                            color = Gray800
-                        )
+                            contentAlignment = Alignment.Center // Box의 중앙에 Text 배치
+                        ){
+                            Text(
+                                text = "사진 촬영",
+                                modifier = Modifier.clickable{onCameraOpen()},
+                                fontSize = 16.sp,
+                                color = Gray800
+                            )
+
+                        }
+                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
+                                .weight(1f),
+                            contentAlignment = Alignment.Center // Box의 중앙에 Text 배치
+                        ){
+                            Text(
+                                text = "갤러리",
+                                modifier = Modifier.clickable{onGalleryOpen()},
+                                fontSize = 16.sp,
+                                color = Gray800
+                            )
+
+                        }
+                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
+                                .weight(1f),
+                            contentAlignment = Alignment.Center // Box의 중앙에 Text 배치
+                        ){
+                            Text(
+                                text = "배경 설정하기",
+                                modifier = Modifier
+                                    .clickable{ println("clicked!") },
+                                fontSize = 16.sp,
+                                color = Gray800
+                            )
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun LinkPopup(LinkExpanded : Boolean, onDismiss: () -> Unit, backLink:()->Unit, linkBubble:() -> Unit){
+
+    Box {
+        val popupWidth = 150.dp
+        val popupHeight = 92.dp
+        val cornerSize = 16.dp
+
+        if (LinkExpanded) {
+            Popup(
+                alignment = Alignment.BottomCenter,
+                offset = IntOffset(30, -100),
+                properties = PopupProperties(
+                    dismissOnClickOutside = true,
+                ),
+                onDismissRequest = { onDismiss() }
+            ) {
+                Box(
+                    Modifier
+                        .shadow(6.dp,shape = RoundedCornerShape(cornerSize))
+                        .size(popupWidth, popupHeight)
+                        .padding(top = 5.dp)
+                        .background(Color.White, RoundedCornerShape(cornerSize))
+                        .border(1.dp, color = Gray800, RoundedCornerShape(cornerSize))
+
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    ) {
+
+                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
+                                .weight(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "[ ] 백링크",
+                                fontSize = 16.sp,
+                                color = Gray800,
+                                modifier = Modifier.clickable{backLink()}
+                            )
+                        }
+                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray800))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { }
+                                .weight(1f),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = "링크버블 만들기",
+                                modifier = Modifier.padding(vertical = 13.dp, )
+                                    .clickable{ linkBubble() },
+                                fontSize = 16.sp,
+                                color = Gray800
+                            )
+
+                        }
                     }
                 }
             }

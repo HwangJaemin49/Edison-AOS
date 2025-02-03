@@ -1,5 +1,6 @@
 package com.umc.edison.ui.my_edison
 
+import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -28,39 +29,52 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
+import android.os.Build
+import android.text.Html
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.navigation.NavHostController
 import com.umc.edison.R
-import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.domain.model.ContentType
+import com.umc.edison.presentation.label.LabelEditMode
+import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.my_edison.BubbleInputViewModel
+import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BubbleDoor
-import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.components.LabelModalContent
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray900
-import com.umc.edison.ui.theme.Pink400
-import com.umc.edison.ui.theme.White000
-import com.umc.edison.ui.theme.Yellow100
 import java.io.File
+import java.io.FileOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BubbleInputScreen(
-
+    navHostController: NavHostController,
+    updateShowBottomNav: (Boolean) -> Unit,
     viewModel: BubbleInputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var textExpanded by remember { mutableStateOf(false) }
     var listExpanded by remember { mutableStateOf(false) }
     var cameraExpanded by remember { mutableStateOf(false) }
+    var linkExpanded by remember { mutableStateOf(false) }
     var galleryOpen by remember { mutableStateOf(false) }
     var cameraOpen by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedImages by remember { mutableStateOf(mutableListOf<Uri>()) }
     var isBoldActive by remember { mutableStateOf(false) }
     var isItalicActive by remember { mutableStateOf(false) }
     var isUnderlineActive by remember { mutableStateOf(false) }
@@ -69,19 +83,30 @@ fun BubbleInputScreen(
     var isOrderedListActive by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var isBottomSheetOpen by remember { mutableStateOf(false) }
-    var currentLabel by remember { mutableStateOf(LabelModel(name = "", color = Yellow100)) }
-    var selectedLabels by remember { mutableStateOf(mutableSetOf<LabelModel>()) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var linkDropDownExpanded by remember { mutableStateOf(false) }
+    var selectedBubbles by remember { mutableStateOf(mutableListOf<BubbleModel>()) }
+    var addLink by remember { mutableStateOf(false) }
+    var selectedTitle by remember { mutableStateOf("") }
+    var selectedId by remember { mutableStateOf(0) }
+    var addLinkBubble by remember { mutableStateOf(false) }
 
-
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, )
 
     val takePictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            selectedImageUri?.let { uri ->
-                viewModel.addContentBlock(uri.toString())
+            if (selectedImages.size < 10){
+                selectedImageUri?.let { uri ->
+                    val savedUri = saveImageToInternalStorage(context, uri)
+                    selectedImages.add(savedUri)
+                    viewModel.addContentBlock(savedUri.toString())
+                }
+
+            } else {
+                Toast.makeText(context, "최대 10장까지 첨부할 수 있습니다.", Toast.LENGTH_SHORT).show()
             }
+
         }
     }
 
@@ -97,17 +122,108 @@ fun BubbleInputScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
-            viewModel.addContentBlock(it.toString()) // ViewModel에 전달
-            selectedImageUri = it // 선택된 URI 저장
+            if (selectedImages.size < 10) {
+                val savedUri = saveImageToInternalStorage(context, it)
+                selectedImages.add(savedUri)
+                viewModel.addContentBlock(savedUri.toString())
+            } else {
+                Toast.makeText(context, "최대 10장까지 첨부할 수 있습니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
+
+    if (uiState.labelEditMode == LabelEditMode.ADD) {
+        BottomSheet(
+            onDismiss = {
+                viewModel.updateEditMode(LabelEditMode.NONE)
+            },
+            sheetState = sheetState,
+        ) {
+            LabelModalContent(
+                editMode = uiState.labelEditMode,
+                onDismiss = {
+                    viewModel.updateEditMode(LabelEditMode.NONE)
+                },
+                onConfirm = { label ->
+
+                    val updatedLabels = uiState.bubble.labels.toMutableList().apply { add(label) }
+                    viewModel.updateLabel(updatedLabels)
+                    viewModel.confirmLabelModal(label)
+                },
+                label = uiState.selectedLabel
+            )
+        }
+    }
+
+    if (isBottomSheetOpen) {
+
+        println("확인2"+uiState.bubble.labels)
+        BottomSheet(
+            onDismiss = { isBottomSheetOpen = false },
+            sheetState = sheetState,
+        ) {
+            LabelSelectModal(
+                labels = uiState.labels ,
+                selectedLabels = uiState.bubble.labels,
+                onConfirm = { selectedLabelsFromModal ->
+                    viewModel.updateLabel(selectedLabelsFromModal)
+                },
+                onAddLabelClick = {
+                    viewModel.updateEditMode(LabelEditMode.ADD)
+                    isBottomSheetOpen = false
+                                  },
+                onDismiss = {
+                    isBottomSheetOpen = false
+                }
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) { updateShowBottomNav(false) }
+
+
+    BackHandler {
+        updateShowBottomNav(true)
+        navHostController.popBackStack()
+        viewModel.saveBubble()
+    }
+
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     )
+
+
     {
+        BubbleDoor(
+            bubble = uiState.bubble,
+            isEditable = true,
+            onClick = { /* TODO: 구현 */ },
+            onBubbleChange = { updatedBubble ->
+                viewModel.updateBubble(updatedBubble)
+                println(updatedBubble)
+            },
+            isBoldActive = isBoldActive,
+            isItalicActive = isItalicActive,
+            isUnderlineActive = isUnderlineActive,
+            isHighlightActive = isHighlightActive,
+            isListActive = isListActive,
+            isOrderedListActive = isOrderedListActive,
+            bottomPadding = 56.dp,
+            addLink = addLink,
+            selectedTitle = selectedTitle,
+            selectedId = selectedId,
+            onAddLinkHandled = { addLink = false },
+            deleteClicked = { contentBlock ->
+                viewModel.deleteContentBlock(contentBlock)
+            },
+            linkClicked = {bubbleId->
+                println("콜백함수"+bubbleId)
+                viewModel.fetchBubble(bubbleId)
+            }
+        )
 
         Row(
             modifier = Modifier
@@ -123,15 +239,11 @@ fun BubbleInputScreen(
                 modifier = Modifier
                     .size(28.dp)
                     .offset(x = 23.dp, y = 20.dp)
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.ic_more),
-                contentDescription = "More",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(28.dp)
-                    .offset(y = 20.dp)
+                    .clickable{
+                        viewModel.saveBubble()
+                        navHostController.navigate(NavRoute.MyEdison.route)
+                        updateShowBottomNav(true)
+                    }
             )
 
             Image(
@@ -141,31 +253,28 @@ fun BubbleInputScreen(
                 modifier = Modifier
                     .size(28.dp)
                     .offset(x = -23.dp, y = 20.dp)
-                    .clickable { println("Save button clicked") }
+                    .clickable {
+
+                        if (uiState.bubble.contentBlocks.isEmpty() || uiState.bubble.contentBlocks.all { it.content.isBlank() }) {
+                            Toast.makeText(context, "내용이 없습니다.", Toast.LENGTH_SHORT).show()
+                            return@clickable
+                        }
+
+                        viewModel.saveBubble()
+//                        navHostController.navigate(NavRoute.MyEdison.route)
+//                        updateShowBottomNav(true)
+                    }
             )
+
+
         }
-        BubbleDoor(
-            bubble = uiState.bubble,
-            isEditable = true,
-            onClick = { /* TODO: 구현 */ },
-            onBubbleChange = { updatedBubble ->
-                viewModel.updateBubble(updatedBubble)
-            },
-            isBoldActive = isBoldActive,
-            isItalicActive=isItalicActive,
-            isUnderlineActive=isUnderlineActive,
-            isHighlightActive=isHighlightActive,
-            isListActive=isListActive,
-            isOrderedListActive=isOrderedListActive,
-            bottomPadding = 56.dp
-        )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .align(Alignment.BottomCenter)
-                .offset(y=-56.dp)
+                .offset(y = -56.dp)
                 .imePadding(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -186,7 +295,6 @@ fun BubbleInputScreen(
                 }
             }
         }
-
 
         Row(
             modifier = Modifier
@@ -224,7 +332,8 @@ fun BubbleInputScreen(
                         .size(24.dp)
                         .clickable { cameraExpanded = true }
                 )
-                CameraPopup(CameraExpanded = cameraExpanded,
+                CameraPopup(
+                    CameraExpanded = cameraExpanded,
                     onGalleryOpen = {
                         galleryOpen = true
                         cameraExpanded = false
@@ -254,17 +363,103 @@ fun BubbleInputScreen(
                 cameraOpen = false
             }
 
+            var selectedBubbleId by remember { mutableStateOf(0) }
+            var selectedBubbleTitle by remember { mutableStateOf<String?>(null) }
 
-            Image(
-                painter = painterResource(id = R.drawable.ic_link),
-                contentDescription = "Link",
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
 
+
+            Box() {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_link),
+                    contentDescription = "Link",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {
+                            linkExpanded = true
+                        }
+                )
+                LinkPopup(LinkExpanded = linkExpanded,
+                    onDismiss = {
+                        linkExpanded = false
+                    },
+                    backLink = {
+                        linkExpanded = false
+                        linkDropDownExpanded = true
+                    },
+                    linkBubble = {
+                        linkExpanded = false
+                        val previousBubble = uiState.bubble
+                        selectedBubbleId = uiState.bubble.id
+                        selectedBubbleTitle = uiState.bubble.title
+
+                        if (!selectedBubbles.contains(previousBubble)) {
+                            selectedBubbles = selectedBubbles.toMutableList().apply {
+                                add(previousBubble)
+                            }
+                        }
+
+                        viewModel.updateBubbleWithLink()
+                        addLinkBubble = true
                     }
-            )
+                )
+
+
+
+                if (addLinkBubble) {
+                    addLinkBubble = false
+                    val lastTextBlock = uiState.bubble.contentBlocks
+                        .filter { it.type == ContentType.TEXT }
+                        .lastOrNull()
+
+                    if (lastTextBlock != null) {
+                        selectedTitle = selectedBubbleTitle.toString()
+                        selectedId = selectedBubbleId
+                        addLink = true
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = linkDropDownExpanded,
+                    onDismissRequest = { linkDropDownExpanded = false },
+                    modifier = Modifier.heightIn(max = 300.dp)
+                                       .background(Color.White)
+                ) {
+
+                    val bubbles = uiState.bubbles
+
+
+                    bubbles.forEach { bubble ->
+                        DropdownMenuItem(
+                            text = {Text(
+                                bubble.title?.takeIf { it.isNotBlank() }
+                                    ?: bubble.contentBlocks
+                                        .filter { it.type == ContentType.TEXT }
+                                        .firstOrNull { it.content.parseHtml().isNotBlank() }
+                                        ?.content?.parseHtml()?.take(5)
+                                    ?: "내용 없음"
+                            )},
+                            onClick = {
+                                println("Selected Bubble Title: ${bubble.title}")
+                                if (!selectedBubbles.contains(bubble)) {
+                                    selectedBubbles = selectedBubbles.toMutableList().apply {
+                                        add(bubble)
+                                    }
+                                    selectedTitle = bubble.title?.takeIf { it.isNotBlank() }
+                                        ?: bubble.contentBlocks
+                                            .filter { it.type == ContentType.TEXT }
+                                            .firstOrNull { it.content.parseHtml().isNotBlank() }
+                                            ?.content?.parseHtml()?.take(5)
+                                                ?: "내용 없음"
+                                    selectedId = bubble.id
+                                    addLink = true
+                                    linkDropDownExpanded = false
+                                }
+                            }
+                        )
+                    }
+                }
+            }
 
             Image(
                 painter = painterResource(id = R.drawable.ic_tag),
@@ -273,30 +468,8 @@ fun BubbleInputScreen(
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = -23.dp)
-                    .clickable{  isBottomSheetOpen = true}
+                    .clickable { isBottomSheetOpen = true }
             )
-        }
-
-        if (isBottomSheetOpen) {
-            ModalBottomSheet(
-                onDismissRequest = { isBottomSheetOpen = false },
-                sheetState = sheetState,
-                containerColor = White000,
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            ) {
-                LabelSelectModal(
-                    labels = uiState.labels, // Room에서 가져온 데이터를 전달
-                    selectedLabels = uiState.bubble.labels, // 이미 선택된 라벨
-                    onConfirm = { selectedLabelsFromModal ->
-                        viewModel.updateLabel(selectedLabelsFromModal)
-                        println("Selected Labels: $selectedLabels")
-
-                    },
-                    onDismiss = {
-                        isBottomSheetOpen = false
-                    }
-                )
-            }
         }
 
         if (textExpanded) Row(
@@ -309,55 +482,63 @@ fun BubbleInputScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_bold),
+                painter = painterResource(if(isBoldActive) R.drawable.ic_bold else R.drawable.ic_bold_off),
                 contentDescription = "Bold",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = 23.dp)
-                    . clickable { isBoldActive = !isBoldActive }
+                    .clickable { isBoldActive = !isBoldActive }
             )
 
             Image(
-                painter = painterResource(id = R.drawable.ic_italic),
+                painter = painterResource(if(isItalicActive) R.drawable.ic_italic else R.drawable.ic_italic_off),
                 contentDescription = "italic",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable {  isItalicActive=!isItalicActive}
+                    .clickable { isItalicActive = !isItalicActive }
             )
 
 
             Box() {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_underlined),
+                    painter = painterResource(if(isUnderlineActive) R.drawable.ic_underline else R.drawable.ic_underline_off),
                     contentDescription = "underline",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(24.dp)
-                        .clickable { isUnderlineActive=!isUnderlineActive}
+                        .clickable { isUnderlineActive = !isUnderlineActive }
 
                 )
             }
 
 
             Image(
-                painter = painterResource(id = R.drawable.ic_brush),
+                painter = painterResource(
+                    id = if (isHighlightActive) R.drawable.ic_highlight else R.drawable.ic_highlight_off
+                    ),
                 contentDescription = "highlight",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { isHighlightActive=!isHighlightActive}
+                    .clickable { isHighlightActive = !isHighlightActive }
             )
 
             Image(
-                painter = painterResource(id = R.drawable.ic_close),
+                painter = painterResource(id = R.drawable.ic_x),
                 contentDescription = "close",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = -23.dp)
-                    .clickable { textExpanded = false }
+                    .clickable {
+                        textExpanded = false
+                        isBoldActive =false
+                        isItalicActive =false
+                        isUnderlineActive = false
+                        isHighlightActive = false
+                    }
             )
 
         }
@@ -372,22 +553,24 @@ fun BubbleInputScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_list_add),
+                painter =  painterResource(
+                    id = if (isListActive) R.drawable.ic_list_tool_off else R.drawable.ic_list_tool_off1
+                ),
                 contentDescription = "list add",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = 23.dp)
-                    .clickable { isListActive=!isListActive}
+                    .clickable { isListActive = !isListActive }
             )
 
             Image(
-                painter = painterResource(id = R.drawable.ic_list_num),
+                painter = painterResource(id = if(isOrderedListActive) R.drawable.ic_number else R.drawable.ic_number_off),
                 contentDescription = "List num",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { isOrderedListActive=!isOrderedListActive}
+                    .clickable { isOrderedListActive = !isOrderedListActive }
             )
 
 
@@ -416,18 +599,20 @@ fun BubbleInputScreen(
             )
 
             Image(
-                painter = painterResource(id = R.drawable.ic_close),
+                painter = painterResource(id = R.drawable.ic_x),
                 contentDescription = "close",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(24.dp)
                     .offset(x = -23.dp)
-                    .clickable { listExpanded = false }
+                    .clickable {
+                        listExpanded = false
+                        isListActive = false
+                        isOrderedListActive = false
+                    }
             )
 
         }
-
-
 
 
     }
@@ -435,5 +620,25 @@ fun BubbleInputScreen(
 }
 
 
+fun String.parseHtml(): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        Html.fromHtml(this, Html.FROM_HTML_MODE_LEGACY).toString()
+    } else {
+        Html.fromHtml(this).toString()
+    }
+}
 
 
+fun saveImageToInternalStorage(context: Context, uri: Uri): Uri {
+    val inputStream = context.contentResolver.openInputStream(uri)
+
+    val fileName = "image_${System.currentTimeMillis()}.jpg"
+    val file = File(context.filesDir, fileName)
+
+    val outputStream = FileOutputStream(file)
+    inputStream?.copyTo(outputStream)
+    inputStream?.close()
+    outputStream.close()
+
+    return Uri.fromFile(file)
+}

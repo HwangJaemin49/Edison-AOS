@@ -1,38 +1,52 @@
 package com.umc.edison.ui.components
 
+import android.graphics.BlurMaskFilter
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,9 +60,12 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -64,19 +81,23 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size
+import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
+import com.mohamedrejeb.richeditor.ui.material.RichText
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.ui.my_edison.parseHtml
 import com.umc.edison.ui.theme.Aqua100
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray400
 import com.umc.edison.ui.theme.Gray500
+import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Pretendard
 import com.umc.edison.ui.theme.Red100
@@ -152,32 +173,43 @@ fun BubbleInput(
 /**
  * 버블 내용 확인 가능한 컴포저블
  */
-//@Composable
-//fun Bubble(
-//    bubble: BubbleModel,
-//    onClick: () -> Unit,
-//    richTextState: RichTextState// 편집 모드로 들어가는 클릭 리스너
-//) {
-//    val bubbleSize = calculateBubbleSize(bubble)
-//
-//    if (checkBubbleContainImage(bubble) && bubbleSize == BubbleType.BubbleMain) {
-//        BubbleDoor(
-//            bubble = bubble,
-//            isEditable = false,
-//            onClick = onClick,
-//            onBubbleChange = {},
-//            bottomPadding = 0.dp,
-//            richTextState = richTextState
-//        )
-//    } else {
-//        TextContentBubble(
-//            bubble = bubble,
-//            colors = bubble.labels.map { it.color },
-//            onClick = onClick,
-//            bubbleSize = BubbleType.BubbleMain
-//        )
-//    }
-//}
+@Composable
+fun Bubble(
+    bubble: BubbleModel,
+    onClick: () -> Unit,
+
+) {
+    val bubbleSize = calculateBubbleSize(bubble)
+
+    if (checkBubbleContainImage(bubble) && bubbleSize == BubbleType.BubbleMain) {
+        BubbleDoor(
+            bubble = bubble,
+            isEditable = false,
+            onClick = onClick,
+            onBubbleChange = {},
+            bottomPadding = 0.dp,
+            isBoldActive = false,
+            isItalicActive = false,
+            isUnderlineActive = false,
+            isHighlightActive = false,
+            isListActive = false,
+            isOrderedListActive = false,
+            addLink = false,
+            onAddLinkHandled = {},
+            selectedId = 0,
+            selectedTitle = TODO(),
+            deleteClicked = {},
+            linkClicked = {}
+        )
+    } else {
+        TextContentBubble(
+            bubble = bubble,
+            colors = bubble.labels.map { it.color },
+            onClick = onClick,
+            bubbleSize = BubbleType.BubbleMain
+        )
+    }
+}
 
 /**
  * 버블 보관함 화면에서 사용되는 버블 미리보기 컴포저블
@@ -218,6 +250,12 @@ fun BubbleDoor(
     isHighlightActive:Boolean,
     isListActive:Boolean,
     isOrderedListActive:Boolean,
+    addLink : Boolean,
+    selectedTitle : String,
+    selectedId : Int,
+    onAddLinkHandled: () -> Unit,
+    deleteClicked: (ContentBlockModel) -> Unit,
+    linkClicked: (Int) -> Unit,
     bottomPadding : Dp
 ) {
     val colors = bubble.labels.map { it.color }
@@ -283,6 +321,12 @@ fun BubbleDoor(
                 isHighlightActive=isHighlightActive,
                 isListActive=isListActive,
                 isOrderedListActive=isOrderedListActive,
+                addLink = addLink,
+                selectedTitle = selectedTitle,
+                selectedId = selectedId,
+                onAddLinkHandled = onAddLinkHandled,
+                deleteClicked = deleteClicked,
+                linkClicked = linkClicked
             )
         }
     }
@@ -292,6 +336,7 @@ fun BubbleDoor(
 
 
 
+@OptIn(ExperimentalRichTextApi::class)
 @Composable
 private fun BubbleContent(
     bubble: BubbleModel,
@@ -302,112 +347,179 @@ private fun BubbleContent(
     isUnderlineActive:Boolean,
     isHighlightActive:Boolean,
     isListActive:Boolean,
-    isOrderedListActive:Boolean
+    isOrderedListActive:Boolean,
+    addLink: Boolean,
+    selectedTitle: String,
+    selectedId :Int,
+    onAddLinkHandled: () -> Unit,
+    deleteClicked: (ContentBlockModel) -> Unit,
+    linkClicked: (Int) -> Unit
 ) {
-
-
-    LazyColumn(
+    Column(
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxSize()
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .padding(bottom = 110.dp)
     ) {
-        // Title
-        item {
-            if (isEditable) {
-                BasicTextField(
-                    value = bubble.title ?: "",
-                    onValueChange = { newTitle ->
-                        onBubbleChange(
-                            bubble.copy(title = newTitle) // 제목 변경
-                        )
-                    },
-                    textStyle = MaterialTheme.typography.displayMedium.copy(color = Gray800),
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            if (bubble.title.isNullOrEmpty()) {
-                                Text(
-                                    text = "제목",
-                                    style = MaterialTheme.typography.displayMedium.copy(color = Gray500),
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-
-                            innerTextField()
+        if (isEditable) {
+            BasicTextField(
+                value = bubble.title ?: "",
+                onValueChange = { newTitle ->
+                    onBubbleChange(
+                        bubble.copy(title = newTitle)
+                    )
+                },
+                textStyle = MaterialTheme.typography.displayMedium.copy(color = Gray800),
+                modifier = Modifier.fillMaxWidth(),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (bubble.title.isNullOrEmpty()) {
+                            Text(
+                                text = "제목",
+                                style = MaterialTheme.typography.displayMedium.copy(color = Gray500),
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
+                        innerTextField()
                     }
-                )
-            } else {
-                Text(
-                    text = bubble.title ?: "",
-                    style = MaterialTheme.typography.displayMedium,
-                    color = Gray800,
-                    textAlign = TextAlign.Start
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
+                }
+            )
+        } else {
+            Text(
+                text = bubble.title ?: "",
+                style = MaterialTheme.typography.displayMedium,
+                color = Gray800,
+                textAlign = TextAlign.Start
+            )
         }
+        Spacer(modifier = Modifier.height(20.dp))
+
+        var targetBlockId by remember { mutableStateOf<Int?>(null) }
+        var deletedImageBlockId by remember { mutableStateOf<Int?>(null) }
 
 
-
-        // Content Blocks
-        itemsIndexed(
-            items = bubble.contentBlocks,
-            key = { _, contentBlock -> contentBlock.position }
-        ) { index, contentBlock ->
+        bubble.contentBlocks.forEachIndexed { _, contentBlock ->
             when (contentBlock.type) {
                 ContentType.TEXT -> {
+
+                    val myUriHandler by remember {
+                        mutableStateOf(object : UriHandler {
+                            override fun openUri(uri: String) {
+                                val bubbleId = uri.toIntOrNull()
+                                if (bubbleId != null) {
+                                    println(bubbleId)
+                                    linkClicked(bubbleId)
+                                }
+                            }
+                        })
+                    }
+
                     if (isEditable) {
 
                         val richTextState = rememberRichTextState()
+                        var previousHtml by remember { mutableStateOf("") }
+                        val isInitialized = remember(contentBlock.position) { mutableStateOf(false) }
+
+                        LaunchedEffect(deletedImageBlockId) {
+                            deletedImageBlockId?.let {
+                                richTextState.setHtml(contentBlock.content)
+                                deletedImageBlockId = null//이미지블록삭제이후재렌더링
+                            }
+                        }
+
+
+                        SideEffect {
+                            if (!isInitialized.value) {
+                                richTextState.setHtml(contentBlock.content)
+                                previousHtml = contentBlock.content
+                                isInitialized.value = true
+                            }
+                        } // 기존 버블 불러올 때 초기화
+
+
+                        LaunchedEffect(richTextState.toHtml()) {
+
+                            val newHtml = richTextState.toHtml()
+
+                            if (newHtml != previousHtml && newHtml != "<br>") {
+                                previousHtml = newHtml
+
+                                val updatedBubble = bubble.copy(
+                                    contentBlocks = bubble.contentBlocks.map { block ->
+                                        if (block.position == contentBlock.position) {
+                                            block.copy(content = newHtml)
+                                        } else {
+                                            block
+                                        }
+                                    }
+                                )
+                                onBubbleChange(updatedBubble)
+                            }
+                        }
+
 
                         if (isBoldActive) {
                             richTextState.addSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        }else {
+                        } else {
                             richTextState.removeSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
                         }
 
                         if (isItalicActive) {
                             richTextState.addSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-                        }else {
+                        } else {
                             richTextState.removeSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
                         }
 
                         if (isUnderlineActive) {
                             richTextState.addSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
-                        }else {
+                        } else {
                             richTextState.removeSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
                         }
 
                         if (isHighlightActive) {
-                            richTextState.addSpanStyle(SpanStyle(background=Color(0xFFFEFBFF)))
-                        }else {
-                            richTextState.removeSpanStyle(SpanStyle(background=Color(0xFFFEFBFF)))
+                            richTextState.addSpanStyle(SpanStyle(background = Color.Yellow))
+                        } else {
+                            richTextState.removeSpanStyle(SpanStyle(background = Color.Yellow))
                         }
 
                         if (isListActive) {
                             richTextState.addUnorderedList()
-                        }else {
+                        } else {
                             richTextState.removeUnorderedList()
                         }
 
                         if (isOrderedListActive) {
                             richTextState.addOrderedList()
-                        }else {
+                        } else {
                             richTextState.removeOrderedList()
                         }
 
+                        if (addLink) {
+                            targetBlockId = bubble.contentBlocks.lastOrNull()?.position
+                        }
+
+                        if (addLink && contentBlock.position == targetBlockId) {
+                            richTextState.addLink(
+                                text = "[[$selectedTitle]]",
+                                url = "$selectedId"
+                            )
+                            previousHtml = richTextState.toHtml()
+                            contentBlock.content = previousHtml
+                            println(contentBlock.content)
+                            onAddLinkHandled()
+                            targetBlockId = null
+                        }
 
                         BasicRichTextEditor(
                             state = richTextState,
                             textStyle = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             decorationBox = { innerTextField ->
                                 Box(
                                     modifier = Modifier.fillMaxWidth(),
@@ -420,58 +532,122 @@ private fun BubbleContent(
                                             modifier = Modifier.fillMaxWidth()
                                         )
                                     }
-
                                     innerTextField()
                                 }
                             }
                         )
                     } else {
-                        Text(
-                            text = contentBlock.content,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Gray800,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+
+                        val richTextState = rememberRichTextState()
+
+                        LaunchedEffect(contentBlock.content) {
+                            richTextState.setHtml(contentBlock.content)
+                        }
+
+                        CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+
+                            RichText(
+                                state = richTextState,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Gray800,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                        }
+
+
                     }
                 }
 
                 ContentType.IMAGE -> {
-                    var aspectRatio by remember { mutableStateOf(1f) }
-                    val painter = rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(contentBlock.content)
-                            .crossfade(true)
-                            .size(Size.ORIGINAL)
-                            .build(),
-                        onSuccess = { result ->
-                            val width = result.painter.intrinsicSize.width
-                            val height = result.painter.intrinsicSize.height
-                            if (width > 0 && height > 0) {
-                                aspectRatio = width / height
-                            }
-                        }
-                    )
+                    val aspectRatio = calculateAspectRatio(contentBlock.content)
+                    var showDeleteButton by remember { mutableStateOf(false) }
 
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(aspectRatio)
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onLongPress = {
+                                        showDeleteButton = true
+                                    }
+                                )
+                            }
                     ) {
-
-
                         Image(
-                            painter = painter,
+                            painter = rememberAsyncImagePainter(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(contentBlock.content)
+                                    .crossfade(true)
+                                    .size(Size.ORIGINAL)
+                                    .build()
+                            ),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                                               .clip(RoundedCornerShape(8.dp)),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(8.dp))
                         )
+
+                        if (isEditable && showDeleteButton) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable { showDeleteButton = false },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Button(
+
+                                    shape = RoundedCornerShape(100.dp),
+                                    onClick = {
+                                        println(bubble)
+                                        showDeleteButton = false
+                                        deleteClicked(contentBlock)
+                                        println(bubble)
+                                        deletedImageBlockId = contentBlock.position
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Gray700,
+                                    )
+                                ) {
+                                    Text(
+                                        text = "삭제하기",
+                                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray100),
+                                        fontSize = 14.sp
+                                        )
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+
+    @Composable
+fun calculateAspectRatio(content: String): Float {
+    var aspectRatio by remember { mutableStateOf(1f) }
+
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(content)
+            .crossfade(true)
+            .size(Size.ORIGINAL)
+            .build(),
+        onSuccess = { result ->
+            val width = result.painter.intrinsicSize.width
+            val height = result.painter.intrinsicSize.height
+            if (width > 0 && height > 0) {
+                aspectRatio = width / height
+            }
+        }
+    )
+
+    return aspectRatio
+}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -735,14 +911,14 @@ private fun DrawScope.drawLayerBlur(
                 when (colors.size) {
                     1 -> {
                         // 단일 색상
-                        shader = android.graphics.LinearGradient(
+                        shader = LinearGradient(
                             center.x - radius,
                             center.y,
                             center.x + radius,
                             center.y,
                             intArrayOf(White000.toArgb(), colors[0].toArgb()),
                             floatArrayOf(0f, 1f),
-                            android.graphics.Shader.TileMode.CLAMP
+                            Shader.TileMode.CLAMP
                         )
                     }
 
@@ -753,7 +929,7 @@ private fun DrawScope.drawLayerBlur(
                         val startY = center.y - radius * sin(angleRadians).toFloat()
                         val endX = center.x + radius * cos(angleRadians).toFloat()
                         val endY = center.y + radius * sin(angleRadians).toFloat()
-                        shader = android.graphics.LinearGradient(
+                        shader = LinearGradient(
                             startX, startY,
                             endX, endY,
                             intArrayOf(
@@ -762,7 +938,7 @@ private fun DrawScope.drawLayerBlur(
                                 colors[0].toArgb()
                             ),
                             floatArrayOf(0f, 0.46f, 1f),
-                            android.graphics.Shader.TileMode.CLAMP
+                            Shader.TileMode.CLAMP
                         )
                     }
 
@@ -772,9 +948,9 @@ private fun DrawScope.drawLayerBlur(
                     }
                 }
                 // 블러 효과 추가
-                maskFilter = android.graphics.BlurMaskFilter(
+                maskFilter = BlurMaskFilter(
                     blurRadius,
-                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                    BlurMaskFilter.Blur.NORMAL
                 )
             }
         }
@@ -796,9 +972,9 @@ private fun DrawScope.drawCircleWithBlur(
             this.color = color
             this.asFrameworkPaint().apply {
                 isAntiAlias = true
-                maskFilter = android.graphics.BlurMaskFilter(
+                maskFilter = BlurMaskFilter(
                     blurRadius,
-                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                    BlurMaskFilter.Blur.NORMAL
                 )
             }
         }
@@ -868,9 +1044,9 @@ private fun DrawScope.drawBlurredOuterGradientBubbleDoor(
                 isAntiAlias = true
                 color = android.graphics.Color.WHITE
                 this.alpha = 100 // 투명도 설정
-                maskFilter = android.graphics.BlurMaskFilter(
+                maskFilter = BlurMaskFilter(
                     30f,
-                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                    BlurMaskFilter.Blur.NORMAL
                 )
             }
         }

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.umc.edison.R
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.components.BubbleStorageTopBar
+import com.umc.edison.ui.navigation.NavRoute
 
 @Composable
 fun MyEdisonScreen(navController: NavHostController) {
@@ -58,9 +59,8 @@ fun MyEdisonScreen(navController: NavHostController) {
 
 
         BubbleInput(
-            onClick = { navController.navigate("bubble_input_screen") },
-            onSwipeUp = { navController.navigate("bubble_input_screen") },
-
+            onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0)) },
+            onSwipeUp = { }
 
             )
 
