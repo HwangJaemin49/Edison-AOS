@@ -14,16 +14,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
+import com.umc.edison.presentation.model.UserModel
+import com.umc.edison.presentation.mypage.EditProfileViewModel
 import com.umc.edison.ui.theme.*
 
 @Composable
 fun EditProfileScreen(
     navHostController: NavHostController,
+    viewModel: EditProfileViewModel = hiltViewModel()
 ) {
-    var nickname by remember { mutableStateOf(TextFieldValue("")) }
+    val uiState by viewModel.uiState.collectAsState()
+    var nickname by remember { mutableStateOf(TextFieldValue(uiState.user.nickname)) }
 
     Column(
         modifier = Modifier
@@ -35,30 +40,40 @@ fun EditProfileScreen(
             text = "저장",
             modifier = Modifier
                 .align(Alignment.End)
-                .clickable(onClick = {}),
+                .clickable(onClick = {
+                    viewModel.updateUserProfile()
+                    navHostController.popBackStack()
+                }),
             style = MaterialTheme.typography.titleMedium,
             color = Gray800
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        EditProfileImage(modifier = Modifier.align(Alignment.CenterHorizontally))
+        EditProfileImage(
+            user = uiState.user,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        EditProfileNameInput(nickname) { nickname = it }
+        EditProfileNameInput(nickname) {
+            nickname = it
+            viewModel.updateUserNickname(nickname.text)
+        }
     }
 }
 
 @Composable
 private fun EditProfileImage(
-    modifier: Modifier
+    user: UserModel,
+    modifier: Modifier,
 ) {
     Box(
-        modifier = modifier.size(120.dp)
+        modifier = modifier.width(120.dp).height(125.dp)
     ) {
         AsyncImage(
-            model = R.drawable.ic_profile_default_small,
+            model = user.profileImage ?: R.drawable.ic_profile_default_small,
             contentDescription = "Profile Image",
             modifier = Modifier
                 .size(120.dp)
@@ -88,11 +103,14 @@ private fun EditProfileNameInput(
     nickname: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit
 ) {
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -124,7 +142,7 @@ private fun EditProfileNameInput(
                 .background(Gray100),
             placeholder = {
                 Text(
-                    text = "닉네임을 입력해주세요.",
+                    text = nickname.text.ifEmpty { "닉네임을 입력해주세요." },
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray600,
                 )
