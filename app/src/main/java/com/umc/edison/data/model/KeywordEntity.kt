@@ -1,0 +1,22 @@
+package com.umc.edison.data.model
+
+import com.umc.edison.domain.model.Keyword
+
+data class KeywordEntity(
+    val id: Int,
+    val name: String
+) : DataMapper<Keyword> {
+    override fun toDomain(): Keyword {
+        return Keyword(
+            id = id,
+            name = name
+        )
+    }
+}
+
+fun Keyword.toData(): KeywordEntity {
+    return KeywordEntity(
+        id = id,
+        name = name
+    )
+}

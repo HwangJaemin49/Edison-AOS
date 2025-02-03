@@ -15,13 +15,24 @@ open class BaseLocalDataSourceImpl<T : BaseSyncLocal>(
         baseDao.insert(entity)
     }
 
-    suspend fun update(entity: T) {
+    suspend fun update(entity: T, tableName: String) {
+        val query = SimpleSQLiteQuery("SELECT * FROM $tableName WHERE id = ${entity.id}")
+        baseDao.getById(query)?.let {
+            entity.createdAt = it.createdAt
+        }
+
         entity.updatedAt = Date()
         entity.isSynced = false
         baseDao.update(entity)
     }
 
-    suspend fun softDelete(entity: T) {
+    suspend fun softDelete(entity: T, tableName: String) {
+        val query = SimpleSQLiteQuery("SELECT * FROM $tableName WHERE id = ${entity.id}")
+        baseDao.getById(query)?.let {
+            entity.createdAt = it.createdAt
+            entity.updatedAt = it.updatedAt
+        }
+
         entity.deletedAt = Date()
         entity.isDeleted = true
         entity.isSynced = false
@@ -36,5 +47,11 @@ open class BaseLocalDataSourceImpl<T : BaseSyncLocal>(
     suspend fun markAsSynced(tableName: String, id: Int) {
         val query = SimpleSQLiteQuery("UPDATE $tableName SET is_synced = 1 WHERE id = $id")
         baseDao.markAsSynced(query)
+    }
+
+    suspend fun recover(entity: T, tableName: String): Int {
+        val query =
+            SimpleSQLiteQuery("UPDATE $tableName SET is_deleted = 0 WHERE id = ${entity.id}")
+       return baseDao.recover(query)
     }
 }

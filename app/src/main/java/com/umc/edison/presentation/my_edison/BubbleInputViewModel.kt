@@ -14,7 +14,6 @@ import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
-import com.umc.edison.ui.my_edison.parseHtml
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,9 +38,8 @@ class BubbleInputViewModel @Inject constructor(
         fetchLabels()
         fetchBubbles()
         val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
-        fetchBubble(7)
+        fetchBubble(id)
         addTextBlock()
-
     }
 
 
@@ -280,5 +278,9 @@ class BubbleInputViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(bubble = updatedBubble)
         }
+    }
+
+    override fun clearError() {
+        TODO("Not yet implemented")
     }
 }

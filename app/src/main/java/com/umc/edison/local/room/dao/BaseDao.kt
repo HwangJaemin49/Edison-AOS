@@ -21,4 +21,10 @@ interface BaseDao<T> {
 
     @androidx.room.RawQuery
     suspend fun markAsSynced(query: SupportSQLiteQuery): Int
+
+    @androidx.room.RawQuery
+    suspend fun getById(query: SupportSQLiteQuery): T?
+
+    @androidx.room.RawQuery
+    suspend fun recover(query: SupportSQLiteQuery): Int
 }

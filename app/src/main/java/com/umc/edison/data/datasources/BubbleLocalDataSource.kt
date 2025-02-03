@@ -1,7 +1,6 @@
 package com.umc.edison.data.datasources
 
 import com.umc.edison.data.model.BubbleEntity
-import com.umc.edison.data.model.LabelEntity
 
 interface BubbleLocalDataSource {
     suspend fun getAllBubbles(): List<BubbleEntity>
@@ -21,4 +20,9 @@ interface BubbleLocalDataSource {
     suspend fun markAsSynced(bubble: BubbleEntity)
 
     suspend fun getBubbleDetail(bubbleId: Int): BubbleEntity
+
+    suspend fun getDeletedBubbles(): List<BubbleEntity>
+
+    suspend fun recoverBubbles(bubbles: List<BubbleEntity>)
+    suspend fun recoverBubble(bubble: BubbleEntity)
 }

@@ -9,7 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 
 @Composable
-fun SpaceTabScreen(navHostController: NavHostController) {
+fun SpaceTabScreen(
+    navHostController: NavHostController,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

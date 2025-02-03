@@ -2,8 +2,10 @@ package com.umc.edison.remote.di
 
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
 import com.umc.edison.data.datasources.LabelRemoteDataSource
+import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.remote.datasources.BubbleRemoteDataSourceImpl
 import com.umc.edison.remote.datasources.LabelRemoteDataSourceImpl
+import com.umc.edison.remote.datasources.UserRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -24,4 +26,10 @@ internal abstract class RemoteDataSourceModule {
     abstract fun bindLabelRemoteDataSource(
         labelRemoteDataSourceImpl: LabelRemoteDataSourceImpl
     ): LabelRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRemoteDataSource(
+        userRemoteDataSourceImpl: UserRemoteDataSourceImpl
+    ): UserRemoteDataSource
 }
