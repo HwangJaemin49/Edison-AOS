@@ -12,7 +12,6 @@ import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
-import com.umc.edison.ui.label.LabelDetailScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.IdentityEditScreen
@@ -45,7 +44,7 @@ fun NavigationGraph(
             route = "${NavRoute.SpaceLabel.route}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
-            LabelDetailScreen(navHostController, updateShowBottomNav)
+            BubbleStorageScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.ArtBoard.route) {

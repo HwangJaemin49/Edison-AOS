@@ -1,22 +1,31 @@
 package com.umc.edison.presentation.storage
 
+import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.presentation.model.LabelModel
 
 data class BubbleStorageState(
+    val label: LabelModel? = null,
     val bubbles: List<BubbleModel> = emptyList(),
     val selectedBubbles: List<BubbleModel> = emptyList(),
     val bubbleStorageMode: BubbleStorageMode = BubbleStorageMode.NONE,
-    val isLoading: Boolean,
-    val error: Throwable?,
-) {
+    val movableLabels: List<LabelModel> = listOf(),
+    override val isLoading: Boolean,
+    override val error: Throwable? = null,
+    override val toastMessage: String? = null,
+) : BaseState {
     companion object {
         val DEFAULT = BubbleStorageState(
             isLoading = false,
-            error = null
         )
     }
 }
 
 enum class BubbleStorageMode {
-    NONE, VIEW, EDIT, SHARE, DELETE
+    NONE,
+    VIEW,
+    EDIT,
+    DELETE,
+    SHARE,
+    MOVE
 }
