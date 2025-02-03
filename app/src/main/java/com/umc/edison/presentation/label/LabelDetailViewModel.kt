@@ -3,7 +3,7 @@ package com.umc.edison.presentation.label
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
@@ -24,7 +24,7 @@ class LabelDetailViewModel @Inject constructor(
     private val getLabelDetailUseCase: GetLabelDetailUseCase,
     private val addBubblesUseCase: AddBubblesUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
-    private val deleteBubblesUseCase: DeleteBubblesUseCase,
+    private val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
     private val moveBubblesUseCase: MoveBubblesUseCase,
 ) : BaseViewModel() {
 
@@ -43,6 +43,7 @@ class LabelDetailViewModel @Inject constructor(
             flow = getLabelDetailUseCase(id),
             onSuccess = { label ->
                 val shuffledBubbles = label.bubbles.shuffled().toPresentation()
+
                 _uiState.update {
                     it.copy(
                         label = label.toPresentation().copy(bubbles = shuffledBubbles)
@@ -50,12 +51,7 @@ class LabelDetailViewModel @Inject constructor(
                 }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -117,12 +113,7 @@ class LabelDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(movableLabels = movableLabels) }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -146,12 +137,7 @@ class LabelDetailViewModel @Inject constructor(
                 fetchBubbles(_uiState.value.label.id)
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -164,7 +150,7 @@ class LabelDetailViewModel @Inject constructor(
 
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
-            flow = deleteBubblesUseCase(
+            flow = softDeleteBubblesUseCase(
                 _uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
             onSuccess = {
                 updateEditMode(LabelDetailMode.NONE)
@@ -172,12 +158,7 @@ class LabelDetailViewModel @Inject constructor(
                 fetchBubbles(_uiState.value.label.id)
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -285,12 +266,7 @@ class LabelDetailViewModel @Inject constructor(
                 }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -301,7 +277,7 @@ class LabelDetailViewModel @Inject constructor(
         )
     }
 
-    override fun clearError() {
-        _uiState.update { it.copy(error = null, toastMessage = null) }
+    override fun clearToastMessage() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
 }

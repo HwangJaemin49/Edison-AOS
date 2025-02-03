@@ -40,6 +40,7 @@ import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
+import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.CheckBoxButton
 import com.umc.edison.ui.components.RadioButton
 import com.umc.edison.ui.theme.Gray100
@@ -62,7 +63,7 @@ fun TrashScreen(
     }
 
     BackHandler {
-        if (uiState.mode == BubbleRecoverMode.SELECT) {
+        if (uiState.mode != BubbleRecoverMode.NONE) {
             viewModel.updateBubbleRecoverMode(BubbleRecoverMode.NONE)
         } else {
             navHostController.popBackStack()
@@ -70,7 +71,66 @@ fun TrashScreen(
     }
 
     Scaffold(
-        topBar = {
+        bottomBar = {
+            if (uiState.mode == BubbleRecoverMode.SELECT) {
+                BottomSheetForDelete(
+                    onButtonClick = { viewModel.recoverBubbles() },
+                    onDelete = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.DELETE) },
+                    buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
+                    buttonText = if (uiState.selectedBubbles.size == uiState.bubbles.size) {
+                        "모두 복원"
+                    } else {
+                        "복원"
+                    },
+                )
+            }
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(White000)
+                .padding(innerPadding)
+        ) {
+            TrashContent(viewModel, uiState, navHostController)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TrashContent(
+    viewModel: TrashViewModel,
+    uiState: TrashState,
+    navHostController: NavHostController
+) {
+
+    var onBubbleClick: (BubbleModel) -> Unit = {}
+    var onBubbleLongClick: (BubbleModel) -> Unit = {}
+
+    if (uiState.mode == BubbleRecoverMode.SELECT) {
+        onBubbleClick = { viewModel.toggleBubbleSelection(it) }
+    } else if (uiState.mode == BubbleRecoverMode.NONE) {
+        onBubbleClick = {
+            viewModel.updateBubbleRecoverMode(BubbleRecoverMode.VIEW)
+            viewModel.selectBubble(it)
+        }
+        onBubbleLongClick = {
+            viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT)
+            viewModel.toggleBubbleSelection(it)
+        }
+    }
+
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .wrapContentHeight(),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
             BackButtonTopBar(
                 onBack = { navHostController.popBackStack() },
             ) {
@@ -94,66 +154,9 @@ fun TrashScreen(
                     )
                 }
             }
-        },
-        bottomBar = {
-            if (uiState.mode == BubbleRecoverMode.SELECT) {
-                BottomSheetForDelete(
-                    onButtonClick = { viewModel.recoverBubbles() },
-                    onDelete = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.DELETE) },
-                    buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
-                    buttonText = if (uiState.selectedBubbles.size == uiState.bubbles.size) {
-                        "모두 복원"
-                    } else {
-                        "복원"
-                    },
-                )
-            }
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(White000)
-                .padding(innerPadding)
-        ) {
-            TrashContent(viewModel, uiState)
-        }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TrashContent(
-    viewModel: TrashViewModel,
-    uiState: TrashState,
-) {
+            if (uiState.mode != BubbleRecoverMode.NONE && uiState.mode != BubbleRecoverMode.VIEW) {
 
-    var onBubbleClick: (BubbleModel) -> Unit = {}
-    var onBubbleLongClick: (BubbleModel) -> Unit = {}
-
-    if (uiState.mode == BubbleRecoverMode.SELECT) {
-        onBubbleClick = { viewModel.toggleBubbleSelection(it) }
-    } else if (uiState.mode == BubbleRecoverMode.NONE) {
-        onBubbleClick = { /* TODO: 버블 보는 화면으로 전환 */ }
-        onBubbleLongClick = {
-            viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT)
-            viewModel.toggleBubbleSelection(it)
-        }
-    }
-
-    BaseContent(
-        uiState = uiState,
-        onDismiss = { viewModel.clearError() },
-    ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentHeight()
-                .padding(top = 36.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            if (uiState.mode != BubbleRecoverMode.NONE) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -184,7 +187,7 @@ private fun TrashContent(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = if (uiState.mode == BubbleRecoverMode.NONE) {
+                verticalArrangement = if (uiState.mode == BubbleRecoverMode.NONE || uiState.mode == BubbleRecoverMode.VIEW) {
                     Arrangement.spacedBy(0.dp)
                 } else {
                     Arrangement.spacedBy(8.dp)
@@ -208,6 +211,17 @@ private fun TrashContent(
                 confirmText = "삭제",
                 onDismiss = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT) },
                 onConfirm = { viewModel.deleteBubbles() }
+            )
+        }
+
+        if (uiState.mode == BubbleRecoverMode.VIEW) {
+            Bubble(
+                bubble = uiState.selectedBubbles.first(),
+                onBackScreenClick = {
+                    viewModel.updateBubbleRecoverMode(BubbleRecoverMode.NONE)
+                    viewModel.clearSelection()
+                },
+                onBubbleClick = {}
             )
         }
     }
@@ -247,13 +261,13 @@ private fun TrashItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = bubble.title ?: "제목 없음",
+                text = bubble.title ?: bubble.contentBlocks.firstOrNull()?.content?.take(10) ?: "내용 없음",
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray800,
                 modifier = Modifier.weight(1f)
             )
 
-            if (uiState.mode != BubbleRecoverMode.NONE) {
+            if (uiState.mode != BubbleRecoverMode.NONE && uiState.mode != BubbleRecoverMode.VIEW) {
                 CheckBoxButton(
                     selected = uiState.selectedBubbles.contains(bubble),
                     onClick = { onBubbleClick(bubble) }
@@ -261,7 +275,7 @@ private fun TrashItem(
             }
         }
 
-        if (uiState.mode == BubbleRecoverMode.NONE) {
+        if (uiState.mode == BubbleRecoverMode.NONE || uiState.mode == BubbleRecoverMode.VIEW) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

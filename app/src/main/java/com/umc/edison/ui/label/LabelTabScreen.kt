@@ -56,7 +56,7 @@ fun LabelTabScreen(
     ) { innerPadding ->
         BaseContent(
             uiState = uiState,
-            onDismiss = { viewModel.clearError() },
+            onDismiss = { viewModel.clearToastMessage() },
             modifier = Modifier.padding(innerPadding)
         ) {
             if (uiState.labelEditMode == LabelEditMode.ADD || uiState.labelEditMode == LabelEditMode.EDIT) {

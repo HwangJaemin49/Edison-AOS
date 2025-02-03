@@ -13,9 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -73,7 +71,7 @@ fun LabelDetailScreen(
     ) { innerPadding ->
         BaseContent(
             uiState = uiState,
-            onDismiss = { viewModel.clearError() },
+            onDismiss = { viewModel.clearToastMessage() },
             modifier = Modifier.padding(innerPadding),
         ) {
             var onBubbleClick: (BubbleModel) -> Unit = {}
@@ -123,23 +121,15 @@ fun LabelDetailScreen(
 
             if (uiState.labelDetailMode == LabelDetailMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
                 val bubble = uiState.selectedBubbles.first()
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.5f))
-                        .clickable(onClick = {
-                            viewModel.updateEditMode(LabelDetailMode.NONE)
-                        }),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Bubble(
-                        bubble = bubble,
-                        onClick = {
-                            // TODO: 버블 작성 화면 구현 완료되면 연결
-                            // navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
-                        }
-                    )
-                }
+                Bubble(
+                    bubble = bubble,
+                    onBackScreenClick = {
+                        viewModel.updateEditMode(LabelDetailMode.NONE)
+                    },
+                    onBubbleClick = {
+                        // TODO: 버블 클릭 시 동작 추가
+                    }
+                )
             } else if (uiState.labelDetailMode == LabelDetailMode.MOVE) {
                 BottomSheet(
                     onDismiss = {

@@ -14,6 +14,14 @@ data class UserModel(
             email = "",
         )
     }
+
+    fun toDomain(): User {
+        return User(
+            nickname = nickname,
+            profileImage = profileImage,
+            email = email,
+        )
+    }
 }
 
 fun User.toPresentation(): UserModel {

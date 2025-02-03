@@ -175,6 +175,26 @@ fun BubbleInput(
  */
 @Composable
 fun Bubble(
+    onBackScreenClick: () -> Unit,
+    bubble: BubbleModel,
+    onBubbleClick: (BubbleModel) -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .clickable(onClick = onBackScreenClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Bubble(
+            bubble = bubble,
+            onClick = { onBubbleClick(bubble) }
+        )
+    }
+}
+
+@Composable
+private fun Bubble(
     bubble: BubbleModel,
     onClick: () -> Unit,
 

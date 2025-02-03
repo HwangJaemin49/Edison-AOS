@@ -175,7 +175,8 @@ fun EditDeleteIcons(
 @Composable
 fun RadioButton(
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_radio_on)
     val unselectedIcon = ImageVector.vectorResource(id = R.drawable.ic_radio_off)
@@ -184,14 +185,16 @@ fun RadioButton(
         selected = selected,
         onClick = onClick,
         selectedIcon = selectedIcon,
-        unselectedIcon = unselectedIcon
+        unselectedIcon = unselectedIcon,
+        modifier = modifier
     )
 }
 
 @Composable
 fun CheckBoxButton(
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val selectedIcon = ImageVector.vectorResource(id = R.drawable.ic_check_box_on)
     val unselectedIcon = ImageVector.vectorResource(id = R.drawable.ic_check_box_off)
@@ -200,7 +203,8 @@ fun CheckBoxButton(
         selected = selected,
         onClick = onClick,
         selectedIcon = selectedIcon,
-        unselectedIcon = unselectedIcon
+        unselectedIcon = unselectedIcon,
+        modifier = modifier
     )
 }
 
@@ -209,12 +213,13 @@ private fun IconButton(
     selected: Boolean,
     onClick: () -> Unit,
     selectedIcon: ImageVector,
-    unselectedIcon: ImageVector
+    unselectedIcon: ImageVector,
+    modifier: Modifier = Modifier
 ) {
     Icon(
         imageVector = if (selected) selectedIcon else unselectedIcon,
         contentDescription = null,
-        modifier = Modifier.clickable { onClick() },
+        modifier = modifier.clickable { onClick() },
         tint = Color.Unspecified
     )
 }

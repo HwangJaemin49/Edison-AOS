@@ -11,7 +11,10 @@ data class BubbleEntity(
     val content: String? = null,
     var mainImage: String? = null,
     var labels: List<LabelEntity> = emptyList(),
-    val date: Date,
+    val isDeleted: Boolean = false,
+    val createdAt: Date = Date(),
+    val updatedAt: Date = Date(),
+    val deletedAt: Date? = null
 ) : DataMapper<Bubble> {
     override fun toDomain(): Bubble {
         // Text 타입의 경우 앞에 %<TEXT>와 뒤에 </TEXT>%가 붙어있고
@@ -26,8 +29,17 @@ data class BubbleEntity(
             ContentBlock(type, content, index)
         }?.filterNotNull() ?: emptyList()
 
-        return Bubble(id, title, contentBlocks, mainImage, labels.map { it.toDomain() }, date)
+        return Bubble(id, title, contentBlocks, mainImage, labels.map { it.toDomain() }, updatedAt)
     }
+}
+
+fun BubbleEntity.same(other: BubbleEntity): Boolean {
+    return id == other.id &&
+        title == other.title &&
+        content == other.content &&
+        mainImage == other.mainImage &&
+        labels.map { it.id } == other.labels.map { it.id } &&
+        isDeleted == other.isDeleted
 }
 
 fun Bubble.toData(): BubbleEntity = BubbleEntity(
@@ -38,7 +50,7 @@ fun Bubble.toData(): BubbleEntity = BubbleEntity(
     },
     mainImage = mainImage,
     labels = labels.toData(),
-    date = date
+    updatedAt = date
 )
 
 fun List<Bubble>.toData(): List<BubbleEntity> = map { it.toData() }

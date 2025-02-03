@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
-import com.umc.edison.remote.model.toDate
+import com.umc.edison.remote.model.parseIso8601ToDate
 
 data class GetAllBubblesResponse(
     @SerializedName("bubbleId") val bubbleId: Int,
@@ -14,7 +14,7 @@ data class GetAllBubblesResponse(
     @SerializedName("mainImageUrl") val mainImageUrl: String,
     @SerializedName("labels") val labels: List<LabelResponse>,
     @SerializedName("linkedBubbleId") val linkedBubbleId: Int?,
-    @SerializedName("createdAt") val linkedBubbleTitle: String?,
+    @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String
 ) : RemoteMapper<BubbleEntity> {
 
@@ -37,6 +37,7 @@ data class GetAllBubblesResponse(
         content = content,
         mainImage = mainImageUrl,
         labels = labels.map { it.toData() },
-        date = updatedAt.toDate() ?: throw IllegalArgumentException("updatedAt is null"),
+        createdAt = parseIso8601ToDate(createdAt),
+        updatedAt = parseIso8601ToDate(updatedAt),
     )
 }

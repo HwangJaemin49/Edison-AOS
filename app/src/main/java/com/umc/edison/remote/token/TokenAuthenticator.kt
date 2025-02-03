@@ -3,7 +3,6 @@ package com.umc.edison.remote.token
 import com.google.gson.Gson
 import com.umc.edison.remote.api.RefreshTokenApiService
 import com.umc.edison.remote.model.BaseResponse
-import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
@@ -15,18 +14,21 @@ class TokenAuthenticator @Inject constructor(
     private val refreshTokenApiService: RefreshTokenApiService
 ) : Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
-        val errorBody = response.body?.string()
+        if (responseCount(response) >= 3) return null
+
+        val errorBody = response.peekBody(Long.MAX_VALUE).string()
         val errorResponse = Gson().fromJson(errorBody, BaseResponse::class.java)
 
-        if (errorResponse?.code == "LOGIN4005") {
-            val newToken: String = runBlocking {
-                val refreshToken = tokenManager.loadRefreshToken() ?: return@runBlocking ""
-                refreshTokenApiService.refreshToken("Bearer $refreshToken").data.accessToken
-            }
+        if (errorResponse?.code == "LOGIN4004") {
+            val refreshToken = tokenManager.loadRefreshToken()
 
-            if (newToken.isEmpty()) {
+            if (refreshToken.isNullOrEmpty()) {
+                tokenManager.deleteToken()
                 return null
             }
+
+            val newTokenResponse = refreshTokenApiService.refreshToken("Bearer $refreshToken").execute()
+            val newToken = newTokenResponse.body()?.data?.accessToken ?: return null
 
             tokenManager.setToken(newToken)
 
@@ -35,5 +37,15 @@ class TokenAuthenticator @Inject constructor(
                 .build()
         }
         return null
+    }
+
+    private fun responseCount(response: Response): Int {
+        var result = 1
+        var priorResponse = response.priorResponse
+        while (priorResponse != null) {
+            result++
+            priorResponse = priorResponse.priorResponse
+        }
+        return result
     }
 }

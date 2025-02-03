@@ -5,10 +5,7 @@ import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import com.umc.edison.remote.model.parseIso8601ToDate
 
 data class GetLabelDetailResponse(
     @SerializedName("labelId") val id: Int,
@@ -42,7 +39,8 @@ data class GetBubbleResponse(
         content = content,
         mainImage = mainImageUrl,
         labels = labels.map { it.toData() },
-        date = parseIso8601ToDate(updatedAt)
+        createdAt = parseIso8601ToDate(createdAt),
+        updatedAt = parseIso8601ToDate(updatedAt)
     )
 
     data class GetLabelResponse(
@@ -56,18 +54,5 @@ data class GetBubbleResponse(
             color = Color(color),
             bubbles = emptyList()
         )
-    }
-
-    companion object {
-        private fun parseIso8601ToDate(isoDateTime: String): Date {
-            return try {
-                val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
-                simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-                simpleDateFormat.parse(isoDateTime)!!
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Date()
-            }
-        }
     }
 }
