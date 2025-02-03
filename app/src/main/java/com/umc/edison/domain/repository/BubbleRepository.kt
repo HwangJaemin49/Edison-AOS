@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface BubbleRepository {
     fun getAllBubbles(): Flow<DataResource<List<Bubble>>>
     fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
-    fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
+    fun softDeleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
     fun updateBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
 
     fun getDeletedBubbles(): Flow<DataResource<List<Bubble>>>

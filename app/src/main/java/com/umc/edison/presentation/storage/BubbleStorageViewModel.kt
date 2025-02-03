@@ -2,7 +2,7 @@ package com.umc.edison.presentation.storage
 
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class BubbleStorageViewModel @Inject constructor(
     private val getAllBubblesUseCase: GetAllBubblesUseCase,
     private val addBubblesUseCase: AddBubblesUseCase,
-    private val deleteBubblesUseCase: DeleteBubblesUseCase
+    private val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
@@ -84,7 +84,7 @@ class BubbleStorageViewModel @Inject constructor(
 
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
-            flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
+            flow = softDeleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
             onSuccess = {
                 updateEditMode(BubbleStorageMode.NONE)
                 showBottomNav(true)
