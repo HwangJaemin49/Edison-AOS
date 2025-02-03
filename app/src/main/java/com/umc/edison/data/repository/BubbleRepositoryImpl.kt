@@ -38,6 +38,10 @@ class BubbleRepositoryImpl @Inject constructor(
         localDataAction = { bubbleLocalDataSource.getTrashedBubbles() },
         saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
     )
+    
+    override fun getBubbleDetail(bubbleId: Int): Flow<DataResource<Bubble>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.getBubbleDetail(bubbleId) }
+    )
 
     override fun recoverBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
         dataAction = { bubbleLocalDataSource.recoverBubbles(bubbles.toData()) }

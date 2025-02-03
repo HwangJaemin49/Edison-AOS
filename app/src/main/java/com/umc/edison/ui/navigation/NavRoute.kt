@@ -4,10 +4,17 @@ sealed class NavRoute(val route: String) {
     data object MyEdison : NavRoute("my-edison")
     data object Space : NavRoute("space")
     data object ArtBoard : NavRoute("art-board")
+    data object ArtBoardDetail : NavRoute("art-board/art-letter") // TODO: 경로 art-board/detail/${id} 형식으로 수정
     data object MyPage : NavRoute("my-page")
 
     data object BubbleStorage: NavRoute("my-edison/bubble-storage")
     data object SpaceLabel : NavRoute("space/labels")
+
+    data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/labels/${id}") {
+        companion object {
+            fun createRoute(labelId: Int): String = "${SpaceLabel.route}/labels/${labelId}"
+        }
+    }
 
     data object ProfileEdit: NavRoute("my-page/profile-edit")
     data object Menu : NavRoute("my-page/menu")
@@ -16,12 +23,6 @@ sealed class NavRoute(val route: String) {
 
     data object ScrapBoard : NavRoute("my-page/scrap-board")
     data object ScrapBoardDetail : NavRoute("my-page/scrap-board-detail")
-
-    data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/${id}") {
-        companion object {
-            fun createRoute(labelId: Int): String = "${SpaceLabel.route}/${labelId}"
-        }
-    }
 
     data class BubbleEdit(val id: Int = 0) : NavRoute("${MyEdison.route}/bubbles/${id}") {
         companion object {

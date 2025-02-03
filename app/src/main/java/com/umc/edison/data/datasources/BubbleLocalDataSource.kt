@@ -20,6 +20,7 @@ interface BubbleLocalDataSource {
     suspend fun markAsSynced(bubble: BubbleEntity)
 
     suspend fun getTrashedBubbles(): List<BubbleEntity>
+    suspend fun getBubbleDetail(bubbleId: Int): BubbleEntity
 
     suspend fun recoverBubbles(bubbles: List<BubbleEntity>)
     suspend fun recoverBubble(bubble: BubbleEntity)

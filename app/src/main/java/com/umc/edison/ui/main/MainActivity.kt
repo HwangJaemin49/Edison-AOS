@@ -5,10 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,10 +18,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.umc.edison.presentation.sync.SyncTrigger
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.navigation.BottomNavigation
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.navigation.NavigationGraph
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray800
@@ -32,6 +37,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         syncTrigger = SyncTrigger(this)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             EdisonTheme {
                 MainScreen()
@@ -59,7 +65,15 @@ fun MainScreen() {
                     onBubbleClick = { showInputBubble = !showInputBubble }
                 )
             }
-        }
+        },
+
+//        contentWindowInsets = WindowInsets(
+//            left = 0.dp,
+//            top = 25.dp,
+//            right = 0.dp,
+//            bottom = 0.dp
+//        )
+
     ) {
         Box(Modifier.padding(it)) {
             NavigationGraph(navController, updateShowBottomNav = { flag -> showBottomNav = flag })
@@ -72,7 +86,7 @@ fun MainScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     BubbleInput(
-                        onClick = { },
+                        onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0))},
                         onSwipeUp = { }
                     )
                 }
