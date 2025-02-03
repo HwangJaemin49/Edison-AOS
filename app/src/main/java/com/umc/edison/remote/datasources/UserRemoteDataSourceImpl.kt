@@ -102,7 +102,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
         return UserEntity(
             email = "edison@gmail.com",
             nickname = "닉네임",
-            profileImage = ""
+            profileImage = null,
         )
     }
 

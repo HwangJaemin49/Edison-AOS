@@ -63,7 +63,7 @@ class MyPageViewModel @Inject constructor(
         collectDataResource(
             flow = getProfileInfoUseCase(),
             onSuccess = { user ->
-//                _uiState.update { it.copy(user = user.toPresentation()) }
+                _uiState.update { it.copy(user = user.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update {
