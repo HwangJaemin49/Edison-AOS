@@ -1,6 +1,5 @@
 package com.umc.edison.local.datasources
 
-import android.util.Log
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.local.model.BubbleLocal
@@ -50,14 +49,17 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         return bubble
     }
 
-    override suspend fun deleteBubbles(bubbles: List<BubbleEntity>) {
+    override suspend fun moveBubblesToTrash(bubbles: List<BubbleEntity>) {
         bubbles.map { bubble ->
-            deleteBubble(bubble)
+            moveBubbleToTrash(bubble)
         }
     }
 
-    override suspend fun deleteBubble(bubble: BubbleEntity) {
-        softDelete(bubble.toLocal(), tableName)
+    override suspend fun moveBubbleToTrash(bubble: BubbleEntity) {
+        val localBubble = bubble.toLocal()
+        localBubble.isTrashed = true
+
+        update(localBubble, tableName)
     }
 
     override suspend fun updateBubbles(bubbles: List<BubbleEntity>) {
@@ -72,7 +74,6 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         bubbleLabelDao.deleteByBubbleId(bubble.id)
         addBubbleLabel(bubble)
     }
-
 
     override suspend fun addBubbles(bubbles: List<BubbleEntity>) {
         bubbles.map { bubble ->
@@ -95,7 +96,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getDeletedBubbles(): List<BubbleEntity> {
-        val deletedBubbles = bubbleDao.getDeletedBubbles().map { it.toData() }
+        val deletedBubbles = bubbleDao.getTrashedBubbles().map { it.toData() }
 
         deletedBubbles.map { bubble ->
             bubble.labels = labelDao.getAllLabelsByBubbleId(bubble.id).map { it.toData() }
@@ -111,9 +112,10 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun recoverBubble(bubble: BubbleEntity) {
-        val id = recover(bubble.toLocal(), tableName)
+        val localBubble = bubble.toLocal()
+        localBubble.isTrashed = false
 
-        Log.i("BubbleLocalDataSourceImpl", "recoverBubble: $id, bubble: $bubble")
+        update(localBubble, tableName)
 
         addBubbleLabel(bubble)
     }

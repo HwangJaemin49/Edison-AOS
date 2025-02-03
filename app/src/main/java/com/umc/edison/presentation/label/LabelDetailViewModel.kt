@@ -43,6 +43,7 @@ class LabelDetailViewModel @Inject constructor(
             flow = getLabelDetailUseCase(id),
             onSuccess = { label ->
                 val shuffledBubbles = label.bubbles.shuffled().toPresentation()
+
                 _uiState.update {
                     it.copy(
                         label = label.toPresentation().copy(bubbles = shuffledBubbles)
