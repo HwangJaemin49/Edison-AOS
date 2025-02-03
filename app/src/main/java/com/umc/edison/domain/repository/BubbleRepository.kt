@@ -10,6 +10,8 @@ interface BubbleRepository {
     fun softDeleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
     fun updateBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
 
-    fun getDeletedBubbles(): Flow<DataResource<List<Bubble>>>
+    fun getTrashedBubbles(): Flow<DataResource<List<Bubble>>>
     fun recoverBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
+
+    fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
 }

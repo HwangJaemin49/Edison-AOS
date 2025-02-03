@@ -26,7 +26,10 @@ data class BubbleLocal(
         content = content,
         mainImage = mainImage,
         labels = emptyList(),
-        date = updatedAt
+        isDeleted = isDeleted,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        deletedAt = deletedAt,
     )
 }
 

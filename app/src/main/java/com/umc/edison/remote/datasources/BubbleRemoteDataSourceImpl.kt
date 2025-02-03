@@ -17,14 +17,14 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
         return response.map { it.toData() }
     }
 
-    override suspend fun getDeletedBubbles(): List<BubbleEntity> {
+    override suspend fun getTrashedBubbles(): List<BubbleEntity> {
         val response: List<GetDeletedBubbleListResponse>
             = myPageApiService.getDeletedBubbles().data
 
         return response.map { it.toData() }
     }
 
-    override suspend fun syncBubble(bubble: BubbleEntity) {
+    override suspend fun syncBubble(bubble: BubbleEntity): BubbleEntity {
         TODO("Not yet implemented")
     }
 }

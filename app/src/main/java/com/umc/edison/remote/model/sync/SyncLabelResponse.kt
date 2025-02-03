@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
-import com.umc.edison.remote.model.toDate
+import com.umc.edison.remote.model.parseIso8601ToDate
 
 data class SyncLabelResponse(
     @SerializedName("labelId") val id: Int,
@@ -22,9 +22,9 @@ data class SyncLabelResponse(
             color = Color(color),
             bubbles = emptyList(),
             isDeleted = isDeleted,
-            createdAt = createdAt.toDate() ?: throw IllegalArgumentException("createdAt is null"),
-            updatedAt = updatedAt.toDate() ?: throw IllegalArgumentException("updatedAt is null"),
-            deletedAt = deletedAt?.toDate()
+            createdAt = parseIso8601ToDate(createdAt),
+            updatedAt = parseIso8601ToDate(updatedAt),
+            deletedAt = deletedAt?.let { parseIso8601ToDate(it) }
         )
     }
 }

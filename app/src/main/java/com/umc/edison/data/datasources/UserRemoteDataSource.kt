@@ -1,7 +1,6 @@
 package com.umc.edison.data.datasources
 
 import com.umc.edison.data.model.ArtLetterCategoryEntity
-import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.IdentityEntity
 import com.umc.edison.data.model.InterestEntity
 import com.umc.edison.data.model.UserEntity
@@ -19,8 +18,6 @@ interface UserRemoteDataSource {
     suspend fun updateInterest(interest: InterestEntity)
 
     suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity
-
-    suspend fun getDeletedBubbles(): List<BubbleEntity>
 
     suspend fun logOut()
     suspend fun deleteAccount()

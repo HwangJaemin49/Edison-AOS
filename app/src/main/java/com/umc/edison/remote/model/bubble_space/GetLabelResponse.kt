@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
-import java.util.Date
 
 data class GetLabelResponse(
     @SerializedName("labelId")
@@ -21,6 +20,6 @@ data class GetLabelResponse(
         id = id,
         name = name,
         color = Color(color),
-        bubbles = List(bubbleCnt) { BubbleEntity(id = 0, date = Date(), labels = emptyList()) }
+        bubbles = List(bubbleCnt) { BubbleEntity(id = 0, labels = emptyList()) }
     )
 }

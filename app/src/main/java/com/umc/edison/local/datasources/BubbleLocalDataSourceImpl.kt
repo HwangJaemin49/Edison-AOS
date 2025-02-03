@@ -95,7 +95,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         markAsSynced(tableName, bubble.id)
     }
 
-    override suspend fun getDeletedBubbles(): List<BubbleEntity> {
+    override suspend fun getTrashedBubbles(): List<BubbleEntity> {
         val deletedBubbles = bubbleDao.getTrashedBubbles().map { it.toData() }
 
         deletedBubbles.map { bubble ->
@@ -118,6 +118,22 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         update(localBubble, tableName)
 
         addBubbleLabel(bubble)
+    }
+
+    override suspend fun softDeleteBubbles(bubbles: List<BubbleEntity>) {
+        bubbles.map { bubble ->
+            softDeleteBubble(bubble)
+        }
+    }
+
+    override suspend fun softDeleteBubble(bubble: BubbleEntity) {
+        softDelete(bubble.toLocal(), tableName)
+
+        bubbleLabelDao.deleteByBubbleId(bubble.id)
+    }
+
+    override suspend fun deleteBubble(bubble: BubbleEntity) {
+        bubbleDao.delete(bubble.toLocal())
     }
 
     private suspend fun addBubbleLabel(bubble: BubbleEntity) {

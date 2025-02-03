@@ -2,7 +2,6 @@ package com.umc.edison.remote.datasources
 
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.ArtLetterCategoryEntity
-import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.IdentityCategoryMapper
 import com.umc.edison.data.model.IdentityEntity
 import com.umc.edison.data.model.InterestCategoryMapper
@@ -145,10 +144,6 @@ class UserRemoteDataSourceImpl @Inject constructor(
             },
             options = options.map { it.toData() }
         )
-    }
-
-    override suspend fun getDeletedBubbles(): List<BubbleEntity> {
-        return myPageApiService.getDeletedBubbles().data.map { it.toData() }
     }
 
     override suspend fun logOut() {

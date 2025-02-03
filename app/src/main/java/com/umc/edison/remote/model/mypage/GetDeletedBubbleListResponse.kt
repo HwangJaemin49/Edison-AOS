@@ -52,7 +52,7 @@ data class GetDeletedBubbleListResponse(
             title = title,
             content = content,
             mainImage = mainImageUrl,
-            date = calendar.time
+            updatedAt = calendar.time
         )
     }
 }

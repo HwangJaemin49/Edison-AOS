@@ -3,7 +3,6 @@ package com.umc.edison.data.repository
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
-import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Bubble
@@ -14,7 +13,6 @@ import javax.inject.Inject
 class BubbleRepositoryImpl @Inject constructor(
     private val bubbleLocalDataSource: BubbleLocalDataSource,
     private val bubbleRemoteDataSource: BubbleRemoteDataSource,
-    private val userRemoteDataSource: UserRemoteDataSource
 ) : BubbleRepository {
 
     override fun getAllBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
@@ -35,13 +33,17 @@ class BubbleRepositoryImpl @Inject constructor(
         dataAction = { bubbleLocalDataSource.updateBubbles(bubbles.toData()) }
     )
 
-    override fun getDeletedBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
-        remoteDataAction = { userRemoteDataSource.getDeletedBubbles() },
-        localDataAction = { bubbleLocalDataSource.getDeletedBubbles() },
+    override fun getTrashedBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
+        remoteDataAction = { bubbleRemoteDataSource.getTrashedBubbles() },
+        localDataAction = { bubbleLocalDataSource.getTrashedBubbles() },
         saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
     )
 
     override fun recoverBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
         dataAction = { bubbleLocalDataSource.recoverBubbles(bubbles.toData()) }
+    )
+
+    override fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.softDeleteBubbles(bubbles.toData()) }
     )
 }
