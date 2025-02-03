@@ -129,4 +129,19 @@ class BubbleLocalDataSourceImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getBubbleDetail(bubbleId: Int): BubbleEntity {
+        // bubbleId로 Bubble 데이터를 가져옴
+        val localBubble = bubbleDao.getBubbleById(bubbleId) ?: throw Exception("Bubble not found")
+
+        // Bubble 데이터를 도메인 계층 데이터로 변환
+        val bubble = localBubble.toData()
+
+        // Bubble에 연결된 Label 데이터를 추가
+        bubble.labels = labelDao.getAllLabelsByBubbleId(bubbleId).map { it.toData() }
+
+        return bubble
+    }
+
+
 }

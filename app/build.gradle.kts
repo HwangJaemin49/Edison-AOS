@@ -88,6 +88,8 @@ dependencies {
     implementation(libs.compose.ui.viewbinding)
 
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
@@ -106,9 +108,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
-
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc09")
     implementation(libs.androidx.work)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -35,6 +35,10 @@ class BubbleRepositoryImpl @Inject constructor(
         dataAction = { bubbleLocalDataSource.updateBubbles(bubbles.toData()) }
     )
 
+    override fun getBubbleDetail(bubbleId: Int): Flow<DataResource<Bubble>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.getBubbleDetail(bubbleId) }
+    )
+
     override fun getDeletedBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
         remoteDataAction = { userRemoteDataSource.getDeletedBubbles() },
         localDataAction = { bubbleLocalDataSource.getDeletedBubbles() },

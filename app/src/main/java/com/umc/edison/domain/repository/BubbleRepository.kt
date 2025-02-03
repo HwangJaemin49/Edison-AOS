@@ -9,6 +9,7 @@ interface BubbleRepository {
     fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
     fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
     fun updateBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
+    fun getBubbleDetail(bubbleId: Int): Flow<DataResource<Bubble>>
 
     fun getDeletedBubbles(): Flow<DataResource<List<Bubble>>>
     fun recoverBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>

@@ -13,6 +13,7 @@ import com.umc.edison.ui.my_edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.label.LabelDetailScreen
+import com.umc.edison.ui.my_edison.BubbleInputScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.IdentityEditScreen
@@ -96,6 +97,21 @@ fun NavigationGraph(
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
             InterestEditScreen(navHostController, updateShowBottomNav)
+        }
+
+        composable(
+            route = "${NavRoute.SpaceLabel.route}/labels/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) {
+            LabelDetailScreen(navHostController, updateShowBottomNav)
+        }
+
+        composable(
+            route = "${NavRoute.MyEdison.route}/bubbles/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) {
+            BubbleInputScreen(navHostController,updateShowBottomNav)
+
         }
     }
 }
