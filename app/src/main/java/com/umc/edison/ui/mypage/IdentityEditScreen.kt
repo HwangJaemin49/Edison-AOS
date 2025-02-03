@@ -74,7 +74,7 @@ private fun IdentityContent(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearError() },
+        onDismiss = { viewModel.clearToastMessage() },
     ) {
         Column(
             modifier = Modifier

@@ -26,15 +26,13 @@ class SyncRepositoryImpl @Inject constructor(
                 try {
                     val syncedLabel = labelRemoteDataSource.syncLabel(label)
 
-                    if (syncedLabel.same(label)) {
+                    if (syncedLabel.isDeleted) {
+                        labelLocalDataSource.deleteLabel(label)
+                    } else if (syncedLabel.same(label)) {
                         Log.d("SyncRepositoryImpl", "Label with id: ${label.id} is synced")
                         labelLocalDataSource.markAsSynced(label)
-
-                        if (syncedLabel.isDeleted) {
-                            labelLocalDataSource.deleteLabel(label)
-                        }
                     } else {
-                        Log.e("SyncRepositoryImpl", "Label with id: ${label.id} is not synced")
+                        throw Exception("Label with id: ${label.id} is not synced")
                     }
                 } catch (e: Exception) {
                     Log.e("SyncRepositoryImpl", "Failed to sync label with id: ${label.id}", e)
@@ -50,8 +48,18 @@ class SyncRepositoryImpl @Inject constructor(
                 bubbleLocalDataSource.getUnSyncedBubbles()
             unSyncedLocalBubbles.forEach { bubble ->
                 try {
-                    bubbleRemoteDataSource.syncBubble(bubble)
-                    bubbleLocalDataSource.markAsSynced(bubble)
+                    val syncedBubble = bubbleRemoteDataSource.syncBubble(bubble)
+
+                    if (syncedBubble.isDeleted) {
+                        Log.d("SyncRepositoryImpl", "Bubble with id: ${bubble.id} is deleted")
+                        bubbleLocalDataSource.deleteBubble(bubble)
+                    } else if (syncedBubble.same(bubble)) {
+                        Log.d("SyncRepositoryImpl", "Bubble with id: ${bubble.id} is synced")
+                        bubbleLocalDataSource.markAsSynced(bubble)
+                    } else {
+                        throw Exception("Bubble with id: ${bubble.id} is not synced")
+                    }
+
                 } catch (e: Exception) {
                     Log.e("SyncRepositoryImpl", "Failed to sync bubble with id: ${bubble.id}", e)
                     throw e

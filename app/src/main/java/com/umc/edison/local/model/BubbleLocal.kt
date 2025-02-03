@@ -13,6 +13,7 @@ data class BubbleLocal(
     val content: String?,
     @ColumnInfo(name = "main_image") val mainImage: String?,
     @ColumnInfo(name = "is_synced") override var isSynced: Boolean = false,
+    @ColumnInfo(name = "is_trashed") var isTrashed: Boolean = false,
     @ColumnInfo(name = "is_deleted") override var isDeleted: Boolean = false,
     @ColumnInfo(name = "created_at") override var createdAt: Date = Date(),
     @ColumnInfo(name = "updated_at") override var updatedAt: Date = Date(),
@@ -25,7 +26,10 @@ data class BubbleLocal(
         content = content,
         mainImage = mainImage,
         labels = emptyList(),
-        date = updatedAt
+        isDeleted = isDeleted,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        deletedAt = deletedAt,
     )
 }
 

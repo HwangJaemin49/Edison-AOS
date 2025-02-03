@@ -38,7 +38,7 @@ class AccountManagementViewModel @Inject constructor(
                 }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error, toastMessage = error.message) }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -56,7 +56,7 @@ class AccountManagementViewModel @Inject constructor(
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error, toastMessage = error.message) }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -79,16 +79,26 @@ class AccountManagementViewModel @Inject constructor(
         collectDataResource(
             flow = logOutUseCase(),
             onSuccess = {
-                _uiState.update { it.copy(isLoggedIn = false, user = null) }
+                _uiState.update { it.copy(
+                    isLoggedIn = false,
+                    user = null,
+                    toastMessage = "로그아웃 되었습니다."
+                ) }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error, toastMessage = error.message) }
+                _uiState.update { it.copy(
+                    error = error,
+                    toastMessage = "로그아웃에 실패했습니다."
+                ) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    mode = AccountManagementMode.NONE
+                ) }
             }
         )
     }
@@ -97,22 +107,31 @@ class AccountManagementViewModel @Inject constructor(
         collectDataResource(
             flow = deleteAccountUseCase(),
             onSuccess = {
-                _uiState.update { it.copy(isLoggedIn = false, user = null) }
+                _uiState.update { it.copy(
+                    isLoggedIn = false,
+                    user = null,
+                    toastMessage = "회원 탈퇴 되었습니다."
+                ) }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error, toastMessage = error.message) }
+                _uiState.update { it.copy(
+                    error = error,
+                    toastMessage = "회원 탈퇴에 실패했습니다."
+                ) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    mode = AccountManagementMode.NONE
+                ) }
             }
         )
     }
 
-    override fun clearError() {
-        _uiState.update { it.copy(error = null, toastMessage = null) }
+    override fun clearToastMessage() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
-
 }

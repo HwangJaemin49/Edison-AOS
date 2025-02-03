@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.mypage
 
-import com.umc.edison.domain.usecase.mypage.GetDeletedBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
+import com.umc.edison.domain.usecase.mypage.GetTrashedBubblesUseCase
 import com.umc.edison.domain.usecase.mypage.RecoverBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
@@ -13,25 +14,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TrashViewModel @Inject constructor(
-    private val getDeletedBubblesUseCase: GetDeletedBubblesUseCase,
+    private val getTrashedBubblesUseCase: GetTrashedBubblesUseCase,
     private val recoverBubblesUseCase: RecoverBubblesUseCase,
+    private val deleteBubblesUseCase: DeleteBubblesUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(TrashState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     fun fetchDeletedBubbles() {
         collectDataResource(
-            flow = getDeletedBubblesUseCase(),
+            flow = getTrashedBubblesUseCase(),
             onSuccess = { bubbles ->
+                bubbles.sortedByDescending { it.date }
                 _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -63,8 +61,36 @@ class TrashViewModel @Inject constructor(
         }
     }
 
+    fun clearSelection() {
+        _uiState.update { it.copy(selectedBubbles = emptyList()) }
+    }
+
+    fun selectBubble(bubble: BubbleModel) {
+        _uiState.update { it.copy(selectedBubbles = listOf(bubble)) }
+    }
+
     fun deleteBubbles() {
-        // TODO: 영구 삭제 기능 구현
+        collectDataResource(
+            flow = deleteBubblesUseCase(uiState.value.selectedBubbles.map { it.toDomain() }),
+            onSuccess = {
+                _uiState.update {
+                    it.copy(
+                        toastMessage = "버블이 삭제되었습니다.",
+                        mode = BubbleRecoverMode.NONE,
+                    )
+                }
+                fetchDeletedBubbles()
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
     }
 
     fun recoverBubbles() {
@@ -80,12 +106,7 @@ class TrashViewModel @Inject constructor(
                 fetchDeletedBubbles()
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -96,8 +117,8 @@ class TrashViewModel @Inject constructor(
         )
     }
 
-    override fun clearError() {
-        _uiState.update { it.copy(error = null, toastMessage = null) }
+    override fun clearToastMessage() {
+        _uiState.update { it.copy(toastMessage = null) }
     }
 
 }

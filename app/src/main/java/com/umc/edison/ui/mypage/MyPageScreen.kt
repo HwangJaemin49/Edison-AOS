@@ -76,7 +76,7 @@ fun MyPageScreen(
     ) { innerPadding ->
         BaseContent(
             uiState = uiState,
-            onDismiss = { viewModel.clearError() },
+            onDismiss = { viewModel.clearToastMessage() },
             modifier = Modifier.padding(innerPadding)
         ) {
             Box(

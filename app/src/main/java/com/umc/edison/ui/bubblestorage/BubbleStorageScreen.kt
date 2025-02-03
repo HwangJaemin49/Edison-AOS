@@ -87,7 +87,7 @@ fun BubbleStorageScreen(
     ) { innerPadding ->
         BaseContent(
             uiState = uiState,
-            onDismiss = { viewModel.clearError() },
+            onDismiss = { viewModel.clearToastMessage() },
             modifier = Modifier.padding(innerPadding),
         ) {
             var onBubbleClick: (BubbleModel) -> Unit = {}
@@ -150,10 +150,13 @@ fun BubbleStorageScreen(
                 ) {
                     Bubble(
                         bubble = bubble,
-                        onClick = {
+                        onBubbleClick = {
                             // TODO: 버블 작성 화면 구현 완료되면 연결
                             // navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
-                        }
+                        },
+                        onBackScreenClick = {
+                            viewModel.updateEditMode(BubbleStorageMode.NONE)
+                        },
                     )
                 }
             } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {

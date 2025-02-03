@@ -3,7 +3,7 @@ package com.umc.edison.presentation.storage
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
@@ -25,7 +25,7 @@ class BubbleStorageViewModel @Inject constructor(
     private val getLabelDetailUseCase: GetLabelDetailUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     private val getAllBubblesUseCase: GetAllBubblesUseCase,
-    private val deleteBubblesUseCase: DeleteBubblesUseCase,
+    private val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
     private val moveBubblesUseCase: MoveBubblesUseCase,
     private val addBubblesUseCase: AddBubblesUseCase
 ) : BaseViewModel() {
@@ -131,7 +131,7 @@ class BubbleStorageViewModel @Inject constructor(
 
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
-            flow = deleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
+            flow = softDeleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
             onSuccess = {
                 updateEditMode(BubbleStorageMode.NONE)
                 showBottomNav(true)
@@ -328,8 +328,8 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
-    override fun clearError() {
-        _uiState.update { it.copy(error = null) }
+    override fun clearToastMessage() {
+        TODO("Not yet implemented")
     }
 
 }

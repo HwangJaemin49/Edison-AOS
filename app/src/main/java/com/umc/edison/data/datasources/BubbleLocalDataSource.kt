@@ -10,8 +10,8 @@ interface BubbleLocalDataSource {
     suspend fun getBubblesByLabel(labelId: Int): List<BubbleEntity>
     suspend fun getBubble(bubbleId: Int): BubbleEntity
 
-    suspend fun deleteBubbles(bubbles: List<BubbleEntity>)
-    suspend fun deleteBubble(bubble: BubbleEntity)
+    suspend fun moveBubblesToTrash(bubbles: List<BubbleEntity>)
+    suspend fun moveBubbleToTrash(bubble: BubbleEntity)
 
     suspend fun updateBubbles(bubbles: List<BubbleEntity>)
     suspend fun updateBubble(bubble: BubbleEntity)
@@ -19,8 +19,14 @@ interface BubbleLocalDataSource {
     suspend fun getUnSyncedBubbles(): List<BubbleEntity>
     suspend fun markAsSynced(bubble: BubbleEntity)
 
-    suspend fun getDeletedBubbles(): List<BubbleEntity>
+    suspend fun getTrashedBubbles(): List<BubbleEntity>
+    suspend fun getBubbleDetail(bubbleId: Int): BubbleEntity
 
     suspend fun recoverBubbles(bubbles: List<BubbleEntity>)
     suspend fun recoverBubble(bubble: BubbleEntity)
+
+    suspend fun softDeleteBubbles(bubbles: List<BubbleEntity>)
+    suspend fun softDeleteBubble(bubble: BubbleEntity)
+
+    suspend fun deleteBubble(bubble: BubbleEntity)
 }

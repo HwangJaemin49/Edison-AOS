@@ -16,10 +16,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.umc.edison.presentation.sync.SyncTrigger
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.navigation.BottomNavigation
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.navigation.NavigationGraph
 import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray800
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         syncTrigger = SyncTrigger(this)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             EdisonTheme {
                 MainScreen()
@@ -59,7 +62,7 @@ fun MainScreen() {
                     onBubbleClick = { showInputBubble = !showInputBubble }
                 )
             }
-        }
+        },
     ) {
         Box(Modifier.padding(it)) {
             NavigationGraph(navController, updateShowBottomNav = { flag -> showBottomNav = flag })
@@ -72,7 +75,7 @@ fun MainScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     BubbleInput(
-                        onClick = { },
+                        onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0))},
                         onSwipeUp = { }
                     )
                 }
