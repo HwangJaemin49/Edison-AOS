@@ -1,4 +1,4 @@
-package com.umc.edison.presentation.my_edison
+package com.umc.edison.presentation.edison
 
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType

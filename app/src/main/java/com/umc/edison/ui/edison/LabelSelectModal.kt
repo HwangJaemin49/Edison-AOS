@@ -1,4 +1,4 @@
-package com.umc.edison.ui.my_edison
+package com.umc.edison.ui.edison
 
 import android.widget.Toast
 import androidx.compose.foundation.background

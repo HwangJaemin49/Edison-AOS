@@ -1,4 +1,4 @@
-package com.umc.edison.ui.my_edison
+package com.umc.edison.ui.edison
 
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -49,7 +49,7 @@ import com.umc.edison.R
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.presentation.my_edison.BubbleInputViewModel
+import com.umc.edison.presentation.edison.BubbleInputViewModel
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BubbleDoor
 import com.umc.edison.ui.components.LabelModalContent

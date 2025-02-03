@@ -1,4 +1,4 @@
-package com.umc.edison.ui.my_edison
+package com.umc.edison.ui.edison
 
 
 import androidx.compose.foundation.Image

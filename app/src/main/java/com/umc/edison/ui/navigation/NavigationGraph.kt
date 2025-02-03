@@ -9,10 +9,10 @@ import androidx.navigation.navArgument
 import com.umc.edison.ui.artboard.ArtBoardScreen
 import com.umc.edison.ui.artboard.ArtBoardDetailScreen
 import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
-import com.umc.edison.ui.my_edison.MyEdisonScreen
+import com.umc.edison.ui.edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
-import com.umc.edison.ui.my_edison.BubbleInputScreen
+import com.umc.edison.ui.edison.BubbleInputScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.IdentityEditScreen
