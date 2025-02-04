@@ -160,6 +160,9 @@ fun BubbleStorageScreen(
                         onBackScreenClick = {
                             viewModel.updateEditMode(BubbleStorageMode.NONE)
                         },
+                        onLinkedBubbleClicked = { linkedBubble ->
+                            // TODO: 연결된 버블 클릭 시 동작 구현
+                        }
                     )
                 }
             } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {

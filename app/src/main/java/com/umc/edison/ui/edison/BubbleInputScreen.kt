@@ -113,6 +113,9 @@ fun BubbleInputScreen(
                     },
                     onCameraOpen = {
                         viewModel.updateCameraOpen(true)
+                    },
+                    onBackLinkClick = { bubble ->
+                        viewModel.addBackLink(bubble)
                     }
                 )
             }

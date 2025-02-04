@@ -148,7 +148,7 @@ class BubbleInputViewModel @Inject constructor(
             return
         }
 
-        if (iconType == IconType.LINK || _uiState.value.selectedIcon == IconType.LINK) {
+        if (iconType == IconType.LINK && _uiState.value.selectedIcon == IconType.LINK) {
             _uiState.update { it.copy(selectedIcon = IconType.NONE) }
             return
         }
@@ -338,7 +338,7 @@ class BubbleInputViewModel @Inject constructor(
         )
     }
 
-    fun checkCanSave() {
+    private fun checkCanSave() {
         var canSave = true
 
         val bubble = _uiState.value.bubble
@@ -409,6 +409,20 @@ class BubbleInputViewModel @Inject constructor(
 
     fun updateCameraOpen(isOpen: Boolean) {
         _uiState.update { it.copy(isCameraOpen = isOpen) }
+    }
+
+    fun addBackLink(bubble: BubbleModel) {
+        if (_uiState.value.bubble.backLinks.map { it.id }.contains(bubble.id)) {
+            return
+        }
+
+        _uiState.update {
+            it.copy(
+                bubble = it.bubble.copy(
+                    backLinks = it.bubble.backLinks + bubble
+                )
+            )
+        }
     }
 
     private fun saveImageToInternalStorage(context: Context, uri: Uri): Uri {

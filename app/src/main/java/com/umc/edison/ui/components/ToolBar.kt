@@ -20,7 +20,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
 import com.umc.edison.R
+import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.edison.BubbleInputState
+import com.umc.edison.presentation.edison.parseHtml
+import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray600
@@ -34,7 +37,8 @@ fun Toolbar(
     onTextStylesClicked: (TextStyle) -> Unit,
     onListStyleClicked: (ListStyle) -> Unit,
     onGalleryOpen: () -> Unit,
-    onCameraOpen: () -> Unit
+    onCameraOpen: () -> Unit,
+    onBackLinkClick: (BubbleModel) -> Unit
 ) {
     when (uiState.selectedIcon) {
         IconType.TEXT -> {
@@ -198,9 +202,17 @@ fun Toolbar(
 
                     if (uiState.selectedIcon == IconType.LINK) {
                         LinkPopUp(
-                            backLink = { /* Handle Back Link */ },
+                            backLink = { onIconClicked(IconType.BACK_LINK) },
                             linkBubble = { /* Handle Link Bubble */ },
                             onDismiss = { onIconClicked(IconType.NONE) }
+                        )
+                    }
+
+                    if (uiState.selectedIcon == IconType.BACK_LINK) {
+                        BackLinkPopUp(
+                            onDismiss = { onIconClicked(IconType.NONE) },
+                            bubbles = uiState.bubbles,
+                            onBackLinkClick = { bubble -> onBackLinkClick(bubble) }
                         )
                     }
                 }
@@ -218,7 +230,7 @@ fun Toolbar(
 }
 
 @Composable
-fun CameraPopup(
+private fun CameraPopup(
     onGalleryOpen: () -> Unit,
     onCameraOpen: () -> Unit,
     onDismiss: () -> Unit
@@ -292,7 +304,7 @@ fun CameraPopup(
 }
 
 @Composable
-fun LinkPopUp(
+private fun LinkPopUp(
     backLink: () -> Unit,
     linkBubble: () -> Unit,
     onDismiss: () -> Unit
@@ -355,8 +367,74 @@ fun LinkPopUp(
     }
 }
 
+@Composable
+private fun BackLinkPopUp(
+    onDismiss: () -> Unit,
+    bubbles: List<BubbleModel>,
+    onBackLinkClick: (BubbleModel) -> Unit
+) {
+    Popup(
+        alignment = Alignment.BottomCenter,
+        offset = IntOffset(0, -150),
+        properties = PopupProperties(
+            dismissOnClickOutside = true,
+            focusable = false
+        ),
+        onDismissRequest = { onDismiss() },
+    ) {
+        Box(
+            modifier = Modifier
+                .wrapContentSize()
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Gray300, White000),
+                    )
+                )
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(16.dp),
+                    ambientColor = Color(0xFF3A3D40).copy(alpha = 0.12f),
+                    spotColor = Color(0xFF3A3D40).copy(alpha = 0.12f),
+                )
+                .padding(1.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .width(150.dp)
+                    .wrapContentHeight()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(White000)
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                for (bubble in bubbles) {
+                    Text(
+                        text = bubble.title?.takeIf { it.isNotBlank() }
+                            ?: bubble.contentBlocks
+                                .filter { it.type == ContentType.TEXT }
+                                .firstOrNull { it.content.parseHtml().isNotBlank() }
+                                ?.content?.parseHtml()?.take(5)
+                            ?: "내용 없음",
+                        modifier = Modifier.clickable { onBackLinkClick(bubble) },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray800,
+                        textAlign = TextAlign.Center
+                    )
+
+                    if (bubbles.indexOf(bubble) != bubbles.size - 1) {
+                        HorizontalDivider(modifier = Modifier.border(1.dp, Gray300))
+                    }
+                }
+            }
+        }
+    }
+}
+
 enum class IconType {
-    NONE, TEXT, LIST, CAMERA, LINK, TAG
+    NONE, TEXT, LIST, CAMERA, LINK, TAG,
+    BACK_LINK, LINK_BUBBLE
 }
 
 enum class TextStyle {

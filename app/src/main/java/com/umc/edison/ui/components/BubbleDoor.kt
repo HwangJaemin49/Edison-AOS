@@ -10,6 +10,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,19 +59,27 @@ import com.umc.edison.ui.theme.Gray800
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
 import com.mohamedrejeb.richeditor.model.RichTextState
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.BasicRichText
 import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
+import com.mohamedrejeb.richeditor.ui.material3.RichText
 import com.umc.edison.presentation.edison.BubbleInputState
+import com.umc.edison.presentation.edison.parseHtml
 import com.umc.edison.ui.theme.White000
 import com.umc.edison.ui.theme.Yellow100
 
@@ -81,6 +91,7 @@ fun BubbleDoor(
     onBubbleUpdate: (BubbleModel) -> Unit = {},
     onImageDeleted: (ContentBlockModel) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
+    linkClicked: (Int) -> Unit = {},
 ) {
     val colors = bubble.labels.map { it.color }
     val outerColors = when (colors.size) {
@@ -140,15 +151,20 @@ fun BubbleDoor(
                     deleteClicked = onImageDeleted,
                 )
             } else {
-                BubbleContent(bubble)
+                BubbleContent(
+                    bubble = bubble,
+                    linkClicked = linkClicked
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalRichTextApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun BubbleContent(
     bubble: BubbleModel,
+    linkClicked: (Int) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
@@ -171,8 +187,14 @@ private fun BubbleContent(
         bubble.contentBlocks.forEach { contentBlock ->
             when (contentBlock.type) {
                 ContentType.TEXT -> {
-                    Text(
-                        text = contentBlock.content,
+                    val richTextState = rememberRichTextState()
+
+                    LaunchedEffect(contentBlock.content) {
+                        richTextState.setHtml(contentBlock.content)
+                    }
+
+                    RichText(
+                        state = richTextState,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Gray800,
                         modifier = Modifier.fillMaxWidth()
@@ -200,9 +222,59 @@ private fun BubbleContent(
                 }
             }
         }
+
+        FlowRow (
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            bubble.backLinks.forEach { backLink ->
+
+                val myUriHandler by remember {
+                    mutableStateOf(object : UriHandler {
+                        override fun openUri(uri: String) {
+                            val bubbleId = uri.toIntOrNull()
+                            if (bubbleId != null) {
+                                linkClicked(bubbleId)
+                            }
+                        }
+                    })
+                }
+
+                val richTextState = rememberRichTextState()
+                val isInitialized = remember(backLink.id) { mutableStateOf(false) }
+
+                if (!isInitialized.value) {
+                    val selectedTitle = backLink.title?.takeIf { it.isNotBlank() }
+                        ?: backLink.contentBlocks
+                            .filter { it.type == ContentType.TEXT }
+                            .firstOrNull { it.content.parseHtml().isNotBlank() }
+                            ?.content?.parseHtml()?.take(5)
+                        ?: "내용 없음"
+
+                    val splitTitle = selectedTitle.split("\n")
+
+                    richTextState.addLink(
+                        text = "[[${splitTitle[0]}]]",
+                        url = "${backLink.id}"
+                    )
+
+                    isInitialized.value = true
+                }
+
+                CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                    RichText(
+                        state = richTextState,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Gray800,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
     }
 }
 
+@OptIn(ExperimentalRichTextApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun BubbleContent(
     bubble: BubbleModel,
@@ -411,6 +483,63 @@ private fun BubbleContent(
                 }
             }
         }
+
+        FlowRow (
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            bubble.backLinks.forEach { backLink ->
+
+                val richTextState = rememberRichTextState()
+                val isInitialized = remember(backLink.id) { mutableStateOf(false) }
+
+                if (!isInitialized.value) {
+                    val selectedTitle = backLink.title?.takeIf { it.isNotBlank() }
+                        ?: backLink.contentBlocks
+                            .filter { it.type == ContentType.TEXT }
+                            .firstOrNull { it.content.parseHtml().isNotBlank() }
+                            ?.content?.parseHtml()?.take(5)
+                        ?: "내용 없음"
+
+                    val splitTitle = selectedTitle.split("\n")
+
+                    richTextState.addLink(
+                        text = "[[${splitTitle[0]}]]",
+                        url = "${backLink.id}"
+                    )
+
+                    isInitialized.value = true
+                }
+
+                BasicRichText(
+                    state = richTextState,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+                )
+            }
+        }
+
+        bubble.linkedBubble?.let { linkedBubble ->
+            val richTextState = rememberRichTextState()
+
+            val selectedTitle = linkedBubble.title?.takeIf { it.isNotBlank() }
+                ?: linkedBubble.contentBlocks
+                    .filter { it.type == ContentType.TEXT }
+                    .firstOrNull { it.content.parseHtml().isNotBlank() }
+                    ?.content?.parseHtml()?.take(5)
+                ?: "내용 없음"
+
+            richTextState.addLink(
+                text = "\n[[$selectedTitle]]",
+                url = "${linkedBubble.id}"
+            )
+
+            BasicRichText(
+                state = richTextState,
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+            )
+        }
     }
 }
 
@@ -472,6 +601,7 @@ private fun DrawScope.drawOuterGradientBubbleDoor(
                             Shader.TileMode.CLAMP
                         )
                     }
+
                     3 -> {
                         val startX = circleCenter.x - width
                         val endX = circleCenter.x + width
@@ -489,6 +619,7 @@ private fun DrawScope.drawOuterGradientBubbleDoor(
                             Shader.TileMode.CLAMP
                         )
                     }
+
                     else -> color = Gray800.toArgb()
                 }
             }
@@ -531,6 +662,7 @@ private fun DrawScope.drawBlurredInnerGradientBubbleDoor(
                             Shader.TileMode.CLAMP
                         )
                     }
+
                     2 -> {
                         val startX = circleCenter.x
                         val endX = circleCenter.x
@@ -547,6 +679,7 @@ private fun DrawScope.drawBlurredInnerGradientBubbleDoor(
                             Shader.TileMode.CLAMP
                         )
                     }
+
                     3 -> {
                         val startX = circleCenter.x - width
                         val endX = circleCenter.x + width
@@ -563,6 +696,7 @@ private fun DrawScope.drawBlurredInnerGradientBubbleDoor(
                             Shader.TileMode.CLAMP
                         )
                     }
+
                     4 -> {
                         val startX = circleCenter.x - width
                         val endX = circleCenter.x + width
@@ -580,6 +714,7 @@ private fun DrawScope.drawBlurredInnerGradientBubbleDoor(
                             Shader.TileMode.CLAMP
                         )
                     }
+
                     else -> color = Gray800.toArgb()
                 }
                 maskFilter = BlurMaskFilter(80f, BlurMaskFilter.Blur.NORMAL)

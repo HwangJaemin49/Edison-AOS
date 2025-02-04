@@ -128,6 +128,7 @@ fun Bubble(
     onBackScreenClick: () -> Unit,
     bubble: BubbleModel,
     onBubbleClick: (BubbleModel) -> Unit,
+    onLinkedBubbleClicked: (Int) -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -138,7 +139,8 @@ fun Bubble(
     ) {
         Bubble(
             bubble = bubble,
-            onClick = { onBubbleClick(bubble) }
+            onClick = { onBubbleClick(bubble) },
+            linkClicked = onLinkedBubbleClicked
         )
     }
 }
@@ -147,6 +149,7 @@ fun Bubble(
 private fun Bubble(
     bubble: BubbleModel,
     onClick: () -> Unit, // 편집 모드로 들어가는 클릭 리스너
+    linkClicked: (Int) -> Unit,
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
@@ -155,6 +158,7 @@ private fun Bubble(
             bubble = bubble,
             isEditable = false,
             onClick = onClick,
+            linkClicked = linkClicked,
         )
     } else {
         TextContentBubble(
