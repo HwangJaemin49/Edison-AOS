@@ -8,20 +8,26 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,6 +48,7 @@ import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
+import com.umc.edison.ui.theme.Gray900
 import com.umc.edison.ui.theme.White000
 import java.io.File
 
@@ -120,6 +127,31 @@ fun BubbleInputScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 BubbleInputContent(viewModel)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .align(Alignment.BottomCenter),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    uiState.bubble.labels.forEach { label ->
+                        Box(
+                            modifier = Modifier
+                                .height(41.dp)
+                                .background(label.color, RoundedCornerShape(20.dp))
+                                .padding(horizontal = 16.dp)
+
+                        ) {
+                            Text(
+                                text = label.name,
+                                color = Gray900,
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -187,6 +219,28 @@ fun BubbleInputContent(
         }
     }
 
+    if (uiState.isGalleryOpen) {
+        ImageGallery(
+            onImageSelected = { uriList ->
+                viewModel.addContentBlocks(uriList)
+            },
+            onClose = { viewModel.closeGallery() },
+            multiSelectMode = true
+        )
+    }
+
+    if (uiState.isCameraOpen) {
+        val tempFile = createImageFile()
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            tempFile
+        )
+        viewModel.saveCameraImage(uri)
+        takePictureLauncher.launch(uri)
+        viewModel.updateCameraOpen(false)
+    }
+
     if (uiState.labelEditMode == LabelEditMode.ADD) {
         BottomSheet(
             onDismiss = {
@@ -238,27 +292,4 @@ fun BubbleInputContent(
         },
         bubbleInputState = uiState,
     )
-
-    if (uiState.isGalleryOpen) {
-        ImageGallery(
-            onImageSelected = { uriList ->
-                viewModel.addContentBlocks(uriList)
-            },
-            onClose = { viewModel.closeGallery() },
-            multiSelectMode = true
-        )
-    }
-
-
-    if (uiState.isCameraOpen) {
-        val tempFile = createImageFile()
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.provider",
-            tempFile
-        )
-        viewModel.saveCameraImage(uri)
-        takePictureLauncher.launch(uri)
-        viewModel.updateCameraOpen(false)
-    }
 }
