@@ -11,6 +11,8 @@ data class BubbleEntity(
     val content: String? = null,
     var mainImage: String? = null,
     var labels: List<LabelEntity> = emptyList(),
+    var backLinks: List<BubbleEntity> = emptyList(),
+    var linkedBubble: BubbleEntity? = null,
     val isDeleted: Boolean = false,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
@@ -25,21 +27,33 @@ data class BubbleEntity(
                 s.startsWith("${ContentType.IMAGE}>") -> ContentType.IMAGE
                 else -> return@mapIndexed null
             }
-            val content = s.substringAfter(">").substringBefore("</")
+            val content = when (type) {
+                ContentType.TEXT -> s.substringAfter("${ContentType.TEXT}>").substringBefore("</${ContentType.TEXT}")
+                ContentType.IMAGE -> s.substringAfter("${ContentType.IMAGE}>").substringBefore("</${ContentType.IMAGE}")
+            }
             ContentBlock(type, content, index)
         }?.filterNotNull() ?: emptyList()
 
-        return Bubble(id, title, contentBlocks, mainImage, labels.map { it.toDomain() }, updatedAt)
+        return Bubble(
+            id,
+            title,
+            contentBlocks,
+            mainImage,
+            labels.toDomain(),
+            backLinks.toDomain(),
+            linkedBubble?.toDomain(),
+            updatedAt
+        )
     }
 }
 
 fun BubbleEntity.same(other: BubbleEntity): Boolean {
     return id == other.id &&
-        title == other.title &&
-        content == other.content &&
-        mainImage == other.mainImage &&
-        labels.map { it.id } == other.labels.map { it.id } &&
-        isDeleted == other.isDeleted
+            title == other.title &&
+            content == other.content &&
+            mainImage == other.mainImage &&
+            labels.map { it.id } == other.labels.map { it.id } &&
+            isDeleted == other.isDeleted
 }
 
 fun Bubble.toData(): BubbleEntity = BubbleEntity(
@@ -50,6 +64,8 @@ fun Bubble.toData(): BubbleEntity = BubbleEntity(
     },
     mainImage = mainImage,
     labels = labels.toData(),
+    backLinks = backLinks.toData(),
+    linkedBubble = linkedBubble?.toData(),
     updatedAt = date
 )
 

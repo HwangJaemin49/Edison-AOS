@@ -6,7 +6,8 @@ import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetBubbleUseCase @Inject constructor( private val bubbleRepository: BubbleRepository)
-{
-    operator fun invoke(bubbleId: Int): Flow<DataResource<Bubble>> = bubbleRepository.getBubble(bubbleId)
+class AddBubbleUseCase @Inject constructor(
+    private val bubbleRepository: BubbleRepository
+) {
+    operator fun invoke(bubble: Bubble): Flow<DataResource<Bubble>> = bubbleRepository.addBubble(bubble)
 }

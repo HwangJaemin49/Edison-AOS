@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,7 +24,12 @@ import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.navigation.NavRoute
 
 @Composable
-fun MyEdisonScreen(navController: NavHostController) {
+fun MyEdisonScreen(
+    navController: NavHostController,
+    updateShowBottomNav: (Boolean) -> Unit
+) {
+    LaunchedEffect(Unit) { updateShowBottomNav(true) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

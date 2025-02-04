@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,7 +32,7 @@ import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTopAppBar
-import com.umc.edison.ui.label.LabelMoveModalContent
+import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray900
 
@@ -44,6 +45,8 @@ fun BubbleStorageScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isBlur = uiState.bubbleStorageMode != BubbleStorageMode.NONE
+
+    LaunchedEffect(Unit) { updateShowBottomNav(true) }
 
     BackHandler(enabled = true) {
         if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
@@ -165,14 +168,14 @@ fun BubbleStorageScreen(
                         viewModel.updateEditMode(BubbleStorageMode.EDIT)
                     },
                 ) {
-                    LabelMoveModalContent(
+                    LabelSelectModalContent(
                         labels = uiState.movableLabels,
                         onDismiss = {
                             viewModel.updateEditMode(BubbleStorageMode.EDIT)
                         },
-                        onConfirm = { label ->
-                            viewModel.moveSelectedBubbles(label, showBottomNav = updateShowBottomNav)
-                        }
+                        onConfirm = { labelList ->
+                            viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
+                        },
                     )
                 }
             } else if (uiState.bubbleStorageMode == BubbleStorageMode.DELETE) {

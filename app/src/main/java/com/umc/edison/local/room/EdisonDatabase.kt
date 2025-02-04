@@ -6,12 +6,14 @@ import androidx.room.TypeConverters
 import com.umc.edison.local.model.BubbleLabelLocal
 import com.umc.edison.local.model.BubbleLocal
 import com.umc.edison.local.model.LabelLocal
+import com.umc.edison.local.model.LinkedBubbleLocal
 import com.umc.edison.local.room.dao.BubbleDao
 import com.umc.edison.local.room.dao.BubbleLabelDao
 import com.umc.edison.local.room.dao.LabelDao
+import com.umc.edison.local.room.dao.LinkedBubbleDao
 
 @Database(
-    entities = [BubbleLocal::class, LabelLocal::class, BubbleLabelLocal::class],
+    entities = [BubbleLocal::class, LabelLocal::class, BubbleLabelLocal::class, LinkedBubbleLocal::class],
     version = RoomConstant.ROOM_VERSION,
     exportSchema = true
 )
@@ -20,4 +22,5 @@ abstract class EdisonDatabase : RoomDatabase() {
     abstract fun bubbleDao(): BubbleDao
     abstract fun labelDao(): LabelDao
     abstract fun bubbleLabelDao(): BubbleLabelDao
+    abstract fun linkedBubbleDao(): LinkedBubbleDao
 }

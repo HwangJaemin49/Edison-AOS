@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import java.util.Date
 
 @Entity(
-    indices = [Index(value = ["bubble_id"]), Index(value = ["label_id"])],
+    indices = [Index(value = ["bubble_id", "label_id"], unique = true), Index(value = ["label_id"]), Index(value = ["bubble_id"])],
     foreignKeys = [
         ForeignKey(
             entity = BubbleLocal::class,

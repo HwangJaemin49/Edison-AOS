@@ -30,7 +30,7 @@ fun NavigationGraph(
     NavHost(navHostController, startDestination = NavRoute.MyEdison.route) {
         // bottom navigation
         composable(NavRoute.MyEdison.route) {
-            MyEdisonScreen(navHostController)
+            MyEdisonScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.BubbleStorage.route) {
