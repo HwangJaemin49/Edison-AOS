@@ -25,8 +25,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -36,6 +38,7 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,10 +46,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.edison.parseHtml
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.ui.theme.Gray100
+import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
@@ -152,7 +157,7 @@ private fun Bubble(
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
-    if (checkBubbleContainImage(bubble) && bubbleSize == BubbleType.BubbleMain) {
+    if (checkBubbleContainImage(bubble) || bubbleSize == BubbleType.BubbleMain) {
         BubbleDoor(
             bubble = bubble,
             isEditable = false,
@@ -188,11 +193,24 @@ fun BubblePreview(
             bubbleSize = size
         )
     } else {
-        // TODO: 이미지 1개를 배경으로 하는 버블 컴포저블
-        ImageBubble(
-            bubbleSize = size,
-            imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
-        )
+        val imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
+
+        if (imageUrl.isNotEmpty()) {
+            ImageBubble(
+                bubbleSize = size,
+                imageUrl = imageUrl,
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
+        } else {
+            TextContentBubble(
+                bubble = bubble,
+                colors = bubble.labels.map { it.color },
+                onClick = onClick,
+                onLongClick = onLongClick,
+                bubbleSize = size
+            )
+        }
     }
 }
 
@@ -220,7 +238,12 @@ private fun TextContentBubble(
         contentAlignment = Alignment.Center
     ) {
         if (bubble.mainImage != null) {
-            ImageBubble(bubbleSize = bubbleSize, imageUrl = bubble.mainImage)
+            ImageBubble(
+                bubbleSize = bubbleSize,
+                imageUrl = bubble.mainImage,
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
         } else {
             when (colors.size) {
                 0 -> SingleBubble(bubbleSize = bubbleSize, color = Gray100)
@@ -250,12 +273,91 @@ private fun TextContentBubble(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ImageBubble(
     bubbleSize: BubbleType.BubbleSize,
-    imageUrl: String
+    imageUrl: String,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit = {},
 ) {
-    // TODO: 이미지 관련 정리되면 개발
+    val canvasSize = bubbleSize.size
+
+    Box(
+        modifier = Modifier
+            .size(canvasSize)
+            .clip(CircleShape)
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(modifier = Modifier.size(bubbleSize.size)) {
+            val outerRadius = bubbleSize.size.toPx() / 2
+
+            // 큰 원 그리기
+            drawCircle(color = Gray200, radius = outerRadius, center = center)
+        }
+        Box(
+            modifier = Modifier
+                .size(bubbleSize.size)
+                .clip(CircleShape)
+                .drawWithContent {
+                    clipPath(
+                        Path().apply {
+                            addOval(
+                                Rect(
+                                    center - Offset(bubbleSize.size.toPx() / 2, bubbleSize.size.toPx() / 2),
+                                    center + Offset(bubbleSize.size.toPx() / 2, bubbleSize.size.toPx() / 2)
+                                )
+                            )
+                        }
+                    ) {
+                        val colors = listOf(White000, Gray200)
+                        drawCircle(
+                            brush = Brush.verticalGradient(colors),
+                            blendMode = BlendMode.SrcIn,
+                        )
+                        this@drawWithContent.drawContent()
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.size(bubbleSize.innerSize).clip(CircleShape)
+            )
+
+            Canvas(modifier = Modifier.size(bubbleSize.size * 0.95f)) {
+                drawIntoCanvas { canvas ->
+                    val paint = Paint().apply {
+                        this.asFrameworkPaint().apply {
+                            isAntiAlias = true
+                            shader = LinearGradient(
+                                center.x - bubbleSize.size.toPx() / 2,
+                                center.y,
+                                center.x + bubbleSize.size.toPx() / 2,
+                                center.y,
+                                intArrayOf(White000.copy(alpha = 0.5f).toArgb(), Gray200.copy(alpha = 0.5f).toArgb()),
+                                floatArrayOf(0f, 1f),
+                                Shader.TileMode.CLAMP
+                            )
+                            maskFilter = BlurMaskFilter(
+                                30f,
+                                BlurMaskFilter.Blur.NORMAL
+                            )
+                        }
+                    }
+                    canvas.drawCircle(center, (bubbleSize.size * 0.95f).toPx() / 2, paint)
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -343,7 +445,7 @@ private fun TripleBubble(
         clipPath(Path().apply {
             addOval(
                 Rect(
-                    center - Offset(outerRadius * 0.9f, outerRadius * 0.9f),
+                    center - Offset(outerRadius, outerRadius),
                     center + Offset(outerRadius, outerRadius),
                 )
             )
@@ -379,6 +481,10 @@ private fun checkBubbleContainImage(bubble: BubbleModel): Boolean {
  * 버블 텍스트 길이에 따른 사이즈 계산 함수
  */
 fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
+    if (bubble.title == null && !bubble.contentBlocks.map { it.type }.contains(ContentType.TEXT)) {
+        return BubbleType.Bubble100
+    }
+
     var text = bubble.title ?: ""
 
     if (text.isEmpty() && bubble.contentBlocks.firstOrNull()?.type == ContentType.IMAGE) {

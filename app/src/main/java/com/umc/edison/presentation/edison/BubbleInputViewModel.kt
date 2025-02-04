@@ -46,7 +46,6 @@ class BubbleInputViewModel @Inject constructor(
     init {
         val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
         fetchBubble(id)
-        addTextBlockToFront()
         fetchLabels()
         fetchBubbles()
     }
@@ -57,7 +56,8 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getBubbleUseCase(bubbleId),
             onSuccess = { bubble ->
-                val sortedContentBlocks = bubble.contentBlocks.sortedBy { it.position }.toPresentation()
+                val sortedContentBlocks =
+                    bubble.contentBlocks.sortedBy { it.position }.toPresentation()
                 _uiState.update {
                     it.copy(
                         bubble = bubble.toPresentation().copy(
@@ -74,6 +74,7 @@ class BubbleInputViewModel @Inject constructor(
             },
             onComplete = {
                 _uiState.update { it.copy(isLoading = false) }
+                addTextBlockToFront()
             }
         )
     }
@@ -94,7 +95,12 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                _uiState.update { it.copy(labels = labels.filter { label -> label.id != 0 }.toMutableList().toPresentation()) }
+                _uiState.update {
+                    it.copy(
+                        labels = labels.filter { label -> label.id != 0 }.toMutableList()
+                            .toPresentation()
+                    )
+                }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -221,6 +227,23 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     private fun addTextBlockToFront() {
+        if (_uiState.value.bubble.contentBlocks.isEmpty()) {
+            addTextBlock()
+            return
+        }
+
+        if (_uiState.value.bubble.contentBlocks[0].type == ContentType.TEXT && _uiState.value.bubble.contentBlocks.last().type == ContentType.TEXT) {
+            return
+        }
+
+        if (_uiState.value.bubble.contentBlocks.last().type == ContentType.IMAGE) {
+            addTextBlock()
+        }
+
+        if (_uiState.value.bubble.contentBlocks[0].type == ContentType.TEXT) {
+            return
+        }
+
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "",
@@ -232,9 +255,12 @@ class BubbleInputViewModel @Inject constructor(
         }
 
         _uiState.update {
+            val updatedContentBlocks = listOf(newTextBlock) + it.bubble.contentBlocks
+            // position 순으로 정렬
+            val sorted = updatedContentBlocks.sortedBy { it.position }
             it.copy(
                 bubble = it.bubble.copy(
-                    contentBlocks = listOf(newTextBlock) + it.bubble.contentBlocks
+                    contentBlocks = sorted
                 )
             )
         }
@@ -280,13 +306,9 @@ class BubbleInputViewModel @Inject constructor(
         }
 
         checkCanSave()
-
-        Log.i("BubbleInputViewModel", "updateBubbleContent: ${bubble.contentBlocks}")
     }
 
     fun deleteContentBlock(contentBlock: ContentBlockModel) {
-        Log.i("BubbleInputViewModel", "before delete: ${_uiState.value.bubble}")
-
         val currentBubble = _uiState.value.bubble
         val contentBlocks = currentBubble.contentBlocks.toMutableList()
 
@@ -317,8 +339,6 @@ class BubbleInputViewModel @Inject constructor(
                 bubble = it.bubble.copy(contentBlocks = contentBlocks)
             )
         }
-
-        Log.i("BubbleInputViewModel", "after delete: ${_uiState.value.bubble}")
     }
 
     fun updateBubbleWithLink() {
@@ -372,16 +392,18 @@ class BubbleInputViewModel @Inject constructor(
         var canSave = true
 
         val bubble = _uiState.value.bubble
-        Log.i("BubbleInputViewModel", "checkCanSave: $bubble")
 
         if (bubble.title.isNullOrEmpty() && bubble.mainImage.isNullOrEmpty()) {
-            canSave = if(bubble.contentBlocks.isEmpty()) {
+            canSave = if (bubble.contentBlocks.isEmpty()) {
                 false
             } else if (bubble.contentBlocks.size == 1) {
-                bubble.contentBlocks[0].content.parseHtml().isNotEmpty() && bubble.contentBlocks[0].content != "<br>"
+                bubble.contentBlocks[0].content.parseHtml()
+                    .isNotEmpty() && bubble.contentBlocks[0].content != "<br>"
             } else {
-                (bubble.contentBlocks[0].content.parseHtml().isNotEmpty() && bubble.contentBlocks[0].content != "<br>")
-                        || (bubble.contentBlocks[1].content.parseHtml().isNotEmpty() && bubble.contentBlocks[1].content != "<br>")
+                (bubble.contentBlocks[0].content.parseHtml()
+                    .isNotEmpty() && bubble.contentBlocks[0].content != "<br>")
+                        || (bubble.contentBlocks[1].content.parseHtml()
+                    .isNotEmpty() && bubble.contentBlocks[1].content != "<br>")
             }
         }
 
