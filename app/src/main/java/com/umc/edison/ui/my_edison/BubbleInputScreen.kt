@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
-import android.os.Build
 import android.text.Html
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -74,7 +73,7 @@ fun BubbleInputScreen(
     var galleryOpen by remember { mutableStateOf(false) }
     var cameraOpen by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var selectedImages by remember { mutableStateOf(mutableListOf<Uri>()) }
+    val selectedImages by remember { mutableStateOf(mutableListOf<Uri>()) }
     var isBoldActive by remember { mutableStateOf(false) }
     var isItalicActive by remember { mutableStateOf(false) }
     var isUnderlineActive by remember { mutableStateOf(false) }
@@ -333,7 +332,7 @@ fun BubbleInputScreen(
                         .clickable { cameraExpanded = true }
                 )
                 CameraPopup(
-                    CameraExpanded = cameraExpanded,
+                    cameraExpanded = cameraExpanded,
                     onGalleryOpen = {
                         galleryOpen = true
                         cameraExpanded = false
@@ -379,7 +378,7 @@ fun BubbleInputScreen(
                             linkExpanded = true
                         }
                 )
-                LinkPopup(LinkExpanded = linkExpanded,
+                LinkPopup(linkExpanded = linkExpanded,
                     onDismiss = {
                         linkExpanded = false
                     },
@@ -619,15 +618,9 @@ fun BubbleInputScreen(
 
 }
 
-
 fun String.parseHtml(): String {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        Html.fromHtml(this, Html.FROM_HTML_MODE_LEGACY).toString()
-    } else {
-        Html.fromHtml(this).toString()
-    }
+    return Html.fromHtml(this, Html.FROM_HTML_MODE_LEGACY).toString()
 }
-
 
 fun saveImageToInternalStorage(context: Context, uri: Uri): Uri {
     val inputStream = context.contentResolver.openInputStream(uri)

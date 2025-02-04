@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,14 +37,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,7 +56,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -72,7 +67,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -82,17 +76,12 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size
 import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
-import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
 import com.mohamedrejeb.richeditor.ui.material.RichText
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.presentation.model.LabelModel
-import com.umc.edison.ui.my_edison.parseHtml
-import com.umc.edison.ui.theme.Aqua100
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray400
@@ -100,9 +89,7 @@ import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Pretendard
-import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.White000
-import com.umc.edison.ui.theme.Yellow100
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -197,7 +184,6 @@ fun Bubble(
 private fun Bubble(
     bubble: BubbleModel,
     onClick: () -> Unit,
-
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
@@ -882,11 +868,12 @@ fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         val fontSizeSp = bubbleType.fontStyle.fontSize.value
         val lineCount = calculateLineCount(text, textBoxWidth, fontSizeSp)
 
-        when {
-            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> return BubbleType.Bubble100
-            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> return BubbleType.Bubble160
-            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> return BubbleType.Bubble230
-            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> return BubbleType.Bubble300
+        return when {
+            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> BubbleType.Bubble100
+            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> BubbleType.Bubble160
+            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> BubbleType.Bubble230
+            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> BubbleType.Bubble300
+            else -> BubbleType.BubbleMain
         }
     }
 

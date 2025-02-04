@@ -108,7 +108,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
-    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc09")
+    implementation(libs.richeditor.compose)
     implementation(libs.androidx.work)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

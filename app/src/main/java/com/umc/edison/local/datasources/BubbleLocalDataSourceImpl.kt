@@ -150,7 +150,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getBubbleDetail(bubbleId: Int): BubbleEntity {
         // bubbleId로 Bubble 데이터를 가져옴
-        val localBubble = bubbleDao.getBubbleById(bubbleId) ?: throw Exception("Bubble not found")
+        val localBubble = bubbleDao.getBubbleById(bubbleId)
 
         // Bubble 데이터를 도메인 계층 데이터로 변환
         val bubble = localBubble.toData()

@@ -13,6 +13,7 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 nav-compose = "2.8.5"
+richeditorCompose = "1.0.0-rc09"
 ui-compose = "1.7.6"
 
 ksp = "1.9.0-1.0.13"
@@ -70,6 +71,7 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 androidx-work = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
 androidx-foundation-layout-android = { group = "androidx.compose.foundation", name = "foundation-layout-android", version.ref = "foundationLayoutAndroid" }
 androidx-foundation-android = { group = "androidx.compose.foundation", name = "foundation-android", version.ref = "foundationAndroid" }
+richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditorCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

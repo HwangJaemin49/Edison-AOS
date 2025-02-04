@@ -5,12 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,7 +16,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.umc.edison.presentation.sync.SyncTrigger
@@ -66,14 +63,6 @@ fun MainScreen() {
                 )
             }
         },
-
-//        contentWindowInsets = WindowInsets(
-//            left = 0.dp,
-//            top = 25.dp,
-//            right = 0.dp,
-//            bottom = 0.dp
-//        )
-
     ) {
         Box(Modifier.padding(it)) {
             NavigationGraph(navController, updateShowBottomNav = { flag -> showBottomNav = flag })
