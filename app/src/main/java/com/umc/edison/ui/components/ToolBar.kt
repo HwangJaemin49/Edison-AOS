@@ -34,6 +34,7 @@ fun Toolbar(
     onTextStylesClicked: (TextStyle) -> Unit,
     onListStyleClicked: (ListStyle) -> Unit,
     onGalleryOpen: () -> Unit,
+    onCameraOpen: () -> Unit
 ) {
     when (uiState.selectedIcon) {
         IconType.TEXT -> {
@@ -179,7 +180,10 @@ fun Toolbar(
                                 onGalleryOpen()
                                 onIconClicked(IconType.NONE)
                             },
-                            onCameraOpen = { /* Handle Camera Open */ },
+                            onCameraOpen = {
+                                onCameraOpen()
+                                onIconClicked(IconType.NONE)
+                            },
                             onDismiss = { onIconClicked(IconType.NONE) }
                         )
                     }

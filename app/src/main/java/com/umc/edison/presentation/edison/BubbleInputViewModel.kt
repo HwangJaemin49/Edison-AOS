@@ -143,7 +143,12 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun updateIcon(iconType: IconType) {
-        if (_uiState.value.selectedIcon == IconType.CAMERA || _uiState.value.selectedIcon == IconType.LINK) {
+        if (iconType == IconType.CAMERA && _uiState.value.selectedIcon == IconType.CAMERA) {
+            _uiState.update { it.copy(selectedIcon = IconType.NONE) }
+            return
+        }
+
+        if (iconType == IconType.LINK || _uiState.value.selectedIcon == IconType.LINK) {
             _uiState.update { it.copy(selectedIcon = IconType.NONE) }
             return
         }
@@ -385,6 +390,41 @@ class BubbleInputViewModel @Inject constructor(
         _uiState.update { it.copy(isGalleryOpen = true) }
     }
 
+    fun saveCameraImage(uri: Uri) {
+        _uiState.update {
+            it.copy(cameraImagePath = uri)
+        }
+    }
+
+    fun saveCameraImage(context: Context) {
+        val imageCnt = _uiState.value.bubble.contentBlocks.count { it.type == ContentType.IMAGE }
+        if (imageCnt >= 10) {
+            _uiState.update { it.copy(toastMessage = "최대 10장까지 첨부할 수 있습니다.") }
+            return
+        }
+
+        val savedUri = saveImageToInternalStorage(context, _uiState.value.cameraImagePath!!)
+        addContentBlocks(listOf(savedUri))
+    }
+
+    fun updateCameraOpen(isOpen: Boolean) {
+        _uiState.update { it.copy(isCameraOpen = isOpen) }
+    }
+
+    private fun saveImageToInternalStorage(context: Context, uri: Uri): Uri {
+        val inputStream = context.contentResolver.openInputStream(uri)
+
+        val fileName = "image_${System.currentTimeMillis()}.jpg"
+        val file = File(context.filesDir, fileName)
+
+        val outputStream = FileOutputStream(file)
+        inputStream?.copyTo(outputStream)
+        inputStream?.close()
+        outputStream.close()
+
+        return Uri.fromFile(file)
+    }
+
     override fun clearToastMessage() {
         _uiState.update { it.copy(toastMessage = null) }
     }
@@ -392,18 +432,4 @@ class BubbleInputViewModel @Inject constructor(
 
 fun String.parseHtml(): String {
     return Html.fromHtml(this, Html.FROM_HTML_MODE_LEGACY).toString()
-}
-
-private fun saveImageToInternalStorage(context: Context, uri: Uri): Uri {
-    val inputStream = context.contentResolver.openInputStream(uri)
-
-    val fileName = "image_${System.currentTimeMillis()}.jpg"
-    val file = File(context.filesDir, fileName)
-
-    val outputStream = FileOutputStream(file)
-    inputStream?.copyTo(outputStream)
-    inputStream?.close()
-    outputStream.close()
-
-    return Uri.fromFile(file)
 }

@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.edison
 
+import android.net.Uri
 import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.BubbleModel
@@ -18,6 +19,8 @@ data class BubbleInputState(
     val selectedTextStyles: List<TextStyle> = emptyList(),
     val selectedListStyle: ListStyle = ListStyle.NONE,
     val isGalleryOpen: Boolean = false,
+    val isCameraOpen: Boolean = false,
+    val cameraImagePath: Uri? = null,
     val canSave: Boolean = false,
     override val error: Throwable? = null,
     override val toastMessage: String? = null,

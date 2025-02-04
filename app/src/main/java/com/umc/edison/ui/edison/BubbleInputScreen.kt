@@ -5,6 +5,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,8 +23,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.umc.edison.R
 import com.umc.edison.presentation.label.LabelEditMode
@@ -39,6 +43,7 @@ import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
+import java.io.File
 
 @Composable
 fun BubbleInputScreen(
@@ -98,6 +103,9 @@ fun BubbleInputScreen(
                     },
                     onGalleryOpen = {
                         viewModel.openGallery()
+                    },
+                    onCameraOpen = {
+                        viewModel.updateCameraOpen(true)
                     }
                 )
             }
@@ -161,6 +169,23 @@ fun BubbleInputContent(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            viewModel.saveCameraImage(context)
+        }
+    }
+
+    val createImageFile: @Composable () -> File = {
+        val tempFile = File(context.cacheDir, "temp_image_${System.currentTimeMillis()}.jpg")
+        tempFile.apply {
+            createNewFile()
+            deleteOnExit()
+        }
+    }
 
     if (uiState.labelEditMode == LabelEditMode.ADD) {
         BottomSheet(
@@ -222,5 +247,18 @@ fun BubbleInputContent(
             onClose = { viewModel.closeGallery() },
             multiSelectMode = true
         )
+    }
+
+
+    if (uiState.isCameraOpen) {
+        val tempFile = createImageFile()
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            tempFile
+        )
+        viewModel.saveCameraImage(uri)
+        takePictureLauncher.launch(uri)
+        viewModel.updateCameraOpen(false)
     }
 }
