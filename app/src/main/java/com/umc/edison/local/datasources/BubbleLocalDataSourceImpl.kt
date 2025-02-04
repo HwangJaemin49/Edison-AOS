@@ -89,6 +89,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
 
     override suspend fun addBubble(bubble: BubbleEntity): BubbleEntity {
         val id = insert(bubble.toLocal())
+        bubble.id = id.toInt()
 
         if (bubble.labels.isNotEmpty()) {
             addBubbleLabel(bubble)
@@ -98,7 +99,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
             addLinkedBubble(bubble)
         }
 
-        return getBubble(id.toInt())
+        return getBubble(bubble.id)
     }
 
     override suspend fun getUnSyncedBubbles(): List<BubbleEntity> {

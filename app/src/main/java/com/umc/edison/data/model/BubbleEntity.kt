@@ -6,7 +6,7 @@ import com.umc.edison.domain.model.ContentType
 import java.util.Date
 
 data class BubbleEntity(
-    val id: Int,
+    var id: Int,
     val title: String? = null,
     val content: String? = null,
     var mainImage: String? = null,

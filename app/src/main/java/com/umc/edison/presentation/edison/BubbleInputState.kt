@@ -18,6 +18,7 @@ data class BubbleInputState(
     val selectedTextStyles: List<TextStyle> = emptyList(),
     val selectedListStyle: ListStyle = ListStyle.NONE,
     val isGalleryOpen: Boolean = false,
+    val canSave: Boolean = false,
     override val error: Throwable? = null,
     override val toastMessage: String? = null,
 ) : BaseState {

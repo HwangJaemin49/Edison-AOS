@@ -26,7 +26,7 @@ import com.umc.edison.ui.theme.White000
 @Composable
 fun BottomSheet(
     onDismiss: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    sheetState: SheetState = rememberModalBottomSheetState(),
     content: @Composable () -> Unit
 ) {
     ModalBottomSheet(

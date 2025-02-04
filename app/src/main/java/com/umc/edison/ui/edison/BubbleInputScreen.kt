@@ -56,7 +56,7 @@ fun BubbleInputScreen(
         if (uiState.labelEditMode != LabelEditMode.NONE) {
             viewModel.updateLabelEditMode(LabelEditMode.NONE)
         } else {
-            if (viewModel.checkCanSave()) {
+            if (uiState.canSave) {
                 viewModel.saveBubble(false)
             }
             navHostController.popBackStack()
@@ -75,7 +75,7 @@ fun BubbleInputScreen(
                     viewModel.saveBubble(false)
                     navHostController.navigate(NavRoute.BubbleStorage.route)
                 },
-                confirmButtonEnabled = viewModel.checkCanSave()
+                confirmButtonEnabled = uiState.canSave
             )
         },
         bottomBar = {
@@ -185,6 +185,7 @@ fun BubbleInputContent(
         ) {
             LabelSelectModalContent(labels = uiState.labels,
                 initSelectedLabels = uiState.bubble.labels,
+                multiSelectMode = true,
                 onConfirm = { selectedLabelsFromModal ->
                     viewModel.updateLabel(selectedLabelsFromModal)
                 },
@@ -196,7 +197,8 @@ fun BubbleInputContent(
                 },
                 onItemClicked = { label ->
                     viewModel.toggleLabelSelection(label)
-                })
+                }
+            )
         }
     }
 

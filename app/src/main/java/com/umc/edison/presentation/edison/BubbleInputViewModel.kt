@@ -91,7 +91,7 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                _uiState.update { it.copy(labels = labels.toPresentation()) }
+                _uiState.update { it.copy(labels = labels.filter { label -> label.id != 0 }.toMutableList().toPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -155,6 +155,10 @@ class BubbleInputViewModel @Inject constructor(
                     selectedListStyle = ListStyle.NONE
                 )
             }
+        }
+
+        if (iconType == IconType.TAG) {
+            updateLabelEditMode(LabelEditMode.EDIT)
         }
 
         _uiState.update { it.copy(selectedIcon = iconType) }
@@ -241,6 +245,8 @@ class BubbleInputViewModel @Inject constructor(
             )
         }
 
+        checkCanSave()
+
         Log.i("BubbleInputViewModel", "updateBubbleContent: ${bubble.contentBlocks}")
     }
 
@@ -286,7 +292,9 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun saveBubble(isLinked: Boolean = false) {
-        if (checkCanSave().not() && isLinked.not()) {
+        checkCanSave()
+
+        if (!_uiState.value.canSave && isLinked) {
             _uiState.update { it.copy(toastMessage = "내용을 입력해주세요.") }
             return
         }
@@ -325,12 +333,14 @@ class BubbleInputViewModel @Inject constructor(
         )
     }
 
-    fun checkCanSave(): Boolean {
+    fun checkCanSave() {
+        var canSave = true
+
         val bubble = _uiState.value.bubble
         Log.i("BubbleInputViewModel", "checkCanSave: $bubble")
 
         if (bubble.title.isNullOrEmpty() && bubble.mainImage.isNullOrEmpty()) {
-            return if(bubble.contentBlocks.isEmpty()) {
+            canSave = if(bubble.contentBlocks.isEmpty()) {
                 false
             } else if (bubble.contentBlocks.size == 1) {
                 bubble.contentBlocks[0].content.parseHtml().isNotEmpty() && bubble.contentBlocks[0].content != "<br>"
@@ -340,7 +350,7 @@ class BubbleInputViewModel @Inject constructor(
             }
         }
 
-        return true
+        _uiState.update { it.copy(canSave = canSave) }
     }
 
     private fun convertBrToBackSlash() {
