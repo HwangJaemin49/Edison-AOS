@@ -53,11 +53,10 @@ fun LabelTabScreen(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             )
-    ) { innerPadding ->
+    ) { padding ->
         BaseContent(
             uiState = uiState,
             onDismiss = { viewModel.clearToastMessage() },
-            modifier = Modifier.padding(innerPadding)
         ) {
             if (uiState.labelEditMode == LabelEditMode.ADD || uiState.labelEditMode == LabelEditMode.EDIT) {
                 BottomSheet(

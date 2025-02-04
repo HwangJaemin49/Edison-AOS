@@ -38,7 +38,8 @@ fun Toolbar(
     onListStyleClicked: (ListStyle) -> Unit,
     onGalleryOpen: () -> Unit,
     onCameraOpen: () -> Unit,
-    onBackLinkClick: (BubbleModel) -> Unit
+    onBackLinkClick: (BubbleModel) -> Unit,
+    onLinkBubbleClick: () -> Unit
 ) {
     when (uiState.selectedIcon) {
         IconType.TEXT -> {
@@ -203,7 +204,7 @@ fun Toolbar(
                     if (uiState.selectedIcon == IconType.LINK) {
                         LinkPopUp(
                             backLink = { onIconClicked(IconType.BACK_LINK) },
-                            linkBubble = { /* Handle Link Bubble */ },
+                            linkBubble = { onLinkBubbleClick() },
                             onDismiss = { onIconClicked(IconType.NONE) }
                         )
                     }
@@ -406,17 +407,21 @@ private fun BackLinkPopUp(
                     .clip(RoundedCornerShape(16.dp))
                     .background(White000)
                     .padding(horizontal = 16.dp, vertical = 14.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 for (bubble in bubbles) {
+                    val selectedTitle = bubble.title?.takeIf { it.isNotBlank() }
+                        ?: bubble.contentBlocks
+                            .filter { it.type == ContentType.TEXT }
+                            .firstOrNull { it.content.parseHtml().isNotBlank() }
+                            ?.content?.parseHtml()?.take(5)
+                        ?: "내용 없음"
+
+                    val splitTitle = selectedTitle.split("\n")
+
                     Text(
-                        text = bubble.title?.takeIf { it.isNotBlank() }
-                            ?: bubble.contentBlocks
-                                .filter { it.type == ContentType.TEXT }
-                                .firstOrNull { it.content.parseHtml().isNotBlank() }
-                                ?.content?.parseHtml()?.take(5)
-                            ?: "내용 없음",
+                        text = splitTitle.first(),
                         modifier = Modifier.clickable { onBackLinkClick(bubble) },
                         style = MaterialTheme.typography.bodySmall,
                         color = Gray800,
@@ -434,7 +439,7 @@ private fun BackLinkPopUp(
 
 enum class IconType {
     NONE, TEXT, LIST, CAMERA, LINK, TAG,
-    BACK_LINK, LINK_BUBBLE
+    BACK_LINK
 }
 
 enum class TextStyle {

@@ -1,8 +1,6 @@
 package com.umc.edison.presentation.storage
 
 import androidx.lifecycle.SavedStateHandle
-import com.umc.edison.domain.model.ContentType
-import com.umc.edison.domain.usecase.bubble.AddBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
@@ -10,7 +8,6 @@ import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +24,6 @@ class BubbleStorageViewModel @Inject constructor(
     private val getAllBubblesUseCase: GetAllBubblesUseCase,
     private val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
     private val moveBubblesUseCase: MoveBubblesUseCase,
-    private val addBubblesUseCase: AddBubblesUseCase
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
@@ -69,9 +65,6 @@ class BubbleStorageViewModel @Inject constructor(
             },
             onComplete = {
                 _uiState.update { it.copy(isLoading = false) }
-                if (_uiState.value.label?.bubbles.isNullOrEmpty()) {
-                    insertBubbles()
-                }
             }
         )
     }
@@ -216,120 +209,8 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
-
-    private fun insertBubbles() {
-        val label = LabelModel(
-            id = _uiState.value.label!!.id,
-            name = _uiState.value.label!!.name,
-            color = _uiState.value.label!!.color,
-            bubbles = _uiState.value.label!!.bubbles
-        )
-
-        val dummyBubbles = listOf(
-            BubbleModel(
-                id = 1,
-                contentBlocks = listOf(
-                    ContentBlockModel(
-                        content = "새우간장볶음 밥 앤나 명란젓",
-                        type = ContentType.TEXT,
-                        position = 0
-                    ),
-                ),
-                mainImage = null,
-                labels = listOf(label)
-            ),
-            BubbleModel(
-                id = 2,
-                contentBlocks = listOf(
-                    ContentBlockModel(
-                        content = "오늘 따뜻함 찾으러 나갔음. 생각보다 쉽게 찾았음. 따뜻함 한 스푼 더해서 커피 마셨는데 커피가 너무 맛있었음",
-                        type = ContentType.TEXT,
-                        position = 0
-                    ),
-                ),
-                mainImage = null,
-                labels = listOf(label)
-            ),
-            BubbleModel(
-                id = 3,
-                contentBlocks = listOf(
-                    ContentBlockModel(
-                        content = "길에서 고양이 마주치다가",
-                        type = ContentType.TEXT,
-                        position = 0
-                    )
-                ),
-                mainImage = null,
-                labels = listOf(label)
-            ),
-            BubbleModel(
-                id = 4,
-                contentBlocks = listOf(
-                    ContentBlockModel(
-                        content = "새우간장볶음 밥 앤나 명란젓",
-                        type = ContentType.TEXT,
-                        position = 0
-                    ),
-                ),
-                mainImage = null,
-                labels = listOf(label)
-            ),
-            BubbleModel(
-                id = 5,
-                contentBlocks = listOf(
-                    ContentBlockModel(
-                        content = "오늘 따뜻함 찾으러 나갔음. 생각보다 쉽게 찾았음. 따뜻함 한 스푼 더해서 커피 마셨는데 커피가 너무 맛있었음",
-                        type = ContentType.TEXT,
-                        position = 0
-                    ),
-                ),
-                mainImage = null,
-                labels = listOf(label)
-            ),
-            BubbleModel(
-                id = 6,
-                contentBlocks = listOf(
-                    ContentBlockModel(
-                        content = "길에서 고양이 마주치다가",
-                        type = ContentType.TEXT,
-                        position = 0
-                    )
-                ),
-                mainImage = null,
-                labels = listOf(label)
-            )
-        )
-
-        collectDataResource(
-            flow = addBubblesUseCase(dummyBubbles.map { it.toDomain() }),
-            onSuccess = {
-                _uiState.update {
-                    it.copy(
-                        label = it.label!!.copy(
-                            bubbles = it.label.bubbles + dummyBubbles
-                        )
-                    )
-                }
-            },
-            onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
-    }
-
     override fun clearToastMessage() {
-        TODO("Not yet implemented")
+        _uiState.update { it.copy(toastMessage = null) }
     }
 
 }

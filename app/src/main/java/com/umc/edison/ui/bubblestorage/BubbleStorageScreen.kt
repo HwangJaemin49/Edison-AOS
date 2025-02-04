@@ -33,6 +33,7 @@ import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTopAppBar
 import com.umc.edison.ui.label.LabelSelectModalContent
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray900
 
@@ -87,11 +88,10 @@ fun BubbleStorageScreen(
                 )
             }
         }
-    ) { innerPadding ->
+    ) { padding ->
         BaseContent(
             uiState = uiState,
             onDismiss = { viewModel.clearToastMessage() },
-            modifier = Modifier.padding(innerPadding),
         ) {
             var onBubbleClick: (BubbleModel) -> Unit = {}
             var onBubbleLongClick: (BubbleModel) -> Unit = {}
@@ -154,14 +154,13 @@ fun BubbleStorageScreen(
                     Bubble(
                         bubble = bubble,
                         onBubbleClick = {
-                            // TODO: 버블 작성 화면 구현 완료되면 연결
-                            // navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
+                             navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
                         },
                         onBackScreenClick = {
                             viewModel.updateEditMode(BubbleStorageMode.NONE)
                         },
-                        onLinkedBubbleClicked = { linkedBubble ->
-                            // TODO: 연결된 버블 클릭 시 동작 구현
+                        onLinkedBubbleClicked = { linkedBubbleId ->
+                            navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))
                         }
                     )
                 }

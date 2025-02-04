@@ -3,7 +3,6 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
-import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -242,7 +241,7 @@ private fun TextContentBubble(
             else bubble.title ?: bubble.contentBlocks[0].content
 
             Text(
-                text = text.parseHtml(),
+                text = text.parseHtml().replace("\n\n", "\n").trim(),
                 style = bubbleSize.fontStyle,
                 color = Gray800,
                 textAlign = TextAlign.Center
@@ -388,8 +387,7 @@ fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         text = bubble.contentBlocks.firstOrNull()?.content ?: ""
     }
 
-    text = text.parseHtml()
-    Log.i("Bubble", "text: $text")
+    text = text.parseHtml().replace("\n\n", "\n").trim()
 
     fun calculateLineCount(text: String, textBoxWidthDp: Int, fontSizeSp: Float): Int {
         val charPerLine = (textBoxWidthDp / (fontSizeSp * 0.57)).toInt()
@@ -413,12 +411,11 @@ fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         val fontSizeSp = bubbleType.fontStyle.fontSize.value
         val lineCount = calculateLineCount(text, textBoxWidth, fontSizeSp)
 
-        return when {
-            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> BubbleType.Bubble100
-            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> BubbleType.Bubble160
-            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> BubbleType.Bubble230
-            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> BubbleType.Bubble300
-            else -> BubbleType.BubbleMain
+        when {
+            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> return BubbleType.Bubble100
+            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> return BubbleType.Bubble160
+            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> return BubbleType.Bubble230
+            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> return BubbleType.Bubble300
         }
     }
 

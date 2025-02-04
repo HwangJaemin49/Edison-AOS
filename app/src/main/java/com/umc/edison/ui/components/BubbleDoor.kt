@@ -271,6 +271,49 @@ private fun BubbleContent(
                 }
             }
         }
+
+        bubble.linkedBubble?.let { linkedBubble ->
+            val myUriHandler by remember {
+                mutableStateOf(object : UriHandler {
+                    override fun openUri(uri: String) {
+                        val bubbleId = uri.toIntOrNull()
+                        if (bubbleId != null) {
+                            linkClicked(bubbleId)
+                        }
+                    }
+                })
+            }
+
+            val richTextState = rememberRichTextState()
+            val isInitialized = remember(linkedBubble.id) { mutableStateOf(false) }
+
+            if (!isInitialized.value) {
+                val selectedTitle = linkedBubble.title?.takeIf { it.isNotBlank() }
+                    ?: linkedBubble.contentBlocks
+                        .filter { it.type == ContentType.TEXT }
+                        .firstOrNull { it.content.parseHtml().isNotBlank() }
+                        ?.content?.parseHtml()?.take(5)
+                    ?: "내용 없음"
+
+                val splitTitle = selectedTitle.split("\n")
+
+                richTextState.addLink(
+                    text = "[[${splitTitle[0]}]]",
+                    url = "${linkedBubble.id}"
+                )
+
+                isInitialized.value = true
+            }
+
+            CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                RichText(
+                    state = richTextState,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Gray800,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
     }
 }
 
@@ -521,18 +564,25 @@ private fun BubbleContent(
 
         bubble.linkedBubble?.let { linkedBubble ->
             val richTextState = rememberRichTextState()
+            val isInitialized = remember(linkedBubble.id) { mutableStateOf(false) }
 
-            val selectedTitle = linkedBubble.title?.takeIf { it.isNotBlank() }
-                ?: linkedBubble.contentBlocks
-                    .filter { it.type == ContentType.TEXT }
-                    .firstOrNull { it.content.parseHtml().isNotBlank() }
-                    ?.content?.parseHtml()?.take(5)
-                ?: "내용 없음"
+            if (!isInitialized.value) {
+                val selectedTitle = linkedBubble.title?.takeIf { it.isNotBlank() }
+                    ?: linkedBubble.contentBlocks
+                        .filter { it.type == ContentType.TEXT }
+                        .firstOrNull { it.content.parseHtml().isNotBlank() }
+                        ?.content?.parseHtml()?.take(5)
+                    ?: "내용 없음"
 
-            richTextState.addLink(
-                text = "\n[[$selectedTitle]]",
-                url = "${linkedBubble.id}"
-            )
+                val splitTitle = selectedTitle.split("\n")
+
+                richTextState.addLink(
+                    text = "[[${splitTitle[0]}]]",
+                    url = "${linkedBubble.id}"
+                )
+
+                isInitialized.value = true
+            }
 
             BasicRichText(
                 state = richTextState,

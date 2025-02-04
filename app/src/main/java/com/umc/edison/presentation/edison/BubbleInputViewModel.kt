@@ -46,7 +46,7 @@ class BubbleInputViewModel @Inject constructor(
     init {
         val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
         fetchBubble(id)
-        addTextBlock()
+        addTextBlockToFront()
         fetchLabels()
         fetchBubbles()
     }
@@ -57,9 +57,12 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getBubbleUseCase(bubbleId),
             onSuccess = { bubble ->
+                val sortedContentBlocks = bubble.contentBlocks.sortedBy { it.position }.toPresentation()
                 _uiState.update {
                     it.copy(
-                        bubble = bubble.toPresentation(),
+                        bubble = bubble.toPresentation().copy(
+                            contentBlocks = sortedContentBlocks
+                        ),
                     )
                 }
             },
@@ -163,6 +166,10 @@ class BubbleInputViewModel @Inject constructor(
         }
 
         if (iconType == IconType.TAG) {
+            fetchLabels()
+        }
+
+        if (iconType == IconType.TAG) {
             updateLabelEditMode(LabelEditMode.EDIT)
         }
 
@@ -211,6 +218,28 @@ class BubbleInputViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun addTextBlockToFront() {
+        val newTextBlock = ContentBlockModel(
+            type = ContentType.TEXT,
+            content = "",
+            position = 0,
+        )
+
+        _uiState.value.bubble.contentBlocks.forEachIndexed { index, contentBlock ->
+            contentBlock.position = index + 1
+        }
+
+        _uiState.update {
+            it.copy(
+                bubble = it.bubble.copy(
+                    contentBlocks = listOf(newTextBlock) + it.bubble.contentBlocks
+                )
+            )
+        }
+
+        Log.i("BubbleInputViewModel", "addTextBlockToFront: ${_uiState.value.bubble.contentBlocks}")
     }
 
     fun addContentBlocks(imagePaths: List<Uri>) {
@@ -297,14 +326,14 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun saveBubble(isLinked: Boolean = false) {
+        trimBlankBlock()
+
         checkCanSave()
 
         if (!_uiState.value.canSave && isLinked) {
             _uiState.update { it.copy(toastMessage = "내용을 입력해주세요.") }
             return
         }
-
-        convertBrToBackSlash()
 
         collectDataResource(
             flow = if (_uiState.value.bubble.id == 0) {
@@ -324,6 +353,7 @@ class BubbleInputViewModel @Inject constructor(
                             bubbles = it.bubbles + savedBubble.toPresentation()
                         )
                     }
+                    addTextBlockToFront()
                 }
             },
             onError = { error ->
@@ -358,24 +388,32 @@ class BubbleInputViewModel @Inject constructor(
         _uiState.update { it.copy(canSave = canSave) }
     }
 
-    private fun convertBrToBackSlash() {
+    private fun trimBlankBlock() {
         val contentBlocks = _uiState.value.bubble.contentBlocks.toMutableList()
         val updatedContentBlocks = mutableListOf<ContentBlockModel>()
+        var position = 0
 
         contentBlocks.forEachIndexed { _, contentBlock ->
-            val contents = contentBlock.content.split("<br>")
-
             if (contentBlock.type == ContentType.TEXT) {
-                val updatedContentBlock = contentBlock.copy(
-                    content = if (contents.size > 1) {
-                        contents.joinToString(separator = "\n", prefix = "\n").removePrefix("\n")
-                    } else {
-                        contentBlock.content
-                    }
-                )
-                updatedContentBlocks.add(updatedContentBlock)
+                val contents = contentBlock.content.split("<br>")
+                val newContent = if (contents.size > 1) {
+                    contents.joinToString(separator = "") { it.trim() }
+                } else {
+                    contentBlock.content
+                }
+
+                if (newContent.parseHtml().trim().isNotEmpty()) {
+                    val updatedContentBlock = contentBlock.copy(
+                        content = newContent,
+                        position = position
+                    )
+                    updatedContentBlocks.add(updatedContentBlock)
+                    position++
+                }
             } else {
-                updatedContentBlocks.add(contentBlock)
+                val updatedContentBlock = contentBlock.copy(position = position)
+                updatedContentBlocks.add(updatedContentBlock)
+                position++ // position 증가
             }
         }
 

@@ -41,6 +41,7 @@ import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BubbleDoor
+import com.umc.edison.ui.components.IconType
 import com.umc.edison.ui.components.ImageGallery
 import com.umc.edison.ui.components.LabelModalContent
 import com.umc.edison.ui.components.Toolbar
@@ -67,6 +68,15 @@ fun BubbleInputScreen(
     BackHandler {
         if (uiState.labelEditMode != LabelEditMode.NONE) {
             viewModel.updateLabelEditMode(LabelEditMode.NONE)
+        } else if(uiState.isGalleryOpen) {
+            viewModel.closeGallery()
+            viewModel.updateIcon(IconType.NONE)
+        } else if (uiState.isCameraOpen) {
+            viewModel.updateCameraOpen(false)
+            viewModel.updateIcon(IconType.NONE)
+        } else if (uiState.selectedIcon == IconType.CAMERA || uiState.selectedIcon == IconType.LINK
+            || uiState.selectedIcon == IconType.BACK_LINK) {
+            viewModel.updateIcon(IconType.NONE)
         } else {
             if (uiState.canSave) {
                 viewModel.saveBubble(false)
@@ -116,6 +126,9 @@ fun BubbleInputScreen(
                     },
                     onBackLinkClick = { bubble ->
                         viewModel.addBackLink(bubble)
+                    },
+                    onLinkBubbleClick = {
+                        viewModel.updateBubbleWithLink()
                     }
                 )
             }
@@ -254,9 +267,12 @@ fun BubbleInputContent(
                 editMode = uiState.labelEditMode,
                 onDismiss = {
                     viewModel.updateLabelEditMode(LabelEditMode.EDIT)
-                }, onConfirm = { label ->
+                },
+                onConfirm = { label ->
                     viewModel.saveLabel(label)
-                }, label = LabelModel.DEFAULT
+                    viewModel.updateLabelEditMode(LabelEditMode.EDIT)
+                },
+                label = LabelModel.DEFAULT
             )
         }
     }
