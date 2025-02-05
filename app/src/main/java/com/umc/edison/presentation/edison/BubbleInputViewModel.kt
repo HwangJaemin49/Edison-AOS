@@ -46,6 +46,7 @@ class BubbleInputViewModel @Inject constructor(
     init {
         val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
         fetchBubble(id)
+        addTextBlockToFront()
         fetchLabels()
         fetchBubbles()
     }
@@ -74,7 +75,6 @@ class BubbleInputViewModel @Inject constructor(
             },
             onComplete = {
                 _uiState.update { it.copy(isLoading = false) }
-                addTextBlockToFront()
             }
         )
     }
@@ -257,7 +257,7 @@ class BubbleInputViewModel @Inject constructor(
         _uiState.update {
             val updatedContentBlocks = listOf(newTextBlock) + it.bubble.contentBlocks
             // position 순으로 정렬
-            val sorted = updatedContentBlocks.sortedBy { it.position }
+            val sorted = updatedContentBlocks.sortedBy { contentBlock -> contentBlock.position }
             it.copy(
                 bubble = it.bubble.copy(
                     contentBlocks = sorted
@@ -373,7 +373,7 @@ class BubbleInputViewModel @Inject constructor(
                             bubbles = it.bubbles + savedBubble.toPresentation()
                         )
                     }
-                    addTextBlockToFront()
+                    addTextBlock()
                 }
             },
             onError = { error ->
