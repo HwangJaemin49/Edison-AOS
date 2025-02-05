@@ -137,7 +137,7 @@ fun Bubble(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f))
+            .background(Gray800.copy(alpha = 0.5f))
             .clickable(onClick = onBackScreenClick),
         contentAlignment = Alignment.Center
     ) {
@@ -152,7 +152,7 @@ fun Bubble(
 @Composable
 private fun Bubble(
     bubble: BubbleModel,
-    onClick: () -> Unit, // 편집 모드로 들어가는 클릭 리스너
+    onClick: () -> Unit,
     linkClicked: (Int) -> Unit,
 ) {
     val bubbleSize = calculateBubbleSize(bubble)

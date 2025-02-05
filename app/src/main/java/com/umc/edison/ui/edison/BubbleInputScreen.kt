@@ -24,7 +24,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -85,7 +84,9 @@ fun BubbleInputScreen(
         }
     }
 
-    Scaffold(
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
         topBar = {
             BubbleInputTopBar(
                 onBackClicked = {
@@ -133,39 +134,33 @@ fun BubbleInputScreen(
                 )
             }
         }
-    ) { innerPadding ->
-        BaseContent(
-            uiState = uiState,
-            onDismiss = { viewModel.clearToastMessage() },
-            modifier = Modifier.padding(innerPadding)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
+            BubbleInputContent(viewModel)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .align(Alignment.BottomCenter),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                BubbleInputContent(viewModel)
+                uiState.bubble.labels.forEach { label ->
+                    Box(
+                        modifier = Modifier
+                            .height(41.dp)
+                            .background(label.color, RoundedCornerShape(20.dp))
+                            .padding(horizontal = 16.dp)
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .align(Alignment.BottomCenter),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    uiState.bubble.labels.forEach { label ->
-                        Box(
-                            modifier = Modifier
-                                .height(41.dp)
-                                .background(label.color, RoundedCornerShape(20.dp))
-                                .padding(horizontal = 16.dp)
-
-                        ) {
-                            Text(
-                                text = label.name,
-                                color = Gray900,
-                                style = MaterialTheme.typography.labelLarge,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
+                    ) {
+                        Text(
+                            text = label.name,
+                            color = Gray900,
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
                     }
                 }
             }

@@ -28,7 +28,6 @@ class BubbleStorageViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
     val uiState = _uiState.asStateFlow()
-
     init {
         val id: Int? = savedStateHandle["id"]
 

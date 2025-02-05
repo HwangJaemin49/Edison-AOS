@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,7 +46,9 @@ fun BubbleStorageScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isBlur = uiState.bubbleStorageMode != BubbleStorageMode.NONE
 
-    LaunchedEffect(Unit) { updateShowBottomNav(true) }
+    LaunchedEffect(Unit) {
+        updateShowBottomNav(true)
+    }
 
     BackHandler(enabled = true) {
         if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
@@ -57,7 +58,9 @@ fun BubbleStorageScreen(
         }
     }
 
-    Scaffold(
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
                 val onButtonClick: () -> Unit
@@ -88,166 +91,161 @@ fun BubbleStorageScreen(
                 )
             }
         }
-    ) { padding ->
-        BaseContent(
-            uiState = uiState,
-            onDismiss = { viewModel.clearToastMessage() },
-        ) {
-            var onBubbleClick: (BubbleModel) -> Unit = {}
-            var onBubbleLongClick: (BubbleModel) -> Unit = {}
+    ) {
+        var onBubbleClick: (BubbleModel) -> Unit = {}
+        var onBubbleLongClick: (BubbleModel) -> Unit = {}
 
-            if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
-                onBubbleClick = { bubble ->
-                    viewModel.toggleSelectBubble(bubble)
-                }
-            } else if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
-                onBubbleClick = { bubble ->
-                    viewModel.selectBubble(bubble)
-                    viewModel.updateEditMode(BubbleStorageMode.VIEW)
-                }
-                onBubbleLongClick = { bubble ->
-                    viewModel.selectBubble(bubble)
-                    viewModel.updateEditMode(BubbleStorageMode.EDIT)
-                    updateShowBottomNav(false)
-                }
+        if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
+            onBubbleClick = { bubble ->
+                viewModel.toggleSelectBubble(bubble)
             }
+        } else if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
+            onBubbleClick = { bubble ->
+                viewModel.selectBubble(bubble)
+                viewModel.updateEditMode(BubbleStorageMode.VIEW)
+            }
+            onBubbleLongClick = { bubble ->
+                viewModel.selectBubble(bubble)
+                viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                updateShowBottomNav(false)
+            }
+        }
 
-            Column(
-                modifier = Modifier.clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
-                        resetEditMode(viewModel, updateShowBottomNav)
-                    }
-                }
+        Column(
+            modifier = Modifier.clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
             ) {
-                if (uiState.label != null) {
-                    LabelTopAppBar(
-                        label = uiState.label!!,
-                        onBackClick = {
-                            resetEditMode(viewModel, updateShowBottomNav)
-                            navHostController.popBackStack()}
-                    )
+                if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
+                    resetEditMode(viewModel, updateShowBottomNav)
                 }
-
-                BubblesLayout(
-                    bubbles = uiState.label?.bubbles ?: uiState.bubbles,
-                    onBubbleClick = onBubbleClick,
-                    onBubbleLongClick = onBubbleLongClick,
-                    isBlur = isBlur,
-                    selectedBubble = uiState.selectedBubbles,
+            }
+        ) {
+            if (uiState.label != null) {
+                LabelTopAppBar(
+                    label = uiState.label!!,
+                    onBackClick = {
+                        resetEditMode(viewModel, updateShowBottomNav)
+                        navHostController.popBackStack()}
                 )
             }
 
-            if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
-                val bubble = uiState.selectedBubbles.first()
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.5f))
-                        .clickable(onClick = {
-                            viewModel.updateEditMode(BubbleStorageMode.NONE)
-                        }),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Bubble(
-                        bubble = bubble,
-                        onBubbleClick = {
-                             navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
-                        },
-                        onBackScreenClick = {
-                            viewModel.updateEditMode(BubbleStorageMode.NONE)
-                        },
-                        onLinkedBubbleClicked = { linkedBubbleId ->
-                            navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))
-                        }
-                    )
-                }
-            } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {
-                BottomSheet(
+            BubblesLayout(
+                bubbles = uiState.label?.bubbles ?: uiState.bubbles,
+                onBubbleClick = onBubbleClick,
+                onBubbleLongClick = onBubbleLongClick,
+                isBlur = isBlur,
+                selectedBubble = uiState.selectedBubbles,
+            )
+        }
+
+        if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
+            val bubble = uiState.selectedBubbles.first()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable(onClick = {
+                        viewModel.updateEditMode(BubbleStorageMode.NONE)
+                    }),
+                contentAlignment = Alignment.Center
+            ) {
+                Bubble(
+                    bubble = bubble,
+                    onBubbleClick = {
+                        navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
+                    },
+                    onBackScreenClick = {
+                        viewModel.updateEditMode(BubbleStorageMode.NONE)
+                    },
+                    onLinkedBubbleClicked = { linkedBubbleId ->
+                        navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))
+                    }
+                )
+            }
+        } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {
+            BottomSheet(
+                onDismiss = {
+                    viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                },
+            ) {
+                LabelSelectModalContent(
+                    labels = uiState.movableLabels,
                     onDismiss = {
                         viewModel.updateEditMode(BubbleStorageMode.EDIT)
                     },
-                ) {
-                    LabelSelectModalContent(
-                        labels = uiState.movableLabels,
-                        onDismiss = {
-                            viewModel.updateEditMode(BubbleStorageMode.EDIT)
-                        },
-                        onConfirm = { labelList ->
-                            viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
-                        },
-                    )
-                }
-            } else if (uiState.bubbleStorageMode == BubbleStorageMode.DELETE) {
-                BottomSheetPopUp(
-                    title = "${uiState.selectedBubbles.size} 개의 버블을 삭제하시겠습니까?",
-                    cancelText = "취소",
-                    confirmText = "삭제",
-                    onDismiss = {
-                        viewModel.updateEditMode(BubbleStorageMode.EDIT)
-                    },
-                    onConfirm = {
-                        viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
+                    onConfirm = { labelList ->
+                        viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
                     },
                 )
-            } else if (uiState.bubbleStorageMode == BubbleStorageMode.SHARE) {
-                BottomSheet(
-                    onDismiss = {
-                        viewModel.updateEditMode(BubbleStorageMode.EDIT)
-                    },
+            }
+        } else if (uiState.bubbleStorageMode == BubbleStorageMode.DELETE) {
+            BottomSheetPopUp(
+                title = "${uiState.selectedBubbles.size} 개의 버블을 삭제하시겠습니까?",
+                cancelText = "취소",
+                confirmText = "삭제",
+                onDismiss = {
+                    viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                },
+                onConfirm = {
+                    viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
+                },
+            )
+        } else if (uiState.bubbleStorageMode == BubbleStorageMode.SHARE) {
+            BottomSheet(
+                onDismiss = {
+                    viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                },
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
                 ) {
-                    Column(
+                    TextButton(
+                        onClick = { /* TODO: 이미지 공유 로직 추가 */ },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp)
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
-                        TextButton(
-                            onClick = { /* TODO: 이미지 공유 로직 추가 */ },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 10.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "이미지로 공유하기",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = Gray900
-                                )
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        ) {
-                            HorizontalDivider(
-                                color = Gray300,
-                                thickness = 1.dp,
-                                modifier = Modifier.width(326.dp)
+                            Text(
+                                text = "이미지로 공유하기",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = Gray900
                             )
                         }
+                    }
 
-                        TextButton(
-                            onClick = { /* TODO: 텍스트 공유 로직 추가 */ },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 10.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    ) {
+                        HorizontalDivider(
+                            color = Gray300,
+                            thickness = 1.dp,
+                            modifier = Modifier.width(326.dp)
+                        )
+                    }
 
+                    TextButton(
+                        onClick = { /* TODO: 텍스트 공유 로직 추가 */ },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 10.dp)
+
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(
-                                    text = "텍스트로 공유하기",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = Gray900
-                                )
-                            }
+                            Text(
+                                text = "텍스트로 공유하기",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = Gray900
+                            )
                         }
                     }
                 }
