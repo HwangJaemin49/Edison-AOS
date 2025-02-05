@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,7 +45,6 @@ import com.umc.edison.ui.components.RadioButton
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.White000
 
 @Composable
 fun TrashScreen(
@@ -70,7 +68,9 @@ fun TrashScreen(
         }
     }
 
-    Scaffold(
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.mode == BubbleRecoverMode.SELECT) {
                 BottomSheetForDelete(
@@ -84,16 +84,13 @@ fun TrashScreen(
                     },
                 )
             }
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(White000)
-                .padding(innerPadding)
-        ) {
-            TrashContent(viewModel, uiState, navHostController)
-        }
+        },
+    ) {
+        TrashContent(
+            viewModel = viewModel,
+            uiState = uiState,
+            navHostController = navHostController
+        )
     }
 }
 
@@ -121,109 +118,104 @@ private fun TrashContent(
         }
     }
 
-    BaseContent(
-        uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentHeight(),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .wrapContentHeight(),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+        BackButtonTopBar(
+            onBack = { navHostController.popBackStack() },
         ) {
-            BackButtonTopBar(
-                onBack = { navHostController.popBackStack() },
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "휴지통",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Gray800,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .weight(1f)
-                    )
-
-                    Text(
-                        text = "삭제된 버블은 30일간 보관됩니다.",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Gray500
-                    )
-                }
-            }
-
-            if (uiState.mode != BubbleRecoverMode.NONE && uiState.mode != BubbleRecoverMode.VIEW) {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(32.dp)
-                        .padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    RadioButton(
-                        selected = uiState.selectedBubbles.size == uiState.bubbles.size,
-                        onClick = { viewModel.selectAllBubbles() }
-                    )
-
-                    Text(
-                        text = "전체",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray800
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Text(
-                        text = "버블 선택",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray800
-                    )
-                }
-            }
-
-            LazyColumn(
+            Row(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = if (uiState.mode == BubbleRecoverMode.NONE || uiState.mode == BubbleRecoverMode.VIEW) {
-                    Arrangement.spacedBy(0.dp)
-                } else {
-                    Arrangement.spacedBy(8.dp)
-                }
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(uiState.bubbles) { bubble ->
-                    TrashItem(
-                        bubble = bubble,
-                        uiState = uiState,
-                        onBubbleClick = onBubbleClick,
-                        onBubbleLongClick = onBubbleLongClick
-                    )
-                }
+                Text(
+                    text = "휴지통",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Gray800,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(1f)
+                )
+
+                Text(
+                    text = "삭제된 버블은 30일간 보관됩니다.",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Gray500
+                )
             }
         }
 
-        if (uiState.mode == BubbleRecoverMode.DELETE) {
-            BottomSheetPopUp(
-                title = "클라우드와 모든 기기에서 완전히 삭제됩니다.",
-                cancelText = "취소",
-                confirmText = "삭제",
-                onDismiss = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT) },
-                onConfirm = { viewModel.deleteBubbles() }
-            )
+        if (uiState.mode != BubbleRecoverMode.NONE && uiState.mode != BubbleRecoverMode.VIEW) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(32.dp)
+                    .padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                RadioButton(
+                    selected = uiState.selectedBubbles.size == uiState.bubbles.size,
+                    onClick = { viewModel.selectAllBubbles() }
+                )
+
+                Text(
+                    text = "전체",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Gray800
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = "버블 선택",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Gray800
+                )
+            }
         }
 
-        if (uiState.mode == BubbleRecoverMode.VIEW) {
-            Bubble(
-                bubble = uiState.selectedBubbles.first(),
-                onBackScreenClick = {
-                    viewModel.updateBubbleRecoverMode(BubbleRecoverMode.NONE)
-                    viewModel.clearSelection()
-                },
-                onBubbleClick = {}
-            )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = if (uiState.mode == BubbleRecoverMode.NONE || uiState.mode == BubbleRecoverMode.VIEW) {
+                Arrangement.spacedBy(0.dp)
+            } else {
+                Arrangement.spacedBy(8.dp)
+            }
+        ) {
+            items(uiState.bubbles) { bubble ->
+                TrashItem(
+                    bubble = bubble,
+                    uiState = uiState,
+                    onBubbleClick = onBubbleClick,
+                    onBubbleLongClick = onBubbleLongClick
+                )
+            }
         }
+    }
+
+    if (uiState.mode == BubbleRecoverMode.DELETE) {
+        BottomSheetPopUp(
+            title = "클라우드와 모든 기기에서 완전히 삭제됩니다.",
+            cancelText = "취소",
+            confirmText = "삭제",
+            onDismiss = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT) },
+            onConfirm = { viewModel.deleteBubbles() }
+        )
+    }
+
+    if (uiState.mode == BubbleRecoverMode.VIEW) {
+        Bubble(
+            bubble = uiState.selectedBubbles.first(),
+            onBackScreenClick = {
+                viewModel.updateBubbleRecoverMode(BubbleRecoverMode.NONE)
+                viewModel.clearSelection()
+            },
+            onBubbleClick = {}
+        )
     }
 }
 

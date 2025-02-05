@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,7 +51,9 @@ fun AccountManagementScreen(
         updateShowBottomNav(false)
     }
 
-    Scaffold(
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = "계정 관리",
@@ -64,14 +65,8 @@ fun AccountManagementScreen(
                 } else White000
             )
         }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            AccountManagementContent(viewModel, uiState)
-        }
+    ) {
+        AccountManagementContent(viewModel, uiState)
     }
 }
 
@@ -81,164 +76,160 @@ private fun AccountManagementContent(
     uiState: AccountManagementState
 ) {
 
-    BaseContent(
-        uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 28.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 28.dp)
+                .fillMaxWidth()
+                .height(32.dp)
+                .padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(32.dp)
-                    .padding(horizontal = 24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = if (uiState.isLoggedIn) "소셜 계정이 연결되었습니다." else "소셜 계정 연결이 필요합니다.",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Gray600,
-                )
-            }
+            Text(
+                text = if (uiState.isLoggedIn) "소셜 계정이 연결되었습니다." else "소셜 계정 연결이 필요합니다.",
+                style = MaterialTheme.typography.labelLarge,
+                color = Gray600,
+            )
+        }
 
-            Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp, bottom = 18.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp, bottom = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Google",
+                style = MaterialTheme.typography.bodySmall,
+                color = Gray800,
+                modifier = Modifier.weight(1f)
+            )
+
+            if (uiState.isLoggedIn && uiState.user != null) {
                 Text(
-                    text = "Google",
+                    text = uiState.user.email,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Gray800,
-                    modifier = Modifier.weight(1f)
+                    color = Gray600
                 )
 
-                if (uiState.isLoggedIn && uiState.user != null) {
-                    Text(
-                        text = uiState.user.email,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray600
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Gray100)
-                            .clickable { viewModel.updateMode(AccountManagementMode.EMAIL_CHANGE) }
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = "업데이트",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = Gray800
-                        )
-                    }
-                } else {
-                    Text(
-                        text = "연결 없음",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray600
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Gray100)
-                            .clickable { /* TODO: 로그인하기 기능 */ }
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = "로그인하기",
-                            style = MaterialTheme.typography.titleSmall,
-                            color = Gray800
-                        )
-                    }
-                }
-            }
-
-            if (uiState.isLoggedIn) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(12.dp)
+                        .wrapContentSize()
+                        .clip(RoundedCornerShape(20.dp))
                         .background(Gray100)
-                )
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                        .clickable { viewModel.updateMode(AccountManagementMode.EMAIL_CHANGE) }
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "로그아웃",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Red,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { viewModel.updateMode(AccountManagementMode.LOGOUT) }
-                            .padding(vertical = 6.dp),
+                        text = "업데이트",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Gray800
                     )
+                }
+            } else {
+                Text(
+                    text = "연결 없음",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Gray600
+                )
 
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Gray100)
+                        .clickable { /* TODO: 로그인하기 기능 */ }
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
                     Text(
-                        text = "회원탈퇴",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray800,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { viewModel.updateMode(AccountManagementMode.DELETE_ACCOUNT) }
-                            .padding(vertical = 6.dp),
+                        text = "로그인하기",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = Gray800
                     )
                 }
             }
         }
 
-        if (uiState.mode != AccountManagementMode.NONE) {
+        if (uiState.isLoggedIn) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFF3E3E3E).copy(alpha = 0.5f))
-                    .clickable { viewModel.updateMode(AccountManagementMode.NONE) },
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .background(Gray100)
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                if (uiState.mode == AccountManagementMode.DELETE_ACCOUNT) {
-                    PopUpDecision(
-                        question = "회원탈퇴 하시겠습니까?",
-                        positiveButtonText = "회원탈퇴",
-                        negativeButtonText = "취소",
-                        onPositiveClick = { viewModel.deleteAccount() },
-                        onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
-                    )
-                } else if (uiState.mode == AccountManagementMode.LOGOUT) {
-                    PopUpDecision(
-                        question = "로그아웃 하시겠습니까?",
-                        positiveButtonText = "로그아웃",
-                        negativeButtonText = "취소",
-                        onPositiveClick = { viewModel.logOut() },
-                        onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
-                    )
-                } else if (uiState.mode == AccountManagementMode.EMAIL_CHANGE) {
-                    PopUpMultiDecision(
-                        question = "이메일 주소를 업데이트하시겠습니까?",
-                        positiveButtonText = "업데이트",
-                        negativeButtonText = "취소",
-                        onPositiveClick = { email -> viewModel.updateEmail(email) },
-                        onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) },
-                        placeholderText = uiState.user?.email ?: "",
-                    )
-                }
+                Text(
+                    text = "로그아웃",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.updateMode(AccountManagementMode.LOGOUT) }
+                        .padding(vertical = 6.dp),
+                )
+
+                Text(
+                    text = "회원탈퇴",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Gray800,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.updateMode(AccountManagementMode.DELETE_ACCOUNT) }
+                        .padding(vertical = 6.dp),
+                )
             }
         }
+    }
+
+    if (uiState.mode != AccountManagementMode.NONE) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF3E3E3E).copy(alpha = 0.5f))
+                .clickable { viewModel.updateMode(AccountManagementMode.NONE) },
+            contentAlignment = Alignment.Center
+        ) {
+            if (uiState.mode == AccountManagementMode.DELETE_ACCOUNT) {
+                PopUpDecision(
+                    question = "회원탈퇴 하시겠습니까?",
+                    positiveButtonText = "회원탈퇴",
+                    negativeButtonText = "취소",
+                    onPositiveClick = { viewModel.deleteAccount() },
+                    onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
+                )
+            } else if (uiState.mode == AccountManagementMode.LOGOUT) {
+                PopUpDecision(
+                    question = "로그아웃 하시겠습니까?",
+                    positiveButtonText = "로그아웃",
+                    negativeButtonText = "취소",
+                    onPositiveClick = { viewModel.logOut() },
+                    onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
+                )
+            } else if (uiState.mode == AccountManagementMode.EMAIL_CHANGE) {
+                PopUpMultiDecision(
+                    question = "이메일 주소를 업데이트하시겠습니까?",
+                    positiveButtonText = "업데이트",
+                    negativeButtonText = "취소",
+                    onPositiveClick = { email -> viewModel.updateEmail(email) },
+                    onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) },
+                    placeholderText = uiState.user?.email ?: "",
+                )
+            }
+        }
+
     }
 }

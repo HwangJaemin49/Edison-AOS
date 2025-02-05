@@ -8,6 +8,8 @@ data class Bubble(
     val contentBlocks: List<ContentBlock> = listOf(),
     val mainImage: String? = null,
     var labels: List<Label>,
+    val backLinks: List<Bubble> = listOf(),
+    val linkedBubble: Bubble? = null,
     val date: Date = Date(),
 )
 

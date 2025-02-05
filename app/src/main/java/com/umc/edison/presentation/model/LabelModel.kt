@@ -2,6 +2,7 @@ package com.umc.edison.presentation.model
 
 import androidx.compose.ui.graphics.Color
 import com.umc.edison.domain.model.Label
+import com.umc.edison.ui.theme.Gray300
 
 data class LabelModel(
     val id: Int,
@@ -15,6 +16,15 @@ data class LabelModel(
         color = color,
         bubbles = bubbles.map { it.toDomain() }
     )
+
+    companion object {
+        val DEFAULT = LabelModel(
+            id = 0,
+            name = "",
+            color = Gray300,
+            bubbles = emptyList()
+        )
+    }
 }
 
 fun Label.toPresentation(): LabelModel = LabelModel(id, name, color, bubbles.toPresentation())

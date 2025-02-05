@@ -8,11 +8,11 @@ import java.util.Date
 open class BaseLocalDataSourceImpl<T : BaseSyncLocal>(
     private val baseDao: BaseDao<T>
 ) {
-    suspend fun insert(entity: T) {
+    suspend fun insert(entity: T): Long {
         entity.createdAt = Date()
         entity.updatedAt = Date()
         entity.isSynced = false
-        baseDao.insert(entity)
+        return baseDao.insert(entity)
     }
 
     suspend fun update(entity: T, tableName: String) {

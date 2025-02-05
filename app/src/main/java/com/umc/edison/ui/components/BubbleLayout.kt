@@ -37,15 +37,21 @@ fun BubblesLayout(
                 calculateInitialBubbleXOffset(bubble)
             }
 
+            var bubbleSize = calculateBubbleSize(bubble)
+
+            if (bubbleSize == BubbleType.BubbleMain) {
+                bubbleSize = BubbleType.Bubble300
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = xOffset)
-                    .size(calculateBubbleSize(bubble).size + 4.dp)
+                    .size(bubbleSize.size + 4.dp)
             ) {
                 BubblePreview(
                     bubble = bubble,
-                    size = calculateBubbleSize(bubble),
+                    size = bubbleSize,
                     onClick = { onBubbleClick(bubble) },
                     onLongClick = { onBubbleLongClick(bubble) }
                 )
@@ -73,8 +79,13 @@ private fun calculateInitialBubbleXOffset(bubble: BubbleModel): Dp {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp
     val padding = 8.dp
+    var bubbleSize = calculateBubbleSize(bubble)
 
-    val maxXOffset = screenWidthDp - calculateBubbleSize(bubble).size - padding
+    if (bubbleSize == BubbleType.BubbleMain) {
+        bubbleSize = BubbleType.Bubble300
+    }
+
+    val maxXOffset = screenWidthDp - bubbleSize.size - padding
 
     // 랜덤 초기 오프셋 계산
     return (padding.value.toInt()..maxXOffset.value.toInt()).random().dp

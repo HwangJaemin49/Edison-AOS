@@ -12,6 +12,7 @@ object RoomConstant {
         const val BUBBLE = "BubbleLocal"
         const val LABEL = "LabelLocal"
         const val BUBBLE_LABEL = "BubbleLabelLocal"
+        const val LINKED_BUBBLE = "LinkedBubbleLocal"
     }
 
     fun getTableNameByClass(clazz: Class<*>): String {

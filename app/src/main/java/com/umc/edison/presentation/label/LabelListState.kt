@@ -2,7 +2,6 @@ package com.umc.edison.presentation.label
 
 import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.LabelModel
-import com.umc.edison.ui.theme.Gray300
 
 data class LabelListState(
     override val isLoading: Boolean,
@@ -16,12 +15,7 @@ data class LabelListState(
         val DEFAULT = LabelListState(
             isLoading = false,
             labels = emptyList(),
-            selectedLabel = LabelModel(
-                id = 0,
-                name = "",
-                color = Gray300,
-                bubbles = listOf()
-            ),
+            selectedLabel = LabelModel.DEFAULT,
             labelEditMode = LabelEditMode.NONE,
         )
     }

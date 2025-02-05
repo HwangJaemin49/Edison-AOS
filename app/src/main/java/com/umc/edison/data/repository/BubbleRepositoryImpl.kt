@@ -18,15 +18,20 @@ class BubbleRepositoryImpl @Inject constructor(
     override fun getAllBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
         remoteDataAction = { bubbleRemoteDataSource.getAllBubbles() },
         localDataAction = { bubbleLocalDataSource.getAllBubbles() },
-        saveCacheAction = { bubbleLocalDataSource.addBubbles(it)}
+        saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
     )
 
     override fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
         dataAction = { bubbleLocalDataSource.addBubbles(bubbles.toData()) }
     )
 
-    override fun softDeleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
-        dataAction = { bubbleLocalDataSource.moveBubblesToTrash(bubbles.toData()) }
+    override fun softDeleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
+        flowDataResource(
+            dataAction = { bubbleLocalDataSource.moveBubblesToTrash(bubbles.toData()) }
+        )
+
+    override fun updateBubble(bubble: Bubble): Flow<DataResource<Bubble>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.updateBubble(bubble.toData()) }
     )
 
     override fun updateBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
@@ -38,9 +43,9 @@ class BubbleRepositoryImpl @Inject constructor(
         localDataAction = { bubbleLocalDataSource.getTrashedBubbles() },
         saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
     )
-    
-    override fun getBubbleDetail(bubbleId: Int): Flow<DataResource<Bubble>> = flowDataResource(
-        dataAction = { bubbleLocalDataSource.getBubbleDetail(bubbleId) }
+
+    override fun getBubble(bubbleId: Int): Flow<DataResource<Bubble>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.getBubble(bubbleId) }
     )
 
     override fun recoverBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
@@ -49,5 +54,9 @@ class BubbleRepositoryImpl @Inject constructor(
 
     override fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
         dataAction = { bubbleLocalDataSource.softDeleteBubbles(bubbles.toData()) }
+    )
+
+    override fun addBubble(bubble: Bubble): Flow<DataResource<Bubble>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.addBubble(bubble.toData()) }
     )
 }

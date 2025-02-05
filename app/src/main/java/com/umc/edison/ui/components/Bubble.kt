@@ -6,48 +6,29 @@ import android.graphics.Shader
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -58,35 +39,21 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import coil3.size.Size
-import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
-import com.mohamedrejeb.richeditor.ui.material.RichText
+import coil3.compose.AsyncImage
 import com.umc.edison.domain.model.ContentType
-import com.umc.edison.presentation.model.ContentBlockModel
+import com.umc.edison.presentation.edison.parseHtml
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.ui.theme.Gray100
+import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
-import com.umc.edison.ui.theme.Gray400
 import com.umc.edison.ui.theme.Gray500
-import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Pretendard
 import com.umc.edison.ui.theme.White000
@@ -101,7 +68,7 @@ fun BubbleInput(
     onClick: () -> Unit,
     onSwipeUp: () -> Unit,
 
-) {
+    ) {
     val bubbleSize = BubbleType.BubbleMain
     val canvasSize = bubbleSize.size
 
@@ -165,17 +132,19 @@ fun Bubble(
     onBackScreenClick: () -> Unit,
     bubble: BubbleModel,
     onBubbleClick: (BubbleModel) -> Unit,
+    onLinkedBubbleClicked: (Int) -> Unit = {},
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.5f))
+            .background(Gray800.copy(alpha = 0.5f))
             .clickable(onClick = onBackScreenClick),
         contentAlignment = Alignment.Center
     ) {
         Bubble(
             bubble = bubble,
-            onClick = { onBubbleClick(bubble) }
+            onClick = { onBubbleClick(bubble) },
+            linkClicked = onLinkedBubbleClicked
         )
     }
 }
@@ -184,28 +153,16 @@ fun Bubble(
 private fun Bubble(
     bubble: BubbleModel,
     onClick: () -> Unit,
+    linkClicked: (Int) -> Unit,
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
-    if (checkBubbleContainImage(bubble) && bubbleSize == BubbleType.BubbleMain) {
+    if (checkBubbleContainImage(bubble) || bubbleSize == BubbleType.BubbleMain) {
         BubbleDoor(
             bubble = bubble,
             isEditable = false,
             onClick = onClick,
-            onBubbleChange = {},
-            bottomPadding = 0.dp,
-            isBoldActive = false,
-            isItalicActive = false,
-            isUnderlineActive = false,
-            isHighlightActive = false,
-            isListActive = false,
-            isOrderedListActive = false,
-            addLink = false,
-            onAddLinkHandled = {},
-            selectedId = 0,
-            selectedTitle = TODO(),
-            deleteClicked = {},
-            linkClicked = {}
+            linkClicked = linkClicked,
         )
     } else {
         TextContentBubble(
@@ -236,424 +193,26 @@ fun BubblePreview(
             bubbleSize = size
         )
     } else {
-        // TODO: 이미지 1개를 배경으로 하는 버블 컴포저블
-        ImageBubble(
-            bubbleSize = size,
-            imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
-        )
-    }
-}
+        val imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
 
-@Composable
-fun BubbleDoor(
-    bubble: BubbleModel,
-    isEditable: Boolean = false,
-    onClick: () -> Unit,
-    onBubbleChange: (BubbleModel) -> Unit,
-    isBoldActive: Boolean,
-    isItalicActive:Boolean,
-    isUnderlineActive:Boolean,
-    isHighlightActive:Boolean,
-    isListActive:Boolean,
-    isOrderedListActive:Boolean,
-    addLink : Boolean,
-    selectedTitle : String,
-    selectedId : Int,
-    onAddLinkHandled: () -> Unit,
-    deleteClicked: (ContentBlockModel) -> Unit,
-    linkClicked: (Int) -> Unit,
-    bottomPadding : Dp
-) {
-    val colors = bubble.labels.map { it.color }
-    val outerColors = when (colors.size) {
-        0 -> listOf(Color.White, Gray400)
-        1 -> listOf(Color.White, colors[0])
-        2 -> listOf(Color.White, colors[0], colors[1])
-        3 -> listOf(Color.White, colors[0], colors[1], colors[2])
-        else -> colors
-    }
-
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = bottomPadding)
-            .clickable(
-                indication = null, // Ripple 효과 제거
-                interactionSource = interactionSource
-            ) {
-                onClick()
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        // Outer Canvas
-        Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.BottomCenter)
-        ) {
-            // Outer Layer
-            drawOuterGradientBubbleDoor(
-                center = Offset(size.width / 2, size.height * 0.3f),
-                width = size.width,
-                height = size.height,
-                colors = outerColors,
-            )
-
-            // Blur Layer
-            drawBlurredOuterGradientBubbleDoor(
-                center = Offset(size.width / 2, size.height * 0.3f),
-                width = size.width,
-                height = size.height,
-            )
-        }
-
-        // Text Box
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.BottomCenter)
-                .padding(start = 23.dp, top = 260.dp, end = 23.dp, bottom = 20.dp),
-            contentAlignment = Alignment.TopStart
-        ) {
-            BubbleContent(
-                bubble = bubble,
-                isEditable = isEditable,
-                onBubbleChange = onBubbleChange, // 상태 변경을 외부로 전달
-                isBoldActive = isBoldActive,
-                isItalicActive=isItalicActive,
-                isUnderlineActive=isUnderlineActive,
-                isHighlightActive=isHighlightActive,
-                isListActive=isListActive,
-                isOrderedListActive=isOrderedListActive,
-                addLink = addLink,
-                selectedTitle = selectedTitle,
-                selectedId = selectedId,
-                onAddLinkHandled = onAddLinkHandled,
-                deleteClicked = deleteClicked,
-                linkClicked = linkClicked
-            )
-        }
-    }
-}
-
-
-
-
-
-@OptIn(ExperimentalRichTextApi::class)
-@Composable
-private fun BubbleContent(
-    bubble: BubbleModel,
-    isEditable: Boolean = false,
-    onBubbleChange: (BubbleModel) -> Unit,
-    isBoldActive: Boolean,
-    isItalicActive:Boolean,
-    isUnderlineActive:Boolean,
-    isHighlightActive:Boolean,
-    isListActive:Boolean,
-    isOrderedListActive:Boolean,
-    addLink: Boolean,
-    selectedTitle: String,
-    selectedId :Int,
-    onAddLinkHandled: () -> Unit,
-    deleteClicked: (ContentBlockModel) -> Unit,
-    linkClicked: (Int) -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .imePadding()
-            .padding(bottom = 110.dp)
-    ) {
-        if (isEditable) {
-            BasicTextField(
-                value = bubble.title ?: "",
-                onValueChange = { newTitle ->
-                    onBubbleChange(
-                        bubble.copy(title = newTitle)
-                    )
-                },
-                textStyle = MaterialTheme.typography.displayMedium.copy(color = Gray800),
-                modifier = Modifier.fillMaxWidth(),
-                decorationBox = { innerTextField ->
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        if (bubble.title.isNullOrEmpty()) {
-                            Text(
-                                text = "제목",
-                                style = MaterialTheme.typography.displayMedium.copy(color = Gray500),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
+        if (imageUrl.isNotEmpty()) {
+            ImageBubble(
+                bubbleSize = size,
+                imageUrl = imageUrl,
+                onClick = onClick,
+                onLongClick = onLongClick
             )
         } else {
-            Text(
-                text = bubble.title ?: "",
-                style = MaterialTheme.typography.displayMedium,
-                color = Gray800,
-                textAlign = TextAlign.Start
+            TextContentBubble(
+                bubble = bubble,
+                colors = bubble.labels.map { it.color },
+                onClick = onClick,
+                onLongClick = onLongClick,
+                bubbleSize = size
             )
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-
-        var targetBlockId by remember { mutableStateOf<Int?>(null) }
-        var deletedImageBlockId by remember { mutableStateOf<Int?>(null) }
-
-
-        bubble.contentBlocks.forEachIndexed { _, contentBlock ->
-            when (contentBlock.type) {
-                ContentType.TEXT -> {
-
-                    val myUriHandler by remember {
-                        mutableStateOf(object : UriHandler {
-                            override fun openUri(uri: String) {
-                                val bubbleId = uri.toIntOrNull()
-                                if (bubbleId != null) {
-                                    println(bubbleId)
-                                    linkClicked(bubbleId)
-                                }
-                            }
-                        })
-                    }
-
-                    if (isEditable) {
-
-                        val richTextState = rememberRichTextState()
-                        var previousHtml by remember { mutableStateOf("") }
-                        val isInitialized = remember(contentBlock.position) { mutableStateOf(false) }
-
-                        LaunchedEffect(deletedImageBlockId) {
-                            deletedImageBlockId?.let {
-                                richTextState.setHtml(contentBlock.content)
-                                deletedImageBlockId = null//이미지블록삭제이후재렌더링
-                            }
-                        }
-
-
-                        SideEffect {
-                            if (!isInitialized.value) {
-                                richTextState.setHtml(contentBlock.content)
-                                previousHtml = contentBlock.content
-                                isInitialized.value = true
-                            }
-                        } // 기존 버블 불러올 때 초기화
-
-
-                        LaunchedEffect(richTextState.toHtml()) {
-
-                            val newHtml = richTextState.toHtml()
-
-                            if (newHtml != previousHtml && newHtml != "<br>") {
-                                previousHtml = newHtml
-
-                                val updatedBubble = bubble.copy(
-                                    contentBlocks = bubble.contentBlocks.map { block ->
-                                        if (block.position == contentBlock.position) {
-                                            block.copy(content = newHtml)
-                                        } else {
-                                            block
-                                        }
-                                    }
-                                )
-                                onBubbleChange(updatedBubble)
-                            }
-                        }
-
-
-                        if (isBoldActive) {
-                            richTextState.addSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        } else {
-                            richTextState.removeSpanStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        }
-
-                        if (isItalicActive) {
-                            richTextState.addSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-                        } else {
-                            richTextState.removeSpanStyle(SpanStyle(fontStyle = FontStyle.Italic))
-                        }
-
-                        if (isUnderlineActive) {
-                            richTextState.addSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
-                        } else {
-                            richTextState.removeSpanStyle(SpanStyle(textDecoration = TextDecoration.Underline))
-                        }
-
-                        if (isHighlightActive) {
-                            richTextState.addSpanStyle(SpanStyle(background = Color.Yellow))
-                        } else {
-                            richTextState.removeSpanStyle(SpanStyle(background = Color.Yellow))
-                        }
-
-                        if (isListActive) {
-                            richTextState.addUnorderedList()
-                        } else {
-                            richTextState.removeUnorderedList()
-                        }
-
-                        if (isOrderedListActive) {
-                            richTextState.addOrderedList()
-                        } else {
-                            richTextState.removeOrderedList()
-                        }
-
-                        if (addLink) {
-                            targetBlockId = bubble.contentBlocks.lastOrNull()?.position
-                        }
-
-                        if (addLink && contentBlock.position == targetBlockId) {
-                            richTextState.addLink(
-                                text = "[[$selectedTitle]]",
-                                url = "$selectedId"
-                            )
-                            previousHtml = richTextState.toHtml()
-                            contentBlock.content = previousHtml
-                            println(contentBlock.content)
-                            onAddLinkHandled()
-                            targetBlockId = null
-                        }
-
-                        BasicRichTextEditor(
-                            state = richTextState,
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                            modifier = Modifier.fillMaxWidth(),
-                            decorationBox = { innerTextField ->
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    if (richTextState.toHtml() == "<br>" && bubble.contentBlocks.size == 1) {
-                                        Text(
-                                            text = "내용을 입력해주세요.",
-                                            style = MaterialTheme.typography.bodyMedium.copy(color = Gray500),
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                    innerTextField()
-                                }
-                            }
-                        )
-                    } else {
-
-                        val richTextState = rememberRichTextState()
-
-                        LaunchedEffect(contentBlock.content) {
-                            richTextState.setHtml(contentBlock.content)
-                        }
-
-                        CompositionLocalProvider(LocalUriHandler provides myUriHandler){
-
-                            RichText(
-                                state = richTextState,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Gray800,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                        }
-
-
-                    }
-                }
-
-                ContentType.IMAGE -> {
-                    val aspectRatio = calculateAspectRatio(contentBlock.content)
-                    var showDeleteButton by remember { mutableStateOf(false) }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(aspectRatio)
-                            .pointerInput(Unit) {
-                                detectTapGestures(
-                                    onLongPress = {
-                                        showDeleteButton = true
-                                    }
-                                )
-                            }
-                    ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(contentBlock.content)
-                                    .crossfade(true)
-                                    .size(Size.ORIGINAL)
-                                    .build()
-                            ),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(8.dp))
-                        )
-
-                        if (isEditable && showDeleteButton) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable { showDeleteButton = false },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Button(
-
-                                    shape = RoundedCornerShape(100.dp),
-                                    onClick = {
-                                        println(bubble)
-                                        showDeleteButton = false
-                                        deleteClicked(contentBlock)
-                                        println(bubble)
-                                        deletedImageBlockId = contentBlock.position
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Gray700,
-                                    )
-                                ) {
-                                    Text(
-                                        text = "삭제하기",
-                                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray100),
-                                        fontSize = 14.sp
-                                        )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }
-
-    @Composable
-fun calculateAspectRatio(content: String): Float {
-    var aspectRatio by remember { mutableStateOf(1f) }
-
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(content)
-            .crossfade(true)
-            .size(Size.ORIGINAL)
-            .build(),
-        onSuccess = { result ->
-            val width = result.painter.intrinsicSize.width
-            val height = result.painter.intrinsicSize.height
-            if (width > 0 && height > 0) {
-                aspectRatio = width / height
-            }
-        }
-    )
-
-    return aspectRatio
-}
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -661,7 +220,7 @@ private fun TextContentBubble(
     bubble: BubbleModel,
     colors: List<Color>,
     onClick: () -> Unit,
-    onLongClick: () -> Unit= {},
+    onLongClick: () -> Unit = {},
     bubbleSize: BubbleType.BubbleSize,
 ) {
     val canvasSize = bubbleSize.size
@@ -679,7 +238,12 @@ private fun TextContentBubble(
         contentAlignment = Alignment.Center
     ) {
         if (bubble.mainImage != null) {
-            ImageBubble(bubbleSize = bubbleSize, imageUrl = bubble.mainImage)
+            ImageBubble(
+                bubbleSize = bubbleSize,
+                imageUrl = bubble.mainImage,
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
         } else {
             when (colors.size) {
                 0 -> SingleBubble(bubbleSize = bubbleSize, color = Gray100)
@@ -700,7 +264,7 @@ private fun TextContentBubble(
             else bubble.title ?: bubble.contentBlocks[0].content
 
             Text(
-                text = text,
+                text = text.parseHtml().replace("\n\n", "\n").trim(),
                 style = bubbleSize.fontStyle,
                 color = Gray800,
                 textAlign = TextAlign.Center
@@ -709,12 +273,91 @@ private fun TextContentBubble(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ImageBubble(
     bubbleSize: BubbleType.BubbleSize,
-    imageUrl: String
+    imageUrl: String,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit = {},
 ) {
-    // TODO: 이미지 관련 정리되면 개발
+    val canvasSize = bubbleSize.size
+
+    Box(
+        modifier = Modifier
+            .size(canvasSize)
+            .clip(CircleShape)
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { onLongClick() },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(modifier = Modifier.size(bubbleSize.size)) {
+            val outerRadius = bubbleSize.size.toPx() / 2
+
+            // 큰 원 그리기
+            drawCircle(color = Gray200, radius = outerRadius, center = center)
+        }
+        Box(
+            modifier = Modifier
+                .size(bubbleSize.size)
+                .clip(CircleShape)
+                .drawWithContent {
+                    clipPath(
+                        Path().apply {
+                            addOval(
+                                Rect(
+                                    center - Offset(bubbleSize.size.toPx() / 2, bubbleSize.size.toPx() / 2),
+                                    center + Offset(bubbleSize.size.toPx() / 2, bubbleSize.size.toPx() / 2)
+                                )
+                            )
+                        }
+                    ) {
+                        val colors = listOf(White000, Gray200)
+                        drawCircle(
+                            brush = Brush.verticalGradient(colors),
+                            blendMode = BlendMode.SrcIn,
+                        )
+                        this@drawWithContent.drawContent()
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.size(bubbleSize.innerSize).clip(CircleShape)
+            )
+
+            Canvas(modifier = Modifier.size(bubbleSize.size * 0.95f)) {
+                drawIntoCanvas { canvas ->
+                    val paint = Paint().apply {
+                        this.asFrameworkPaint().apply {
+                            isAntiAlias = true
+                            shader = LinearGradient(
+                                center.x - bubbleSize.size.toPx() / 2,
+                                center.y,
+                                center.x + bubbleSize.size.toPx() / 2,
+                                center.y,
+                                intArrayOf(White000.copy(alpha = 0.5f).toArgb(), Gray200.copy(alpha = 0.5f).toArgb()),
+                                floatArrayOf(0f, 1f),
+                                Shader.TileMode.CLAMP
+                            )
+                            maskFilter = BlurMaskFilter(
+                                30f,
+                                BlurMaskFilter.Blur.NORMAL
+                            )
+                        }
+                    }
+                    canvas.drawCircle(center, (bubbleSize.size * 0.95f).toPx() / 2, paint)
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -802,7 +445,7 @@ private fun TripleBubble(
         clipPath(Path().apply {
             addOval(
                 Rect(
-                    center - Offset(outerRadius * 0.9f, outerRadius * 0.9f),
+                    center - Offset(outerRadius, outerRadius),
                     center + Offset(outerRadius, outerRadius),
                 )
             )
@@ -838,6 +481,10 @@ private fun checkBubbleContainImage(bubble: BubbleModel): Boolean {
  * 버블 텍스트 길이에 따른 사이즈 계산 함수
  */
 fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
+    if (bubble.title == null && !bubble.contentBlocks.map { it.type }.contains(ContentType.TEXT)) {
+        return BubbleType.Bubble100
+    }
+
     var text = bubble.title ?: ""
 
     if (text.isEmpty() && bubble.contentBlocks.firstOrNull()?.type == ContentType.IMAGE) {
@@ -845,6 +492,8 @@ fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
     } else if (text.isEmpty()) {
         text = bubble.contentBlocks.firstOrNull()?.content ?: ""
     }
+
+    text = text.parseHtml().replace("\n\n", "\n").trim()
 
     fun calculateLineCount(text: String, textBoxWidthDp: Int, fontSizeSp: Float): Int {
         val charPerLine = (textBoxWidthDp / (fontSizeSp * 0.57)).toInt()
@@ -868,12 +517,11 @@ fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         val fontSizeSp = bubbleType.fontStyle.fontSize.value
         val lineCount = calculateLineCount(text, textBoxWidth, fontSizeSp)
 
-        return when {
-            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> BubbleType.Bubble100
-            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> BubbleType.Bubble160
-            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> BubbleType.Bubble230
-            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> BubbleType.Bubble300
-            else -> BubbleType.BubbleMain
+        when {
+            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> return BubbleType.Bubble100
+            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> return BubbleType.Bubble160
+            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> return BubbleType.Bubble230
+            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> return BubbleType.Bubble300
         }
     }
 
@@ -989,78 +637,6 @@ private fun DrawScope.drawCircleWithBlur(
     }
 }
 
-private fun DrawScope.drawOuterGradientBubbleDoor(
-    center: Offset,
-    width: Float,
-    height: Float,
-    colors: List<Color>
-) {
-    val combinedPath = Path().apply {
-        // 직사각형 부분
-        moveTo(center.x - width / 2, center.y) // 왼쪽 위
-        lineTo(center.x - width / 2, center.y + height * 2f) // 왼쪽 아래
-        lineTo(center.x + width / 2, center.y + height * 2f) // 오른쪽 아래
-        lineTo(center.x + width / 2, center.y) // 오른쪽 위
-
-        // 아치 부분
-        cubicTo(
-            x1 = center.x + width * 0.25f, y1 = center.y - height * 0.15f,
-            x2 = center.x - width * 0.25f, y2 = center.y - height * 0.15f,
-            x3 = center.x - width / 2, y3 = center.y
-        )
-        close()
-    }
-
-    val gradient = Brush.linearGradient(
-        colors = colors,
-        start = Offset(center.x - width / 2, center.y - height / 2),
-        end = Offset(center.x + width / 2, center.y + height / 2),
-    )
-
-    drawPath(
-        path = combinedPath,
-        brush = gradient
-    )
-}
-
-private fun DrawScope.drawBlurredOuterGradientBubbleDoor(
-    center: Offset,
-    width: Float,
-    height: Float,
-) {
-
-    val blurredPath = Path().apply {
-        // 직사각형 부분
-        moveTo(center.x - width, center.y) // 왼쪽 위
-        lineTo(center.x - width, center.y + height * 5f) // 왼쪽 아래
-        lineTo(center.x + width, center.y + height * 5f) // 오른쪽 아래
-        lineTo(center.x + width, center.y) // 오른쪽 위
-
-        // 아치 부분
-        cubicTo(
-            x1 = center.x + width * 0.1f, y1 = center.y - height * 0.2f,
-            x2 = center.x - width * 0.1f, y2 = center.y - height * 0.2f,
-            x3 = center.x - width / 2, y3 = center.y
-        )
-        close()
-    }
-
-    drawIntoCanvas { canvas ->
-        val paint = Paint().apply {
-            this.asFrameworkPaint().apply {
-                isAntiAlias = true
-                color = android.graphics.Color.WHITE
-                this.alpha = 100 // 투명도 설정
-                maskFilter = BlurMaskFilter(
-                    30f,
-                    BlurMaskFilter.Blur.NORMAL
-                )
-            }
-        }
-        canvas.drawPath(blurredPath, paint)
-    }
-}
-
 object BubbleType {
     val BubbleMain = BubbleSize(
         size = 364.dp,
@@ -1129,30 +705,3 @@ object BubbleType {
         val textBoxSize: Pair<Int, Int>,
     )
 }
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewBubbleDoor() {
-//    EdisonTheme {
-//        BubbleDoor(
-//            bubble = BubbleModel(
-//                id = 0,
-//                title = "버블 제목",
-//                contentBlocks = listOf(
-//                    BubbleModel.BubbleContentBlock(ContentType.TEXT, "버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 버블 내용 ", 0),
-//                ),
-//                labels = listOf(
-//                    LabelModel(0, "라벨1", Aqua100),
-//                    LabelModel(1, "라벨2", Yellow100),
-//                    LabelModel(2, "라벨3", Red100),
-//                ),
-//                mainImage = null
-//            ),
-//            isEditable = true,
-//            onClick = { },
-//            onBubbleChange= { },
-//            bottomPadding = 0.dp,
-//            isBoldActive = false
-//        )
-//    }
-//}

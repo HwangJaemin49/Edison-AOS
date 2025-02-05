@@ -7,23 +7,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.ui.components.AddLabelButton
 import com.umc.edison.ui.components.LabelListItemForSelect
 import com.umc.edison.ui.components.MiddleCancelButton
 import com.umc.edison.ui.components.MiddleConfirmButton
 import com.umc.edison.ui.theme.Gray800
 
 @Composable
-fun LabelMoveModalContent(
+fun LabelSelectModalContent(
+    labels: List<LabelModel>,
     onDismiss: () -> Unit,
-    onConfirm: (LabelModel) -> Unit,
-    labels: List<LabelModel>
+    onConfirm: (List<LabelModel>) -> Unit,
+    initSelectedLabels: List<LabelModel> = emptyList(),
+    onAddLabelClicked: (() -> Unit)? = null,
+    onItemClicked: ((LabelModel) -> Unit)? = null,
+    multiSelectMode: Boolean = false
 ) {
-    var selectedLabel by remember { mutableStateOf<LabelModel?>(null) }
+    var selectedLabels by remember { mutableStateOf(initSelectedLabels) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 27.dp)
+            .padding(start = 24.dp)
     ) {
         Text(
             text = "라벨 선택",
@@ -31,6 +36,12 @@ fun LabelMoveModalContent(
             color = Gray800,
             modifier = Modifier.padding(bottom = 18.dp)
         )
+
+        if (onAddLabelClicked != null) {
+            AddLabelButton(
+                onClick = onAddLabelClicked,
+            )
+        }
 
         // 라벨 리스트
         LazyColumn(
@@ -40,10 +51,19 @@ fun LabelMoveModalContent(
                 val label = labels[index]
                 LabelListItemForSelect(
                     label = label,
-                    selected = selectedLabel == label,
-                    multiSelectMode = false,
+                    selected = selectedLabels.contains(label),
+                    multiSelectMode = multiSelectMode,
                     onClick = {
-                        selectedLabel = label
+                        selectedLabels = if (multiSelectMode) {
+                            if (selectedLabels.contains(label)) {
+                                selectedLabels.filter { it != label }
+                            } else {
+                                selectedLabels + label
+                            }
+                        } else {
+                            listOf(label)
+                        }
+                        onItemClicked?.invoke(label)
                     },
                 )
             }
@@ -65,9 +85,9 @@ fun LabelMoveModalContent(
             MiddleConfirmButton(
                 text = "선택하기",
                 onClick = {
-                    onConfirm(selectedLabel!!)
+                    onConfirm(selectedLabels)
                 },
-                enabled = selectedLabel != null,
+                enabled = selectedLabels.isNotEmpty(),
                 modifier = Modifier.weight(1f)
             )
         }

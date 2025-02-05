@@ -17,8 +17,8 @@ class TokenManager @Inject constructor(
 
     fun loadAccessToken(): String? {
         setToken(
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxNiIsImV4cCI6MTc0MTIxMzU4MiwiZW1haWwiOiJvLnNzLnUyMDU2QGdtYWlsLmNvbSJ9.aN6hhgIo0Aue9iDSCC_r-dKzg-J6MTmQ9rySD6t5vE0",
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxNiIsImV4cCI6MTc1NDMwODYzOCwiZW1haWwiOiJvLnNzLnUyMDU2QGdtYWlsLmNvbSJ9.RLlFhE5W8OwvzFmryjClZVzjRwpchYu482G1pDAEjbU"
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxNiIsImV4cCI6MTc0MTM3ODEwNSwiZW1haWwiOiJvLnNzLnUyMDU2QGdtYWlsLmNvbSJ9.4zSjAsk-5vewIVFN9ocwni48-m1KQt7Gggb5H-COCoo",
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxNiIsImV4cCI6MTc1NDQ3MzE2MSwiZW1haWwiOiJvLnNzLnUyMDU2QGdtYWlsLmNvbSJ9.nN9fmbiiZnI5CriBtN-f2GPtNoYTzc24EFEBkDsY4zU"
         )
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
         ACCESS_TOKEN = sharedPreferences.getString("access_token", null)

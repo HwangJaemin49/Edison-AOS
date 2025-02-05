@@ -1,12 +1,10 @@
 package com.umc.edison.ui.mypage
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.umc.edison.presentation.mypage.IdentityEditState
 import com.umc.edison.presentation.mypage.IdentityEditViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
@@ -39,11 +37,15 @@ fun IdentityEditScreen(
     viewModel: IdentityEditViewModel = hiltViewModel()
 ) {
 
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
     }
 
-    Scaffold(
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = "Identity 고르기",
@@ -53,25 +55,17 @@ fun IdentityEditScreen(
                 }
             )
         }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            IdentityContent(viewModel)
-        }
+    ) {
+        IdentityContent(viewModel, uiState)
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun IdentityContent(
-    viewModel: IdentityEditViewModel
+    viewModel: IdentityEditViewModel,
+    uiState: IdentityEditState
 ) {
-
-    val uiState by viewModel.uiState.collectAsState()
-
     BaseContent(
         uiState = uiState,
         onDismiss = { viewModel.clearToastMessage() },

@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +38,7 @@ import com.umc.edison.R
 import com.umc.edison.presentation.model.ArtLetterCategoryModel
 import com.umc.edison.presentation.model.IdentityModel
 import com.umc.edison.presentation.model.InterestModel
+import com.umc.edison.presentation.mypage.MyPageState
 import com.umc.edison.presentation.mypage.MyPageViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.GrayColumnContainer
@@ -66,46 +66,42 @@ fun MyPageScreen(
         viewModel.fetchLoginState()
     }
 
-    Scaffold(
+    BaseContent(
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
         topBar = {
             HamburgerMenu(
                 onClick = { navHostController.navigate(NavRoute.Menu.route) },
                 alignment = Alignment.End
             )
         }
-    ) { innerPadding ->
-        BaseContent(
-            uiState = uiState,
-            onDismiss = { viewModel.clearToastMessage() },
-            modifier = Modifier.padding(innerPadding)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = if (uiState.isLoggedIn) White000 else White000.copy(alpha = 0.5f)
+                )
+                .blur(if (uiState.isLoggedIn) 0.dp else 10.dp),
         ) {
+            MyPageContent(navHostController, uiState)
+        }
+
+        if (!uiState.isLoggedIn) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        color = if (uiState.isLoggedIn) White000 else White000.copy(alpha = 0.5f)
-                    )
-                    .blur(if (uiState.isLoggedIn) 0.dp else 10.dp),
+                    .padding(horizontal = 18.dp),
+                contentAlignment = Alignment.Center
             ) {
-                MyPageContent(navHostController, viewModel)
-            }
-
-            if (!uiState.isLoggedIn) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 18.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    PopUpMulti(
-                        title = "로그인이 필요한 페이지입니다",
-                        detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
-                        hintText = "스페이스 자동 시각화 기능 지원\n" +
-                                "맞춤형 레터 추천과 북마크 기능 지원",
-                        buttonText = "구글 로그인",
-                        onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
-                    )
-                }
+                PopUpMulti(
+                    title = "로그인이 필요한 페이지입니다",
+                    detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
+                    hintText = "스페이스 자동 시각화 기능 지원\n" +
+                            "맞춤형 레터 추천과 북마크 기능 지원",
+                    buttonText = "구글 로그인",
+                    onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
+                )
             }
         }
     }
@@ -114,10 +110,8 @@ fun MyPageScreen(
 @Composable
 private fun MyPageContent(
     navHostController: NavHostController,
-    viewModel: MyPageViewModel,
+    uiState: MyPageState
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     Column(
         modifier = Modifier
             .fillMaxWidth()

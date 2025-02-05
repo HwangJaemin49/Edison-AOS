@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,7 +43,7 @@ fun LabelTabScreen(
         viewModel.fetchLabels()
     }
 
-    Scaffold(
+    BaseContent(
         modifier = Modifier
             .clickable(
                 onClick = {
@@ -52,81 +51,77 @@ fun LabelTabScreen(
                 },
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
-            )
-    ) { innerPadding ->
-        BaseContent(
-            uiState = uiState,
-            onDismiss = { viewModel.clearToastMessage() },
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            if (uiState.labelEditMode == LabelEditMode.ADD || uiState.labelEditMode == LabelEditMode.EDIT) {
-                BottomSheet(
-                    onDismiss = {
-                        viewModel.updateEditMode(LabelEditMode.NONE)
-                    },
-                ) {
-                    LabelModalContent(
-                        editMode = uiState.labelEditMode,
-                        onDismiss = {
-                            viewModel.updateEditMode(LabelEditMode.NONE)
-                        },
-                        onConfirm = { label ->
-                            viewModel.confirmLabelModal(label)
-                        },
-                        label = uiState.selectedLabel
-                    )
-                }
-            }
-
-            if (uiState.labelEditMode == LabelEditMode.DELETE) {
-                BottomSheetPopUp(
-                    title = "${uiState.selectedLabel.name} 라벨을 삭제하시겠습니까?",
-                    cancelText = "취소",
-                    confirmText = "삭제",
-                    onDismiss = {
-                        viewModel.updateEditMode(LabelEditMode.NONE)
-                    },
-                    onConfirm = {
-                        viewModel.deleteSelectedLabel()
-                    },
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .padding(start = 24.dp, top = 42.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight()
+            ),
+        uiState = uiState,
+        onDismiss = { viewModel.clearToastMessage() },
+    ) {
+        if (uiState.labelEditMode == LabelEditMode.ADD || uiState.labelEditMode == LabelEditMode.EDIT) {
+            BottomSheet(
+                onDismiss = {
+                    viewModel.updateEditMode(LabelEditMode.NONE)
+                },
             ) {
-                AddLabelButton(
-                    onClick = {
-                        viewModel.updateEditMode(LabelEditMode.ADD)
-                    }
-                )
-
-                LabelList(
-                    labels = uiState.labels,
-                    draggedIndex = draggedIndex.intValue,
-                    onLabelClick = { labelId ->
-                        navHostController.navigate(NavRoute.LabelDetail.createRoute(labelId))
+                LabelModalContent(
+                    editMode = uiState.labelEditMode,
+                    onDismiss = {
+                        viewModel.updateEditMode(LabelEditMode.NONE)
                     },
-                    onEditClick = { index ->
-                        viewModel.updateEditMode(LabelEditMode.EDIT)
-                        viewModel.updateSelectedLabel(uiState.labels[index])
+                    onConfirm = { label ->
+                        viewModel.confirmLabelModal(label)
                     },
-                    onDeleteClick = { index ->
-                        viewModel.updateEditMode(LabelEditMode.DELETE)
-                        viewModel.updateSelectedLabel(uiState.labels[index])
-                    },
-                    onDrag = { index ->
-                        // 드래그된 아이템 인덱스 업데이트
-                        draggedIndex.intValue = index
-                    },
-                    resetDrag = {
-                        draggedIndex.intValue = -1
-                    }
+                    label = uiState.selectedLabel
                 )
             }
+        }
+
+        if (uiState.labelEditMode == LabelEditMode.DELETE) {
+            BottomSheetPopUp(
+                title = "${uiState.selectedLabel.name} 라벨을 삭제하시겠습니까?",
+                cancelText = "취소",
+                confirmText = "삭제",
+                onDismiss = {
+                    viewModel.updateEditMode(LabelEditMode.NONE)
+                },
+                onConfirm = {
+                    viewModel.deleteSelectedLabel()
+                },
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .padding(start = 24.dp, top = 42.dp)
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
+            AddLabelButton(
+                onClick = {
+                    viewModel.updateEditMode(LabelEditMode.ADD)
+                }
+            )
+
+            LabelList(
+                labels = uiState.labels,
+                draggedIndex = draggedIndex.intValue,
+                onLabelClick = { labelId ->
+                    navHostController.navigate(NavRoute.LabelDetail.createRoute(labelId))
+                },
+                onEditClick = { index ->
+                    viewModel.updateEditMode(LabelEditMode.EDIT)
+                    viewModel.updateSelectedLabel(uiState.labels[index])
+                },
+                onDeleteClick = { index ->
+                    viewModel.updateEditMode(LabelEditMode.DELETE)
+                    viewModel.updateSelectedLabel(uiState.labels[index])
+                },
+                onDrag = { index ->
+                    // 드래그된 아이템 인덱스 업데이트
+                    draggedIndex.intValue = index
+                },
+                resetDrag = {
+                    draggedIndex.intValue = -1
+                }
+            )
         }
     }
 }
