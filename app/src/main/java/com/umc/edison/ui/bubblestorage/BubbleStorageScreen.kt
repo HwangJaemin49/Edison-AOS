@@ -28,8 +28,10 @@ import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
+import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTopAppBar
+import com.umc.edison.ui.components.calculateBubbleSize
 import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
@@ -110,6 +112,11 @@ fun BubbleStorageScreen(
             onBubbleClick = { bubble ->
                 viewModel.selectBubble(bubble)
                 viewModel.updateEditMode(BubbleStorageMode.VIEW)
+                val bubbleSize = calculateBubbleSize(bubble)
+
+                if (bubbleSize == BubbleType.BubbleDoor) {
+                    updateShowBottomNav(false)
+                }
             }
             onBubbleLongClick = { bubble ->
                 viewModel.selectBubble(bubble)
@@ -154,6 +161,7 @@ fun BubbleStorageScreen(
                     .background(Gray800.copy(alpha = 0.5f))
                     .clickable(onClick = {
                         viewModel.updateEditMode(BubbleStorageMode.NONE)
+                        updateShowBottomNav(true)
                     }),
                 contentAlignment = Alignment.Center
             ) {

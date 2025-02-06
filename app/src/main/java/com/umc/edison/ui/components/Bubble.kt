@@ -556,7 +556,7 @@ fun calculateBubblePreviewSize(bubble: BubbleModel): BubbleType.BubbleSize {
 /**
  * 버블 텍스트 길이에 따른 버블 사이즈 계산
  */
-private fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
+fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
     // title && content text가 없는 경우
     if (bubble.title == null && !bubble.contentBlocks.map { it.type }.contains(ContentType.TEXT)) {
         return BubbleType.Bubble100
