@@ -158,7 +158,7 @@ fun BubbleStorageScreen(
                     onBackScreenClick = {
                         viewModel.updateEditMode(BubbleStorageMode.NONE)
                     },
-                    onLinkedBubbleClicked = { linkedBubbleId ->
+                    onLinkedBubbleClick = { linkedBubbleId ->
                         navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))
                     }
                 )

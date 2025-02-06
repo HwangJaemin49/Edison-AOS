@@ -3,7 +3,6 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
@@ -46,13 +45,15 @@ class BubbleInputViewModel @Inject constructor(
     init {
         val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
         fetchBubble(id)
-        addTextBlockToFront()
         fetchLabels()
         fetchBubbles()
     }
 
     private fun fetchBubble(bubbleId: Int) {
-        if (bubbleId == 0) return
+        if (bubbleId == 0) {
+            addTextBlockToFront()
+            return
+        }
 
         collectDataResource(
             flow = getBubbleUseCase(bubbleId),
@@ -75,6 +76,7 @@ class BubbleInputViewModel @Inject constructor(
             },
             onComplete = {
                 _uiState.update { it.copy(isLoading = false) }
+                addTextBlockToFront()
             }
         )
     }
@@ -213,16 +215,26 @@ class BubbleInputViewModel @Inject constructor(
     private fun addTextBlock() {
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
-            content = "",
+            content = "<br>",
             position = _uiState.value.bubble.contentBlocks.size,
         )
 
-        _uiState.update {
-            it.copy(
-                bubble = it.bubble.copy(
-                    contentBlocks = it.bubble.contentBlocks + newTextBlock
+        if (_uiState.value.bubble.contentBlocks.isEmpty()) {
+            _uiState.update {
+                it.copy(
+                    bubble = it.bubble.copy(
+                        contentBlocks = listOf(newTextBlock)
+                    )
                 )
-            )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    bubble = it.bubble.copy(
+                        contentBlocks = it.bubble.contentBlocks + newTextBlock
+                    )
+                )
+            }
         }
     }
 
@@ -234,10 +246,6 @@ class BubbleInputViewModel @Inject constructor(
 
         if (_uiState.value.bubble.contentBlocks[0].type == ContentType.TEXT && _uiState.value.bubble.contentBlocks.last().type == ContentType.TEXT) {
             return
-        }
-
-        if (_uiState.value.bubble.contentBlocks.last().type == ContentType.IMAGE) {
-            addTextBlock()
         }
 
         if (_uiState.value.bubble.contentBlocks[0].type == ContentType.TEXT) {
@@ -265,7 +273,9 @@ class BubbleInputViewModel @Inject constructor(
             )
         }
 
-        Log.i("BubbleInputViewModel", "addTextBlockToFront: ${_uiState.value.bubble.contentBlocks}")
+        if (_uiState.value.bubble.contentBlocks.last().type == ContentType.IMAGE) {
+            addTextBlock()
+        }
     }
 
     fun addContentBlocks(imagePaths: List<Uri>) {

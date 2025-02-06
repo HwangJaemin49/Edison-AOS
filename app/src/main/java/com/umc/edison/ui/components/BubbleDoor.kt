@@ -91,7 +91,7 @@ fun BubbleDoor(
     onBubbleUpdate: (BubbleModel) -> Unit = {},
     onImageDeleted: (ContentBlockModel) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
-    linkClicked: (Int) -> Unit = {},
+    onLinkClick: (Int) -> Unit = {},
 ) {
     val colors = bubble.labels.map { it.color }
     val outerColors = when (colors.size) {
@@ -112,11 +112,7 @@ fun BubbleDoor(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 60.dp)
-            .clickable(
-                onClick = onClick ?: {},
-                enabled = onClick != null
-            ),
+            .padding(top = 60.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         // 배경 Canvas (전체 높이 채우기)
@@ -139,7 +135,11 @@ fun BubbleDoor(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(start = 24.dp, top = 80.dp, end = 24.dp, bottom = 24.dp),
+                .padding(start = 24.dp, top = 80.dp, end = 24.dp, bottom = 24.dp)
+                .clickable(
+                    onClick = onClick ?: {},
+                    enabled = onClick != null
+                ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -153,7 +153,7 @@ fun BubbleDoor(
             } else {
                 BubbleContent(
                     bubble = bubble,
-                    linkClicked = linkClicked
+                    onLinkClick = onLinkClick
                 )
             }
         }
@@ -164,7 +164,7 @@ fun BubbleDoor(
 @Composable
 private fun BubbleContent(
     bubble: BubbleModel,
-    linkClicked: (Int) -> Unit
+    onLinkClick: (Int) -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.Start,
@@ -234,7 +234,7 @@ private fun BubbleContent(
                         override fun openUri(uri: String) {
                             val bubbleId = uri.toIntOrNull()
                             if (bubbleId != null) {
-                                linkClicked(bubbleId)
+                                onLinkClick(bubbleId)
                             }
                         }
                     })
@@ -278,7 +278,7 @@ private fun BubbleContent(
                     override fun openUri(uri: String) {
                         val bubbleId = uri.toIntOrNull()
                         if (bubbleId != null) {
-                            linkClicked(bubbleId)
+                            onLinkClick(bubbleId)
                         }
                     }
                 })
