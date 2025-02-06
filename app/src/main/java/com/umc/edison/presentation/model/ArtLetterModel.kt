@@ -9,6 +9,16 @@ data class ArtLetterModel(
     val likes: Int,
     val scraps: Int,
 ) {
+    companion object {
+        val DEFAULT = ArtLetterModel(
+            id = 0,
+            title = "제목",
+            thumbnail = "",
+            likes = 0,
+            scraps = 0
+        )
+    }
+
     fun toDomain(): ArtLetter {
         return ArtLetter(
             id = id,

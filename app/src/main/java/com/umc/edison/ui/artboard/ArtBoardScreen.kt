@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,10 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
 import com.umc.edison.domain.model.ArtLetter
+import com.umc.edison.presentation.artletter.ArtLetterState
+import com.umc.edison.presentation.artletter.ArtLetterViewModel
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
@@ -49,8 +53,9 @@ import com.umc.edison.ui.theme.White000
 @Composable
 fun ArtBoardScreen(
     navHostController: NavHostController,
-    artLetters: List<ArtLetter>,
+    viewModel: ArtLetterViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -60,7 +65,7 @@ fun ArtBoardScreen(
     ) {
         TopBar()
         EditorPickSection()
-        ArtboardSection(navHostController, artLetters)
+        ArtboardSection(navHostController, uiState)
     }
 }
 
@@ -152,7 +157,7 @@ fun EditorPickSection() {
 @Composable
 fun ArtboardSection(
     navHostController: NavHostController,
-    artLetters: List<ArtLetter> // API에서 받아온 데이터 리스트 추가
+    uiState: ArtLetterState
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -167,7 +172,7 @@ fun ArtboardSection(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            artLetters.chunked(2).forEach { rowItems ->
+            uiState.artletters.thumbnail.chunked(2).forEach { rowItems ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -176,11 +181,8 @@ fun ArtboardSection(
                         ArtBoardCard(
                             modifier = Modifier.weight(1f),
                             navHostController = navHostController,
-                            artLetter = artLetter // 데이터 전달
+                            uiState
                         )
-                    }
-                    if (rowItems.size < 2) {
-                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -193,7 +195,7 @@ fun ArtboardSection(
 fun ArtBoardCard(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
-    artLetter: ArtLetter, // API에서 받은 데이터 추가
+    uiState: ArtLetterState, // API에서 받은 데이터 추가
 ) {
     var isBookmarked by remember { mutableStateOf(false) }
 
@@ -204,7 +206,7 @@ fun ArtBoardCard(
             .clip(RoundedCornerShape(10.dp))
     ) {
         AsyncImage( // API에서 받은 썸네일 이미지 적용
-            model = artLetter.thumbnail,
+            model = uiState.artletters.thumbnail,
             contentDescription = "Thumbnail Image",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -221,7 +223,7 @@ fun ArtBoardCard(
                 .clickable { isBookmarked = !isBookmarked }
         )
         Text(
-            text = artLetter.title, // API에서 받은 제목 적용
+            text = uiState.artletters.title, // API에서 받은 제목 적용
             style = MaterialTheme.typography.headlineLarge,
             color = Color.White,
             modifier = Modifier
