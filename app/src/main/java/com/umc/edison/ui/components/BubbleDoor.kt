@@ -3,7 +3,6 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
