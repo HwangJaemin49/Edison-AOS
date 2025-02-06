@@ -196,14 +196,6 @@ class BubbleInputViewModel @Inject constructor(
         _uiState.update { it.copy(selectedListStyle = listStyle) }
     }
 
-    fun updateLabel(label: List<LabelModel>) {
-        _uiState.update {
-            it.copy(
-                bubble = it.bubble.copy(labels = label)
-            )
-        }
-    }
-
     fun updateLabelEditMode(labelEditMode: LabelEditMode) {
         _uiState.update { it.copy(labelEditMode = labelEditMode) }
     }
