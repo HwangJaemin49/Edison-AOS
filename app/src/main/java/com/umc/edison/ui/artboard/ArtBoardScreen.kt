@@ -37,7 +37,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.umc.edison.R
+import com.umc.edison.domain.model.ArtLetter
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
@@ -45,7 +47,11 @@ import com.umc.edison.ui.theme.White000
 
 
 @Composable
-fun ArtBoardScreen(navHostController: NavHostController) {
+fun ArtBoardScreen(
+    navHostController: NavHostController,
+    artLetters: List<ArtLetter>,
+) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,9 +60,10 @@ fun ArtBoardScreen(navHostController: NavHostController) {
     ) {
         TopBar()
         EditorPickSection()
-        ArtboardSection(navHostController)
+        ArtboardSection(navHostController, artLetters)
     }
 }
+
 
 
 
@@ -142,13 +149,13 @@ fun EditorPickSection() {
     }
 }
 
-
-
 @Composable
-fun ArtboardSection(navHostController: NavHostController) {
+fun ArtboardSection(
+    navHostController: NavHostController,
+    artLetters: List<ArtLetter> // API에서 받아온 데이터 리스트 추가
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
             text = "당신을 자극할 세상의 이모저모",
@@ -160,16 +167,17 @@ fun ArtboardSection(navHostController: NavHostController) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            val items = List(10) { it }
-            items.chunked(2).forEach { rowItems ->
+            artLetters.chunked(2).forEach { rowItems ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    rowItems.forEach { _ ->
+                    rowItems.forEach { artLetter ->
                         ArtBoardCard(
                             modifier = Modifier.weight(1f),
-                            navHostController = navHostController)
+                            navHostController = navHostController,
+                            artLetter = artLetter // 데이터 전달
+                        )
                     }
                     if (rowItems.size < 2) {
                         Spacer(modifier = Modifier.weight(1f))
@@ -184,7 +192,9 @@ fun ArtboardSection(navHostController: NavHostController) {
 @Composable
 fun ArtBoardCard(
     modifier: Modifier = Modifier,
-    navHostController: NavHostController) {
+    navHostController: NavHostController,
+    artLetter: ArtLetter, // API에서 받은 데이터 추가
+) {
     var isBookmarked by remember { mutableStateOf(false) }
 
     Box(
@@ -193,11 +203,11 @@ fun ArtBoardCard(
             .clickable { navHostController.navigate(NavRoute.ArtBoardDetail.route) }
             .clip(RoundedCornerShape(10.dp))
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.delivery),
+        AsyncImage( // API에서 받은 썸네일 이미지 적용
+            model = artLetter.thumbnail,
             contentDescription = "Thumbnail Image",
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop // 이미지가 박스 크기에 맞게 조정됨
+            contentScale = ContentScale.Crop
         )
 
         Icon(
@@ -211,7 +221,7 @@ fun ArtBoardCard(
                 .clickable { isBookmarked = !isBookmarked }
         )
         Text(
-            text = "배달을 바라보는 시선,\n‘딜리버리 댄서의 구’",
+            text = artLetter.title, // API에서 받은 제목 적용
             style = MaterialTheme.typography.headlineLarge,
             color = Color.White,
             modifier = Modifier
