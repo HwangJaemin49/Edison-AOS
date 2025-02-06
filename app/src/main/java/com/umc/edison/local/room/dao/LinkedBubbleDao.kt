@@ -32,4 +32,7 @@ interface LinkedBubbleDao {
                 "WHERE id IN (SELECT link_bubble_id FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND is_back = 1)"
     )
     suspend fun getBackLinksByBubbleId(currId: Int): List<BubbleLocal>
+
+    @Query("SELECT id FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND link_bubble_id = :linkedId AND is_back = :isBack")
+    suspend fun getLinkedBubbleId(currId: Int, linkedId: Int, isBack: Boolean): Int?
 }

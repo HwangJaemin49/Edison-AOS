@@ -23,4 +23,7 @@ interface BubbleLabelDao {
         "DELETE FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId"
     )
     suspend fun deleteByBubbleId(bubbleId: Int)
+
+    @Query("SELECT id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId AND label_id = :labelId")
+    suspend fun getBubbleLabelId(bubbleId: Int, labelId: Int): Int?
 }

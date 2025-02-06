@@ -40,8 +40,7 @@ fun BottomSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(bottom = 20.dp),
+                .wrapContentHeight(),
             contentAlignment = Alignment.Center
         ) {
             content()

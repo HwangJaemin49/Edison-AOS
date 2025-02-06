@@ -3,6 +3,7 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
@@ -81,7 +82,9 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getAllBubblesUseCase(),
             onSuccess = { bubbles ->
-                _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
+                _uiState.update { it.copy(bubbles = bubbles.toPresentation().filter {
+                    bubble -> bubble.id != _uiState.value.bubble.id
+                }) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -203,7 +206,7 @@ class BubbleInputViewModel @Inject constructor(
     private fun addTextBlock() {
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
-            content = "<br>",
+            content = "",
         )
 
         if (_uiState.value.bubble.contentBlocks.isEmpty()) {
@@ -366,6 +369,8 @@ class BubbleInputViewModel @Inject constructor(
             return
         }
 
+        Log.i("BubbleInputViewModel", "before Saving: ${_uiState.value.bubble}")
+
         collectDataResource(
             flow = if (_uiState.value.bubble.id == 0) {
                 addBubbleUseCase(_uiState.value.bubble.toDomain())
@@ -384,6 +389,8 @@ class BubbleInputViewModel @Inject constructor(
                             bubbles = it.bubbles + savedBubble.toPresentation()
                         )
                     }
+
+                    Log.i("BubbleInputViewModel", "savedBubble: $savedBubble")
                     addTextBlock()
                 }
             },

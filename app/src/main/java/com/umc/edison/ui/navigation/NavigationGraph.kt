@@ -54,7 +54,7 @@ fun NavigationGraph(
         }
 
         composable(NavRoute.ProfileEdit.route) {
-            EditProfileScreen(navHostController)
+            EditProfileScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.Menu.route) {

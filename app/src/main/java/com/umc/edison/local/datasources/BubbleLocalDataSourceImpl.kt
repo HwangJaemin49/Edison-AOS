@@ -1,5 +1,6 @@
 package com.umc.edison.local.datasources
 
+import android.util.Log
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.local.model.BubbleLocal
@@ -74,11 +75,15 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateBubble(bubble: BubbleEntity) {
+    override suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity {
         update(bubble.toLocal(), tableName)
+
+        Log.i("BubbleLocalDataSourceImpl", "addBubble: $bubble")
 
         addBubbleLabel(bubble)
         addLinkedBubble(bubble)
+
+        return getBubble(bubble.id)
     }
 
     override suspend fun addBubbles(bubbles: List<BubbleEntity>) {
@@ -91,13 +96,10 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         val id = insert(bubble.toLocal())
         bubble.id = id.toInt()
 
-        if (bubble.labels.isNotEmpty()) {
-            addBubbleLabel(bubble)
-        }
+        Log.i("BubbleLocalDataSourceImpl", "addBubble: $bubble")
 
-        if (bubble.linkedBubble != null || bubble.backLinks.isNotEmpty()) {
-            addLinkedBubble(bubble)
-        }
+        addBubbleLabel(bubble)
+        addLinkedBubble(bubble)
 
         return getBubble(bubble.id)
     }
@@ -150,18 +152,21 @@ class BubbleLocalDataSourceImpl @Inject constructor(
                 val labelId: Long = labelDao.insert(label.toLocal())
                 bubbleLabelDao.insert(bubble.id, labelId.toInt())
             } else {
-                bubbleLabelDao.insert(bubble.id, localLabel.id)
+                val id = bubbleLabelDao.getBubbleLabelId(bubble.id, localLabel.id)
+                if (id == null) bubbleLabelDao.insert(bubble.id, localLabel.id)
             }
         }
     }
 
     private suspend fun addLinkedBubble(bubble: BubbleEntity) {
         bubble.linkedBubble?.let { linkedBubble ->
-            linkedBubbleDao.insert(bubble.id, linkedBubble.id, false)
+            val id = linkedBubbleDao.getLinkedBubbleId(bubble.id, linkedBubble.id, false)
+            if (id == null) linkedBubbleDao.insert(bubble.id, linkedBubble.id, false)
         }
 
         bubble.backLinks.map { backLink ->
-            linkedBubbleDao.insert(bubble.id, backLink.id, true)
+            val id = linkedBubbleDao.getLinkedBubbleId(bubble.id, backLink.id, true)
+            if (id == null) linkedBubbleDao.insert(bubble.id, backLink.id, true)
         }
     }
 }

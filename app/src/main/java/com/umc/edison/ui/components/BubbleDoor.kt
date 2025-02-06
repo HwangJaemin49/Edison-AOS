@@ -3,6 +3,7 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -249,6 +250,8 @@ private fun BubbleContent(
                                 }
                             )
                         )
+
+                        Log.i("BubbleContent", richTextState.toHtml())
                     }
 
                     if (uiState.selectedTextStyles.contains(TextStyle.BOLD)) {
@@ -297,7 +300,8 @@ private fun BubbleContent(
                                     modifier = Modifier.fillMaxWidth(),
                                     contentAlignment = Alignment.CenterStart
                                 ) {
-                                    if (richTextState.toHtml() == "<br>" && bubble.contentBlocks.size == 1) {
+                                    if (richTextState.toHtml() == "<br>" && bubble.contentBlocks.size == 1
+                                    ) {
                                         Text(
                                             text = "내용을 입력해주세요.",
                                             style = MaterialTheme.typography.bodyMedium.copy(color = Gray500),
@@ -381,7 +385,7 @@ private fun BubbleContent(
             }
         }
 
-        FlowRow (
+        FlowRow(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -420,7 +424,7 @@ private fun BubbleContent(
                 }
 
                 if (isEditable) {
-                    CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                    CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
                         BasicRichText(
                             state = richTextState,
                             modifier = Modifier.fillMaxWidth(),
@@ -428,7 +432,7 @@ private fun BubbleContent(
                         )
                     }
                 } else {
-                    CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                    CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
                         RichText(
                             state = richTextState,
                             style = MaterialTheme.typography.bodyMedium,
@@ -482,7 +486,7 @@ private fun BubbleContent(
                     )
                 }
             } else {
-                CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
                     RichText(
                         state = richTextState,
                         style = MaterialTheme.typography.bodyMedium,

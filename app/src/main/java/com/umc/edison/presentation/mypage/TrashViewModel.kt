@@ -77,6 +77,7 @@ class TrashViewModel @Inject constructor(
                     it.copy(
                         toastMessage = "버블이 삭제되었습니다.",
                         mode = BubbleRecoverMode.NONE,
+                        bubbles = it.bubbles - it.selectedBubbles.toSet(),
                     )
                 }
                 fetchDeletedBubbles()
@@ -101,9 +102,9 @@ class TrashViewModel @Inject constructor(
                     it.copy(
                         toastMessage = "버블이 복원되었습니다.",
                         mode = BubbleRecoverMode.NONE,
+                        bubbles = it.bubbles - it.selectedBubbles.toSet(),
                     )
                 }
-                fetchDeletedBubbles()
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

@@ -27,11 +27,14 @@ import com.umc.edison.ui.theme.*
 @Composable
 fun EditProfileScreen(
     navHostController: NavHostController,
-    viewModel: EditProfileViewModel = hiltViewModel()
+    updateShowBottomNav: (Boolean) -> Unit,
+    viewModel: EditProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var nickname by remember { mutableStateOf(TextFieldValue(uiState.user.nickname)) }
     var showGallery by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) { updateShowBottomNav(false) }
 
     Column(
         modifier = Modifier

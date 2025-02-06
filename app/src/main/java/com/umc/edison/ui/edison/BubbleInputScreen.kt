@@ -134,7 +134,12 @@ fun BubbleInputScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             BubbleInputContent(viewModel, onLinkClick = { bubbleId ->
-                navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubbleId))
+                navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubbleId)) {
+                    // 현재 화면을 스택에서 제거하고 새로운 화면을 추가
+                    popUpTo(NavRoute.BubbleEdit.createRoute(uiState.bubble.id)) {
+                        inclusive = true
+                    }
+                }
             })
 
             LabelTagList(
