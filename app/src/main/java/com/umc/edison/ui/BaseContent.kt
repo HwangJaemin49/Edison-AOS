@@ -3,7 +3,6 @@ package com.umc.edison.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
@@ -23,7 +22,6 @@ fun BaseContent(
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
             .background(White000)
     ) {
         if (topBar != null) {

@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -26,6 +27,8 @@ import com.umc.edison.ui.theme.White000
 @Composable
 fun BottomSheet(
     onDismiss: () -> Unit,
+    uiState: BaseState,
+    clearToastMessage: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable () -> Unit
 ) {
@@ -38,9 +41,18 @@ fun BottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(bottom = 20.dp)
+                .padding(bottom = 20.dp),
+            contentAlignment = Alignment.Center
         ) {
             content()
+
+            if (uiState.toastMessage != null) {
+                ToastMessage(
+                    message = uiState.toastMessage!!,
+                    isVisible = true,
+                    onDismiss = clearToastMessage
+                )
+            }
         }
     }
 }
@@ -53,10 +65,14 @@ fun BottomSheetPopUp(
     confirmText: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    uiState: BaseState,
+    clearToastMessage: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
     BottomSheet(
         onDismiss = onDismiss,
+        uiState = uiState,
+        clearToastMessage = clearToastMessage,
         sheetState = sheetState,
     ) {
         BottomSheetPopUpContent(

@@ -205,7 +205,9 @@ private fun TrashContent(
             cancelText = "취소",
             confirmText = "삭제",
             onDismiss = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT) },
-            onConfirm = { viewModel.deleteBubbles() }
+            onConfirm = { viewModel.deleteBubbles() },
+            uiState = uiState,
+            clearToastMessage = { viewModel.clearToastMessage() }
         )
     }
 

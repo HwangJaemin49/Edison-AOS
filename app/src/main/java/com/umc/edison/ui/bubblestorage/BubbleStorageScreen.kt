@@ -184,13 +184,13 @@ fun BubbleStorageScreen(
             }
         } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {
             BottomSheet(
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() },
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
                 },
             ) {
                 LabelSelectModalContent(
-                    uiState = uiState,
-                    clearToastMessage = { viewModel.clearToastMessage() },
                     labels = uiState.movableLabels,
                     selectedLabels = uiState.selectedLabel?.let { listOf(it) } ?: emptyList(),
                     onDismiss = {
@@ -215,12 +215,16 @@ fun BubbleStorageScreen(
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
                 },
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() }
             )
         } else if (uiState.bubbleStorageMode == BubbleStorageMode.SHARE) {
             BottomSheet(
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
                 },
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() }
             ) {
                 Column(
                     modifier = Modifier

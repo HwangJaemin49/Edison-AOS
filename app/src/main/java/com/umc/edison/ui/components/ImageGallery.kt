@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 
@@ -35,7 +36,9 @@ import com.umc.edison.ui.theme.Gray800
 fun ImageGallery(
     onImageSelected: (List<Uri>) -> Unit,
     multiSelectMode: Boolean,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    uiState: BaseState,
+    clearToastMessage: () -> Unit
 ) {
     val context = LocalContext.current
     val images = remember { mutableStateListOf<Uri>() }
@@ -59,7 +62,11 @@ fun ImageGallery(
         }
     }
 
-    BottomSheet(onDismiss = { onClose() }) {
+    BottomSheet(
+        onDismiss = { onClose() },
+        uiState = uiState,
+        clearToastMessage = clearToastMessage
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

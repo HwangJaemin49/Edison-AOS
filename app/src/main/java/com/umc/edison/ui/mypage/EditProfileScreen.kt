@@ -72,7 +72,9 @@ fun EditProfileScreen(
                     viewModel.updateUserProfileImage(uriList[0].toString())
                 },
                 onClose = { showGallery = false },
-                multiSelectMode = false
+                multiSelectMode = false,
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() }
             )
         }
     }

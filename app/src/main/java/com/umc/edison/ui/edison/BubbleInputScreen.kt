@@ -214,7 +214,9 @@ fun BubbleInputContent(
                 viewModel.addContentBlocks(uriList)
             },
             onClose = { viewModel.closeGallery() },
-            multiSelectMode = true
+            multiSelectMode = true,
+            uiState = uiState,
+            clearToastMessage = { viewModel.clearToastMessage() }
         )
     }
 
@@ -235,6 +237,8 @@ fun BubbleInputContent(
             onDismiss = {
                 viewModel.updateLabelEditMode(LabelEditMode.NONE)
             },
+            uiState = uiState,
+            clearToastMessage = { viewModel.clearToastMessage() }
         ) {
             LabelModalContent(
                 editMode = uiState.labelEditMode,
@@ -253,20 +257,22 @@ fun BubbleInputContent(
     if (uiState.labelEditMode == LabelEditMode.EDIT) {
         BottomSheet(
             onDismiss = { viewModel.updateLabelEditMode(LabelEditMode.NONE) },
+            uiState = uiState,
+            clearToastMessage = { viewModel.clearToastMessage() }
         ) {
             LabelSelectModalContent(
-                uiState = uiState,
-                clearToastMessage = { viewModel.clearToastMessage() },
                 labels = uiState.labels,
                 selectedLabels = uiState.bubble.labels,
                 onConfirm = { _ ->
                     viewModel.updateLabelEditMode(LabelEditMode.NONE)
+                    viewModel.updateIcon(IconType.NONE)
                 },
                 onAddLabelClicked = {
                     viewModel.updateLabelEditMode(LabelEditMode.ADD)
                 },
                 onDismiss = {
                     viewModel.updateLabelEditMode(LabelEditMode.NONE)
+                    viewModel.updateIcon(IconType.NONE)
                 },
                 onItemClicked = { label ->
                     viewModel.toggleLabelSelection(label)
