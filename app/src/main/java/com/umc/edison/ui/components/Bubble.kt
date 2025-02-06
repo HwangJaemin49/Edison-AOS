@@ -525,13 +525,32 @@ private fun checkBubbleContainText(bubble: BubbleModel): Boolean {
  * 버블 프리뷰 사이즈 결정 함수
  */
 fun calculateBubblePreviewSize(bubble: BubbleModel): BubbleType.BubbleSize {
-    val bubbleSize = calculateBubbleSize(bubble)
-
-    return if (bubbleSize == BubbleType.BubbleMain) {
-        BubbleType.Bubble300
-    } else {
-        bubbleSize
+    if (bubble.title == null && !bubble.contentBlocks.map { it.type }.contains(ContentType.TEXT)) {
+        return BubbleType.Bubble100
     }
+
+    val (text, isTitle) = extractPlainText(bubble)
+
+    listOf(
+        BubbleType.Bubble100,
+        BubbleType.Bubble160,
+        BubbleType.Bubble230,
+        BubbleType.Bubble300,
+    ).forEach { bubbleType ->
+        val textBoxWidth = bubbleType.textBoxWidth
+        val fontSizeSp =
+            if (isTitle) bubbleType.titleFontStyle.fontSize.value else bubbleType.bodyFontStyle.fontSize.value
+        val lineCount = calculateLineCount(text, textBoxWidth, fontSizeSp)
+
+        when {
+            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> return BubbleType.Bubble100
+            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> return BubbleType.Bubble160
+            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> return BubbleType.Bubble230
+            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> return BubbleType.Bubble300
+        }
+    }
+
+    return BubbleType.Bubble300
 }
 
 /**
@@ -543,18 +562,12 @@ private fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         return BubbleType.Bubble100
     }
 
-    val (text, isTitle) = extractPlainText(bubble)
+    var text = extractContentText(bubble)
+    var isTitle = false
 
-    fun calculateLineCount(text: String, textBoxWidthDp: Dp, fontSizeSp: Float): Int {
-        val charPerLine = (textBoxWidthDp.value / fontSizeSp * 1.5).toInt()
-
-        val lines = text.split("\n").sumOf { line ->
-            val lineLength = line.length
-            val lineCount = lineLength / charPerLine
-            if (lineLength % charPerLine == 0) lineCount else lineCount + 1
-        }
-
-        return lines
+    if (text.isEmpty()) {
+        text = bubble.title ?: ""
+        isTitle = true
     }
 
     listOf(
@@ -579,6 +592,21 @@ private fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
     }
 
     return BubbleType.BubbleDoor
+}
+
+/**
+ * 버블 텍스트 길이에 따른 라인 수 계산
+ */
+private fun calculateLineCount(text: String, textBoxWidthDp: Dp, fontSizeSp: Float): Int {
+    val charPerLine = (textBoxWidthDp.value / fontSizeSp * 1.5).toInt()
+
+    val lines = text.split("\n").sumOf { line ->
+        val lineLength = line.length
+        val lineCount = lineLength / charPerLine
+        if (lineLength % charPerLine == 0) lineCount else lineCount + 1
+    }
+
+    return lines
 }
 
 /**
