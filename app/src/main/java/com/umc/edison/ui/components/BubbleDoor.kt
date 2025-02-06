@@ -250,8 +250,6 @@ private fun BubbleContent(
                                 }
                             )
                         )
-
-                        Log.i("BubbleContent", richTextState.toHtml())
                     }
 
                     if (uiState.selectedTextStyles.contains(TextStyle.BOLD)) {

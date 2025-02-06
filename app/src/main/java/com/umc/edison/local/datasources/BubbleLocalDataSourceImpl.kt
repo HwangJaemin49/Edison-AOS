@@ -1,6 +1,5 @@
 package com.umc.edison.local.datasources
 
-import android.util.Log
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.local.model.BubbleLocal
@@ -78,8 +77,6 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     override suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity {
         update(bubble.toLocal(), tableName)
 
-        Log.i("BubbleLocalDataSourceImpl", "addBubble: $bubble")
-
         addBubbleLabel(bubble)
         addLinkedBubble(bubble)
 
@@ -95,8 +92,6 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     override suspend fun addBubble(bubble: BubbleEntity): BubbleEntity {
         val id = insert(bubble.toLocal())
         bubble.id = id.toInt()
-
-        Log.i("BubbleLocalDataSourceImpl", "addBubble: $bubble")
 
         addBubbleLabel(bubble)
         addLinkedBubble(bubble)
