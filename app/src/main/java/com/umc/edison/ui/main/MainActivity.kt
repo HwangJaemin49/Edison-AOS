@@ -65,7 +65,10 @@ fun MainScreen() {
 
             if (showInputBubble) {
                 BubbleInput(
-                    onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0)) },
+                    onClick = {
+                        showInputBubble = false
+                        navController.navigate(NavRoute.BubbleEdit.createRoute(0))
+                    },
                     isBlur = true,
                     onBackScreenClick = { showInputBubble = false }
                 )

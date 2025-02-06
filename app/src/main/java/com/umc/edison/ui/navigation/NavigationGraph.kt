@@ -38,7 +38,7 @@ fun NavigationGraph(
         }
 
         composable(NavRoute.Space.route) {
-            BubbleSpaceScreen(navHostController)
+            BubbleSpaceScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.ArtBoard.route) {
