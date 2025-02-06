@@ -530,7 +530,7 @@ private fun DrawScope.drawOuterGradientBubbleDoor(
                 isAntiAlias = true
                 when (colors.size) {
                     0 -> color = Gray100.toArgb()
-                    1 -> color = colors[0].copy(alpha = 0.5f).toArgb()
+                    1 -> color = colors[0].toArgb()
                     2 -> {
                         val startX = circleCenter.x - width
                         val endX = circleCenter.x + width
@@ -540,8 +540,8 @@ private fun DrawScope.drawOuterGradientBubbleDoor(
                             startX, startY,
                             endX, endY,
                             intArrayOf(
-                                colors[0].copy(alpha = 0.5f).toArgb(),
-                                colors[1].copy(alpha = 0.5f).toArgb()
+                                colors[0].toArgb(),
+                                colors[1].toArgb()
                             ),
                             floatArrayOf(0.0f, 1.0f),
                             Shader.TileMode.CLAMP
@@ -557,9 +557,9 @@ private fun DrawScope.drawOuterGradientBubbleDoor(
                             startX, startY,
                             endX, endY,
                             intArrayOf(
-                                colors[0].copy(alpha = 0.5f).toArgb(),
-                                colors[1].copy(alpha = 0.5f).toArgb(),
-                                colors[2].copy(alpha = 0.5f).toArgb()
+                                colors[0].toArgb(),
+                                colors[1].toArgb(),
+                                colors[2].toArgb()
                             ),
                             floatArrayOf(0.0f, 0.52f, 1.0f),
                             Shader.TileMode.CLAMP
