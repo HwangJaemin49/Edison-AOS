@@ -130,35 +130,9 @@ fun BubbleInput(
  */
 @Composable
 fun Bubble(
-    onBackScreenClick: () -> Unit,
     bubble: BubbleModel,
-    onBubbleClick: (BubbleModel) -> Unit,
-    onLinkedBubbleClick: (Int) -> Unit = {},
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray800.copy(alpha = 0.5f))
-            .clickable(
-                onClick = onBackScreenClick,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Bubble(
-            bubble = bubble,
-            onClick = { onBubbleClick(bubble) },
-            onLinkClick = onLinkedBubbleClick
-        )
-    }
-}
-
-@Composable
-private fun Bubble(
-    bubble: BubbleModel,
-    onClick: () -> Unit,
-    onLinkClick: (Int) -> Unit,
+    onBubbleClick: () -> Unit,
+    onLinkedBubbleClick: (Int) -> Unit,
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
@@ -166,14 +140,14 @@ private fun Bubble(
         BubbleDoor(
             bubble = bubble,
             isEditable = false,
-            onClick = onClick,
-            onLinkClick = onLinkClick,
+            onClick = onBubbleClick,
+            onLinkClick = onLinkedBubbleClick,
         )
     } else {
         TextBubble(
             bubble = bubble,
             colors = bubble.labels.map { it.color },
-            onClick = onClick,
+            onClick = onBubbleClick,
             bubbleSize = BubbleType.BubbleMain,
             isPreview = false
         )

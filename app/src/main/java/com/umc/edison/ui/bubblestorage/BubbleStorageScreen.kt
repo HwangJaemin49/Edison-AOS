@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -34,6 +33,7 @@ import com.umc.edison.ui.components.LabelTopAppBar
 import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Gray900
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,7 +144,7 @@ fun BubbleStorageScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
+                    .background(Gray800.copy(alpha = 0.5f))
                     .clickable(onClick = {
                         viewModel.updateEditMode(BubbleStorageMode.NONE)
                     }),
@@ -154,9 +154,6 @@ fun BubbleStorageScreen(
                     bubble = bubble,
                     onBubbleClick = {
                         navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
-                    },
-                    onBackScreenClick = {
-                        viewModel.updateEditMode(BubbleStorageMode.NONE)
                     },
                     onLinkedBubbleClick = { linkedBubbleId ->
                         navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))

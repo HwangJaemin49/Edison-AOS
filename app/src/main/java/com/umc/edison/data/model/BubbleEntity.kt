@@ -21,7 +21,7 @@ data class BubbleEntity(
     override fun toDomain(): Bubble {
         // Text 타입의 경우 앞에 %<TEXT>와 뒤에 </TEXT>%가 붙어있고
         // Image 타입의 경우 앞에 %<IMAGE>와 뒤에 </IMAGE>%가 붙어있음
-        val contentBlocks = content?.split("%<")?.mapIndexed { index, s ->
+        val contentBlocks = content?.split("%<")?.mapIndexed { _, s ->
             val type = when {
                 s.startsWith("${ContentType.TEXT}>") -> ContentType.TEXT
                 s.startsWith("${ContentType.IMAGE}>") -> ContentType.IMAGE
@@ -31,7 +31,7 @@ data class BubbleEntity(
                 ContentType.TEXT -> s.substringAfter("${ContentType.TEXT}>").substringBefore("</${ContentType.TEXT}")
                 ContentType.IMAGE -> s.substringAfter("${ContentType.IMAGE}>").substringBefore("</${ContentType.IMAGE}")
             }
-            ContentBlock(type, content, index)
+            ContentBlock(type, content)
         }?.filterNotNull() ?: emptyList()
 
         return Bubble(

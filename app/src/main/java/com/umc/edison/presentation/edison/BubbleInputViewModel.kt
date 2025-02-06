@@ -58,13 +58,9 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getBubbleUseCase(bubbleId),
             onSuccess = { bubble ->
-                val sortedContentBlocks =
-                    bubble.contentBlocks.sortedBy { it.position }.toPresentation()
                 _uiState.update {
                     it.copy(
-                        bubble = bubble.toPresentation().copy(
-                            contentBlocks = sortedContentBlocks
-                        ),
+                        bubble = bubble.toPresentation(),
                     )
                 }
             },
@@ -216,7 +212,6 @@ class BubbleInputViewModel @Inject constructor(
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "<br>",
-            position = _uiState.value.bubble.contentBlocks.size,
         )
 
         if (_uiState.value.bubble.contentBlocks.isEmpty()) {
@@ -255,20 +250,13 @@ class BubbleInputViewModel @Inject constructor(
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "",
-            position = 0,
         )
-
-        _uiState.value.bubble.contentBlocks.forEachIndexed { index, contentBlock ->
-            contentBlock.position = index + 1
-        }
 
         _uiState.update {
             val updatedContentBlocks = listOf(newTextBlock) + it.bubble.contentBlocks
-            // position 순으로 정렬
-            val sorted = updatedContentBlocks.sortedBy { contentBlock -> contentBlock.position }
             it.copy(
                 bubble = it.bubble.copy(
-                    contentBlocks = sorted
+                    contentBlocks = updatedContentBlocks
                 )
             )
         }
@@ -285,7 +273,6 @@ class BubbleInputViewModel @Inject constructor(
             val newImageBlock = ContentBlockModel(
                 type = ContentType.IMAGE,
                 content = imagePath.toString(),
-                position = _uiState.value.bubble.contentBlocks.size,
             )
 
             newImageBlocks.add(newImageBlock)
@@ -319,28 +306,49 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun deleteContentBlock(contentBlock: ContentBlockModel) {
+        if (contentBlock.type != ContentType.IMAGE) return
+
         val currentBubble = _uiState.value.bubble
         val contentBlocks = currentBubble.contentBlocks.toMutableList()
 
-        val targetIndex = contentBlocks.indexOfFirst { it.position == contentBlock.position }
+        val targetIndex = contentBlocks.indexOf(contentBlock)
 
-        if (targetIndex == -1 || contentBlock.type != ContentType.IMAGE) return
+        if (targetIndex == -1) return
 
-        val nextTextBlockIndex = contentBlocks.indexOfFirst {
-            it.position > contentBlock.position && it.type == ContentType.TEXT
+        // 이미지가 첫 번째 블록일 때
+        if (targetIndex == 0) {
+            contentBlocks.removeAt(targetIndex)
+            _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
+
+            if (contentBlocks.isEmpty() || contentBlocks[0].type == ContentType.IMAGE) {
+                addTextBlockToFront()
+            }
+            return
         }
 
-        val previousTextBlockIndex = contentBlocks.indexOfLast {
-            it.position < contentBlock.position && it.type == ContentType.TEXT
+        // 이미지가 마지막 블록일 때
+        if (targetIndex == currentBubble.contentBlocks.lastIndex) {
+            contentBlocks.removeAt(targetIndex)
+            _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
+
+            // 마지막 블록이 이미지 블록이면 텍스트 블록 추가
+            if (currentBubble.contentBlocks.last().type == ContentType.IMAGE) {
+                addTextBlock()
+            }
+            return
         }
 
-        if (nextTextBlockIndex != -1 && previousTextBlockIndex != -1) {
-            val updatedTextBlock = contentBlocks[previousTextBlockIndex].copy(
-                content = contentBlocks[previousTextBlockIndex].content + "\n" + contentBlocks[nextTextBlockIndex].content
+        // 이미지가 중간 블럭일 때 이전 블록과 다음 블록이 TEXT일 경우 연결
+        if (contentBlocks[targetIndex - 1].type == ContentType.TEXT && contentBlocks[targetIndex + 1].type == ContentType.TEXT) {
+            contentBlocks[targetIndex - 1] = contentBlocks[targetIndex - 1].copy(
+                content = contentBlocks[targetIndex - 1].content + contentBlocks[targetIndex + 1].content
             )
 
-            contentBlocks[previousTextBlockIndex] = updatedTextBlock
-            contentBlocks.removeAt(nextTextBlockIndex)
+            contentBlocks.removeAt(targetIndex) // 제거하려는 이미지 블록 삭제
+            contentBlocks.removeAt(targetIndex) // 다음 TEXT 블록 삭제
+
+            _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
+            return
         }
 
         contentBlocks.removeAt(targetIndex)
@@ -423,7 +431,6 @@ class BubbleInputViewModel @Inject constructor(
     private fun trimBlankBlock() {
         val contentBlocks = _uiState.value.bubble.contentBlocks.toMutableList()
         val updatedContentBlocks = mutableListOf<ContentBlockModel>()
-        var position = 0
 
         contentBlocks.forEachIndexed { _, contentBlock ->
             if (contentBlock.type == ContentType.TEXT) {
@@ -437,15 +444,11 @@ class BubbleInputViewModel @Inject constructor(
                 if (newContent.parseHtml().trim().isNotEmpty()) {
                     val updatedContentBlock = contentBlock.copy(
                         content = newContent,
-                        position = position
                     )
                     updatedContentBlocks.add(updatedContentBlock)
-                    position++
                 }
             } else {
-                val updatedContentBlock = contentBlock.copy(position = position)
-                updatedContentBlocks.add(updatedContentBlock)
-                position++ // position 증가
+                updatedContentBlocks.add(contentBlock)
             }
         }
 

@@ -12,10 +12,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,13 +39,11 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import coil3.size.Scale
 import coil3.size.Size
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.BubbleModel
@@ -143,176 +139,14 @@ fun BubbleDoor(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isEditable) {
-                BubbleContent(
-                    bubble = bubble,
-                    onBubbleChange = onBubbleUpdate,
-                    uiState = bubbleInputState,
-                    deleteClicked = onImageDeleted,
-                )
-            } else {
-                BubbleContent(
-                    bubble = bubble,
-                    onLinkClick = onLinkClick
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalRichTextApi::class, ExperimentalLayoutApi::class)
-@Composable
-private fun BubbleContent(
-    bubble: BubbleModel,
-    onLinkClick: (Int) -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Title
-        if (bubble.title != null) {
-            Text(
-                text = bubble.title,
-                style = MaterialTheme.typography.displayMedium,
-                color = Gray800,
-                textAlign = TextAlign.Start
+            BubbleContent(
+                isEditable = isEditable,
+                bubble = bubble,
+                onBubbleChange = onBubbleUpdate,
+                uiState = bubbleInputState,
+                deleteClicked = onImageDeleted,
+                onLinkClick = onLinkClick,
             )
-
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-
-        // Content Blocks
-        bubble.contentBlocks.forEach { contentBlock ->
-            when (contentBlock.type) {
-                ContentType.TEXT -> {
-                    val richTextState = rememberRichTextState()
-
-                    LaunchedEffect(contentBlock.content) {
-                        richTextState.setHtml(contentBlock.content)
-                    }
-
-                    RichText(
-                        state = richTextState,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Gray800,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                ContentType.IMAGE -> {
-                    val painter = rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(contentBlock.content)
-                            .crossfade(true)
-                            .scale(Scale.FILL)
-                            .build()
-                    )
-
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.FillWidth
-                    )
-                }
-            }
-        }
-
-        FlowRow (
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            bubble.backLinks.forEach { backLink ->
-
-                val myUriHandler by remember {
-                    mutableStateOf(object : UriHandler {
-                        override fun openUri(uri: String) {
-                            val bubbleId = uri.toIntOrNull()
-                            if (bubbleId != null) {
-                                onLinkClick(bubbleId)
-                            }
-                        }
-                    })
-                }
-
-                val richTextState = rememberRichTextState()
-                val isInitialized = remember(backLink.id) { mutableStateOf(false) }
-
-                if (!isInitialized.value) {
-                    val selectedTitle = backLink.title?.takeIf { it.isNotBlank() }
-                        ?: backLink.contentBlocks
-                            .filter { it.type == ContentType.TEXT }
-                            .firstOrNull { it.content.parseHtml().isNotBlank() }
-                            ?.content?.parseHtml()?.take(5)
-                        ?: "내용 없음"
-
-                    val splitTitle = selectedTitle.split("\n")
-
-                    richTextState.addLink(
-                        text = "[[${splitTitle[0]}]]",
-                        url = "${backLink.id}"
-                    )
-
-                    isInitialized.value = true
-                }
-
-                CompositionLocalProvider(LocalUriHandler provides myUriHandler){
-                    RichText(
-                        state = richTextState,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Gray800,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-        }
-
-        bubble.linkedBubble?.let { linkedBubble ->
-            val myUriHandler by remember {
-                mutableStateOf(object : UriHandler {
-                    override fun openUri(uri: String) {
-                        val bubbleId = uri.toIntOrNull()
-                        if (bubbleId != null) {
-                            onLinkClick(bubbleId)
-                        }
-                    }
-                })
-            }
-
-            val richTextState = rememberRichTextState()
-            val isInitialized = remember(linkedBubble.id) { mutableStateOf(false) }
-
-            if (!isInitialized.value) {
-                val selectedTitle = linkedBubble.title?.takeIf { it.isNotBlank() }
-                    ?: linkedBubble.contentBlocks
-                        .filter { it.type == ContentType.TEXT }
-                        .firstOrNull { it.content.parseHtml().isNotBlank() }
-                        ?.content?.parseHtml()?.take(5)
-                    ?: "내용 없음"
-
-                val splitTitle = selectedTitle.split("\n")
-
-                richTextState.addLink(
-                    text = "[[${splitTitle[0]}]]",
-                    url = "${linkedBubble.id}"
-                )
-
-                isInitialized.value = true
-            }
-
-            CompositionLocalProvider(LocalUriHandler provides myUriHandler){
-                RichText(
-                    state = richTextState,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Gray800,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
         }
     }
 }
@@ -320,53 +154,64 @@ private fun BubbleContent(
 @OptIn(ExperimentalRichTextApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun BubbleContent(
+    isEditable: Boolean,
     bubble: BubbleModel,
     onBubbleChange: (BubbleModel) -> Unit,
     uiState: BubbleInputState,
     deleteClicked: (ContentBlockModel) -> Unit,
+    onLinkClick: (Int) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
     Column(
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        BasicTextField(
-            value = bubble.title ?: "",
-            onValueChange = { newTitle ->
-                onBubbleChange(
-                    bubble.copy(title = newTitle)
-                )
-            },
-            textStyle = MaterialTheme.typography.displayMedium.copy(color = Gray800),
-            modifier = Modifier.fillMaxWidth(),
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (bubble.title.isNullOrEmpty()) {
-                        Text(
-                            text = "제목",
-                            style = MaterialTheme.typography.displayMedium.copy(color = Gray500),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+        if (isEditable) {
+            BasicTextField(
+                value = bubble.title ?: "",
+                onValueChange = { newTitle ->
+                    onBubbleChange(
+                        bubble.copy(title = newTitle)
+                    )
+                },
+                textStyle = MaterialTheme.typography.displayMedium.copy(color = Gray800),
+                modifier = Modifier.fillMaxWidth(),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (bubble.title.isNullOrEmpty()) {
+                            Text(
+                                text = "제목",
+                                style = MaterialTheme.typography.displayMedium.copy(color = Gray500),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
-            }
-        )
+            )
+        } else if (bubble.title != null) {
+            Text(
+                text = bubble.title,
+                style = MaterialTheme.typography.displayMedium,
+                color = Gray800,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
 
         var deletedImageBlockId by remember { mutableStateOf<Int?>(null) }
 
-        bubble.contentBlocks.forEachIndexed { _, contentBlock ->
+        bubble.contentBlocks.forEachIndexed { index, contentBlock ->
             when (contentBlock.type) {
                 ContentType.TEXT -> {
                     val richTextState = rememberSaveable(
-                        key = "richTextState_${contentBlock.position}",
+                        key = "richTextState_${index}",
                         saver = RichTextState.Saver
                     ) {
                         RichTextState().apply {
@@ -374,7 +219,7 @@ private fun BubbleContent(
                         }
                     }
 
-                    val isInitialized = remember(contentBlock.position) { mutableStateOf(false) }
+                    val isInitialized = remember(index) { mutableStateOf(false) }
 
                     LaunchedEffect(deletedImageBlockId) {
                         deletedImageBlockId?.let {
@@ -394,7 +239,7 @@ private fun BubbleContent(
                         onBubbleChange(
                             bubble.copy(
                                 contentBlocks = bubble.contentBlocks.map {
-                                    if (it.position == contentBlock.position) {
+                                    if (it == contentBlock) {
                                         it.copy(content = richTextState.toHtml())
                                     } else {
                                         it
@@ -440,26 +285,34 @@ private fun BubbleContent(
                         richTextState.removeOrderedList()
                     }
 
-                    BasicRichTextEditor(
-                        state = richTextState,
-                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                        modifier = Modifier.fillMaxWidth(),
-                        decorationBox = { innerTextField ->
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                if (richTextState.toHtml() == "<br>" && bubble.contentBlocks.size == 1) {
-                                    Text(
-                                        text = "내용을 입력해주세요.",
-                                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray500),
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
+                    if (isEditable) {
+                        BasicRichTextEditor(
+                            state = richTextState,
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+                            modifier = Modifier.fillMaxWidth(),
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (richTextState.toHtml() == "<br>" && bubble.contentBlocks.size == 1) {
+                                        Text(
+                                            text = "내용을 입력해주세요.",
+                                            style = MaterialTheme.typography.bodyMedium.copy(color = Gray500),
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+                                    innerTextField()
                                 }
-                                innerTextField()
                             }
-                        }
-                    )
+                        )
+                    } else {
+                        BasicRichText(
+                            state = richTextState,
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
 
                 ContentType.IMAGE -> {
@@ -501,14 +354,13 @@ private fun BubbleContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Button(
-
                                     shape = RoundedCornerShape(100.dp),
                                     onClick = {
                                         println(bubble)
                                         showDeleteButton = false
                                         deleteClicked(contentBlock)
                                         println(bubble)
-                                        deletedImageBlockId = contentBlock.position
+                                        deletedImageBlockId = index
                                     },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Gray700,
@@ -536,6 +388,17 @@ private fun BubbleContent(
                 val richTextState = rememberRichTextState()
                 val isInitialized = remember(backLink.id) { mutableStateOf(false) }
 
+                val myUriHandler by remember {
+                    mutableStateOf(object : UriHandler {
+                        override fun openUri(uri: String) {
+                            val bubbleId = uri.toIntOrNull()
+                            if (bubbleId != null) {
+                                onLinkClick(bubbleId)
+                            }
+                        }
+                    })
+                }
+
                 if (!isInitialized.value) {
                     val selectedTitle = backLink.title?.takeIf { it.isNotBlank() }
                         ?: backLink.contentBlocks
@@ -554,17 +417,39 @@ private fun BubbleContent(
                     isInitialized.value = true
                 }
 
-                BasicRichText(
-                    state = richTextState,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                )
+                if (isEditable) {
+                    BasicRichText(
+                        state = richTextState,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+                    )
+                } else {
+                    CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                        RichText(
+                            state = richTextState,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Gray800,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
             }
         }
 
         bubble.linkedBubble?.let { linkedBubble ->
             val richTextState = rememberRichTextState()
             val isInitialized = remember(linkedBubble.id) { mutableStateOf(false) }
+
+            val myUriHandler by remember {
+                mutableStateOf(object : UriHandler {
+                    override fun openUri(uri: String) {
+                        val bubbleId = uri.toIntOrNull()
+                        if (bubbleId != null) {
+                            onLinkClick(bubbleId)
+                        }
+                    }
+                })
+            }
 
             if (!isInitialized.value) {
                 val selectedTitle = linkedBubble.title?.takeIf { it.isNotBlank() }
@@ -584,11 +469,22 @@ private fun BubbleContent(
                 isInitialized.value = true
             }
 
-            BasicRichText(
-                state = richTextState,
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-            )
+            if (isEditable) {
+                BasicRichText(
+                    state = richTextState,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+                )
+            } else {
+                CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                    RichText(
+                        state = richTextState,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Gray800,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
