@@ -16,15 +16,13 @@ import com.umc.edison.ui.theme.Gray800
 @Composable
 fun LabelSelectModalContent(
     labels: List<LabelModel>,
+    selectedLabels: List<LabelModel> = emptyList(),
     onDismiss: () -> Unit,
     onConfirm: (List<LabelModel>) -> Unit,
-    initSelectedLabels: List<LabelModel> = emptyList(),
+    onItemClicked: (LabelModel) -> Unit,
     onAddLabelClicked: (() -> Unit)? = null,
-    onItemClicked: ((LabelModel) -> Unit)? = null,
-    multiSelectMode: Boolean = false
+    multiSelectMode: Boolean = false,
 ) {
-    var selectedLabels by remember { mutableStateOf(initSelectedLabels) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,16 +52,7 @@ fun LabelSelectModalContent(
                     selected = selectedLabels.contains(label),
                     multiSelectMode = multiSelectMode,
                     onClick = {
-                        selectedLabels = if (multiSelectMode) {
-                            if (selectedLabels.contains(label)) {
-                                selectedLabels.filter { it != label }
-                            } else {
-                                selectedLabels + label
-                            }
-                        } else {
-                            listOf(label)
-                        }
-                        onItemClicked?.invoke(label)
+                        onItemClicked(label)
                     },
                 )
             }
@@ -73,7 +62,8 @@ fun LabelSelectModalContent(
 
         // 하단 버튼들
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 17.dp, end = 27.dp, bottom = 17.dp),
+            modifier = Modifier.fillMaxWidth()
+                .padding(top = 17.dp, end = 27.dp, bottom = 17.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             MiddleCancelButton(

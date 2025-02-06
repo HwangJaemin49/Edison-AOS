@@ -53,13 +53,15 @@ fun LabelTabScreen(
                 interactionSource = remember { MutableInteractionSource() }
             ),
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         if (uiState.labelEditMode == LabelEditMode.ADD || uiState.labelEditMode == LabelEditMode.EDIT) {
             BottomSheet(
                 onDismiss = {
                     viewModel.updateEditMode(LabelEditMode.NONE)
                 },
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() }
             ) {
                 LabelModalContent(
                     editMode = uiState.labelEditMode,
@@ -85,6 +87,8 @@ fun LabelTabScreen(
                 onConfirm = {
                     viewModel.deleteSelectedLabel()
                 },
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() }
             )
         }
 

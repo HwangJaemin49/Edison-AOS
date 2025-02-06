@@ -37,11 +37,7 @@ fun BubblesLayout(
                 calculateInitialBubbleXOffset(bubble)
             }
 
-            var bubbleSize = calculateBubbleSize(bubble)
-
-            if (bubbleSize == BubbleType.BubbleMain) {
-                bubbleSize = BubbleType.Bubble300
-            }
+            val bubbleSize = calculateBubblePreviewSize(bubble)
 
             Box(
                 modifier = Modifier
@@ -79,11 +75,7 @@ private fun calculateInitialBubbleXOffset(bubble: BubbleModel): Dp {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp
     val padding = 8.dp
-    var bubbleSize = calculateBubbleSize(bubble)
-
-    if (bubbleSize == BubbleType.BubbleMain) {
-        bubbleSize = BubbleType.Bubble300
-    }
+    val bubbleSize = calculateBubblePreviewSize(bubble)
 
     val maxXOffset = screenWidthDp - bubbleSize.size - padding
 

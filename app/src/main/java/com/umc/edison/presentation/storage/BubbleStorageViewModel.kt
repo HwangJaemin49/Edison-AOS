@@ -28,6 +28,7 @@ class BubbleStorageViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
     val uiState = _uiState.asStateFlow()
+
     init {
         val id: Int? = savedStateHandle["id"]
 
@@ -38,7 +39,7 @@ class BubbleStorageViewModel @Inject constructor(
         }
     }
 
-    private fun fetchLabelDetail(id: Int) {
+    fun fetchLabelDetail(id: Int) {
         _uiState.update { BubbleStorageState.DEFAULT }
 
         collectDataResource(
@@ -63,12 +64,12 @@ class BubbleStorageViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(isLoading = false, labelId = id) }
             }
         )
     }
 
-    private fun fetchAllBubbles() { // TODO: 사용하는 비즈니스 로직이 7일간의 버블만 갖고오는 로직이라 이 부분은 UI 구현이 끝난 이후에 수정
+    fun fetchAllBubbles() { // TODO: 사용하는 비즈니스 로직이 7일간의 버블만 갖고오는 로직이라 이 부분은 UI 구현이 끝난 이후에 수정
         collectDataResource(
             flow = getAllBubblesUseCase(),
             onSuccess = { bubbles ->
@@ -175,6 +176,10 @@ class BubbleStorageViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
+    }
+
+    fun selectLabel(label: LabelModel) {
+        _uiState.update { it.copy(selectedLabel = label) }
     }
 
     fun moveSelectedBubbles(label: LabelModel, showBottomNav: (Boolean) -> Unit) {

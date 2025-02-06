@@ -3,25 +3,26 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,25 +38,26 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.material3.RichText
+import com.umc.edison.R
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.edison.parseHtml
 import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.ui.theme.EdisonTypography
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.Pretendard
 import com.umc.edison.ui.theme.White000
 import kotlin.math.cos
 import kotlin.math.sin
@@ -66,110 +68,88 @@ import kotlin.math.sin
 @Composable
 fun BubbleInput(
     onClick: () -> Unit,
-    onSwipeUp: () -> Unit,
-
-    ) {
+    isBlur: Boolean = false,
+    onBackScreenClick: () -> Unit = {}
+) {
     val bubbleSize = BubbleType.BubbleMain
     val canvasSize = bubbleSize.size
 
-    var offsetY by remember { mutableFloatStateOf(0f) }
-    val animatedOffsetY by animateFloatAsState(targetValue = offsetY)
-
-    Box(
+    Column(
         modifier = Modifier
-            .size(canvasSize)
-            .clip(CircleShape)
-            .pointerInput(Unit) {
-                detectVerticalDragGestures(
-                    onVerticalDrag = { change, dragAmount ->
-                        change.consume()
-                        if (dragAmount < 0) {
-                            offsetY += dragAmount
-                            if (offsetY < -200f) {
-                                onSwipeUp()
-                                offsetY = 0f
-                            }
-                        }
-                    },
-                    onDragEnd = {
-                        offsetY = 0f
-                    }
-                )
-            }
-            .clickable { onClick() }
-            .offset {
-                IntOffset(
-                    x = 0,
-                    y = animatedOffsetY.dp.roundToPx()
-                )
-            },
-        contentAlignment = Alignment.Center
+            .fillMaxSize()
+            .background(
+                color = if (isBlur) Gray800.copy(alpha = 0.5f) else White000
+            )
+            .clickable(
+                onClick = onBackScreenClick,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SingleBubble(bubbleSize = bubbleSize, color = Gray300)
+        Image(
+            painter = painterResource(id = R.drawable.ic_up_slide),
+            contentDescription = "up slide",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .width(24.dp)
+                .height(44.dp)
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
 
         Box(
-            modifier = Modifier.size(
-                bubbleSize.textBoxSize.first.dp,
-                bubbleSize.textBoxSize.second.dp
-            ),
+            modifier = Modifier
+                .size(canvasSize)
+                .clip(CircleShape)
+                .clickable { onClick() },
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "버블을 입력해주세요.",
-                style = bubbleSize.fontStyle,
-                color = Gray500,
-                textAlign = TextAlign.Center
-            )
+            SingleBubble(bubbleSize = bubbleSize, color = Gray300)
+
+            Box(
+                modifier = Modifier
+                    .width(bubbleSize.textBoxWidth)
+                    .wrapContentHeight(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "버블을 입력해주세요.",
+                    style = bubbleSize.bodyFontStyle,
+                    color = Gray500,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
 
 /**
- * 버블 내용 확인 가능한 컴포저블
+ * 버블 전체 내용 확인 가능한 컴포저블
  */
 @Composable
 fun Bubble(
-    onBackScreenClick: () -> Unit,
     bubble: BubbleModel,
-    onBubbleClick: (BubbleModel) -> Unit,
-    onLinkedBubbleClicked: (Int) -> Unit = {},
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray800.copy(alpha = 0.5f))
-            .clickable(onClick = onBackScreenClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Bubble(
-            bubble = bubble,
-            onClick = { onBubbleClick(bubble) },
-            linkClicked = onLinkedBubbleClicked
-        )
-    }
-}
-
-@Composable
-private fun Bubble(
-    bubble: BubbleModel,
-    onClick: () -> Unit,
-    linkClicked: (Int) -> Unit,
+    onBubbleClick: () -> Unit,
+    onLinkedBubbleClick: (Int) -> Unit,
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 
-    if (checkBubbleContainImage(bubble) || bubbleSize == BubbleType.BubbleMain) {
+    if (checkBubbleContainImage(bubble) || bubbleSize == BubbleType.BubbleDoor) {
         BubbleDoor(
             bubble = bubble,
             isEditable = false,
-            onClick = onClick,
-            linkClicked = linkClicked,
+            onClick = onBubbleClick,
+            onLinkClick = onLinkedBubbleClick,
         )
     } else {
-        TextContentBubble(
+        TextBubble(
             bubble = bubble,
             colors = bubble.labels.map { it.color },
-            onClick = onClick,
-            bubbleSize = BubbleType.BubbleMain
+            onClick = onBubbleClick,
+            bubbleSize = BubbleType.BubbleMain,
+            isPreview = false
         )
     }
 }
@@ -184,65 +164,66 @@ fun BubblePreview(
     size: BubbleType.BubbleSize,
     bubble: BubbleModel
 ) {
-    if (bubble.title != null || bubble.contentBlocks.firstOrNull()?.type == ContentType.TEXT) {
-        TextContentBubble(
+    if (bubble.mainImage != null) {
+        ImageBubble(
+            bubble = bubble,
+            bubbleSize = size,
+            imageUrl = bubble.mainImage,
+            onClick = onClick,
+            onLongClick = onLongClick,
+            isPreview = true
+        )
+    } else if (bubble.title != null || checkBubbleContainText(bubble)) {
+        // 제목이 있거나 본문에 텍스트가 있는 경우
+        TextBubble(
             bubble = bubble,
             colors = bubble.labels.map { it.color },
             onClick = onClick,
             onLongClick = onLongClick,
-            bubbleSize = size
+            bubbleSize = size,
+            isPreview = true
         )
     } else {
-        val imageUrl = bubble.mainImage ?: bubble.contentBlocks.firstOrNull()?.content ?: ""
-
-        if (imageUrl.isNotEmpty()) {
-            ImageBubble(
-                bubbleSize = size,
-                imageUrl = imageUrl,
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
-        } else {
-            TextContentBubble(
-                bubble = bubble,
-                colors = bubble.labels.map { it.color },
-                onClick = onClick,
-                onLongClick = onLongClick,
-                bubbleSize = size
-            )
-        }
+        // 그 외의 경우 - 본문 이미지만 있는 경우
+        ImageBubble(
+            bubble = bubble,
+            bubbleSize = size,
+            imageUrl = bubble.contentBlocks.firstOrNull()?.content ?: "",
+            onClick = onClick,
+            onLongClick = onLongClick,
+            isPreview = true
+        )
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TextContentBubble(
+private fun TextBubble(
     bubble: BubbleModel,
     colors: List<Color>,
     onClick: () -> Unit,
     onLongClick: () -> Unit = {},
     bubbleSize: BubbleType.BubbleSize,
+    isPreview: Boolean,
 ) {
-    val canvasSize = bubbleSize.size
-
     Box(
         modifier = Modifier
-            .size(canvasSize)
+            .size(bubbleSize.size)
             .clip(CircleShape)
             .combinedClickable(
                 onClick = { onClick() },
                 onLongClick = { onLongClick() },
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
             ),
         contentAlignment = Alignment.Center
     ) {
         if (bubble.mainImage != null) {
             ImageBubble(
+                bubble = bubble,
                 bubbleSize = bubbleSize,
                 imageUrl = bubble.mainImage,
                 onClick = onClick,
-                onLongClick = onLongClick
+                onLongClick = onLongClick,
+                isPreview = isPreview
             )
         } else {
             when (colors.size) {
@@ -253,22 +234,57 @@ private fun TextContentBubble(
             }
         }
 
-        Box(
-            modifier = Modifier.size(
-                bubbleSize.textBoxSize.first.dp,
-                bubbleSize.textBoxSize.second.dp
-            ),
-            contentAlignment = Alignment.Center
-        ) {
-            val text = if (bubbleSize == BubbleType.BubbleMain) bubble.contentBlocks[0].content
-            else bubble.title ?: bubble.contentBlocks[0].content
+        // 본문 내용 채우기
+        TextContentBubble(bubble = bubble, bubbleSize = bubbleSize, isPreview = isPreview)
+    }
+}
+
+@OptIn(ExperimentalRichTextApi::class)
+@Composable
+private fun TextContentBubble(
+    bubble: BubbleModel,
+    bubbleSize: BubbleType.BubbleSize,
+    isPreview: Boolean
+) {
+    Box(
+        modifier = Modifier
+            .width(bubbleSize.textBoxWidth)
+            .wrapContentHeight(),
+        contentAlignment = Alignment.Center
+    ) {
+        // 미리보기일 때는 제목 or 본문 - 스타일 적용 안 됨
+        if (isPreview) {
+            val (text, isTitle) = extractPlainText(bubble)
 
             Text(
-                text = text.parseHtml().replace("\n\n", "\n").trim(),
-                style = bubbleSize.fontStyle,
+                text = text,
+                style = if (isTitle) bubbleSize.titleFontStyle else bubbleSize.bodyFontStyle,
                 color = Gray800,
                 textAlign = TextAlign.Center
             )
+        } else { // 미리보기 아닐 때는 무조건 본문 - 스타일 적용
+            val text = extractContentText(bubble)
+
+            // 본문이 null인 경우에는 제목으로 보여주기
+            if (text.isEmpty()) {
+                val title = bubble.title ?: ""
+                Text(
+                    text = title,
+                    style = bubbleSize.titleFontStyle,
+                    color = Gray800,
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                val richTextState = rememberRichTextState()
+                richTextState.setHtml(text)
+
+                RichText(
+                    state = richTextState,
+                    style = bubbleSize.bodyFontStyle,
+                    color = Gray800,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }
@@ -276,22 +292,20 @@ private fun TextContentBubble(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ImageBubble(
+    bubble: BubbleModel,
     bubbleSize: BubbleType.BubbleSize,
     imageUrl: String,
     onClick: () -> Unit,
     onLongClick: () -> Unit = {},
+    isPreview: Boolean
 ) {
-    val canvasSize = bubbleSize.size
-
     Box(
         modifier = Modifier
-            .size(canvasSize)
+            .size(bubbleSize.size)
             .clip(CircleShape)
             .combinedClickable(
                 onClick = { onClick() },
                 onLongClick = { onLongClick() },
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -301,6 +315,8 @@ private fun ImageBubble(
             // 큰 원 그리기
             drawCircle(color = Gray200, radius = outerRadius, center = center)
         }
+
+        // 이미지 & 블러 레이어
         Box(
             modifier = Modifier
                 .size(bubbleSize.size)
@@ -310,8 +326,14 @@ private fun ImageBubble(
                         Path().apply {
                             addOval(
                                 Rect(
-                                    center - Offset(bubbleSize.size.toPx() / 2, bubbleSize.size.toPx() / 2),
-                                    center + Offset(bubbleSize.size.toPx() / 2, bubbleSize.size.toPx() / 2)
+                                    center - Offset(
+                                        bubbleSize.size.toPx() / 2,
+                                        bubbleSize.size.toPx() / 2
+                                    ),
+                                    center + Offset(
+                                        bubbleSize.size.toPx() / 2,
+                                        bubbleSize.size.toPx() / 2
+                                    )
                                 )
                             )
                         }
@@ -330,7 +352,9 @@ private fun ImageBubble(
                 model = imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
-                modifier = Modifier.size(bubbleSize.innerSize).clip(CircleShape)
+                modifier = Modifier
+                    .size(bubbleSize.size)
+                    .clip(CircleShape)
             )
 
             Canvas(modifier = Modifier.size(bubbleSize.size * 0.95f)) {
@@ -343,7 +367,10 @@ private fun ImageBubble(
                                 center.y,
                                 center.x + bubbleSize.size.toPx() / 2,
                                 center.y,
-                                intArrayOf(White000.copy(alpha = 0.5f).toArgb(), Gray200.copy(alpha = 0.5f).toArgb()),
+                                intArrayOf(
+                                    White000.copy(alpha = 0.5f).toArgb(),
+                                    Gray200.copy(alpha = 0.5f).toArgb()
+                                ),
                                 floatArrayOf(0f, 1f),
                                 Shader.TileMode.CLAMP
                             )
@@ -356,6 +383,11 @@ private fun ImageBubble(
                     canvas.drawCircle(center, (bubbleSize.size * 0.95f).toPx() / 2, paint)
                 }
             }
+        }
+
+        // 텍스트 있는 경우
+        if (checkBubbleContainText(bubble)) {
+            TextContentBubble(bubble = bubble, bubbleSize = bubbleSize, isPreview = isPreview)
         }
     }
 }
@@ -478,34 +510,26 @@ private fun checkBubbleContainImage(bubble: BubbleModel): Boolean {
 }
 
 /**
- * 버블 텍스트 길이에 따른 사이즈 계산 함수
+ * 버블 내용에 텍스트가 포함되어 있는지 확인하는 함수
  */
-fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
+private fun checkBubbleContainText(bubble: BubbleModel): Boolean {
+    bubble.contentBlocks.forEach {
+        if (it.type == ContentType.TEXT) {
+            return true
+        }
+    }
+    return false
+}
+
+/**
+ * 버블 프리뷰 사이즈 결정 함수
+ */
+fun calculateBubblePreviewSize(bubble: BubbleModel): BubbleType.BubbleSize {
     if (bubble.title == null && !bubble.contentBlocks.map { it.type }.contains(ContentType.TEXT)) {
         return BubbleType.Bubble100
     }
 
-    var text = bubble.title ?: ""
-
-    if (text.isEmpty() && bubble.contentBlocks.firstOrNull()?.type == ContentType.IMAGE) {
-        return BubbleType.BubbleMain
-    } else if (text.isEmpty()) {
-        text = bubble.contentBlocks.firstOrNull()?.content ?: ""
-    }
-
-    text = text.parseHtml().replace("\n\n", "\n").trim()
-
-    fun calculateLineCount(text: String, textBoxWidthDp: Int, fontSizeSp: Float): Int {
-        val charPerLine = (textBoxWidthDp / (fontSizeSp * 0.57)).toInt()
-
-        val lines = text.split("\n").sumOf { line ->
-            val lineLength = line.length
-            val lineCount = lineLength / charPerLine
-            if (lineLength % charPerLine == 0) lineCount else lineCount + 1
-        }
-
-        return lines
-    }
+    val (text, isTitle) = extractPlainText(bubble)
 
     listOf(
         BubbleType.Bubble100,
@@ -513,8 +537,9 @@ fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         BubbleType.Bubble230,
         BubbleType.Bubble300,
     ).forEach { bubbleType ->
-        val (textBoxWidth, _) = bubbleType.textBoxSize
-        val fontSizeSp = bubbleType.fontStyle.fontSize.value
+        val textBoxWidth = bubbleType.textBoxWidth
+        val fontSizeSp =
+            if (isTitle) bubbleType.titleFontStyle.fontSize.value else bubbleType.bodyFontStyle.fontSize.value
         val lineCount = calculateLineCount(text, textBoxWidth, fontSizeSp)
 
         when {
@@ -525,7 +550,90 @@ fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
         }
     }
 
-    return BubbleType.BubbleMain
+    return BubbleType.Bubble300
+}
+
+/**
+ * 버블 텍스트 길이에 따른 버블 사이즈 계산
+ */
+fun calculateBubbleSize(bubble: BubbleModel): BubbleType.BubbleSize {
+    if (checkBubbleContainImage(bubble)) {
+        return BubbleType.BubbleDoor
+    }
+
+    // title && content text가 없는 경우
+    if (bubble.title == null && !bubble.contentBlocks.map { it.type }.contains(ContentType.TEXT)) {
+        return BubbleType.Bubble100
+    }
+
+    var text = extractContentText(bubble)
+    var isTitle = false
+
+    if (text.isEmpty()) {
+        text = bubble.title ?: ""
+        isTitle = true
+    }
+
+    listOf(
+        BubbleType.Bubble100,
+        BubbleType.Bubble160,
+        BubbleType.Bubble230,
+        BubbleType.Bubble300,
+        BubbleType.BubbleMain
+    ).forEach { bubbleType ->
+        val textBoxWidth = bubbleType.textBoxWidth
+        val fontSizeSp =
+            if (isTitle) bubbleType.titleFontStyle.fontSize.value else bubbleType.bodyFontStyle.fontSize.value
+        val lineCount = calculateLineCount(text, textBoxWidth, fontSizeSp)
+
+        when {
+            text.length <= 5 && bubbleType == BubbleType.Bubble100 -> return BubbleType.Bubble100
+            lineCount <= 2 && bubbleType == BubbleType.Bubble160 -> return BubbleType.Bubble160
+            lineCount <= 3 && bubbleType == BubbleType.Bubble230 -> return BubbleType.Bubble230
+            lineCount <= 4 && bubbleType == BubbleType.Bubble300 -> return BubbleType.Bubble300
+            lineCount <= 5 && bubbleType == BubbleType.BubbleMain -> return BubbleType.BubbleMain
+        }
+    }
+
+    return BubbleType.BubbleDoor
+}
+
+/**
+ * 버블 텍스트 길이에 따른 라인 수 계산
+ */
+private fun calculateLineCount(text: String, textBoxWidthDp: Dp, fontSizeSp: Float): Int {
+    val charPerLine = (textBoxWidthDp.value / fontSizeSp * 1.5).toInt()
+
+    val lines = text.split("\n").sumOf { line ->
+        val lineLength = line.length
+        val lineCount = lineLength / charPerLine
+        if (lineLength % charPerLine == 0) lineCount else lineCount + 1
+    }
+
+    return lines
+}
+
+/**
+ * 버블의 스타일 지정 안 된 텍스트 추출 함수
+ */
+private fun extractPlainText(bubble: BubbleModel): Pair<String, Boolean> {
+    var text = bubble.title ?: ""
+    var isTitle = true
+
+    if (text.isEmpty()) {
+        text = extractContentText(bubble)
+        text = text.parseHtml().replace("\n\n", "\n").trim()
+        isTitle = false
+    }
+
+    return text to isTitle
+}
+
+/**
+ * 버블의 본문 텍스트 추출 함수
+ */
+private fun extractContentText(bubble: BubbleModel): String {
+    return bubble.contentBlocks.firstOrNull { it.type == ContentType.TEXT }?.content ?: ""
 }
 
 /**
@@ -638,70 +746,59 @@ private fun DrawScope.drawCircleWithBlur(
 }
 
 object BubbleType {
+    val BubbleDoor = BubbleSize(
+        size = 364.dp,
+        innerSize = 326.dp,
+        titleFontStyle = EdisonTypography.displayMedium,
+        bodyFontStyle = EdisonTypography.headlineSmall,
+        textBoxWidth = 258.dp
+    )
+
     val BubbleMain = BubbleSize(
         size = 364.dp,
         innerSize = 326.dp,
-        fontStyle = TextStyle(
-            fontFamily = Pretendard,
-            fontWeight = FontWeight.Medium,
-            fontSize = 20.sp,
-            lineHeight = 24.sp
-        ), // headingSmall
-        textBoxSize = Pair(258, 144)
+        titleFontStyle = EdisonTypography.displayMedium,
+        bodyFontStyle = EdisonTypography.headlineSmall,
+        textBoxWidth = 258.dp
     )
 
     val Bubble300 = BubbleSize(
         size = 300.dp,
         innerSize = 270.dp,
-        fontStyle = TextStyle(
-            fontFamily = Pretendard,
-            fontWeight = FontWeight.Medium,
-            fontSize = 18.sp,
-            lineHeight = 24.sp
-        ), // titleLarge
-        textBoxSize = Pair(181, 96)
+        titleFontStyle = EdisonTypography.displaySmall,
+        bodyFontStyle = EdisonTypography.titleLarge,
+        textBoxWidth = 182.dp
     )
 
     val Bubble230 = BubbleSize(
         size = 230.dp,
         innerSize = 206.dp,
-        fontStyle = TextStyle(
-            fontFamily = Pretendard,
-            fontWeight = FontWeight.Medium,
-            fontSize = 16.sp,
-            lineHeight = 20.sp
-        ), // titleMedium
-        textBoxSize = Pair(146, 57)
+        titleFontStyle = EdisonTypography.headlineLarge,
+        bodyFontStyle = EdisonTypography.titleMedium,
+        textBoxWidth = 146.dp
     )
 
     val Bubble160 = BubbleSize(
         size = 160.dp,
         innerSize = 144.dp,
-        fontStyle = TextStyle(
-            fontFamily = Pretendard,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            lineHeight = 18.sp
-        ), // titleSmall
-        textBoxSize = Pair(80, 36)
+        titleFontStyle = EdisonTypography.headlineMedium,
+        bodyFontStyle = EdisonTypography.titleSmall,
+        textBoxWidth = 82.dp
     )
 
     val Bubble100 = BubbleSize(
         size = 100.dp,
         innerSize = 90.dp,
-        fontStyle = TextStyle(
-            fontFamily = Pretendard,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            lineHeight = 18.sp
-        ), // titleSmall
-        textBoxSize = Pair(61, 17)
+        titleFontStyle = EdisonTypography.headlineMedium,
+        bodyFontStyle = EdisonTypography.titleSmall,
+        textBoxWidth = 58.dp
     )
 
     data class BubbleSize(
         val size: Dp,
         val innerSize: Dp,
-        val fontStyle: TextStyle,
-        val textBoxSize: Pair<Int, Int>,
+        val titleFontStyle: TextStyle,
+        val bodyFontStyle: TextStyle,
+        val textBoxWidth: Dp,
     )
 }

@@ -123,7 +123,13 @@ fun BottomNavigation(
                         if (navItem == BottomNavItem.Bubble) {
                             onBubbleClick()
                         } else {
-                            navController.navigate(navItem.route!!)
+                            // navController에 쌓여있는 모든 라우트를 제거하고 해당 라우트로 이동
+                            navController.navigate(navItem.route!!) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = false
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     },
                     colors = NavigationBarItemDefaults.colors(

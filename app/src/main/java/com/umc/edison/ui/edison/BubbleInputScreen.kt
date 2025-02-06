@@ -8,23 +8,18 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,12 +38,12 @@ import com.umc.edison.ui.components.BubbleDoor
 import com.umc.edison.ui.components.IconType
 import com.umc.edison.ui.components.ImageGallery
 import com.umc.edison.ui.components.LabelModalContent
+import com.umc.edison.ui.components.LabelTagList
 import com.umc.edison.ui.components.Toolbar
 import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.Gray900
 import com.umc.edison.ui.theme.White000
 import java.io.File
 
@@ -86,7 +81,7 @@ fun BubbleInputScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BubbleInputTopBar(
                 onBackClicked = {
@@ -96,7 +91,7 @@ fun BubbleInputScreen(
                 onConfirmClicked = {
                     updateShowBottomNav(true)
                     viewModel.saveBubble(false)
-                    navHostController.navigate(NavRoute.BubbleStorage.route)
+                    navHostController.popBackStack()
                 },
                 confirmButtonEnabled = uiState.canSave
             )
@@ -138,32 +133,19 @@ fun BubbleInputScreen(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            BubbleInputContent(viewModel)
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.BottomCenter),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                uiState.bubble.labels.forEach { label ->
-                    Box(
-                        modifier = Modifier
-                            .height(41.dp)
-                            .background(label.color, RoundedCornerShape(20.dp))
-                            .padding(horizontal = 16.dp)
-
-                    ) {
-                        Text(
-                            text = label.name,
-                            color = Gray900,
-                            style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.align(Alignment.Center)
-                        )
+            BubbleInputContent(viewModel, onLinkClick = { bubbleId ->
+                navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubbleId)) {
+                    // 현재 화면을 스택에서 제거하고 새로운 화면을 추가
+                    popUpTo(NavRoute.BubbleEdit.createRoute(uiState.bubble.id)) {
+                        inclusive = true
                     }
                 }
-            }
+            })
+
+            LabelTagList(
+                labels = uiState.bubble.labels,
+                modifier = Modifier.align(Alignment.BottomStart)
+            )
         }
     }
 }
@@ -209,6 +191,7 @@ fun BubbleInputTopBar(
 @Composable
 fun BubbleInputContent(
     viewModel: BubbleInputViewModel,
+    onLinkClick: (Int) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -236,7 +219,9 @@ fun BubbleInputContent(
                 viewModel.addContentBlocks(uriList)
             },
             onClose = { viewModel.closeGallery() },
-            multiSelectMode = true
+            multiSelectMode = true,
+            uiState = uiState,
+            clearToastMessage = { viewModel.clearToastMessage() }
         )
     }
 
@@ -257,6 +242,8 @@ fun BubbleInputContent(
             onDismiss = {
                 viewModel.updateLabelEditMode(LabelEditMode.NONE)
             },
+            uiState = uiState,
+            clearToastMessage = { viewModel.clearToastMessage() }
         ) {
             LabelModalContent(
                 editMode = uiState.labelEditMode,
@@ -275,22 +262,27 @@ fun BubbleInputContent(
     if (uiState.labelEditMode == LabelEditMode.EDIT) {
         BottomSheet(
             onDismiss = { viewModel.updateLabelEditMode(LabelEditMode.NONE) },
+            uiState = uiState,
+            clearToastMessage = { viewModel.clearToastMessage() }
         ) {
-            LabelSelectModalContent(labels = uiState.labels,
-                initSelectedLabels = uiState.bubble.labels,
-                multiSelectMode = true,
-                onConfirm = { selectedLabelsFromModal ->
-                    viewModel.updateLabel(selectedLabelsFromModal)
+            LabelSelectModalContent(
+                labels = uiState.labels,
+                selectedLabels = uiState.bubble.labels,
+                onConfirm = { _ ->
+                    viewModel.updateLabelEditMode(LabelEditMode.NONE)
+                    viewModel.updateIcon(IconType.NONE)
                 },
                 onAddLabelClicked = {
                     viewModel.updateLabelEditMode(LabelEditMode.ADD)
                 },
                 onDismiss = {
                     viewModel.updateLabelEditMode(LabelEditMode.NONE)
+                    viewModel.updateIcon(IconType.NONE)
                 },
                 onItemClicked = { label ->
                     viewModel.toggleLabelSelection(label)
-                }
+                },
+                multiSelectMode = true,
             )
         }
     }
@@ -305,5 +297,6 @@ fun BubbleInputContent(
             viewModel.deleteContentBlock(contentBlock)
         },
         bubbleInputState = uiState,
+        onLinkClick = onLinkClick
     )
 }

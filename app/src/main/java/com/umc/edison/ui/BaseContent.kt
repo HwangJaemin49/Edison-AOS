@@ -3,7 +3,6 @@ package com.umc.edison.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
@@ -15,7 +14,7 @@ import com.umc.edison.ui.theme.White000
 @Composable
 fun BaseContent(
     uiState: BaseState,
-    onDismiss: () -> Unit,
+    clearToastMessage: () -> Unit,
     modifier: Modifier = Modifier,
     topBar: (@Composable () -> Unit)? = null,
     bottomBar: (@Composable () -> Unit)? = null,
@@ -23,7 +22,6 @@ fun BaseContent(
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
             .background(White000)
     ) {
         if (topBar != null) {
@@ -48,7 +46,7 @@ fun BaseContent(
                 if (uiState.toastMessage != null) {
                     ToastScreen(
                         message = uiState.toastMessage!!,
-                        onDismiss = { onDismiss() }
+                        onDismiss = { clearToastMessage() }
                     )
                 }
             }

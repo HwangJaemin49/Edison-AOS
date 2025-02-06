@@ -20,93 +20,120 @@ val Pretendard = FontFamily(
     Font(R.font.pretendard_black, FontWeight.Black)
 )
 
-val Typography = Typography(
-    displayLarge = TextStyle(
+object EdisonTypography {
+    val displayLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         lineHeight = 30.sp,
-    ),
-    displayMedium = TextStyle(
+    )
+
+    val displayMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
         lineHeight = 24.sp,
-    ),
-    displaySmall = TextStyle(
+    )
+
+    val displaySmall = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp,
         lineHeight = 24.sp,
-    ),
+    )
 
-    headlineLarge = TextStyle(
+    val headlineLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
         lineHeight = 20.sp
-    ),
-    headlineMedium = TextStyle(
+    )
+
+    val headlineMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         lineHeight = 18.sp
-    ),
-    headlineSmall = TextStyle(
+    )
+
+    val headlineSmall = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 20.sp,
         lineHeight = 24.sp
-    ),
+    )
 
-    titleLarge = TextStyle(
+    val titleLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 18.sp,
         lineHeight = 24.sp
-    ),
-    titleMedium = TextStyle(
+    )
+    val titleMedium = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 16.sp,
         lineHeight = 20.sp
-    ),
-    titleSmall = TextStyle(
+    )
+
+    val titleSmall = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 18.sp
-    ),
+    )
 
-    bodyLarge = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 18.sp,
-        lineHeight = 24.sp
-    ),
-    bodySmall = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 20.sp
-    ),
-
-    labelLarge = TextStyle(
-        fontFamily = Pretendard,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 18.sp
-    ),
-    labelSmall = TextStyle(
+    val bodyLarge = TextStyle(
         fontFamily = Pretendard,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp
     )
+    val bodyMedium = TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp,
+        lineHeight = 24.sp
+    )
+    val bodySmall = TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 20.sp
+    )
+
+    val labelLarge = TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 18.sp
+    )
+    val labelSmall = TextStyle(
+        fontFamily = Pretendard,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 16.sp
+    )
+}
+
+
+val Typography = Typography(
+    displayLarge = EdisonTypography.displayLarge,
+    displayMedium = EdisonTypography.displayMedium,
+    displaySmall = EdisonTypography.displaySmall,
+
+    headlineLarge = EdisonTypography.headlineLarge,
+    headlineMedium = EdisonTypography.headlineMedium,
+    headlineSmall = EdisonTypography.headlineSmall,
+
+    titleLarge = EdisonTypography.titleLarge,
+    titleMedium = EdisonTypography.titleMedium,
+    titleSmall = EdisonTypography.titleSmall,
+
+    bodyLarge = EdisonTypography.bodyLarge,
+    bodyMedium = EdisonTypography.bodyMedium,
+    bodySmall = EdisonTypography.bodySmall,
+
+    labelLarge = EdisonTypography.labelLarge,
+    labelSmall = EdisonTypography.labelSmall
 )

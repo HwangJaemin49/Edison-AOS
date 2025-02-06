@@ -72,6 +72,7 @@ class AccountManagementViewModel @Inject constructor(
     }
 
     fun updateEmail(email: String) {
+        // TODO: 수정 필요
         Log.d("AccountManagementViewModel", "updateEmail: $email")
     }
 

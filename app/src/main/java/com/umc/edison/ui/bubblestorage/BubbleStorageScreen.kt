@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -29,11 +28,15 @@ import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BottomSheet
 import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
+import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
+import com.umc.edison.ui.components.LabelTagList
 import com.umc.edison.ui.components.LabelTopAppBar
+import com.umc.edison.ui.components.calculateBubbleSize
 import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Gray900
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +51,13 @@ fun BubbleStorageScreen(
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
+        viewModel.updateEditMode(BubbleStorageMode.NONE)
+
+        if (uiState.labelId != null) {
+            viewModel.fetchLabelDetail(uiState.labelId!!)
+        } else {
+            viewModel.fetchAllBubbles()
+        }
     }
 
     BackHandler(enabled = true) {
@@ -60,7 +70,7 @@ fun BubbleStorageScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
                 val onButtonClick: () -> Unit
@@ -103,6 +113,11 @@ fun BubbleStorageScreen(
             onBubbleClick = { bubble ->
                 viewModel.selectBubble(bubble)
                 viewModel.updateEditMode(BubbleStorageMode.VIEW)
+                val bubbleSize = calculateBubbleSize(bubble)
+
+                if (bubbleSize == BubbleType.BubbleDoor) {
+                    updateShowBottomNav(false)
+                }
             }
             onBubbleLongClick = { bubble ->
                 viewModel.selectBubble(bubble)
@@ -144,10 +159,12 @@ fun BubbleStorageScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f))
+                    .background(Gray800.copy(alpha = 0.5f))
                     .clickable(onClick = {
                         viewModel.updateEditMode(BubbleStorageMode.NONE)
-                    }),
+                        updateShowBottomNav(true)
+                    })
+                    .padding(top = 24.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Bubble(
@@ -155,27 +172,35 @@ fun BubbleStorageScreen(
                     onBubbleClick = {
                         navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
                     },
-                    onBackScreenClick = {
-                        viewModel.updateEditMode(BubbleStorageMode.NONE)
-                    },
-                    onLinkedBubbleClicked = { linkedBubbleId ->
+                    onLinkedBubbleClick = { linkedBubbleId ->
                         navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))
                     }
+                )
+
+                LabelTagList(
+                    labels = bubble.labels,
+                    modifier = Modifier.align(Alignment.BottomStart)
                 )
             }
         } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {
             BottomSheet(
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() },
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
                 },
             ) {
                 LabelSelectModalContent(
                     labels = uiState.movableLabels,
+                    selectedLabels = uiState.selectedLabel?.let { listOf(it) } ?: emptyList(),
                     onDismiss = {
                         viewModel.updateEditMode(BubbleStorageMode.EDIT)
                     },
                     onConfirm = { labelList ->
                         viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
+                    },
+                    onItemClicked = { label ->
+                        viewModel.selectLabel(label)
                     },
                 )
             }
@@ -190,12 +215,16 @@ fun BubbleStorageScreen(
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
                 },
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() }
             )
         } else if (uiState.bubbleStorageMode == BubbleStorageMode.SHARE) {
             BottomSheet(
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
                 },
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() }
             ) {
                 Column(
                     modifier = Modifier
