@@ -49,7 +49,7 @@ fun Toolbar(
                     .wrapContentHeight()
                     .background(White000)
                     .border(1.dp, color = Gray300)
-                    .padding(horizontal = 22.dp, vertical = 12.dp),
+                    .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -102,7 +102,7 @@ fun Toolbar(
                     .wrapContentHeight()
                     .background(White000)
                     .border(1.dp, color = Gray300)
-                    .padding(horizontal = 22.dp, vertical = 12.dp),
+                    .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -150,7 +150,7 @@ fun Toolbar(
                     .wrapContentHeight()
                     .background(White000)
                     .border(1.dp, color = Gray300)
-                    .padding(horizontal = 22.dp, vertical = 12.dp),
+                    .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -357,7 +357,7 @@ private fun LinkPopUp(
                 HorizontalDivider(modifier = Modifier.border(1.dp, Gray300))
 
                 Text(
-                    text = "링크버블 반들기",
+                    text = "링크버블 만들기",
                     modifier = Modifier.clickable { linkBubble() },
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray800,

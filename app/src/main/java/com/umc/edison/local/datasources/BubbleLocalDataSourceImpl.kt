@@ -157,7 +157,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
 
     private suspend fun addLinkedBubble(bubble: BubbleEntity) {
         bubble.linkedBubble?.let { linkedBubble ->
-            linkedBubbleDao.insert(linkedBubble.id, bubble.id, false)
+            linkedBubbleDao.insert(bubble.id, linkedBubble.id, false)
         }
 
         bubble.backLinks.map { backLink ->

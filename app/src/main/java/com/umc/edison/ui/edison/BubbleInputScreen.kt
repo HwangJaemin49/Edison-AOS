@@ -96,7 +96,7 @@ fun BubbleInputScreen(
                 onConfirmClicked = {
                     updateShowBottomNav(true)
                     viewModel.saveBubble(false)
-                    navHostController.navigate(NavRoute.BubbleStorage.route)
+                    navHostController.popBackStack()
                 },
                 confirmButtonEnabled = uiState.canSave
             )
@@ -138,7 +138,9 @@ fun BubbleInputScreen(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            BubbleInputContent(viewModel)
+            BubbleInputContent(viewModel, onLinkClick = { bubbleId ->
+                navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubbleId))
+            })
 
             Row(
                 modifier = Modifier
@@ -209,6 +211,7 @@ fun BubbleInputTopBar(
 @Composable
 fun BubbleInputContent(
     viewModel: BubbleInputViewModel,
+    onLinkClick: (Int) -> Unit
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -308,5 +311,6 @@ fun BubbleInputContent(
             viewModel.deleteContentBlock(contentBlock)
         },
         bubbleInputState = uiState,
+        onLinkClick = onLinkClick
     )
 }

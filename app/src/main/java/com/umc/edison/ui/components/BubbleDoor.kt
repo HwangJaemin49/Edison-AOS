@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -53,6 +54,7 @@ import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
@@ -108,7 +110,7 @@ fun BubbleDoor(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 60.dp),
+            .padding(top = 24.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         // 배경 Canvas (전체 높이 채우기)
@@ -131,7 +133,7 @@ fun BubbleDoor(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(start = 24.dp, top = 80.dp, end = 24.dp, bottom = 65.dp)
+                .padding(start = 24.dp, top = 80.dp, end = 24.dp, bottom = 24.dp)
                 .clickable(
                     onClick = onClick ?: {},
                     enabled = onClick != null
@@ -418,11 +420,13 @@ private fun BubbleContent(
                 }
 
                 if (isEditable) {
-                    BasicRichText(
-                        state = richTextState,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                    )
+                    CompositionLocalProvider(LocalUriHandler provides myUriHandler){
+                        BasicRichText(
+                            state = richTextState,
+                            modifier = Modifier.fillMaxWidth(),
+                            style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+                        )
+                    }
                 } else {
                     CompositionLocalProvider(LocalUriHandler provides myUriHandler){
                         RichText(
@@ -470,11 +474,13 @@ private fun BubbleContent(
             }
 
             if (isEditable) {
-                BasicRichText(
-                    state = richTextState,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                )
+                CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
+                    BasicRichText(
+                        state = richTextState,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
+                    )
+                }
             } else {
                 CompositionLocalProvider(LocalUriHandler provides myUriHandler){
                     RichText(
@@ -485,6 +491,10 @@ private fun BubbleContent(
                     )
                 }
             }
+        }
+
+        if (uiState.bubble.labels.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(29.dp))
         }
     }
 }
