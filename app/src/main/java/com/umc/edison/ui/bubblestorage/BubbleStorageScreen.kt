@@ -48,6 +48,13 @@ fun BubbleStorageScreen(
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
+        viewModel.updateEditMode(BubbleStorageMode.NONE)
+
+        if (uiState.labelId != null) {
+            viewModel.fetchLabelDetail(uiState.labelId!!)
+        } else {
+            viewModel.fetchAllBubbles()
+        }
     }
 
     BackHandler(enabled = true) {
