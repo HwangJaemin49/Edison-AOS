@@ -30,6 +30,7 @@ import com.umc.edison.ui.components.BottomSheetForDelete
 import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
+import com.umc.edison.ui.components.LabelTagList
 import com.umc.edison.ui.components.LabelTopAppBar
 import com.umc.edison.ui.components.calculateBubbleSize
 import com.umc.edison.ui.label.LabelSelectModalContent
@@ -162,7 +163,8 @@ fun BubbleStorageScreen(
                     .clickable(onClick = {
                         viewModel.updateEditMode(BubbleStorageMode.NONE)
                         updateShowBottomNav(true)
-                    }),
+                    })
+                    .padding(top = 24.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Bubble(
@@ -173,6 +175,11 @@ fun BubbleStorageScreen(
                     onLinkedBubbleClick = { linkedBubbleId ->
                         navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))
                     }
+                )
+
+                LabelTagList(
+                    labels = bubble.labels,
+                    modifier = Modifier.align(Alignment.BottomStart)
                 )
             }
         } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {
