@@ -49,7 +49,7 @@ fun InterestEditScreen(
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
-                title = "Identity 고르기",
+                title = "관심사 고르기",
                 onBack = {
                     viewModel.updateIdentity()
                     navHostController.popBackStack()
