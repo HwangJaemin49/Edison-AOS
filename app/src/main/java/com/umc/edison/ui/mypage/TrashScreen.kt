@@ -72,7 +72,7 @@ fun TrashScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.mode == BubbleRecoverMode.SELECT) {
                 BottomSheetForDelete(

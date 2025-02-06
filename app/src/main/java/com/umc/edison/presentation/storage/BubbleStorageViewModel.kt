@@ -177,6 +177,10 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
+    fun selectLabel(label: LabelModel) {
+        _uiState.update { it.copy(selectedLabel = label) }
+    }
+
     fun moveSelectedBubbles(label: LabelModel, showBottomNav: (Boolean) -> Unit) {
         if (_uiState.value.label == null) return
 

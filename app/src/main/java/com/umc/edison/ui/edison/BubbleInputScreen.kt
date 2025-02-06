@@ -86,7 +86,7 @@ fun BubbleInputScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BubbleInputTopBar(
                 onBackClicked = {
@@ -276,11 +276,13 @@ fun BubbleInputContent(
         BottomSheet(
             onDismiss = { viewModel.updateLabelEditMode(LabelEditMode.NONE) },
         ) {
-            LabelSelectModalContent(labels = uiState.labels,
-                initSelectedLabels = uiState.bubble.labels,
-                multiSelectMode = true,
-                onConfirm = { selectedLabelsFromModal ->
-                    viewModel.updateLabel(selectedLabelsFromModal)
+            LabelSelectModalContent(
+                uiState = uiState,
+                clearToastMessage = { viewModel.clearToastMessage() },
+                labels = uiState.labels,
+                selectedLabels = uiState.bubble.labels,
+                onConfirm = { _ ->
+                    viewModel.updateLabelEditMode(LabelEditMode.NONE)
                 },
                 onAddLabelClicked = {
                     viewModel.updateLabelEditMode(LabelEditMode.ADD)
@@ -290,7 +292,8 @@ fun BubbleInputContent(
                 },
                 onItemClicked = { label ->
                     viewModel.toggleLabelSelection(label)
-                }
+                },
+                multiSelectMode = true,
             )
         }
     }

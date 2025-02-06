@@ -60,7 +60,7 @@ fun BubbleStorageScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
                 val onButtonClick: () -> Unit
@@ -167,12 +167,18 @@ fun BubbleStorageScreen(
                 },
             ) {
                 LabelSelectModalContent(
+                    uiState = uiState,
+                    clearToastMessage = { viewModel.clearToastMessage() },
                     labels = uiState.movableLabels,
+                    selectedLabels = uiState.selectedLabel?.let { listOf(it) } ?: emptyList(),
                     onDismiss = {
                         viewModel.updateEditMode(BubbleStorageMode.EDIT)
                     },
                     onConfirm = { labelList ->
                         viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
+                    },
+                    onItemClicked = { label ->
+                        viewModel.selectLabel(label)
                     },
                 )
             }

@@ -46,7 +46,7 @@ fun InterestEditScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = "Identity 고르기",

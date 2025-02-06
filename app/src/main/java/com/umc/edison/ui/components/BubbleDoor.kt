@@ -131,7 +131,7 @@ fun BubbleDoor(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(start = 24.dp, top = 80.dp, end = 24.dp, bottom = 24.dp)
+                .padding(start = 24.dp, top = 80.dp, end = 24.dp, bottom = 65.dp)
                 .clickable(
                     onClick = onClick ?: {},
                     enabled = onClick != null
