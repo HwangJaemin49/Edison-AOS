@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +40,12 @@ import com.umc.edison.ui.theme.White000
 import kotlinx.coroutines.launch
 
 @Composable
-fun BubbleSpaceScreen(navHostController: NavHostController) {
+fun BubbleSpaceScreen(
+    navHostController: NavHostController,
+    updateShowBottomNav: (Boolean) -> Unit
+) {
+
+    LaunchedEffect(Unit) { updateShowBottomNav(true) }
     // 탭 & 페이지 관련
     val tabs = listOf("스페이스", "라벨")
     var selectedTabIndex by remember { mutableIntStateOf(0) }

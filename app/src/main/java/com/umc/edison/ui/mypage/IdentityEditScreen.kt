@@ -45,7 +45,7 @@ fun IdentityEditScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = "Identity 고르기",
@@ -68,7 +68,7 @@ private fun IdentityContent(
 ) {
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Column(
             modifier = Modifier

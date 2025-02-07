@@ -53,7 +53,7 @@ fun AccountManagementScreen(
 
     BaseContent(
         uiState = uiState,
-        onDismiss = { viewModel.clearToastMessage() },
+        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = "계정 관리",
