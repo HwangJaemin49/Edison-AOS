@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -97,11 +98,10 @@ fun MyPageScreen(
                 contentAlignment = Alignment.Center
             ) {
                 PopUpMulti(
-                    title = "로그인이 필요한 페이지입니다",
-                    detail = "로그인으로 더 안전하게 아이디어를 보관하세요!",
-                    hintText = "스페이스 자동 시각화 기능 지원\n" +
-                            "맞춤형 레터 추천과 북마크 기능 지원",
-                    buttonText = "구글 로그인",
+                    title = stringResource(R.string.login_require_title),
+                    detail = stringResource(R.string.login_require_detail),
+                    hintText = stringResource(R.string.login_require_title_hint),
+                    buttonText = stringResource(R.string.google_login),
                     onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
                 )
             }
@@ -202,7 +202,7 @@ private fun IdentityTestResultContainer(
 ) {
     GrayColumnContainer(
         padding = 12.dp,
-        title = "Identity",
+        title = stringResource(R.string.identity),
     ) {
         identities.forEach {
             WhiteContainerItem(
@@ -221,7 +221,7 @@ private fun InterestResultContainer(
 ) {
     GrayColumnContainer(
         padding = 12.dp,
-        title = "나의 관심사",
+        title = stringResource(R.string.my_interest),
     ) {
         WhiteContainerItem(
             title = interest.question,
@@ -254,7 +254,7 @@ private fun ArtLetterScrap(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "ARTLETTER",
+                text = stringResource(R.string.artletter_capital),
                 style = MaterialTheme.typography.titleMedium,
                 color = Gray800,
                 modifier = Modifier.weight(1f)
@@ -289,7 +289,7 @@ private fun ArtLetterScrap(
                 )
 
                 Text(
-                    text = "영감을 주는 레터를 모아보세요!",
+                    text = stringResource(R.string.empty_scrap),
                     style = MaterialTheme.typography.titleSmall,
                     color = Gray600
                 )

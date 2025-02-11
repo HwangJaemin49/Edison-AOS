@@ -23,9 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.umc.edison.R
 import com.umc.edison.presentation.mypage.AccountManagementMode
 import com.umc.edison.presentation.mypage.AccountManagementState
 import com.umc.edison.presentation.mypage.AccountManagementViewModel
@@ -56,7 +58,7 @@ fun AccountManagementScreen(
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
-                title = "계정 관리",
+                title = stringResource(R.string.account_management),
                 onBack = {
                     navHostController.popBackStack()
                 },
@@ -89,7 +91,8 @@ private fun AccountManagementContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = if (uiState.isLoggedIn) "소셜 계정이 연결되었습니다." else "소셜 계정 연결이 필요합니다.",
+                text = if (uiState.isLoggedIn) stringResource(R.string.social_account_success)
+                else stringResource(R.string.socail_account_failure),
                 style = MaterialTheme.typography.labelLarge,
                 color = Gray600,
             )
@@ -105,7 +108,7 @@ private fun AccountManagementContent(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Google",
+                text = stringResource(R.string.google),
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray800,
                 modifier = Modifier.weight(1f)
@@ -127,14 +130,14 @@ private fun AccountManagementContent(
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "업데이트",
+                        text = stringResource(R.string.update),
                         style = MaterialTheme.typography.titleSmall,
                         color = Gray800
                     )
                 }
             } else {
                 Text(
-                    text = "연결 없음",
+                    text = stringResource(R.string.connection_failure),
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray600
                 )
@@ -148,7 +151,7 @@ private fun AccountManagementContent(
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "로그인하기",
+                        text = stringResource(R.string.login_btn),
                         style = MaterialTheme.typography.titleSmall,
                         color = Gray800
                     )
@@ -173,7 +176,7 @@ private fun AccountManagementContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(
-                    text = "로그아웃",
+                    text = stringResource(R.string.logout),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Red,
                     modifier = Modifier
@@ -183,7 +186,7 @@ private fun AccountManagementContent(
                 )
 
                 Text(
-                    text = "회원탈퇴",
+                    text = stringResource(R.string.delete_account),
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray800,
                     modifier = Modifier
@@ -204,26 +207,20 @@ private fun AccountManagementContent(
             contentAlignment = Alignment.Center
         ) {
             if (uiState.mode == AccountManagementMode.DELETE_ACCOUNT) {
-                PopUpDecision(
-                    question = "회원탈퇴 하시겠습니까?",
-                    positiveButtonText = "회원탈퇴",
-                    negativeButtonText = "취소",
-                    onPositiveClick = { viewModel.deleteAccount() },
-                    onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
-                )
+                // TODO: 회원 탈퇴 화면으로 이동
             } else if (uiState.mode == AccountManagementMode.LOGOUT) {
                 PopUpDecision(
-                    question = "로그아웃 하시겠습니까?",
-                    positiveButtonText = "로그아웃",
-                    negativeButtonText = "취소",
+                    question = stringResource(R.string.logout_question),
+                    positiveButtonText = stringResource(R.string.logout),
+                    negativeButtonText = stringResource(R.string.cancel),
                     onPositiveClick = { viewModel.logOut() },
                     onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
                 )
             } else if (uiState.mode == AccountManagementMode.EMAIL_CHANGE) {
                 PopUpMultiDecision(
-                    question = "이메일 주소를 업데이트하시겠습니까?",
-                    positiveButtonText = "업데이트",
-                    negativeButtonText = "취소",
+                    question = stringResource(R.string.update_question),
+                    positiveButtonText = stringResource(R.string.update),
+                    negativeButtonText = stringResource(R.string.cancel),
                     onPositiveClick = { email -> viewModel.updateEmail(email) },
                     onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) },
                     placeholderText = uiState.user?.email ?: "",
