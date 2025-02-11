@@ -92,21 +92,16 @@ class UserRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity> {
-        // TODO: api 명세 확인 후 구현
-        return emptyList()
+        return myPageApiService.getMyScrapArtLetters().data.map { it.toData() }
     }
 
     override suspend fun getProfileInfo(): UserEntity {
-        // TODO: api 명세 확인 후 구현
-        return UserEntity(
-            email = "edison@gmail.com",
-            nickname = "닉네임",
-            profileImage = null,
-        )
+        return myPageApiService.getProfileInfo().data.toData()
     }
 
-    override suspend fun getScrapArtLettersByCategory(categoryId: Int): List<ArtLetterCategoryEntity> {
-        // TODO: api 명세 확인 후 구현
+    override suspend fun getScrapArtLettersByCategory(category: ArtLetterCategoryEntity): List<ArtLetterCategoryEntity> {
+        // TODO: 반환값 수정 필요
+        // return myPageApiService.getScrapArtLettersByCategory(category.name).data.map { it.toData() }
         return emptyList()
     }
 

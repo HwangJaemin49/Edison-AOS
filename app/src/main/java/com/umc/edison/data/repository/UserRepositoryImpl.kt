@@ -49,9 +49,9 @@ class UserRepositoryImpl @Inject constructor(
             dataAction = { userRemoteDataSource.getMyScrapArtLetters() }
         )
 
-    override fun getScrapArtLettersByCategory(categoryId: Int): Flow<DataResource<List<ArtLetter>>> =
+    override fun getScrapArtLettersByCategory(category: ArtLetterCategory): Flow<DataResource<List<ArtLetter>>> =
         flowDataResource(
-            dataAction = { userRemoteDataSource.getScrapArtLettersByCategory(categoryId) }
+            dataAction = { userRemoteDataSource.getScrapArtLettersByCategory(category.toData()) }
         )
 
     override fun updateProfileInfo(user: User): Flow<DataResource<Unit>> = flowDataResource(

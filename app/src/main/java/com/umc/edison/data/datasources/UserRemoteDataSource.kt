@@ -11,7 +11,7 @@ interface UserRemoteDataSource {
     suspend fun getLogInState(): Boolean
     suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity>
     suspend fun getProfileInfo(): UserEntity
-    suspend fun getScrapArtLettersByCategory(categoryId: Int): List<ArtLetterCategoryEntity>
+    suspend fun getScrapArtLettersByCategory(category: ArtLetterCategoryEntity): List<ArtLetterCategoryEntity>
 
     suspend fun updateProfileInfo(user: UserEntity)
     suspend fun updateIdentity(identity: IdentityEntity)
