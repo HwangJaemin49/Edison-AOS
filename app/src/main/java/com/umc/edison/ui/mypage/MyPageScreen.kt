@@ -49,6 +49,8 @@ import com.umc.edison.ui.components.WhiteContainerItem
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
+import com.umc.edison.ui.theme.Gray500
+import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -271,6 +273,27 @@ private fun ArtLetterScrap(
             items = scrapItems,
         ) {
             ArtLetterCategoryContent(it as ArtLetterCategoryModel)
+        }
+
+        if (scrapItems.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_bin),
+                    contentDescription = "bin",
+                    modifier = Modifier.size(48.dp),
+                    tint = Gray500
+                )
+
+                Text(
+                    text = "영감을 주는 레터를 모아보세요!",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Gray600
+                )
+            }
         }
     }
 }
