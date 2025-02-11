@@ -26,4 +26,10 @@
     <string name="cancel">취소</string>
     <string name="logout_question">로그아웃 하시겠습니까?</string>
     <string name="update_question">이메일 주소를 업데이트하시겠습니까?</string>
+    <string name="delete_account_title">회원탈퇴를 신청하기 전에\n안내사항을 꼭 확인해주세요.</string>
+    <string name="delete_account_agree_1">1. 탈퇴 시 해당 계정으로 Edison 서비스를 더 이상 사용할 수 없습니다.</string>
+    <string name="delete_account_agree_2">2. 계정의 모든 권리와 데이터가 영구적으로 삭제됩니다.</string>
+    <string name="delete_account_agree_2_detail">• 탈퇴 후 회원 정보 및 서비스 이용 기록은 모두 삭제되어 복구가 불가능합니다.\n• 삭제된 데이터는 복구되지 않습니다. 필요한 데이터는 미리 백업해주세요.\n• 삭제 정보: SNS 로그인 정보, 닉네임, 프로필, 키워드, 스페이스 분류 정보, 아트레터 좋아요 및 북마크 기록</string>
+    <string name="delete_account_agree_3">3. 해당 계정으로 Edison에 재가입할 경우, 새로운 계정으로 간주됩니다.</string>
+    <string name="delete_account_agree">안내 사항을 모두 확인하였으며, 이에 동의합니다.</string>
 </resources>

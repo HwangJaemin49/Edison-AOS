@@ -14,6 +14,7 @@ import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.edison.BubbleInputScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
+import com.umc.edison.ui.mypage.DeleteAccountScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.IdentityEditScreen
 import com.umc.edison.ui.mypage.InterestEditScreen
@@ -67,6 +68,10 @@ fun NavigationGraph(
 
         composable(NavRoute.AccountManagement.route) {
             AccountManagementScreen(navHostController, updateShowBottomNav)
+        }
+
+        composable(NavRoute.DeleteAccount.route) {
+            DeleteAccountScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.ScrapBoard.route) {

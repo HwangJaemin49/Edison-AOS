@@ -34,7 +34,7 @@ import com.umc.edison.presentation.mypage.AccountManagementViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.PopUpDecision
-import com.umc.edison.ui.components.PopUpMultiDecision
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
@@ -68,14 +68,15 @@ fun AccountManagementScreen(
             )
         }
     ) {
-        AccountManagementContent(viewModel, uiState)
+        AccountManagementContent(viewModel, uiState, navHostController)
     }
 }
 
 @Composable
 private fun AccountManagementContent(
     viewModel: AccountManagementViewModel,
-    uiState: AccountManagementState
+    uiState: AccountManagementState,
+    navHostController: NavHostController
 ) {
 
     Column(
@@ -120,21 +121,6 @@ private fun AccountManagementContent(
                     style = MaterialTheme.typography.bodySmall,
                     color = Gray600
                 )
-
-                Box(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Gray100)
-                        .clickable { viewModel.updateMode(AccountManagementMode.EMAIL_CHANGE) }
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.update),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Gray800
-                    )
-                }
             } else {
                 Text(
                     text = stringResource(R.string.connection_failure),
@@ -207,7 +193,7 @@ private fun AccountManagementContent(
             contentAlignment = Alignment.Center
         ) {
             if (uiState.mode == AccountManagementMode.DELETE_ACCOUNT) {
-                // TODO: 회원 탈퇴 화면으로 이동
+                navHostController.navigate(NavRoute.DeleteAccount.route)
             } else if (uiState.mode == AccountManagementMode.LOGOUT) {
                 PopUpDecision(
                     question = stringResource(R.string.logout_question),
@@ -216,17 +202,7 @@ private fun AccountManagementContent(
                     onPositiveClick = { viewModel.logOut() },
                     onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
                 )
-            } else if (uiState.mode == AccountManagementMode.EMAIL_CHANGE) {
-                PopUpMultiDecision(
-                    question = stringResource(R.string.update_question),
-                    positiveButtonText = stringResource(R.string.update),
-                    negativeButtonText = stringResource(R.string.cancel),
-                    onPositiveClick = { email -> viewModel.updateEmail(email) },
-                    onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) },
-                    placeholderText = uiState.user?.email ?: "",
-                )
             }
         }
-
     }
 }
