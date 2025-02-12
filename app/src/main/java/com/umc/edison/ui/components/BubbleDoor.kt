@@ -5,6 +5,7 @@ import android.graphics.LinearGradient
 import android.graphics.Shader
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
@@ -78,6 +80,8 @@ import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichText
 import com.umc.edison.presentation.edison.BubbleInputState
 import com.umc.edison.presentation.edison.parseHtml
+import com.umc.edison.ui.theme.Red100
+import com.umc.edison.ui.theme.Red500
 import com.umc.edison.ui.theme.White000
 import com.umc.edison.ui.theme.Yellow100
 
@@ -88,6 +92,7 @@ fun BubbleDoor(
     isEditable: Boolean = false,
     onBubbleUpdate: (BubbleModel) -> Unit = {},
     onImageDeleted: (ContentBlockModel) -> Unit = {},
+    onMainSelected: (String?) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
     onLinkClick: (Int) -> Unit = {},
 ) {
@@ -147,6 +152,7 @@ fun BubbleDoor(
                 onBubbleChange = onBubbleUpdate,
                 uiState = bubbleInputState,
                 deleteClicked = onImageDeleted,
+                mainClicked = onMainSelected,
                 onLinkClick = onLinkClick,
             )
         }
@@ -161,6 +167,7 @@ private fun BubbleContent(
     onBubbleChange: (BubbleModel) -> Unit,
     uiState: BubbleInputState,
     deleteClicked: (ContentBlockModel) -> Unit,
+    mainClicked:(String?)->Unit,
     onLinkClick: (Int) -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -320,7 +327,9 @@ private fun BubbleContent(
 
                 ContentType.IMAGE -> {
                     val aspectRatio = calculateAspectRatio(contentBlock.content)
-                    var showDeleteButton by remember { mutableStateOf(false) }
+                    var isLongPressed by remember {mutableStateOf(false)}
+                    val isMainImage = bubble.mainImage == contentBlock.content
+
 
                     Box(
                         modifier = Modifier
@@ -329,7 +338,7 @@ private fun BubbleContent(
                             .pointerInput(Unit) {
                                 detectTapGestures(
                                     onLongPress = {
-                                        showDeleteButton = true
+                                        isLongPressed = true
                                     }
                                 )
                             }
@@ -349,31 +358,89 @@ private fun BubbleContent(
                                 .clip(RoundedCornerShape(8.dp))
                         )
 
-                        if (showDeleteButton) {
+                        if (isLongPressed) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .clickable { showDeleteButton = false },
+                                    .clickable {isLongPressed= false },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Button(
-                                    shape = RoundedCornerShape(100.dp),
-                                    onClick = {
-                                        println(bubble)
-                                        showDeleteButton = false
-                                        deleteClicked(contentBlock)
-                                        println(bubble)
-                                        deletedImageBlockId = index
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Gray700,
-                                    )
-                                ) {
-                                    Text(
-                                        text = "삭제하기",
-                                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray100),
-                                        fontSize = 14.sp
-                                    )
+                                if(!isMainImage) {
+                                    Column {
+                                        Button(
+                                            shape = RoundedCornerShape(100.dp),
+                                            onClick = {
+                                                isLongPressed = false
+                                                mainClicked(contentBlock.content)
+
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Gray700,
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "대표 설정",
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    color = Gray100
+                                                ),
+                                                fontSize = 14.sp
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(1.dp))
+
+                                        Button(
+                                            shape = RoundedCornerShape(100.dp),
+                                            onClick = {
+                                                isLongPressed = false
+                                                deleteClicked(contentBlock)
+                                                deletedImageBlockId = index
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Gray700,
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "삭제하기",
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    color = Red100
+                                                ),
+                                                fontSize = 14.sp
+                                            )
+                                        }
+                                    }
+                                }
+
+                                else{
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(Color.White.copy(alpha = 0.4f)),
+                                        contentAlignment = Alignment.Center
+
+                                    ) {
+
+                                        Button(
+                                            shape = RoundedCornerShape(100.dp),
+                                            onClick = {
+                                                isLongPressed = false
+                                                mainClicked(null)
+
+                                            },
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = Gray100,
+                                            )
+                                        ) {
+                                            Text(
+                                                text = "대표 해제",
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    color = Red500
+                                                ),
+                                                fontSize = 14.sp
+                                            )
+                                        }
+                                    }
+
                                 }
                             }
                         }

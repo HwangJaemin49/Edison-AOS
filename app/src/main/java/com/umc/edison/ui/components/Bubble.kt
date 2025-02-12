@@ -88,14 +88,7 @@ fun BubbleInput(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_up_slide),
-            contentDescription = "up slide",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .width(24.dp)
-                .height(44.dp)
-        )
+
 
         Spacer(modifier = Modifier.height(48.dp))
 

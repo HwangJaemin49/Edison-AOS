@@ -13,13 +13,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,14 +48,18 @@ fun ImageGallery(
     clearToastMessage: () -> Unit
 ) {
     val context = LocalContext.current
-    val images = remember { mutableStateListOf<Uri>() }
     val selectedImages = remember { mutableStateListOf<Uri>() }
+    var imageList by remember { mutableStateOf(loadGalleryImages(context, "Recent")) }
+    var folderList by remember { mutableStateOf(loadGalleryFolders(context)) } // ✅ 폴더 리스트
+    var selectedFolder by remember { mutableStateOf("Recent") } // ✅ 선택된 폴더
+    var isExpand by remember { mutableStateOf(false) } // ✅ 폴더 리스트 다이얼로그 상태
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            images.addAll(loadGalleryImages(context))
+            imageList=(loadGalleryImages(context, selectedFolder))
+            folderList = loadGalleryFolders(context)
         }
     }
 
@@ -70,35 +81,93 @@ fun ImageGallery(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.9f)
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-        ) {
-            if (multiSelectMode) {
-                Text(
-                    text = "선택(${selectedImages.size})",
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            onImageSelected(selectedImages)
-                            selectedImages.clear()
-                            onClose()
-                        },
-                        enabled = selectedImages.isNotEmpty()
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (selectedImages.isEmpty()) Gray500 else Gray800
-                )
 
-                Spacer(modifier = Modifier.height(8.dp))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Spacer(modifier = Modifier.weight(1f))
+
+                Box{
+                   Text(
+                        text = "$selectedFolder ﹀",
+                        modifier = Modifier.clickable(
+                            onClick = { isExpand = true }
+                        )
+                        ,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Gray800
+                    )
+                    DropdownMenu(
+                        expanded = isExpand,
+                        onDismissRequest = { isExpand = false },
+                                modifier = Modifier.background(Color.White)
+                    ) {
+                        folderList.forEachIndexed { index, folder ->
+                            DropdownMenuItem(
+                                text = { Text(folder, style = MaterialTheme.typography.bodyMedium) },
+                                onClick = {
+                                    selectedFolder = folder
+                                    imageList = loadGalleryImages(context, folder)
+                                    isExpand = false
+                                }
+                            )
+
+                            if (index < folderList.size - 1) {
+                                HorizontalDivider(
+                                    thickness = 1.dp,
+                                    color = Color.Gray.copy(alpha = 0.3f)
+                                )
+                            }
+                        }
+                    }
+
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+
+
+                if (multiSelectMode) {
+                    Text(
+                        text = "선택",
+                        modifier = Modifier.clickable(
+                            onClick = {
+                                onImageSelected(selectedImages)
+                                selectedImages.clear()
+                                onClose()
+                            },
+                            enabled = selectedImages.isNotEmpty()
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (selectedImages.isEmpty()) Gray500 else Gray800
+                    )
+
+
+                }
+
+
             }
 
+
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-                items(count = images.size, key = { index -> images[index].hashCode() }) { index ->
-                    val uri = images[index]
+                items(count = imageList.size, key = { index -> imageList[index].hashCode() }) { index ->
+                    val uri = imageList[index]
                     val isSelected = selectedImages.contains(uri)
+                    val selectedIndex = selectedImages.indexOf(uri) + 1
 
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp)
+                            .aspectRatio(1f)
                             .clickable {
                                 if (multiSelectMode) {
                                     if (isSelected) {
@@ -120,34 +189,40 @@ fun ImageGallery(
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
+                        Box(
+                            modifier = Modifier.align(Alignment.TopEnd).size(50.dp).padding(4.dp),
+                                    contentAlignment = Alignment.Center
+                        ) {
 
-                        RadioButton(
-                            selected = isSelected,
-                            onClick = {
-                                if (multiSelectMode) {
-                                    if (isSelected) {
-                                        selectedImages.remove(uri)
+                            RadioButton(
+                                selected = isSelected,
+                                onClick = {
+                                    if (multiSelectMode) {
+                                        if (isSelected) {
+                                            selectedImages.remove(uri)
+                                        } else {
+                                            selectedImages.add(uri)
+                                        }
                                     } else {
                                         selectedImages.add(uri)
+                                        onImageSelected(selectedImages)
+                                        selectedImages.clear()
+                                        onClose()
                                     }
-                                } else {
-                                    selectedImages.add(uri)
-                                    onImageSelected(selectedImages)
-                                    selectedImages.clear()
-                                    onClose()
-                                }
-                            },
-                            modifier = Modifier.align(Alignment.TopEnd).size(24.dp).padding(4.dp)
-                        )
-
-                        if (multiSelectMode) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        color = if (isSelected) Gray800.copy(alpha = 0.5f) else Color.Transparent
-                                    )
+                                },
                             )
+
+                            if (multiSelectMode) {
+                                if (isSelected) {
+                                    Text(
+                                        text = selectedIndex.toString(),
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier.align(Alignment.Center)
+                                    )
+
+                                }
+                            }
                         }
                     }
                 }
@@ -156,14 +231,17 @@ fun ImageGallery(
     }
 }
 
-fun loadGalleryImages(context: Context): List<Uri> {
+fun loadGalleryImages(context: Context, folder:String): List<Uri> {
     val images = mutableListOf<Uri>()
+    val selection = if (folder == "Recent") null else "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?"
+    val selectionArgs = if (folder == "Recent") null else arrayOf(folder)
+
     val projection = arrayOf(
         MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME
     )
     val uriExternal = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val cursor = context.contentResolver.query(
-        uriExternal, projection, null, null, "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
+        uriExternal, projection, selection,  selectionArgs , "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
     )
 
     cursor?.use {
@@ -181,3 +259,22 @@ fun loadGalleryImages(context: Context): List<Uri> {
     }
     return images
 }
+
+fun loadGalleryFolders(context: Context): List<String> {
+    val folders = mutableSetOf<String>()
+    val projection = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+    val uriExternal = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+
+    val cursor = context.contentResolver.query(uriExternal, projection, null, null, null)
+    cursor?.use {
+        val folderColumn = it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+        while (it.moveToNext()) {
+            val folderName = it.getString(folderColumn) ?: "Unknown"
+            folders.add(folderName)
+        }
+    }
+
+    return listOf("Recent") + folders.toList()
+}
+
