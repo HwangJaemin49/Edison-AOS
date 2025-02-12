@@ -1,0 +1,134 @@
+package com.umc.edison.presentation.login
+
+import android.content.Context
+import android.util.Log
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.umc.edison.R
+import com.umc.edison.domain.DataResource
+import com.umc.edison.domain.usecase.login.GoogleLoginUseCase
+import com.umc.edison.presentation.model.UserModel
+import com.umc.edison.presentation.model.toPresentation
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class GoogleLoginHelper @Inject constructor(
+    private val googleLoginUseCase: GoogleLoginUseCase
+) {
+    private val coroutineScope = MainScope()
+
+    fun signInWithGoogle(
+        context: Context,
+        onSuccess: (UserModel) -> Unit,
+        onFailure: (String) -> Unit,
+        onLoading: (Boolean) -> Unit
+    ) {
+        val signInWithGoogleOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(context.getString(R.string.google_cloud_server_client_id))
+            .setAutoSelectEnabled(true)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(signInWithGoogleOption)
+            .build()
+
+        val credentialManager = CredentialManager.create(context)
+
+        coroutineScope.launch {
+            try {
+                onLoading(true)
+                val response: GetCredentialResponse = credentialManager.getCredential(context, request)
+                handleSignIn(response, onSuccess, onFailure, onLoading)
+            } catch (e: GetCredentialException) {
+                onLoading(false)
+                Log.e("Google SignIn", "로그인 실패: ${e.message}", e)
+
+                when (e) {
+                    is androidx.credentials.exceptions.GetCredentialCancellationException -> {
+                        onFailure("사용자가 로그인 창을 닫았습니다.")
+                    }
+                    else -> {
+                        onFailure("알 수 없는 로그인 오류 발생")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleSignIn(
+        response: GetCredentialResponse,
+        onSuccess: (UserModel) -> Unit,
+        onFailure: (String) -> Unit,
+        onLoading: (Boolean) -> Unit
+    ) {
+        val credential = response.credential
+
+        when (credential) {
+            is GoogleIdTokenCredential -> {
+                val idToken = credential.idToken
+                Log.d("Google SignIn", "ID Token: $idToken")
+
+                sendIdTokenToServer(idToken, onSuccess, onFailure, onLoading)
+            }
+
+            is CustomCredential -> {
+                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    try {
+                        val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                        val idToken = googleIdTokenCredential.idToken
+                        Log.d("Google SignIn", "ID Token (CustomCredential): $idToken")
+
+                        sendIdTokenToServer(idToken, onSuccess, onFailure, onLoading)
+                    } catch (e: Exception) {
+                        Log.e("Google SignIn", "Received an invalid Google ID token response", e)
+                        onFailure("잘못된 ID Token 응답을 받았습니다.")
+                    }
+                } else {
+                    onFailure("Unexpected type of credential")
+                }
+            }
+
+            else -> {
+                onFailure("Unexpected type of credential")
+            }
+        }
+    }
+
+    private fun sendIdTokenToServer(
+        idToken: String,
+        onSuccess: (UserModel) -> Unit,
+        onFailure: (String) -> Unit,
+        onLoading: (Boolean) -> Unit
+    ) {
+        coroutineScope.launch {
+            googleLoginUseCase(idToken).collect { result ->
+                when (result) {
+                    is DataResource.Success -> {
+                        Log.d("Google SignIn", "서버 로그인 성공: ${result.data}")
+                        onLoading(false)
+                        onSuccess(result.data.toPresentation())
+                    }
+
+                    is DataResource.Error -> {
+                        Log.e("Google SignIn", "서버 로그인 실패: ${result.throwable.message}")
+                        onLoading(false)
+                        onFailure("로그인 실패: ${result.throwable.message}")
+                    }
+
+                    is DataResource.Loading -> {
+                        onLoading(true)
+                    }
+                }
+            }
+        }
+    }
+}

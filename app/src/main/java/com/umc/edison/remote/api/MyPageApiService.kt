@@ -7,6 +7,8 @@ import com.umc.edison.remote.model.mypage.GetDeletedBubbleListResponse
 import com.umc.edison.remote.model.mypage.GetIdentityKeywordResponse
 import com.umc.edison.remote.model.mypage.GetAllMyTestResultsResponse
 import com.umc.edison.remote.model.mypage.GetMyScrapArtLettersResponse
+import com.umc.edison.remote.model.mypage.GetProfileInfoResponse
+import com.umc.edison.remote.model.mypage.GetScrapArtLettersByCategoryResponse
 import com.umc.edison.remote.model.mypage.UpdateTestRequest
 import com.umc.edison.remote.model.mypage.UpdateTestResponse
 import com.umc.edison.remote.model.mypage.UpdateProfileRequest
@@ -22,8 +24,8 @@ interface MyPageApiService {
     @GET("bubbles/deleted")
     suspend fun getDeletedBubbles(): ResponseWithPagination<GetDeletedBubbleListResponse>
 
-    @DELETE("bubbles/trashbin/{bubbleId}")
-    suspend fun deleteBubble(@Path("bubbleId") bubbleId: Int): BaseResponse
+    @GET("members")
+    suspend fun getProfileInfo(): ResponseWithData<GetProfileInfoResponse>
 
     @PATCH("members/profile")
     suspend fun updateProfile(@Body profile: UpdateProfileRequest): ResponseWithData<UpdateProfileResponse>
@@ -34,8 +36,11 @@ interface MyPageApiService {
     @GET("members/identity")
     suspend fun getAllMyTestResults(): ResponseWithData<GetAllMyTestResultsResponse>
 
-    @GET("artletters/myscrap")
+    @GET("artletters/scrap")
     suspend fun getMyScrapArtLetters(): ResponseWithPagination<GetMyScrapArtLettersResponse>
+
+    @GET("artletters/scrap/{category}")
+    suspend fun getScrapArtLettersByCategory(@Path("category") category: String): ResponseWithPagination<GetScrapArtLettersByCategoryResponse>
 
     @PATCH("members/identity")
     suspend fun updateTest(@Body identity: UpdateTestRequest): ResponseWithData<UpdateTestResponse>

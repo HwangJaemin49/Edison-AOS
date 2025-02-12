@@ -18,12 +18,45 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userRemoteDataSource: UserRemoteDataSource,
+    private val userRemoteDataSource: UserRemoteDataSource
 ) : UserRepository {
 
     override fun getLogInState(): Flow<DataResource<Boolean>> = flowDataResource(
         dataAction = { userRemoteDataSource.getLogInState() }
     )
+
+    override fun googleLogin(idToken: String): Flow<DataResource<User>> = flowDataResource(
+        dataAction = {
+            userRemoteDataSource.googleLogin(idToken)
+        }
+    )
+
+    override fun makeNickName(nickname: String): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = {
+            userRemoteDataSource.makeNickName(nickname)
+        }
+    )
+
+    override fun getInterestKeywordsByCategory(category: String): Flow<DataResource<Interest>> =
+        flowDataResource(
+            dataAction = { userRemoteDataSource.getInterestKeywordsByCategory(category) }
+        )
+
+    override fun getIdentityKeywordsByCategory(category: String): Flow<DataResource<Identity>> =
+        flowDataResource(
+            dataAction = { userRemoteDataSource.getIdentityKeywordsByCategory(category) }
+        )
+
+
+    override fun setUserIdentity(identity: Identity): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = { userRemoteDataSource.setUserIdentity(identity.toData()) }
+    )
+
+
+    override fun setUserInterest(interest: Interest): Flow<DataResource<Unit>> = flowDataResource(
+        dataAction = { userRemoteDataSource.setUserInterest(interest.toData()) }
+    )
+
 
     override fun getProfileInfo(): Flow<DataResource<User>> = flowDataResource(
         dataAction = { userRemoteDataSource.getProfileInfo() }
@@ -49,9 +82,9 @@ class UserRepositoryImpl @Inject constructor(
             dataAction = { userRemoteDataSource.getMyScrapArtLetters() }
         )
 
-    override fun getScrapArtLettersByCategory(categoryId: Int): Flow<DataResource<List<ArtLetter>>> =
+    override fun getScrapArtLettersByCategory(category: ArtLetterCategory): Flow<DataResource<List<ArtLetter>>> =
         flowDataResource(
-            dataAction = { userRemoteDataSource.getScrapArtLettersByCategory(categoryId) }
+            dataAction = { userRemoteDataSource.getScrapArtLettersByCategory(category.toData()) }
         )
 
     override fun updateProfileInfo(user: User): Flow<DataResource<Unit>> = flowDataResource(

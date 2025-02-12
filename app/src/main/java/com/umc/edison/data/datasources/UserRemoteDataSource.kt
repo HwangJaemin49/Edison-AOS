@@ -11,7 +11,7 @@ interface UserRemoteDataSource {
     suspend fun getLogInState(): Boolean
     suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity>
     suspend fun getProfileInfo(): UserEntity
-    suspend fun getScrapArtLettersByCategory(categoryId: Int): List<ArtLetterCategoryEntity>
+    suspend fun getScrapArtLettersByCategory(category: ArtLetterCategoryEntity): List<ArtLetterCategoryEntity>
 
     suspend fun updateProfileInfo(user: UserEntity)
     suspend fun updateIdentity(identity: IdentityEntity)
@@ -21,4 +21,12 @@ interface UserRemoteDataSource {
 
     suspend fun logOut()
     suspend fun deleteAccount()
+
+
+    suspend fun googleLogin(idToken: String): UserEntity
+    suspend fun makeNickName(nickname: String)
+    suspend fun getInterestKeywordsByCategory(categoryNumber: String): InterestEntity
+    suspend fun getIdentityKeywordsByCategory(categoryNumber: String): IdentityEntity
+    suspend fun setUserIdentity(identity: IdentityEntity)
+    suspend fun setUserInterest(interest: InterestEntity)
 }

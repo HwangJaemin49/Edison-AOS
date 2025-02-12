@@ -7,9 +7,15 @@ sealed class NavRoute(val route: String) {
     data object ArtLetterSearch : NavRoute("art-letter/search")
     data object ArtLetterDetail : NavRoute("art-letter/art-letter") // TODO: 경로 art-board/detail/${id} 형식으로 수정
     data object MyPage : NavRoute("my-page")
-
     data object BubbleStorage: NavRoute("my-edison/bubble-storage")
     data object SpaceLabel : NavRoute("space/labels")
+
+
+    data object Splash : NavRoute("login/splash")
+    data object Login : NavRoute("login")
+    data object MakeNickName : NavRoute("login/make-nick-name")
+    data object IdentityTest : NavRoute("login/identity-test")
+    data object TermsOfUse : NavRoute("login/terms-of-use")
 
     data class LabelDetail(val id: Int) : NavRoute("${SpaceLabel.route}/labels/${id}") {
         companion object {
@@ -21,6 +27,7 @@ sealed class NavRoute(val route: String) {
     data object Menu : NavRoute("my-page/menu")
     data object Trash : NavRoute("my-page/trash")
     data object AccountManagement : NavRoute("my-page/account-management")
+    data object DeleteAccount : NavRoute("my-page/delete-account")
 
     data object ScrapBoard : NavRoute("my-page/scrap-board")
     data object ScrapBoardDetail : NavRoute("my-page/scrap-board-detail")

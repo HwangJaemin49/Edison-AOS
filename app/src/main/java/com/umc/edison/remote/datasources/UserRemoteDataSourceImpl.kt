@@ -8,13 +8,18 @@ import com.umc.edison.data.model.InterestCategoryMapper
 import com.umc.edison.data.model.InterestEntity
 import com.umc.edison.data.model.KeywordEntity
 import com.umc.edison.data.model.UserEntity
+import com.umc.edison.remote.api.LoginApiService
 import com.umc.edison.remote.api.MyPageApiService
+import com.umc.edison.remote.model.login.IdTokenRequest
+import com.umc.edison.remote.model.login.NicknameRequest
+import com.umc.edison.remote.model.login.toSetIdentityKeywordRequest
 import com.umc.edison.remote.model.mypage.toUpdateTestRequest
 import com.umc.edison.remote.model.mypage.toUpdateProfileRequest
 import com.umc.edison.remote.token.TokenManager
 import javax.inject.Inject
 
 class UserRemoteDataSourceImpl @Inject constructor(
+    private val loginApiService: LoginApiService,
     private val myPageApiService: MyPageApiService,
     private val tokenManager: TokenManager,
 ) : UserRemoteDataSource {
@@ -91,22 +96,90 @@ class UserRemoteDataSourceImpl @Inject constructor(
         return tokenManager.loadAccessToken() != null
     }
 
-    override suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity> {
-        // TODO: api 명세 확인 후 구현
-        return emptyList()
-    }
+    override suspend fun googleLogin(idToken: String): UserEntity {
+        val request = IdTokenRequest(idToken)
+        val response = loginApiService.googleLogin(request)
 
-    override suspend fun getProfileInfo(): UserEntity {
-        // TODO: api 명세 확인 후 구현
+        if (!response.isSuccess) {
+            throw Exception("Google 로그인 실패: ${response.message}")
+        }
+
+        tokenManager.setToken(response.data.accessToken, response.data.refreshToken)
+
         return UserEntity(
-            email = "edison@gmail.com",
-            nickname = "닉네임",
-            profileImage = null,
+            email = response.data.email,
+            nickname = "닉네임을 설정해주세요",
+            profileImage = null
         )
     }
 
-    override suspend fun getScrapArtLettersByCategory(categoryId: Int): List<ArtLetterCategoryEntity> {
-        // TODO: api 명세 확인 후 구현
+
+    override suspend fun makeNickName(nickname: String) {
+        loginApiService.makeNickName(NicknameRequest(nickname))
+
+    }
+
+    override suspend fun getInterestKeywordsByCategory(categoryNumber: String): InterestEntity {
+        val options = myPageApiService.getTestKeyword(categoryNumber).data
+
+        if (categoryNumber == "CATEGORY4") {
+
+            return InterestEntity(
+                categoryNumber = categoryNumber,
+                keywords = myPageApiService.getTestKeyword(categoryNumber).data.map {
+                    KeywordEntity(
+                        id = it.id,
+                        name = it.keyword
+                    )
+                },
+                options = options.map { it.toData() }
+            )
+
+        } else {
+            throw IllegalArgumentException("Invalid categoryNumber")
+        }
+    }
+
+    override suspend fun getIdentityKeywordsByCategory(categoryNumber: String): IdentityEntity {
+        val options = myPageApiService.getTestKeyword(categoryNumber).data
+
+        if (categoryNumber == "CATEGORY1" || categoryNumber == "CATEGORY2" || categoryNumber == "CATEGORY3") {
+
+            return IdentityEntity(
+                categoryNumber = categoryNumber,
+                keywords = myPageApiService.getTestKeyword(categoryNumber).data.map {
+                    KeywordEntity(
+                        id = it.id,
+                        name = it.keyword
+                    )
+                },
+                options = options.map { it.toData() }
+            )
+
+        } else {
+            throw IllegalArgumentException("Invalid categoryNumber")
+        }
+    }
+
+    override suspend fun setUserIdentity(identity: IdentityEntity) {
+        loginApiService.setUserIdentityAndInterest(identity.toSetIdentityKeywordRequest())
+    }
+
+    override suspend fun setUserInterest(interest: InterestEntity) {
+        loginApiService.setUserIdentityAndInterest(interest.toSetIdentityKeywordRequest())
+    }
+
+    override suspend fun getMyScrapArtLetters(): List<ArtLetterCategoryEntity> {
+        return myPageApiService.getMyScrapArtLetters().data.map { it.toData() }
+    }
+
+    override suspend fun getProfileInfo(): UserEntity {
+        return myPageApiService.getProfileInfo().data.toData()
+    }
+
+    override suspend fun getScrapArtLettersByCategory(category: ArtLetterCategoryEntity): List<ArtLetterCategoryEntity> {
+        // TODO: 반환값 수정 필요
+        // return myPageApiService.getScrapArtLettersByCategory(category.name).data.map { it.toData() }
         return emptyList()
     }
 

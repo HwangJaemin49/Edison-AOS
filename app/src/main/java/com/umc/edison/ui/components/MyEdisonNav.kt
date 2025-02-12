@@ -37,7 +37,7 @@ import com.umc.edison.ui.theme.Gray500
 @Composable
 fun MyEdisonNavBar(
     onBubbleClicked: () -> Unit,
-    onMyEdisonClicked: () -> Unit
+    onMyEdisonClicked: () -> Unit,
 ) {
     var isSearchActive by remember { mutableStateOf(false) } // 검색창 활성화 여부
 
@@ -182,4 +182,3 @@ fun MyEdisonNavBar(
         }
     }
 }
-

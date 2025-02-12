@@ -16,10 +16,6 @@ class TokenManager @Inject constructor(
     }
 
     fun loadAccessToken(): String? {
-        setToken(
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMyIsImV4cCI6MTc0MTk5NTEyOSwiZW1haWwiOiJlc3RlbGxlMDMyOUBld2hhLmFjLmtyIn0.71zIx_yyWPhLFuZh3zs9lmHt1ecB_K7fPx8LSYAN4FE",
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMyIsImV4cCI6MTc1NTA5MDE4NSwiZW1haWwiOiJlc3RlbGxlMDMyOUBld2hhLmFjLmtyIn0.M9TRlbloK65uP4BGJf4hdXjKQZWy-IcfhdEqJutYzaQ"
-        )
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
         ACCESS_TOKEN = sharedPreferences.getString("access_token", null)
 

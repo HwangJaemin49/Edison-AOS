@@ -12,12 +12,19 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     fun getLogInState(): Flow<DataResource<Boolean>>
+    fun googleLogin(idToken:String): Flow<DataResource<User>>
+    fun makeNickName(nickname: String):Flow<DataResource<Unit>>
+    fun getInterestKeywordsByCategory(category:String):Flow<DataResource<Interest>>
+    fun getIdentityKeywordsByCategory(category:String):Flow<DataResource<Identity>>
+    fun setUserIdentity( identity: Identity):Flow<DataResource<Unit>>
+    fun setUserInterest(interest: Interest):Flow<DataResource<Unit>>
+
 
     fun getProfileInfo(): Flow<DataResource<User>>
     fun getAllMyIdentityResults(): Flow<DataResource<List<Identity>>>
     fun getMyInterestResult(interestCategory: InterestCategory): Flow<DataResource<Interest>>
     fun getMyScrapArtLetters(): Flow<DataResource<List<ArtLetterCategory>>>
-    fun getScrapArtLettersByCategory(categoryId: Int): Flow<DataResource<List<ArtLetter>>>
+    fun getScrapArtLettersByCategory(category: ArtLetterCategory): Flow<DataResource<List<ArtLetter>>>
 
     fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>>
 

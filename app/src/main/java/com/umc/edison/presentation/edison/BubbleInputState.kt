@@ -15,6 +15,7 @@ data class BubbleInputState(
     val bubbles: List<BubbleModel>,
     val labelEditMode: LabelEditMode = LabelEditMode.NONE,
     val labels: List<LabelModel>,
+    val selectedLabels: List<LabelModel> = emptyList(),
     val selectedIcon: IconType = IconType.NONE,
     val selectedTextStyles: List<TextStyle> = emptyList(),
     val selectedListStyle: ListStyle = ListStyle.NONE,

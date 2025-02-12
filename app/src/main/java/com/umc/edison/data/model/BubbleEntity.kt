@@ -53,6 +53,7 @@ fun BubbleEntity.same(other: BubbleEntity): Boolean {
             content == other.content &&
             mainImage == other.mainImage &&
             labels.map { it.id } == other.labels.map { it.id } &&
+            backLinks.map { it.id } == other.backLinks.map { it.id } &&
             isDeleted == other.isDeleted
 }
 
