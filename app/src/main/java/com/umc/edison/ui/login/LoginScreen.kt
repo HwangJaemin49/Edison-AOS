@@ -94,7 +94,7 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 24.dp,)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -129,7 +129,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter), // 하단에 정렬
-                verticalArrangement = Arrangement.spacedBy(24.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
@@ -147,7 +147,7 @@ fun LoginScreen(
                         style=MaterialTheme.typography.bodyMedium,
                         color = Gray800,
                         modifier = Modifier
-                            .padding(vertical = 24.dp)
+                            .padding(vertical = 5.dp)
                             .clickable { showPopup = true }
                     )
                 }
@@ -180,7 +180,7 @@ fun LoginScreen(
                 BasicFullButton(
                     text = "로그인 없이 긴급 시작",
                     enabled = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(bottom=24.dp),
                     onClick = { navHostController.navigate(NavRoute.TermsOfUse.route) },
 
                 )
