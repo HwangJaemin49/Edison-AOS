@@ -30,8 +30,8 @@ fun MyEdisonScreen(
     ) {
 
         MyEdisonNavBar(
-            onProfileClicked = { /* */ },
-            onCompassClicked = { /* */ }
+            onBubbleClicked = { navController.navigate(NavRoute.BubbleStorage.route) },
+            onMyEdisonClicked = { navController.navigate(NavRoute.MyEdison.route) }
         )
 
         Spacer(modifier = Modifier.weight(0.6f))

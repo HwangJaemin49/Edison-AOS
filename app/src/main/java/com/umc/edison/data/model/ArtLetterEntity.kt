@@ -1,7 +1,6 @@
 package com.umc.edison.data.model
 
 import com.umc.edison.domain.model.ArtLetter
-import com.umc.edison.domain.model.ArtLetterCategory
 
 data class ArtletterEntity(
     val id: Int,

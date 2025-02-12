@@ -10,8 +10,14 @@ interface BubbleDao : BaseDao<BubbleLocal> {
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_deleted = 0 AND is_trashed = 0")
     suspend fun getAllBubbles(): List<BubbleLocal>
 
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_deleted = 0 AND is_trashed = 0 AND created_at >= :sevenDaysAgo")
+    suspend fun getStorageBubbles(sevenDaysAgo: Long): List<BubbleLocal>
+
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id = :bubbleId")
     suspend fun getBubbleById(bubbleId: Int): BubbleLocal
+
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE (title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%') AND is_deleted = 0 AND is_trashed = 0")
+    suspend fun getSearchBubbles(query: String): List<BubbleLocal>
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_synced = 0")
     suspend fun getUnSyncedBubbles(): List<BubbleLocal>

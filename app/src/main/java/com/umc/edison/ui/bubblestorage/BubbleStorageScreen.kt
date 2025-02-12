@@ -32,6 +32,7 @@ import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTagList
 import com.umc.edison.ui.components.LabelTopAppBar
+import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.components.calculateBubbleSize
 import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
@@ -56,7 +57,7 @@ fun BubbleStorageScreen(
         if (uiState.labelId != null) {
             viewModel.fetchLabelDetail(uiState.labelId!!)
         } else {
-            viewModel.fetchAllBubbles()
+            viewModel.fetchStorageBubbles()
         }
     }
 
@@ -100,6 +101,12 @@ fun BubbleStorageScreen(
                     buttonText = buttonText,
                 )
             }
+        },
+        topBar = {
+            MyEdisonNavBar(
+                onBubbleClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) },
+                onMyEdisonClicked = { navHostController.navigate(NavRoute.MyEdison.route) }
+            )
         }
     ) {
         var onBubbleClick: (BubbleModel) -> Unit = {}
@@ -136,6 +143,7 @@ fun BubbleStorageScreen(
                 }
             }
         ) {
+
             if (uiState.label != null) {
                 LabelTopAppBar(
                     label = uiState.label!!,
@@ -145,12 +153,13 @@ fun BubbleStorageScreen(
                 )
             }
 
+
             BubblesLayout(
                 bubbles = uiState.label?.bubbles ?: uiState.bubbles,
                 onBubbleClick = onBubbleClick,
                 onBubbleLongClick = onBubbleLongClick,
                 isBlur = isBlur,
-                selectedBubble = uiState.selectedBubbles,
+                selectedBubble = uiState.selectedBubbles
             )
         }
 

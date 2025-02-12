@@ -5,5 +5,5 @@ data class ArtLetter(
     val title: String,
     val thumbnail: String,
     val likes: Int,
-    val scraps: Int
+    val scraps: Int,
 )

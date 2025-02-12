@@ -13,9 +13,9 @@ data class ArtLetterModel(
         val DEFAULT = ArtLetterModel(
             id = 0,
             title = "제목",
-            thumbnail = "",
+            thumbnail = "", // Default 썸네일?
             likes = 0,
-            scraps = 0
+            scraps = 0,
         )
     }
 
@@ -28,4 +28,18 @@ data class ArtLetterModel(
             scraps = scraps,
         )
     }
+}
+
+fun ArtLetter.toPresentation(): ArtLetterModel {
+    return ArtLetterModel(
+        id = id,
+        title = title,
+        thumbnail = thumbnail,
+        likes = likes,
+        scraps = scraps,
+    )
+}
+
+fun List<ArtLetter>.toPresentation(): List<ArtLetterModel> {
+    return map { it.toPresentation() }
 }

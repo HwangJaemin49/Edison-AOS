@@ -42,7 +42,7 @@ import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
 @Composable
-fun ArtBoardDetailScreen(navHostController: NavHostController) {
+fun ArtLetterDetailScreen(navHostController: NavHostController) {
     val isBookmarked = remember { mutableStateOf(false) }
     val isLiked = remember { mutableStateOf(false) }
 

@@ -36,8 +36,8 @@ import com.umc.edison.ui.theme.Gray500
 
 @Composable
 fun MyEdisonNavBar(
-    onProfileClicked: () -> Unit,
-    onCompassClicked: () -> Unit
+    onBubbleClicked: () -> Unit,
+    onMyEdisonClicked: () -> Unit
 ) {
     var isSearchActive by remember { mutableStateOf(false) } // 검색창 활성화 여부
 
@@ -107,7 +107,9 @@ fun MyEdisonNavBar(
                     )
 
                     IconButton(
-                        onClick = { isSearchActive = false },
+                        onClick = { isSearchActive = false
+                                    onBubbleClicked()
+                                  },
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
@@ -120,7 +122,7 @@ fun MyEdisonNavBar(
                     IconButton(
                         onClick = {
                             isSearchActive = false
-                            onCompassClicked()
+                            onMyEdisonClicked()
                         },
                         modifier = Modifier.size(32.dp)
                     ) {
@@ -151,7 +153,8 @@ fun MyEdisonNavBar(
                     }
 
                     IconButton(
-                        onClick = { isSearchActive = false },
+                        onClick = { isSearchActive = false
+                                  onBubbleClicked()},
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
@@ -164,7 +167,7 @@ fun MyEdisonNavBar(
                     IconButton(
                         onClick = {
                             isSearchActive = false
-                            onCompassClicked()
+                            onMyEdisonClicked()
                         },
                         modifier = Modifier.size(32.dp)
                     ) {
@@ -180,17 +183,3 @@ fun MyEdisonNavBar(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun BubbleStorageTopBarPreview() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        MyEdisonNavBar(
-            onProfileClicked = { /* 클릭 로직 */ },
-            onCompassClicked = { /* 클릭 로직 */ }
-        )
-    }
-}
