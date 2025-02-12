@@ -1,6 +1,5 @@
 package com.umc.edison.remote.token
 
-import android.util.Log
 import com.google.gson.Gson
 import com.umc.edison.remote.model.BaseResponse
 import okhttp3.Interceptor

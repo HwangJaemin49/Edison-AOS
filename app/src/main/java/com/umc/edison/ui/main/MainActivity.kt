@@ -80,7 +80,7 @@ fun MainScreen() {
                 if (currentRoute?.startsWith(NavRoute.MyEdison.route) == true && showBottomNav) {
                     Box(
                         modifier = Modifier.padding(vertical = 12.dp)
-                    ){
+                    ) {
                         MyEdisonNavBar(
                             onProfileClicked = { /* TODO: 프로필 클릭 이벤트 */ },
                             onCompassClicked = { /* TODO: 컴퍼스 클릭 이벤트 */ },
@@ -88,7 +88,9 @@ fun MainScreen() {
                     }
                 }
 
-                NavigationGraph(navController, updateShowBottomNav = { flag -> showBottomNav = flag })
+                NavigationGraph(
+                    navController,
+                    updateShowBottomNav = { flag -> showBottomNav = flag })
             }
 
             if (showInputBubble) {

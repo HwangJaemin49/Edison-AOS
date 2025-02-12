@@ -4,12 +4,6 @@ import com.umc.edison.data.model.ArtLetterCategoryEntity
 import com.umc.edison.data.model.IdentityEntity
 import com.umc.edison.data.model.InterestEntity
 import com.umc.edison.data.model.UserEntity
-import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.model.Identity
-import com.umc.edison.domain.model.IdentityCategory
-import com.umc.edison.domain.model.Interest
-import com.umc.edison.domain.model.InterestCategory
-import kotlinx.coroutines.flow.Flow
 
 interface UserRemoteDataSource {
     suspend fun getAllMyIdentityResults(): List<IdentityEntity>
@@ -29,7 +23,7 @@ interface UserRemoteDataSource {
     suspend fun deleteAccount()
 
 
-    suspend fun googleLogin(idToken:String):UserEntity
+    suspend fun googleLogin(idToken: String): UserEntity
     suspend fun makeNickName(nickname: String)
     suspend fun getInterestKeywordsByCategory(categoryNumber: String): InterestEntity
     suspend fun getIdentityKeywordsByCategory(categoryNumber: String): IdentityEntity

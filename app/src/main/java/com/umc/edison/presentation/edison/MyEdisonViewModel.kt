@@ -3,11 +3,9 @@ package com.umc.edison.presentation.edison
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
-import com.umc.edison.ui.navigation.NavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
