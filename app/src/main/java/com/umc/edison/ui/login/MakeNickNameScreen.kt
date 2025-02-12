@@ -132,7 +132,6 @@ fun MakeNickNameScreen(
                 modifier = Modifier,
                 onClick = {
                     viewModel.makeNickName(textState,navHostController)
-                   // viewModel.buttonClicked(navHostController)
                 },
                 textStyle = TextStyle(fontSize = 16.sp)
             )

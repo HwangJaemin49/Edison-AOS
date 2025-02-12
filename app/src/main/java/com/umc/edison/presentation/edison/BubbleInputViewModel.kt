@@ -281,17 +281,6 @@ class BubbleInputViewModel @Inject constructor(
 
             newImageBlocks.add(newImageBlock)
 
-            if (existingImageCount + index == 0) {
-                _uiState.update {
-                    it.copy(
-                        bubble = it.bubble.copy(
-                            mainImage = imagePath.toString()
-                        ),
-                    )
-                }
-
-                Log.d("대표설정", "대표 이미지 변경됨: ${_uiState.value.bubble.mainImage}")
-            }
         }
 
         _uiState.update {

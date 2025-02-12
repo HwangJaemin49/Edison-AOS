@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -50,10 +51,16 @@ fun TermsOfUseScreen (
 
 
             ){
+
+                Spacer(modifier = Modifier.height(52.dp))
+
                 Image(
-                    painter = painterResource(id= R.drawable.ic_color_bubble),
+                    painter = painterResource(id= R.drawable.ic_bubble_logo),
                     contentDescription = "bubble",
+                    modifier = Modifier.size(56.dp)
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
 
 
                 Text(
@@ -233,7 +240,7 @@ fun TermsOfUseScreen (
                 BasicFullButton(
                     text = "동의하고 넘어가기",
                     enabled = true,
-                    modifier = Modifier,
+                    modifier = Modifier.padding(bottom = 24.dp),
                     onClick = {
                         navHostController.navigate(NavRoute.MyEdison.route)
                     },

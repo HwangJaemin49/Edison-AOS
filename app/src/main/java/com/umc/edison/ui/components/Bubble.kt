@@ -178,21 +178,12 @@ fun BubblePreview(
         )
     } else {
         // 그 외의 경우 - 본문 이미지만 있는 경우
-//        ImageBubble(
-//            bubble = bubble,
-//            bubbleSize = size,
-//            imageUrl = bubble.contentBlocks.firstOrNull()?.content ?: "",
-//            onClick = onClick,
-//            onLongClick = onLongClick,
-//            isPreview = true
-//        )
-
-        TextBubble(
+        ImageBubble(
             bubble = bubble,
-            colors = bubble.labels.map { it.color },
+            bubbleSize = size,
+            imageUrl = bubble.contentBlocks.firstOrNull()?.content ?: "",
             onClick = onClick,
             onLongClick = onLongClick,
-            bubbleSize = size,
             isPreview = true
         )
     }

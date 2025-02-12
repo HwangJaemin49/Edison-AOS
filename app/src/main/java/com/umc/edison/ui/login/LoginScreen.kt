@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -88,56 +91,83 @@ fun LoginScreen(
         uiState = uiState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
-
+                .fillMaxSize()
+                .padding(24.dp)
         ) {
-
-            Spacer(modifier = Modifier.weight(1f))
-
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                if (showPopup) {
-                    BubbleMessage(
-                        Modifier.align(Alignment.TopCenter),
-                        onDismiss = { showPopup = false })
-                }
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.weight(0.4f))
 
-                Text(
-                    text = "로그인하면 사용할 수 있는 기능",
-                    fontSize = 16.sp,
-                    color = Gray800,
-                    modifier = Modifier
-                        .padding(vertical = 24.dp)
-                        .clickable { showPopup = true }
-                )
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_big_bubble_logo),
+                        contentDescription = "app logo",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(192.7.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_text_logo),
+                        contentDescription = "app logo",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.size(width = 135.dp, height = 31.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(0.6f))
+                }
             }
 
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter), // 하단에 정렬
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (showPopup) {
+                        BubbleMessage(
+                            Modifier.align(Alignment.TopCenter),
+                            onDismiss = { showPopup = false })
+                    }
+
+                    Text(
+                        text = "로그인하면 사용할 수 있는 기능",
+                        style=MaterialTheme.typography.bodyMedium,
+                        color = Gray800,
+                        modifier = Modifier
+                            .padding(vertical = 24.dp)
+                            .clickable { showPopup = true }
+                    )
+                }
 
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.CenterStart
                 ) {
-
                     BasicFullButton(
                         text = "구글 로그인",
-                        modifier = Modifier,
+                        modifier = Modifier.fillMaxWidth(),
                         enabled = true,
                         onClick = {
                             viewModel.signInWithGoogle(
                                 context = context,
                                 navController = navHostController
                             )
-
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Gray300),
-                        textStyle = TextStyle(color = Gray800, fontSize = 16.sp)
+                        textStyle =TextStyle(color = Gray800)
                     )
 
                     Image(
@@ -145,26 +175,21 @@ fun LoginScreen(
                         contentDescription = "google image",
                         modifier = Modifier.padding(start = 24.dp)
                     )
-
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
 
                 BasicFullButton(
                     text = "로그인 없이 긴급 시작",
                     enabled = true,
-                    modifier = Modifier,
+                    modifier = Modifier.fillMaxWidth(),
                     onClick = { navHostController.navigate(NavRoute.TermsOfUse.route) },
-                    textStyle = TextStyle(fontSize = 16.sp)
+
                 )
-
             }
-
-
         }
-
-
     }
+
+
+}
 
 
 
@@ -181,10 +206,10 @@ fun BubbleMessage(modifier: Modifier, onDismiss: () -> Unit) {
     ){
         Box(
             modifier = Modifier
-                .size(width = 243.dp, height = 124.dp) // ✅ 고정 크기 설정
+                .width(243.dp)
                 .shadow(8.dp, shape = RoundedCornerShape(16.dp))
-                .clip(RoundedCornerShape(16.dp)) // ✅ 말풍선을 둥글게 유지
-                .background(Color.White) // ✅ 배경색 추가
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.White)
                 .padding(14.dp)
         ) {
             Column() {
