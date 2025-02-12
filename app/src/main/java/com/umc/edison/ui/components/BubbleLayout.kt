@@ -28,7 +28,7 @@ fun BubblesLayout(
     val bubbleOffsets = remember { mutableStateMapOf<BubbleModel, Dp>() }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(8.dp)
     ) {
         items(bubbles.size) { index ->
             val bubble = bubbles[index]
