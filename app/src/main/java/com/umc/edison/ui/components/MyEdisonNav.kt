@@ -37,7 +37,7 @@ import com.umc.edison.ui.theme.Gray500
 @Composable
 fun MyEdisonNavBar(
     onProfileClicked: () -> Unit,
-    onCompassClicked: () -> Unit
+    onCompassClicked: () -> Unit,
 ) {
     var isSearchActive by remember { mutableStateOf(false) } // 검색창 활성화 여부
 
@@ -190,7 +190,7 @@ fun BubbleStorageTopBarPreview() {
     ) {
         MyEdisonNavBar(
             onProfileClicked = { /* 클릭 로직 */ },
-            onCompassClicked = { /* 클릭 로직 */ }
+            onCompassClicked = { /* 클릭 로직 */ },
         )
     }
 }

@@ -297,6 +297,8 @@ fun BubbleInputContent(
         onImageDeleted = { contentBlock ->
             viewModel.deleteContentBlock(contentBlock)
         },
+        onMainSelected = { uri ->
+            viewModel.selectMainImage(uri) },
         bubbleInputState = uiState,
         onLinkClick = onLinkClick
     )

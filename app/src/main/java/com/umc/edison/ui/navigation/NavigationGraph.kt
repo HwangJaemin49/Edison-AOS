@@ -13,6 +13,11 @@ import com.umc.edison.ui.edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.edison.BubbleInputScreen
+import com.umc.edison.ui.login.IdentityTestScreen
+import com.umc.edison.ui.login.LoginScreen
+import com.umc.edison.ui.login.MakeNickNameScreen
+import com.umc.edison.ui.login.SplashScreen
+import com.umc.edison.ui.login.TermsOfUseScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.DeleteAccountScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
@@ -28,7 +33,7 @@ fun NavigationGraph(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit
 ) {
-    NavHost(navHostController, startDestination = NavRoute.MyEdison.route) {
+    NavHost(navHostController, startDestination = NavRoute.Splash.route) {
         // bottom navigation
         composable(NavRoute.MyEdison.route) {
             MyEdisonScreen(navHostController, updateShowBottomNav)
@@ -80,6 +85,27 @@ fun NavigationGraph(
 
         composable(NavRoute.ScrapBoardDetail.route) {
             ScrapBoardDetailScreen(navHostController)
+        }
+
+        composable(NavRoute.Login.route){
+            LoginScreen(  navHostController, updateShowBottomNav )
+        }
+
+        composable(NavRoute.Splash.route){
+            SplashScreen(navHostController ,updateShowBottomNav)
+        }
+
+
+        composable(NavRoute.MakeNickName.route){
+            MakeNickNameScreen( navHostController,updateShowBottomNav )
+        }
+
+        composable(NavRoute.IdentityTest.route){
+            IdentityTestScreen(navHostController, updateShowBottomNav )
+        }
+
+        composable(NavRoute.TermsOfUse.route){
+            TermsOfUseScreen(navHostController,updateShowBottomNav )
         }
 
         composable(

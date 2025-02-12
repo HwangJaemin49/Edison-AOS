@@ -1,6 +1,7 @@
 package com.umc.edison.remote.di
 
 import com.umc.edison.remote.api.BubbleSpaceApiService
+import com.umc.edison.remote.api.LoginApiService
 import com.umc.edison.remote.api.MyPageApiService
 import com.umc.edison.remote.api.RefreshTokenApiService
 import com.umc.edison.remote.api.SyncApiService
@@ -37,4 +38,10 @@ internal object ServiceModule {
     fun provideRefreshTokenService(
         @NetworkModule.RefreshRetrofit retrofit: Retrofit
     ): RefreshTokenApiService = retrofit.create(RefreshTokenApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideLoginApiService(
+        @NetworkModule.MainRetrofit retrofit: Retrofit
+    ): LoginApiService = retrofit.create(LoginApiService::class.java)
 }

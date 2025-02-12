@@ -3,6 +3,7 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
@@ -255,21 +256,32 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun addContentBlocks(imagePaths: List<Uri>) {
+
+        val existingImageCount = _uiState.value.bubble.contentBlocks.count { it.type == ContentType.IMAGE }
+
+        if (existingImageCount+imagePaths.size  > 10) {
+            _uiState.update { it.copy(toastMessage = "최대 10장까지 첨부할 수 있습니다.") }
+            return
+        }
+
         val newImageBlocks = mutableListOf<ContentBlockModel>()
 
-        imagePaths.forEach { imagePath ->
+        imagePaths.forEachIndexed { index,imagePath ->
             val newImageBlock = ContentBlockModel(
                 type = ContentType.IMAGE,
                 content = imagePath.toString(),
             )
 
+
             newImageBlocks.add(newImageBlock)
+
         }
 
         _uiState.update {
             it.copy(
                 bubble = it.bubble.copy(
-                    contentBlocks = it.bubble.contentBlocks + newImageBlocks
+                    contentBlocks = it.bubble.contentBlocks + newImageBlocks,
+                    mainImage =  it.bubble.mainImage
                 ),
                 isGalleryOpen = false,
                 selectedIcon = IconType.NONE
@@ -295,7 +307,6 @@ class BubbleInputViewModel @Inject constructor(
 
     fun deleteContentBlock(contentBlock: ContentBlockModel) {
         if (contentBlock.type != ContentType.IMAGE) return
-
         val currentBubble = _uiState.value.bubble
         val contentBlocks = currentBubble.contentBlocks.toMutableList()
 
@@ -500,6 +511,15 @@ class BubbleInputViewModel @Inject constructor(
         outputStream.close()
 
         return Uri.fromFile(file)
+    }
+
+    fun selectMainImage(uri: String?) {
+        _uiState.update {
+            it.copy(
+                bubble = it.bubble.copy(mainImage = uri)
+            )
+        }
+        Log.d("대표설정", "대표 이미지 변경됨: ${_uiState.value.bubble.mainImage}")
     }
 
     override fun clearToastMessage() {
