@@ -24,7 +24,7 @@ interface UserRepository {
     fun getAllMyIdentityResults(): Flow<DataResource<List<Identity>>>
     fun getMyInterestResult(interestCategory: InterestCategory): Flow<DataResource<Interest>>
     fun getMyScrapArtLetters(): Flow<DataResource<List<ArtLetterCategory>>>
-    fun getScrapArtLettersByCategory(categoryId: Int): Flow<DataResource<List<ArtLetter>>>
+    fun getScrapArtLettersByCategory(category: ArtLetterCategory): Flow<DataResource<List<ArtLetter>>>
 
     fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>>
 

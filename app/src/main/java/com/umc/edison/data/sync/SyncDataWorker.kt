@@ -19,6 +19,7 @@ class SyncDataWorker(
             Log.i("SyncDataWorker", "Data synced successfully!")
             Result.success()
         } catch (e: Exception) {
+            Log.e("SyncDataWorker", "Failed to sync data", e)
             Result.retry()
         }
     }

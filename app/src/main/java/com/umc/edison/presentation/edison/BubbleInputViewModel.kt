@@ -62,6 +62,7 @@ class BubbleInputViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         bubble = bubble.toPresentation(),
+                        selectedLabels = bubble.labels.toPresentation()
                     )
                 }
             },
@@ -134,21 +135,14 @@ class BubbleInputViewModel @Inject constructor(
         )
     }
 
-    fun toggleLabelSelection(label: LabelModel) {
-        if (_uiState.value.bubble.labels.contains(label)) {
-            _uiState.update {
-                it.copy(
-                    bubble = it.bubble.copy(labels = it.bubble.labels - label)
-                )
-            }
-        } else if (_uiState.value.bubble.labels.size >= 3) {
-            _uiState.update { it.copy(toastMessage = "최대 3개까지 선택할 수 있습니다.") }
-        } else {
-            _uiState.update {
-                it.copy(
-                    bubble = it.bubble.copy(labels = it.bubble.labels + label)
-                )
-            }
+    fun updateSelectedLabels(labels: List<LabelModel>) {
+        _uiState.update {
+            it.copy(
+                bubble = it.bubble.copy(
+                    labels = labels
+                ),
+                selectedLabels = labels
+            )
         }
     }
 
@@ -530,6 +524,10 @@ class BubbleInputViewModel @Inject constructor(
 
     override fun clearToastMessage() {
         _uiState.update { it.copy(toastMessage = null) }
+    }
+
+    fun updateToastMessage(message: String) {
+        _uiState.update { it.copy(toastMessage = message) }
     }
 }
 

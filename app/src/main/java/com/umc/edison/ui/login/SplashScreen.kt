@@ -2,14 +2,11 @@ package com.umc.edison.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,7 +23,7 @@ import com.umc.edison.ui.navigation.NavRoute
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController,  updateShowBottomNav: (Boolean) -> Unit,) {
+fun SplashScreen(navController: NavController, updateShowBottomNav: (Boolean) -> Unit) {
 
     val context = LocalContext.current
 
@@ -48,7 +45,9 @@ fun SplashScreen(navController: NavController,  updateShowBottomNav: (Boolean) -
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(color=Color.White),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.White),
         contentAlignment = Alignment.Center
     ) {
         Column(

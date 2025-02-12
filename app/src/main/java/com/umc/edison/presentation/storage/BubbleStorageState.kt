@@ -10,7 +10,6 @@ data class BubbleStorageState(
     val selectedBubbles: List<BubbleModel> = emptyList(),
     val bubbleStorageMode: BubbleStorageMode = BubbleStorageMode.NONE,
     val movableLabels: List<LabelModel> = listOf(),
-    val selectedLabel: LabelModel? = null,
     val labelId: Int? = null,
     override val isLoading: Boolean,
     override val error: Throwable? = null,

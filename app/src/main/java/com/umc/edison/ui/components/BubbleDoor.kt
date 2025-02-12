@@ -56,7 +56,6 @@ import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
@@ -167,7 +166,7 @@ private fun BubbleContent(
     onBubbleChange: (BubbleModel) -> Unit,
     uiState: BubbleInputState,
     deleteClicked: (ContentBlockModel) -> Unit,
-    mainClicked:(String?)->Unit,
+    mainClicked: (String?) -> Unit,
     onLinkClick: (Int) -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -327,7 +326,7 @@ private fun BubbleContent(
 
                 ContentType.IMAGE -> {
                     val aspectRatio = calculateAspectRatio(contentBlock.content)
-                    var isLongPressed by remember {mutableStateOf(false)}
+                    var isLongPressed by remember { mutableStateOf(false) }
                     val isMainImage = bubble.mainImage == contentBlock.content
 
 
@@ -362,10 +361,10 @@ private fun BubbleContent(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .clickable {isLongPressed= false },
+                                    .clickable { isLongPressed = false },
                                 contentAlignment = Alignment.Center
                             ) {
-                                if(!isMainImage) {
+                                if (!isMainImage) {
                                     Column {
                                         Button(
                                             shape = RoundedCornerShape(100.dp),
@@ -409,9 +408,7 @@ private fun BubbleContent(
                                             )
                                         }
                                     }
-                                }
-
-                                else{
+                                } else {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()

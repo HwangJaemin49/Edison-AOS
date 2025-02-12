@@ -16,13 +16,15 @@ import com.umc.edison.ui.theme.Gray800
 @Composable
 fun LabelSelectModalContent(
     labels: List<LabelModel>,
-    selectedLabels: List<LabelModel> = emptyList(),
     onDismiss: () -> Unit,
     onConfirm: (List<LabelModel>) -> Unit,
-    onItemClicked: (LabelModel) -> Unit,
+    selectedLabels: List<LabelModel> = emptyList(),
     onAddLabelClicked: (() -> Unit)? = null,
     multiSelectMode: Boolean = false,
+    updateToastMessage: (String) -> Unit = {},
 ) {
+    val selected = remember { mutableStateOf(selectedLabels) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,10 +51,25 @@ fun LabelSelectModalContent(
                 val label = labels[index]
                 LabelListItemForSelect(
                     label = label,
-                    selected = selectedLabels.contains(label),
+                    selected = selected.value.map { it.id }.contains(label.id),
                     multiSelectMode = multiSelectMode,
                     onClick = {
-                        onItemClicked(label)
+                        if (multiSelectMode) {
+                            if (selected.value.map { it.id }.contains(label.id)) {
+                                selected.value = selected.value.filter { it.id != label.id }
+                            } else if (selected.value.size >= 3) {
+                                // 3개 이상 선택 불가
+                                updateToastMessage("라벨은 최대 3개까지 선택 가능합니다.")
+                            } else {
+                                selected.value += label
+                            }
+                        } else {
+                            if (selected.value.map { it.id }.contains(label.id)) {
+                                selected.value = emptyList()
+                            } else {
+                                selected.value = listOf(label)
+                            }
+                        }
                     },
                 )
             }
@@ -73,11 +90,11 @@ fun LabelSelectModalContent(
             )
 
             MiddleConfirmButton(
-                text = "선택하기",
+                text = "라벨 선택",
                 onClick = {
-                    onConfirm(selectedLabels)
+                    onConfirm(selected.value)
                 },
-                enabled = selectedLabels.isNotEmpty(),
+                enabled = true,
                 modifier = Modifier.weight(1f)
             )
         }

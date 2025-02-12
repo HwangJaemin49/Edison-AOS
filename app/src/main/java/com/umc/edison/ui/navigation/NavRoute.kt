@@ -26,6 +26,7 @@ sealed class NavRoute(val route: String) {
     data object Menu : NavRoute("my-page/menu")
     data object Trash : NavRoute("my-page/trash")
     data object AccountManagement : NavRoute("my-page/account-management")
+    data object DeleteAccount : NavRoute("my-page/delete-account")
 
     data object ScrapBoard : NavRoute("my-page/scrap-board")
     data object ScrapBoardDetail : NavRoute("my-page/scrap-board-detail")

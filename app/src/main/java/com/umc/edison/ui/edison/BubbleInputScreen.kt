@@ -267,8 +267,9 @@ fun BubbleInputContent(
         ) {
             LabelSelectModalContent(
                 labels = uiState.labels,
-                selectedLabels = uiState.bubble.labels,
-                onConfirm = { _ ->
+                selectedLabels = uiState.selectedLabels,
+                onConfirm = { selectedLabels ->
+                    viewModel.updateSelectedLabels(selectedLabels)
                     viewModel.updateLabelEditMode(LabelEditMode.NONE)
                     viewModel.updateIcon(IconType.NONE)
                 },
@@ -279,10 +280,10 @@ fun BubbleInputContent(
                     viewModel.updateLabelEditMode(LabelEditMode.NONE)
                     viewModel.updateIcon(IconType.NONE)
                 },
-                onItemClicked = { label ->
-                    viewModel.toggleLabelSelection(label)
-                },
                 multiSelectMode = true,
+                updateToastMessage = { message ->
+                    viewModel.updateToastMessage(message)
+                }
             )
         }
     }

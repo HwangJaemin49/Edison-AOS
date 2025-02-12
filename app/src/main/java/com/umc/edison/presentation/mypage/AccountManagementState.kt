@@ -22,5 +22,5 @@ data class AccountManagementState(
 }
 
 enum class AccountManagementMode {
-    NONE, LOGOUT, EMAIL_CHANGE, DELETE_ACCOUNT
+    NONE, LOGOUT, DELETE_ACCOUNT
 }

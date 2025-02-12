@@ -19,6 +19,7 @@ import com.umc.edison.ui.login.MakeNickNameScreen
 import com.umc.edison.ui.login.SplashScreen
 import com.umc.edison.ui.login.TermsOfUseScreen
 import com.umc.edison.ui.mypage.AccountManagementScreen
+import com.umc.edison.ui.mypage.DeleteAccountScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.IdentityEditScreen
 import com.umc.edison.ui.mypage.InterestEditScreen
@@ -72,6 +73,10 @@ fun NavigationGraph(
 
         composable(NavRoute.AccountManagement.route) {
             AccountManagementScreen(navHostController, updateShowBottomNav)
+        }
+
+        composable(NavRoute.DeleteAccount.route) {
+            DeleteAccountScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.ScrapBoard.route) {

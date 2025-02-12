@@ -1,8 +1,6 @@
 package com.umc.edison.ui.login
 
 import android.app.Activity
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
@@ -94,7 +91,7 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp,)
+                .padding(horizontal = 24.dp)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -144,7 +141,7 @@ fun LoginScreen(
 
                     Text(
                         text = "로그인하면 사용할 수 있는 기능",
-                        style=MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = Gray800,
                         modifier = Modifier
                             .padding(vertical = 5.dp)
@@ -167,7 +164,7 @@ fun LoginScreen(
                             )
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Gray300),
-                        textStyle =TextStyle(color = Gray800)
+                        textStyle = TextStyle(color = Gray800)
                     )
 
                     Image(
@@ -180,17 +177,18 @@ fun LoginScreen(
                 BasicFullButton(
                     text = "로그인 없이 긴급 시작",
                     enabled = true,
-                    modifier = Modifier.fillMaxWidth().padding(bottom=24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
                     onClick = { navHostController.navigate(NavRoute.TermsOfUse.route) },
 
-                )
+                    )
             }
         }
     }
 
 
 }
-
 
 
 @Composable
@@ -203,16 +201,16 @@ fun BubbleMessage(modifier: Modifier, onDismiss: () -> Unit) {
             focusable = false
         ),
         onDismissRequest = { onDismiss() },
-    ){
+    ) {
         Box(
-            modifier = Modifier
-                .width(243.dp)
+            modifier = modifier
+                .wrapContentSize()
                 .shadow(8.dp, shape = RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
                 .padding(14.dp)
         ) {
-            Column() {
+            Column {
                 Text(
                     text = "로그인하면 뭐가 좋을까요?",
                     style = MaterialTheme.typography.titleMedium,

@@ -13,7 +13,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,7 +57,7 @@ fun ImageGallery(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            imageList=(loadGalleryImages(context, selectedFolder))
+            imageList = (loadGalleryImages(context, selectedFolder))
             folderList = loadGalleryFolders(context)
         }
     }
@@ -91,27 +90,31 @@ fun ImageGallery(
                     .height(50.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 Spacer(modifier = Modifier.weight(1f))
 
-                Box{
-                   Text(
+                Box {
+                    Text(
                         text = "$selectedFolder ﹀",
                         modifier = Modifier.clickable(
                             onClick = { isExpand = true }
-                        )
-                        ,
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = Gray800
                     )
                     DropdownMenu(
                         expanded = isExpand,
                         onDismissRequest = { isExpand = false },
-                                modifier = Modifier.background(Color.White)
+                        modifier = Modifier.background(Color.White)
                     ) {
                         folderList.forEachIndexed { index, folder ->
                             DropdownMenuItem(
-                                text = { Text(folder, style = MaterialTheme.typography.bodyMedium) },
+                                text = {
+                                    Text(
+                                        folder,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
                                 onClick = {
                                     selectedFolder = folder
                                     imageList = loadGalleryImages(context, folder)
@@ -160,7 +163,9 @@ fun ImageGallery(
             Spacer(modifier = Modifier.height(8.dp))
 
             LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-                items(count = imageList.size, key = { index -> imageList[index].hashCode() }) { index ->
+                items(
+                    count = imageList.size,
+                    key = { index -> imageList[index].hashCode() }) { index ->
                     val uri = imageList[index]
                     val isSelected = selectedImages.contains(uri)
                     val selectedIndex = selectedImages.indexOf(uri) + 1
@@ -190,8 +195,11 @@ fun ImageGallery(
                             contentScale = ContentScale.Crop
                         )
                         Box(
-                            modifier = Modifier.align(Alignment.TopEnd).size(50.dp).padding(4.dp),
-                                    contentAlignment = Alignment.Center
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(50.dp)
+                                .padding(4.dp),
+                            contentAlignment = Alignment.Center
                         ) {
 
                             RadioButton(
@@ -231,9 +239,10 @@ fun ImageGallery(
     }
 }
 
-fun loadGalleryImages(context: Context, folder:String): List<Uri> {
+fun loadGalleryImages(context: Context, folder: String): List<Uri> {
     val images = mutableListOf<Uri>()
-    val selection = if (folder == "Recent") null else "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?"
+    val selection =
+        if (folder == "Recent") null else "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?"
     val selectionArgs = if (folder == "Recent") null else arrayOf(folder)
 
     val projection = arrayOf(
@@ -241,7 +250,11 @@ fun loadGalleryImages(context: Context, folder:String): List<Uri> {
     )
     val uriExternal = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val cursor = context.contentResolver.query(
-        uriExternal, projection, selection,  selectionArgs , "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
+        uriExternal,
+        projection,
+        selection,
+        selectionArgs,
+        "${MediaStore.Images.Media.DATE_MODIFIED} DESC"
     )
 
     cursor?.use {

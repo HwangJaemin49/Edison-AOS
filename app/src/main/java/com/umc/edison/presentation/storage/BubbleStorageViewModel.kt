@@ -152,11 +152,7 @@ class BubbleStorageViewModel @Inject constructor(
             flow = getAllLabelsUseCase(),
             onSuccess = { allLabels ->
                 val movableLabels = allLabels.toPresentation().filter { label ->
-                    _uiState.value.selectedBubbles.any { bubble ->
-                        bubble.labels.any { bubbleLabel ->
-                            bubbleLabel.id != label.id
-                        }
-                    }
+                    _uiState.value.label?.id != label.id
                 }
 
                 _uiState.update { it.copy(movableLabels = movableLabels) }
@@ -176,10 +172,6 @@ class BubbleStorageViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
-    }
-
-    fun selectLabel(label: LabelModel) {
-        _uiState.update { it.copy(selectedLabel = label) }
     }
 
     fun moveSelectedBubbles(label: LabelModel, showBottomNav: (Boolean) -> Unit) {

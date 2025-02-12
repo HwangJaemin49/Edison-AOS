@@ -192,15 +192,11 @@ fun BubbleStorageScreen(
             ) {
                 LabelSelectModalContent(
                     labels = uiState.movableLabels,
-                    selectedLabels = uiState.selectedLabel?.let { listOf(it) } ?: emptyList(),
                     onDismiss = {
                         viewModel.updateEditMode(BubbleStorageMode.EDIT)
                     },
                     onConfirm = { labelList ->
                         viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
-                    },
-                    onItemClicked = { label ->
-                        viewModel.selectLabel(label)
                     },
                 )
             }

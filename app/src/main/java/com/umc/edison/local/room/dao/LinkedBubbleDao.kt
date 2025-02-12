@@ -35,4 +35,7 @@ interface LinkedBubbleDao {
 
     @Query("SELECT id FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND link_bubble_id = :linkedId AND is_back = :isBack")
     suspend fun getLinkedBubbleId(currId: Int, linkedId: Int, isBack: Boolean): Int?
+
+    @Query("DELETE FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND is_back = :isBack")
+    suspend fun deleteLinkedBubble(currId: Int, isBack: Boolean)
 }

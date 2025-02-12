@@ -14,7 +14,6 @@ import com.umc.edison.domain.model.Interest
 import com.umc.edison.domain.model.InterestCategory
 import com.umc.edison.domain.model.User
 import com.umc.edison.domain.repository.UserRepository
-import com.umc.edison.remote.token.TokenManager
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -26,25 +25,27 @@ class UserRepositoryImpl @Inject constructor(
         dataAction = { userRemoteDataSource.getLogInState() }
     )
 
-    override fun googleLogin(idToken:String): Flow<DataResource<User>> = flowDataResource(
+    override fun googleLogin(idToken: String): Flow<DataResource<User>> = flowDataResource(
         dataAction = {
-          userRemoteDataSource.googleLogin(idToken)
+            userRemoteDataSource.googleLogin(idToken)
         }
     )
 
-    override fun makeNickName( nickname: String): Flow<DataResource<Unit>> = flowDataResource(
+    override fun makeNickName(nickname: String): Flow<DataResource<Unit>> = flowDataResource(
         dataAction = {
-            userRemoteDataSource.makeNickName( nickname)
+            userRemoteDataSource.makeNickName(nickname)
         }
     )
 
-    override fun getInterestKeywordsByCategory(category:String): Flow<DataResource<Interest>> = flowDataResource(
-        dataAction = {userRemoteDataSource.getInterestKeywordsByCategory(category)}
-    )
+    override fun getInterestKeywordsByCategory(category: String): Flow<DataResource<Interest>> =
+        flowDataResource(
+            dataAction = { userRemoteDataSource.getInterestKeywordsByCategory(category) }
+        )
 
-    override fun getIdentityKeywordsByCategory(category:String): Flow<DataResource<Identity>> = flowDataResource(
-        dataAction = {userRemoteDataSource.getIdentityKeywordsByCategory(category)}
-    )
+    override fun getIdentityKeywordsByCategory(category: String): Flow<DataResource<Identity>> =
+        flowDataResource(
+            dataAction = { userRemoteDataSource.getIdentityKeywordsByCategory(category) }
+        )
 
 
     override fun setUserIdentity(identity: Identity): Flow<DataResource<Unit>> = flowDataResource(
@@ -81,9 +82,9 @@ class UserRepositoryImpl @Inject constructor(
             dataAction = { userRemoteDataSource.getMyScrapArtLetters() }
         )
 
-    override fun getScrapArtLettersByCategory(categoryId: Int): Flow<DataResource<List<ArtLetter>>> =
+    override fun getScrapArtLettersByCategory(category: ArtLetterCategory): Flow<DataResource<List<ArtLetter>>> =
         flowDataResource(
-            dataAction = { userRemoteDataSource.getScrapArtLettersByCategory(categoryId) }
+            dataAction = { userRemoteDataSource.getScrapArtLettersByCategory(category.toData()) }
         )
 
     override fun updateProfileInfo(user: User): Flow<DataResource<Unit>> = flowDataResource(

@@ -2,12 +2,9 @@ package com.umc.edison.ui.login
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,8 +15,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,21 +34,13 @@ import com.umc.edison.presentation.login.IdentityTestViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BasicFullButton
 import com.umc.edison.ui.theme.Gray800
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.IntOffset
-import com.umc.edison.ui.BaseContent
-import com.umc.edison.ui.components.BasicFullButton
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
-import com.umc.edison.ui.theme.Gray800
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -123,10 +110,10 @@ fun IdentityTestScreen(
                 ) { page ->
                     selectedTabIndex = pagerState.currentPage
                     when (page) {
-                        0 -> Identitytest1(navHostController,pagerState,coroutineScope)
-                        1 -> Identitytest2(navHostController,pagerState,coroutineScope)
-                        2 -> Identitytest3(navHostController,pagerState,coroutineScope)
-                        3 -> Identitytest4(navHostController,pagerState,coroutineScope)
+                        0 -> Identitytest1(navHostController, pagerState, coroutineScope)
+                        1 -> Identitytest2(navHostController, pagerState, coroutineScope)
+                        2 -> Identitytest3(navHostController, pagerState, coroutineScope)
+                        3 -> Identitytest4(navHostController, pagerState, coroutineScope)
                     }
                 }
             }
@@ -135,7 +122,12 @@ fun IdentityTestScreen(
 }
 
 @Composable
-fun Identitytest1(navHostController: NavHostController,pagerState: PagerState, coroutineScope: CoroutineScope, viewModel: IdentityTestViewModel = hiltViewModel()){
+fun Identitytest1(
+    navHostController: NavHostController,
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    viewModel: IdentityTestViewModel = hiltViewModel()
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -179,12 +171,12 @@ fun Identitytest1(navHostController: NavHostController,pagerState: PagerState, c
 
 
 @Composable
-fun Identitytest2
-            (navHostController: NavHostController,
-             pagerState: PagerState,
-             coroutineScope: CoroutineScope,
-             viewModel: IdentityTestViewModel = hiltViewModel(),)
-{
+fun Identitytest2(
+    navHostController: NavHostController,
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    viewModel: IdentityTestViewModel = hiltViewModel(),
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -228,12 +220,12 @@ fun Identitytest2
 
 
 @Composable
-fun Identitytest3
-            (navHostController: NavHostController,
-                  pagerState: PagerState,
-                  coroutineScope: CoroutineScope,
-             viewModel: IdentityTestViewModel = hiltViewModel(),)
-{
+fun Identitytest3(
+    navHostController: NavHostController,
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    viewModel: IdentityTestViewModel = hiltViewModel(),
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -277,10 +269,11 @@ fun Identitytest3
 
 
 @Composable
-fun Identitytest4(navHostController: NavHostController, pagerState: PagerState,
-                  coroutineScope: CoroutineScope,
-                  viewModel: IdentityTestViewModel = hiltViewModel(),)
-{
+fun Identitytest4(
+    navHostController: NavHostController, pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    viewModel: IdentityTestViewModel = hiltViewModel(),
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
