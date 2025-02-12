@@ -77,6 +77,9 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     override suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity {
         update(bubble.toLocal(), tableName)
 
+        bubbleLabelDao.deleteByBubbleId(bubble.id)
+        linkedBubbleDao.deleteLinkedBubble(bubble.id, false)
+
         addBubbleLabel(bubble)
         addLinkedBubble(bubble)
 
