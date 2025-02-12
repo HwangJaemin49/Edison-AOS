@@ -5,8 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
@@ -16,9 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
@@ -30,6 +28,7 @@ import com.umc.edison.ui.navigation.BottomNavigation
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.navigation.NavigationGraph
 import com.umc.edison.ui.theme.EdisonTheme
+import com.umc.edison.ui.theme.White000
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -70,18 +69,26 @@ fun MainScreen() {
                 )
             }
         },
-
         contentWindowInsets = WindowInsets(0.dp),
         modifier = Modifier.systemBarsPadding()
     ) {
         Box(Modifier.padding(it)) {
-            NavigationGraph(navController, updateShowBottomNav = { flag -> showBottomNav = flag })
+            Column(
+                modifier = Modifier
+                    .background(White000)
+            ) {
+                if (currentRoute?.startsWith(NavRoute.MyEdison.route) == true && showBottomNav) {
+                    Box(
+                        modifier = Modifier.padding(vertical = 12.dp)
+                    ){
+                        MyEdisonNavBar(
+                            onProfileClicked = { /* TODO: 프로필 클릭 이벤트 */ },
+                            onCompassClicked = { /* TODO: 컴퍼스 클릭 이벤트 */ },
+                        )
+                    }
+                }
 
-            if (currentRoute?.startsWith(NavRoute.MyEdison.route) == true) {
-                MyEdisonNavBar(
-                    onProfileClicked = { /* TODO: 프로필 클릭 이벤트 */ },
-                    onCompassClicked = { /* TODO: 컴퍼스 클릭 이벤트 */ },
-                )
+                NavigationGraph(navController, updateShowBottomNav = { flag -> showBottomNav = flag })
             }
 
             if (showInputBubble) {
