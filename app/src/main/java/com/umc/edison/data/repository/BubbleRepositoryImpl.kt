@@ -3,11 +3,11 @@ package com.umc.edison.data.repository
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
-import com.umc.edison.data.model.ClusteredBubblesEntity
 import com.umc.edison.data.model.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Bubble
-import com.umc.edison.domain.model.ClusteredBubbles
+import com.umc.edison.domain.model.Cluster
+import com.umc.edison.domain.model.ClusteredBubblePosition
 import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -62,21 +62,11 @@ class BubbleRepositoryImpl @Inject constructor(
         dataAction = { bubbleLocalDataSource.addBubble(bubble.toData()) }
     )
 
-    override fun getClusteredBubbles(): Flow<DataResource<List<ClusteredBubbles>>> = flowDataResource(
-        dataAction = {
-            val bubblePosition = bubbleRemoteDataSource.getBubblePosition()
-            val bubbleGroupPosition = bubbleRemoteDataSource.getBubbleGroupPosition()
+    override fun getClusteredBubblesPosition(): Flow<DataResource<List<ClusteredBubblePosition>>> = flowDataResource(
+        dataAction = { bubbleRemoteDataSource.getBubblePosition() }
+    )
 
-            bubbleGroupPosition.map { group ->
-                val bubbles = bubblePosition.filter { it.group == group.groupId }
-                ClusteredBubblesEntity(
-                    groupId = group.groupId,
-                    centerX = group.x,
-                    centerY = group.y,
-                    radius = group.radius,
-                    bubbles = bubbles
-                )
-            }
-        }
+    override fun getClusters(): Flow<DataResource<List<Cluster>>> = flowDataResource(
+        dataAction = { bubbleRemoteDataSource.getBubbleGroupPosition() }
     )
 }

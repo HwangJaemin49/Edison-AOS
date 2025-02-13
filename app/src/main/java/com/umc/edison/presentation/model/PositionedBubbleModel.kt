@@ -1,0 +1,22 @@
+package com.umc.edison.presentation.model
+
+import androidx.compose.ui.geometry.Offset
+import com.umc.edison.domain.model.ClusteredBubblePosition
+
+data class PositionedBubbleModel(
+    val bubble: BubbleModel,
+    val position: Offset
+)
+
+fun ClusteredBubblePosition.toPresentation(): PositionedBubbleModel {
+    val scale = 400f
+
+    return PositionedBubbleModel(
+        bubble = bubble.toPresentation(),
+        position = Offset(x * scale, y * scale)
+    )
+}
+
+fun List<ClusteredBubblePosition>.toPresentation(): List<PositionedBubbleModel> {
+    return map { it.toPresentation() }
+}

@@ -1,9 +1,8 @@
 package com.umc.edison.domain.model
 
-data class ClusteredBubbles(
+data class Cluster(
     val groupId: Int,
     val centerX: Float,
     val centerY: Float,
     val radius: Float,
-    val bubbles: List<ClusteredBubblePosition>
 )

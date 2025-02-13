@@ -156,7 +156,7 @@ fun BubbleSpaceScreen(
             ) { page ->
                 selectedTabIndex = pagerState.currentPage
                 when (page) {
-                    0 -> SpaceTabScreen(navHostController)
+                    0 -> SpaceTabScreen()
                     1 -> LabelTabScreen(navHostController)
                 }
             }

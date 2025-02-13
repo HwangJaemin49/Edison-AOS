@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.storage
 
 import androidx.lifecycle.SavedStateHandle
+import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase

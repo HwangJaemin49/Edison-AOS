@@ -2,7 +2,8 @@ package com.umc.edison.domain.repository
 
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Bubble
-import com.umc.edison.domain.model.ClusteredBubbles
+import com.umc.edison.domain.model.ClusteredBubblePosition
+import com.umc.edison.domain.model.Cluster
 import kotlinx.coroutines.flow.Flow
 
 interface BubbleRepository {
@@ -19,5 +20,6 @@ interface BubbleRepository {
     fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>>
     fun addBubble(bubble: Bubble): Flow<DataResource<Bubble>>
 
-    fun getClusteredBubbles(): Flow<DataResource<List<ClusteredBubbles>>>
+    fun getClusteredBubblesPosition(): Flow<DataResource<List<ClusteredBubblePosition>>>
+    fun getClusters(): Flow<DataResource<List<Cluster>>>
 }

@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
+import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.UpdateBubbleUseCase
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
