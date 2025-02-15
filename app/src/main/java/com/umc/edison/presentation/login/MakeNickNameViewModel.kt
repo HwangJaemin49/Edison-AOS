@@ -8,9 +8,12 @@ import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import com.umc.edison.ui.navigation.NavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,6 +57,7 @@ class MakeNickNameViewModel @Inject constructor (
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
+                updateUserProfile(navController)
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -70,11 +74,16 @@ class MakeNickNameViewModel @Inject constructor (
         collectDataResource(
             flow = updateUserProfileUseCase(_uiState.value.user.toDomain()),
             onSuccess = {
-                _uiState.update { it.copy(toastMessage = "닉네임이 설정되었습니다.") }
-                buttonClicked(navController)
+                CoroutineScope(Dispatchers.Main).launch {
+                    _uiState.update { it.copy(toastMessage = "닉네임 설정 완료") }
+                    navController.navigate(NavRoute.IdentityTest.route)
+                }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                CoroutineScope(Dispatchers.Main).launch {
+                    _uiState.update { it.copy(toastMessage = "닉네임 설정 실패",error = error) }
+                    navController.navigate(NavRoute.IdentityTest.route)
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -83,10 +92,6 @@ class MakeNickNameViewModel @Inject constructor (
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
-    }
-
-    private fun buttonClicked(navController: NavHostController) {
-        navController.navigate(NavRoute.IdentityTest.route)
     }
 
 

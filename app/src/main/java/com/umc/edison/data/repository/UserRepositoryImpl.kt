@@ -37,14 +37,26 @@ class UserRepositoryImpl @Inject constructor(
         }
     )
 
-    override fun getInterestKeywordsByCategory(category: String): Flow<DataResource<Interest>> =
+    override fun getInterestKeywordsByCategory(interestCategory: InterestCategory): Flow<DataResource<Interest>> =
         flowDataResource(
-            dataAction = { userRemoteDataSource.getInterestKeywordsByCategory(category) }
+            dataAction = {
+                val categoryNumber = InterestCategoryMapper.entries.first {
+                    it.category == interestCategory
+                }.categoryNumber
+
+                userRemoteDataSource.getMyInterestResult(categoryNumber)
+            }
         )
 
-    override fun getIdentityKeywordsByCategory(category: String): Flow<DataResource<Identity>> =
+    override fun getIdentityKeywordsByCategory(identityCategory: IdentityCategory): Flow<DataResource<Identity>> =
         flowDataResource(
-            dataAction = { userRemoteDataSource.getIdentityKeywordsByCategory(category) }
+            dataAction = {
+                val categoryNumber = IdentityCategoryMapper.entries.first {
+                    it.category == identityCategory
+                }.categoryNumber
+
+                userRemoteDataSource.getMyIdentityResult(categoryNumber)
+            }
         )
 
 

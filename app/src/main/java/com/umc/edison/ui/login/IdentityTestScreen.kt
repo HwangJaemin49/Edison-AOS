@@ -39,6 +39,8 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.IntOffset
+import com.umc.edison.domain.model.IdentityCategory
+import com.umc.edison.ui.components.KeywordChip
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import kotlinx.coroutines.CoroutineScope
@@ -121,6 +123,7 @@ fun IdentityTestScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Identitytest1(
     navHostController: NavHostController,
@@ -128,44 +131,71 @@ fun Identitytest1(
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel()
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Bottom,
 
-        ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val keywordList = uiState.identity.options ?: emptyList()
 
-        Spacer(modifier = Modifier.weight(1f))
 
-        Text(
-            text = "나를 설명하는\n단어를 골라주세요!",
-            fontSize = 24.sp,
-            color = Gray800,
-            style = MaterialTheme.typography.displayLarge,
+
+    BaseContent(
+        uiState = uiState,
+        clearToastMessage = { viewModel.clearToastMessage() },
+    ) {
+        Column(
             modifier = Modifier
-                .offset(y = (-37).dp)
-        )
+                .fillMaxWidth()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Bottom,
 
-        Spacer(modifier = Modifier.height(24.dp))
+            ) {
 
-        Spacer(modifier = Modifier.weight(4f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        BasicFullButton(
-            text = "다음으로",
-            enabled = true,
-            modifier = Modifier,
-            onClick = {
+            Text(
+                text = "나를 설명하는\n단어를 골라주세요!",
+                fontSize = 24.sp,
+                color = Gray800,
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier
+                    .offset(y = (-37).dp)
+            )
 
-                coroutineScope.launch {
-                    if (pagerState.currentPage < 3) {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
+            Spacer(modifier = Modifier.height(24.dp))
+
+            FlowRow(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                uiState.identity.options.forEach { keyword ->
+                    KeywordChip(
+                        keyword = keyword.name,
+                        isSelected = uiState.identity.selectedKeywords.contains(keyword),
+                        onClick = { viewModel.toggleIdentityKeyword(keyword) }
+                    )
                 }
-            },
-            textStyle = TextStyle(fontSize = 16.sp)
-        )
+            }
 
+
+            Spacer(modifier = Modifier.weight(4f))
+
+            BasicFullButton(
+                text = "다음으로",
+                enabled = true,
+                modifier = Modifier,
+                onClick = {
+
+                    viewModel.setIdentityTestResult()
+
+                    coroutineScope.launch {
+                        if (pagerState.currentPage < 3) {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                    }
+                },
+                textStyle = TextStyle(fontSize = 16.sp)
+            )
+
+        }
     }
 }
 
