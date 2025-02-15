@@ -22,6 +22,7 @@ class BubbleGraphViewModel @Inject constructor(
             flow = getClusteredBubblesUseCase(),
             onSuccess = { clusteredBubbles ->
                 val edges = mutableListOf<EdgeDataModel>()
+                val bubbles = clusteredBubbles.sortedByDescending { it.bubble.date }
 
                 clusteredBubbles.forEach { bubblePosition ->
                     bubblePosition.bubble.linkedBubble?.let {
@@ -57,7 +58,7 @@ class BubbleGraphViewModel @Inject constructor(
 
                 _uiState.update {
                     it.copy(
-                        bubbles = clusteredBubbles.toPresentation(),
+                        bubbles = bubbles.toPresentation(),
                         edges = uniqueEdges
                     )
                 }
