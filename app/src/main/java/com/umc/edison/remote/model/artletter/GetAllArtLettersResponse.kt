@@ -13,7 +13,7 @@ data class GetAllArtLettersResponse(
 ) : RemoteMapper<ArtletterEntity> {
 
     override fun toData(): ArtletterEntity = ArtletterEntity(
-        id = id,
+        artletterId = id,
         title = title,
         thumbnail = thumbnail,
         likes = likes,
@@ -21,4 +21,4 @@ data class GetAllArtLettersResponse(
     )
 }
 
-fun List<GetAllArtLettersResponse>.toData(): List<ArtletterEntity> = map { it.toData() }
+//fun List<GetAllArtLettersResponse>.toData(): List<ArtletterEntity> = map { it.toData() }

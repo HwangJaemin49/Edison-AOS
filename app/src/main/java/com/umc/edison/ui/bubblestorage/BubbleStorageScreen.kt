@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.storage.BubbleStorageMode
@@ -49,6 +50,9 @@ fun BubbleStorageScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isBlur = uiState.bubbleStorageMode != BubbleStorageMode.NONE
+    val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
+    val currentRoute = currentBackStackEntry?.destination?.route
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
@@ -102,12 +106,6 @@ fun BubbleStorageScreen(
                 )
             }
         },
-        topBar = {
-            MyEdisonNavBar(
-                onBubbleClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) },
-                onMyEdisonClicked = { navHostController.navigate(NavRoute.MyEdison.route) }
-            )
-        }
     ) {
         var onBubbleClick: (BubbleModel) -> Unit = {}
         var onBubbleLongClick: (BubbleModel) -> Unit = {}
@@ -133,7 +131,7 @@ fun BubbleStorageScreen(
             }
         }
 
-        Column(
+        Box(
             modifier = Modifier.clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
@@ -153,7 +151,6 @@ fun BubbleStorageScreen(
                 )
             }
 
-
             BubblesLayout(
                 bubbles = uiState.label?.bubbles ?: uiState.bubbles,
                 onBubbleClick = onBubbleClick,
@@ -161,7 +158,12 @@ fun BubbleStorageScreen(
                 isBlur = isBlur,
                 selectedBubble = uiState.selectedBubbles
             )
-        }
+                MyEdisonNavBar(
+                    onBubbleClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) },
+                    onMyEdisonClicked = { navHostController.navigate(NavRoute.MyEdison.route) },
+                    onSearchQuerySubmit = { query -> viewModel.fetchSearchBubbles(query) }
+                )
+            }
 
         if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
             val bubble = uiState.selectedBubbles.first()

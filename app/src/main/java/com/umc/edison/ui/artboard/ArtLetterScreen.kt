@@ -1,7 +1,6 @@
 package com.umc.edison.ui.artboard
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -82,7 +81,7 @@ fun ArtLetterScreen(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
         ) {
-            EditorPickSection(viewModel)
+            //EditorPickSection(viewModel)
             ArtboardSection(navHostController, uiState, viewModel)
         }
     }
@@ -145,104 +144,104 @@ fun TopBar(
     }
 }
 
-@Composable
-fun EditorPickSection(viewModel: ArtLetterViewModel) {
-    val editorPickState by viewModel.uiEditorPickState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.postEditorPick(listOf(1, 2, 3)) // ✅ 예시 ID로 API 호출
-    }
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Editor’s Pick",
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            style = MaterialTheme.typography.displayMedium,
-            color = Gray800
-        )
-
-        when {
-            editorPickState.isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = Gray800)
-                }
-            }
-
-            editorPickState.artletters.isEmpty() -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .background(Gray300),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "데이터가 없습니다.", color = Gray800)
-                }
-            }
-
-            else -> {
-                val pagerState = rememberPagerState(pageCount = { editorPickState.artletters.size })
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                ) {
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize()
-                    ) { page ->
-                        val artLetter = editorPickState.artletters[page]
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Gray300),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            AsyncImage(
-                                model = artLetter.thumbnail,
-                                contentDescription = "Banner Image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                    }
-
-                    // 인디케이터
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 8.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        repeat(editorPickState.artletters.size) { index ->
-                            Spacer(
-                                modifier = Modifier
-                                    .padding(2.dp)
-                                    .size(8.dp)
-                                    .clip(CircleShape)
-                                    .background(if (pagerState.currentPage == index) Gray800 else White000)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun EditorPickSection(viewModel: ArtLetterViewModel) {
+//    val editorPickState by viewModel.uiEditorPickState.collectAsState()
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.postEditorPick(listOf(1)) // ID로 API 호출
+//    }
+//
+//    Column(modifier = Modifier.fillMaxWidth()) {
+//        Text(
+//            text = "Editor’s Pick",
+//            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+//            style = MaterialTheme.typography.displayMedium,
+//            color = Gray800
+//        )
+//
+//        when {
+//            editorPickState.isLoading -> {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(180.dp),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    CircularProgressIndicator(color = Gray800)
+//                }
+//            }
+//
+//            editorPickState.artletters.isEmpty() -> {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(180.dp)
+//                        .background(Gray300),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Text(text = "데이터가 없습니다.", color = Gray800)
+//                }
+//            }
+//
+//            else -> {
+//                val pagerState = rememberPagerState(pageCount = { editorPickState.artletters.size })
+//
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(180.dp)
+//                ) {
+//                    HorizontalPager(
+//                        state = pagerState,
+//                        modifier = Modifier.fillMaxSize()
+//                    ) { page ->
+//                        val artLetter = editorPickState.artletters[page]
+//
+//                        Box(
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .background(Gray300),
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            AsyncImage(
+//                                model = artLetter.thumbnail,
+//                                contentDescription = "Banner Image",
+//                                modifier = Modifier.fillMaxSize(),
+//                                contentScale = ContentScale.Crop
+//                            )
+//                        }
+//                    }
+//
+//                    // 인디케이터
+//                    Row(
+//                        modifier = Modifier
+//                            .align(Alignment.BottomCenter)
+//                            .padding(bottom = 8.dp),
+//                        horizontalArrangement = Arrangement.Center
+//                    ) {
+//                        repeat(editorPickState.artletters.size) { index ->
+//                            Spacer(
+//                                modifier = Modifier
+//                                    .padding(2.dp)
+//                                    .size(8.dp)
+//                                    .clip(CircleShape)
+//                                    .background(if (pagerState.currentPage == index) Gray800 else White000)
+//                            )
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 @Composable
 fun ArtboardSection(
     navHostController: NavHostController,
     uiState: ArtLetterState,
-    viewModel: ArtLetterViewModel
+    viewModel: ArtLetterViewModel,
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -254,7 +253,7 @@ fun ArtboardSection(
             color = Gray800
         )
 
-        uiState.artletters?.forEach { artLetter ->
+        uiState.artletters.forEach { artLetter ->
             ArtBoardCard(
                 navHostController = navHostController,
                 uiState = artLetter,
@@ -273,7 +272,8 @@ fun ArtBoardCard(
     viewModel: ArtLetterViewModel
 ) {
     val scrapStatus by viewModel.scrapStatus.collectAsState()
-    val isBookmarked = scrapStatus[uiState.id] ?: false
+    val isBookmarked = scrapStatus[uiState.artletterId] ?: false
+
 
     Box(
         modifier = modifier
@@ -281,7 +281,7 @@ fun ArtBoardCard(
             .clickable { navHostController.navigate(NavRoute.ArtLetterDetail.route) }
             .clip(RoundedCornerShape(10.dp))
     ) {
-        AsyncImage( // API에서 받은 썸네일 이미지 적용
+        AsyncImage(
             model = uiState.thumbnail,
             contentDescription = "Thumbnail Image",
             modifier = Modifier.fillMaxSize(),
@@ -297,11 +297,12 @@ fun ArtBoardCard(
                 .padding(8.dp)
                 .size(24.dp)
                 .clickable {
-                    viewModel.toggleScrap(uiState.id) // 북마크 요청
+                    Log.d("ArtBoardCard", "Bookmark clicked: ${uiState.artletterId}") // 북마크 클릭 로그 추가
+                    viewModel.toggleScrap(uiState.artletterId) // 북마크 요청
                 }
         )
         Text(
-            text = uiState.title, // API에서 받은 제목 적용
+            text = uiState.title,
             style = MaterialTheme.typography.headlineLarge,
             color = Color.White,
             modifier = Modifier
@@ -310,6 +311,7 @@ fun ArtBoardCard(
         )
     }
 }
+
 
 @Composable
 private fun ArtLetterPopup(

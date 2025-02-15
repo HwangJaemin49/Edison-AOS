@@ -12,7 +12,9 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
     private val artLetterApiService: ArtLetterApiService
 ) : ArtLetterRemoteDataSource {
     override suspend fun getAllArtLetters(): List<ArtletterEntity> {
-        return artLetterApiService.getAllArtLetters().data.toData()
+        val response = artLetterApiService.getAllArtLetters().data
+
+        return response.map { it.toData() }
     }
 
     override suspend fun getSortedArtLetters(sortBy: String): List<ArtletterEntity> {

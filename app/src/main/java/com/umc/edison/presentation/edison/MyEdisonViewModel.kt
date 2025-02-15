@@ -24,17 +24,11 @@ class  MyEdisonViewModel @Inject constructor (
         fetchBubbles()
     }
 
-    fun isBubbleExist(): Boolean {
-        return _uiState.value.bubbles.isNotEmpty()
-    }
-
     private fun fetchBubbles() {
         collectDataResource(
             flow = getAllBubblesUseCase(),
             onSuccess = { bubbles ->
-                _uiState.update { it.copy(bubbles = bubbles.toPresentation().filter {
-                        bubble -> bubble.id != _uiState.value.bubble.id
-                }) }
+                _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

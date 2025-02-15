@@ -22,7 +22,7 @@ data class ArtLetterDetailModel(
 ) {
     companion object {
         val DEFAULT = ArtLetterDetailModel(
-            artletterId = 0,
+            artletterId = 1,
             title = "제목",
             content = "본문",
             category = "카테고리",

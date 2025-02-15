@@ -13,7 +13,7 @@ data class GetSortedArtLettersResponse(
 ) : RemoteMapper<ArtletterEntity> {
 
     override fun toData(): ArtletterEntity = ArtletterEntity(
-        id = id,
+        artletterId = id,
         title = title,
         thumbnail = thumbnail,
         likes = likes,

@@ -15,13 +15,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.R
 import com.umc.edison.ui.theme.Gray300
@@ -31,6 +32,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Gray500
 
@@ -38,12 +41,19 @@ import com.umc.edison.ui.theme.Gray500
 fun MyEdisonNavBar(
     onBubbleClicked: () -> Unit,
     onMyEdisonClicked: () -> Unit,
+    onSearchQuerySubmit: (String) -> Unit
 ) {
     var isSearchActive by remember { mutableStateOf(false) } // 검색창 활성화 여부
+    var text by remember { mutableStateOf("") }
+
+    val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
+    val currentRoute = currentBackStackEntry?.destination?.route
 
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -67,7 +77,9 @@ fun MyEdisonNavBar(
                     var text by remember { mutableStateOf("") }
                     BasicTextField(
                         value = text,
-                        onValueChange = { text = it },
+                        onValueChange = {
+                            text = it
+                        },
                         singleLine = true,
                         textStyle = TextStyle(
                             fontSize = 14.sp,
@@ -83,13 +95,23 @@ fun MyEdisonNavBar(
                                         color = Color.White,
                                         shape = RoundedCornerShape(30.dp)
                                     )
-                                    .padding(horizontal = 8.dp) // 내부 여백 설정
+                                    .padding(horizontal = 8.dp)
                             ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_topbar_search),
-                                    contentDescription = "Search Icon",
-                                )
-                                Spacer(modifier = Modifier.width(8.dp)) // 아이콘과 텍스트 간격
+                                IconButton(
+                                    onClick = {
+                                        if (currentRoute == NavRoute.MyEdison.route) {
+                                            navController.navigate(NavRoute.BubbleStorage.route)
+                                        }
+                                        onSearchQuerySubmit(text) }, // 검색 실행
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_topbar_search),
+                                        contentDescription = "Search Icon",
+                                        tint = Color.Unspecified
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.CenterStart
@@ -97,7 +119,9 @@ fun MyEdisonNavBar(
                                     if (text.isEmpty()) {
                                         Text(
                                             text = "검색",
-                                            color = Gray500
+                                            color = Gray500,
+                                            style = MaterialTheme.typography.bodySmall
+
                                         )
                                     }
                                     innerTextField()

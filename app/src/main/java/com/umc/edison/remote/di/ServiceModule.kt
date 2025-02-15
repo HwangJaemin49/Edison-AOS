@@ -53,7 +53,9 @@ internal object ServiceModule {
         @NetworkModule.MainRetrofit retrofit: Retrofit
     ): ArtLetterApiService = retrofit.create(ArtLetterApiService::class.java)
 
+    @Provides
+    @Singleton
     fun provideLoginApiService(
-        @NetworkModule.MainRetrofit retrofit: Retrofit
+        @NetworkModule.RefreshRetrofit retrofit: Retrofit
     ): LoginApiService = retrofit.create(LoginApiService::class.java)
 }

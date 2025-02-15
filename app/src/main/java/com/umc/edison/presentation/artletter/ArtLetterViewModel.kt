@@ -1,6 +1,8 @@
 package com.umc.edison.presentation.artletter
 
 
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.artletter.GetAllArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.GetSortedArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.PostEditorPickUseCase
@@ -26,6 +28,7 @@ class ArtLetterViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ArtLetterState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
+
     private val _uiEditorPickState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiEditorPickState = _uiEditorPickState.asStateFlow()
 
@@ -37,18 +40,27 @@ class ArtLetterViewModel @Inject constructor(
     }
 
     private fun fetchAllArtLetters() {
+        Log.d("ArtLetterViewModel", "fetchAllArtLetters() 호출됨")
+
         collectDataResource(
             flow = getAllArtLettersUseCase(),
             onSuccess = { artletters ->
+                Log.d("ArtLetterViewModel", "성공: ${artletters.size}개의 아트레터를 가져옴")
+                if (artletters.isNotEmpty()) {
+                    Log.d("ArtLetterViewModel", "첫 번째 아트레터 제목: ${artletters.first().title}")
+                }
+
                 _uiState.update { it.copy(artletters = artletters.toPresentation()) }
             },
             onError = { error ->
+                Log.e("ArtLetterViewModel", "오류 발생: ${error.message}", error)
                 _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
+                Log.d("ArtLetterViewModel", "fetchAllArtLetters() 완료됨")
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
@@ -91,6 +103,7 @@ class ArtLetterViewModel @Inject constructor(
     }
 
     fun toggleScrap(artLetterId: Int) {
+        Log.d("ArtLetterViewModel", "toggleScrap called with id: $artLetterId")
         collectDataResource(
             flow = scrapArtLettersUseCase(artLetterId),
             onSuccess = { response ->

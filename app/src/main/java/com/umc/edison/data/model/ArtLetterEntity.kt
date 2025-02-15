@@ -1,17 +1,19 @@
 package com.umc.edison.data.model
 
+import android.util.Log
 import com.umc.edison.domain.model.ArtLetter
 
 data class ArtletterEntity(
-    val id: Int,
+    val artletterId: Int,
     val title: String,
-    val thumbnail: String,
+    val thumbnail: String?,
     val likes: Int,
     val scraps: Int,
 ) : DataMapper<ArtLetter> {
     override fun toDomain(): ArtLetter {
+        Log.d("Mapping", "ArtLetterEntity 내 DataMapper 변환 - id: $artletterId, title: $title")
         return ArtLetter(
-            id = id,
+            artletterId = artletterId,
             title = title,
             thumbnail = thumbnail,
             likes = likes,
@@ -21,8 +23,9 @@ data class ArtletterEntity(
 }
 
 fun ArtLetter.toData(): ArtletterEntity {
+    Log.d("Mapping", "ArtLetterEntity ArtLetter.toData 변환 - id: $artletterId, title: $title")
     return ArtletterEntity(
-        id = id,
+        artletterId = artletterId,
         title = title,
         thumbnail = thumbnail,
         likes = likes,

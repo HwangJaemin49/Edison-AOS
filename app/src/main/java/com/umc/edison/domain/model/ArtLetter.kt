@@ -1,9 +1,9 @@
 package com.umc.edison.domain.model
 
 data class ArtLetter(
-    val id: Int,
+    val artletterId: Int,
     val title: String,
-    val thumbnail: String,
+    val thumbnail: String?,
     val likes: Int,
     val scraps: Int,
 )

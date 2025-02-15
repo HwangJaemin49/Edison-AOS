@@ -11,13 +11,14 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ArtLetterApiService {
     @GET("/artletters")
     suspend fun getAllArtLetters(): ResponseWithPagination<GetAllArtLettersResponse>
 
     @GET("/artletters/sorted")
-    suspend fun getSortedArtLetters(@Body sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
+    suspend fun getSortedArtLetters(@Query("sortBy") sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
 
     @POST("/artletters/{artletterId}/scrap")
     suspend fun toggleScrap(@Path("artletterId") artletterId: Int): ScrapArtLettersResult

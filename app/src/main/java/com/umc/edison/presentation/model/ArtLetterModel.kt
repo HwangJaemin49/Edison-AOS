@@ -3,17 +3,17 @@ package com.umc.edison.presentation.model
 import com.umc.edison.domain.model.ArtLetter
 
 data class ArtLetterModel(
-    val id: Int,
+    val artletterId: Int,
     val title: String,
-    val thumbnail: String,
+    val thumbnail: String?,
     val likes: Int,
     val scraps: Int,
 ) {
     companion object {
         val DEFAULT = ArtLetterModel(
-            id = 0,
-            title = "제목",
-            thumbnail = "", // Default 썸네일?
+            artletterId = 1,
+            title = "",
+            thumbnail = "",
             likes = 0,
             scraps = 0,
         )
@@ -21,7 +21,7 @@ data class ArtLetterModel(
 
     fun toDomain(): ArtLetter {
         return ArtLetter(
-            id = id,
+            artletterId = artletterId,
             title = title,
             thumbnail = thumbnail,
             likes = likes,
@@ -32,7 +32,7 @@ data class ArtLetterModel(
 
 fun ArtLetter.toPresentation(): ArtLetterModel {
     return ArtLetterModel(
-        id = id,
+        artletterId = artletterId,
         title = title,
         thumbnail = thumbnail,
         likes = likes,
