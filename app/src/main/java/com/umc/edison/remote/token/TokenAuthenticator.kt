@@ -21,13 +21,14 @@ class TokenAuthenticator @Inject constructor(
 
         if (errorResponse?.code == "LOGIN4004") {
             val refreshToken = tokenManager.loadRefreshToken()
+            val accessToken = tokenManager.loadAccessToken()
 
             if (refreshToken.isNullOrEmpty()) {
                 tokenManager.deleteToken()
                 return null
             }
 
-            val newTokenResponse = refreshTokenApiService.refreshToken("Bearer $refreshToken").execute()
+            val newTokenResponse = refreshTokenApiService.refreshToken(refreshToken, "Bearer $accessToken").execute()
             val newToken = newTokenResponse.body()?.data?.accessToken ?: return null
 
             tokenManager.setToken(newToken)

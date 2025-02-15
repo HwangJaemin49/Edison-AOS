@@ -51,9 +51,8 @@ object NetworkModule {
     @Singleton
     fun provideTokenAuthenticator(
         tokenManager: TokenManager,
-        @RefreshRetrofit retrofit: Retrofit
+        refreshTokenApiService: RefreshTokenApiService
     ): TokenAuthenticator {
-        val refreshTokenApiService = retrofit.create(RefreshTokenApiService::class.java)
         return TokenAuthenticator(tokenManager, refreshTokenApiService)
     }
 
