@@ -200,11 +200,6 @@ class IdentityTestViewModel @Inject constructor (
             },
             onError = { error ->
                 _uiState.update { it.copy(toastMessage = "$error", error = error) }
-                coroutineScope.launch {
-                    if (pagerState.currentPage < 3) {
-                        pagerState.scrollToPage(pagerState.currentPage + 1)
-                    }
-                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
