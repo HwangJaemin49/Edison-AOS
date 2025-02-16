@@ -237,9 +237,13 @@ private fun TextContentBubble(
     isPreview: Boolean
 ) {
     Box(
-        modifier = Modifier
-            .width(bubbleSize.textBoxWidth)
-            .wrapContentHeight(),
+        modifier = if (bubbleSize == BubbleType.Bubble300)
+            Modifier
+                .size(bubbleSize.textBoxWidth, 96.5.dp)
+        else
+            Modifier
+                .width(bubbleSize.textBoxWidth)
+                .wrapContentHeight(),
         contentAlignment = Alignment.Center
     ) {
         // 미리보기일 때는 제목 or 본문 - 스타일 적용 안 됨
