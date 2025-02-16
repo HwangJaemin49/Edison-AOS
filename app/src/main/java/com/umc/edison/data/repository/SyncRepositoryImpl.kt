@@ -34,7 +34,7 @@ class SyncRepositoryImpl @Inject constructor(
                     } else {
                         throw Exception("Label with id: ${label.id} is not synced")
                     }
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     Log.e("SyncRepositoryImpl", "Failed to sync label with id: ${label.id}", e)
                     throw e
                 }
@@ -60,7 +60,7 @@ class SyncRepositoryImpl @Inject constructor(
                         throw Exception("Bubble with id: ${bubble.id} is not synced")
                     }
 
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     Log.e("SyncRepositoryImpl", "Failed to sync bubble with id: ${bubble.id}", e)
                     throw e
                 }

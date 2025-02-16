@@ -39,7 +39,11 @@ class BubbleSpaceViewModel @Inject constructor(
 
     private fun syncBubbles() {
         viewModelScope.launch {
-            syncDataUseCase()
+            try {
+                syncDataUseCase()
+            } catch (e: Throwable) {
+                _uiState.update { it.copy(error = e, isLoading = false) }
+            }
         }
     }
 
