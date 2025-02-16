@@ -150,7 +150,7 @@ fun Bubble(
 @Composable
 fun BubblePreview(
     onClick: () -> Unit,
-    onLongClick: () -> Unit,
+    onLongClick: () -> Unit = {},
     size: BubbleType.BubbleSize,
     bubble: BubbleModel
 ) {

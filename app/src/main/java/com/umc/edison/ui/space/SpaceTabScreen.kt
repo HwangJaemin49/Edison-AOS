@@ -4,10 +4,8 @@ import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
-import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -37,6 +35,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.space.BubbleGraphViewModel
 import com.umc.edison.ui.components.BubblePreview
 import com.umc.edison.ui.components.calculateBubblePreviewSize
@@ -49,17 +48,20 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun SpaceTabScreen() {
+fun SpaceTabScreen(
+    showBubble: (Boolean, BubbleModel) -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        BubbleGraphScreen()
+        BubbleGraphScreen(showBubble)
     }
 }
 
 @Composable
 fun BubbleGraphScreen(
+    showBubble: (Boolean, BubbleModel) -> Unit,
     viewModel: BubbleGraphViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -71,7 +73,6 @@ fun BubbleGraphScreen(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
                     scale = (scale * zoom).coerceIn(0.5f, 3f)
@@ -216,9 +217,8 @@ fun BubbleGraphScreen(
                         bubble = positionedBubble.bubble,
                         size = previewSize,
                         onClick = {
-                            Log.d("BubbleGraphScreen", "Bubble Clicked: ${positionedBubble.bubble.id}")
+                            showBubble(true, positionedBubble.bubble)
                         },
-                        onLongClick = {}
                     )
                 }
             }
