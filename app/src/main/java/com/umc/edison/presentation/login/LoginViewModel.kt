@@ -20,14 +20,19 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LoginState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-
     fun signInWithGoogle(context: Context, navController: NavHostController) {
         googleLoginHelper.signInWithGoogle(
             context = context,
             onSuccess = { user->
                 CoroutineScope(Dispatchers.Main).launch {
                     _uiState.update { it.copy(toastMessage = "로그인 성공!", user = user) }
-                    navController.navigate(NavRoute.MakeNickName.route)
+
+                    if(user.isNewMember){
+                        navController.navigate(NavRoute.TermsOfUse.route)
+                    }else{
+                        navController.navigate(NavRoute.MyEdison.route)
+                    }
+
                 }
             },
             onFailure = { message ->
@@ -39,6 +44,8 @@ class LoginViewModel @Inject constructor(
             }
         )
     }
+
+
     override fun clearToastMessage() {
         _uiState.update { it.copy(toastMessage = null) }
     }

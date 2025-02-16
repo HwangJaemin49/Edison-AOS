@@ -4,4 +4,5 @@ data class User(
     val nickname: String? = null,
     val profileImage: String? = null,
     val email: String,
+    val isNewMember: Boolean
 )

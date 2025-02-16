@@ -109,7 +109,8 @@ class UserRemoteDataSourceImpl @Inject constructor(
         return UserEntity(
             email = response.data.email,
             nickname = null,
-            profileImage = null
+            profileImage = null,
+            isNewMember = response.data.isNewMember
         )
     }
 

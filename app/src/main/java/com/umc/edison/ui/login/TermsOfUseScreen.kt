@@ -44,7 +44,6 @@ fun TermsOfUseScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: TermsOfUseViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {

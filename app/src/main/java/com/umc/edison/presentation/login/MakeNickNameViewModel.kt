@@ -3,7 +3,6 @@ package com.umc.edison.presentation.login
 import androidx.navigation.NavHostController
 import com.umc.edison.domain.usecase.login.MakeNickNameUseCase
 import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
-import com.umc.edison.domain.usecase.mypage.UpdateUserProfileUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import com.umc.edison.ui.navigation.NavRoute

@@ -170,7 +170,7 @@ class IdentityTestViewModel @Inject constructor (
             onSuccess = {
                 _uiState.update { it.copy(interest = it.interest.copy(options = it.interest.selectedKeywords)) }
                 CoroutineScope(Dispatchers.Main).launch {
-                    navController.navigate(NavRoute.TermsOfUse.route)
+                    navController.navigate(NavRoute.MyEdison.route)
                 }
             },
             onError = { error ->
@@ -199,7 +199,12 @@ class IdentityTestViewModel @Inject constructor (
 
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update { it.copy(toastMessage = "$error", error = error) }
+                coroutineScope.launch {
+                    if (pagerState.currentPage < 3) {
+                        pagerState.scrollToPage(pagerState.currentPage + 1)
+                    }
+                }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }

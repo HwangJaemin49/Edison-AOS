@@ -57,6 +57,8 @@ fun IdentityTestScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val scrollState = rememberScrollState()
+
     val tabs = listOf("아이덴티티 테스트1", "아이덴티티 테스트2", "아이덴티티 테스트3", "아이덴티티 테스트4")
     var selectedTabIndex by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState(
@@ -87,6 +89,7 @@ fun IdentityTestScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
+                .verticalScroll(scrollState)
         ) {
             Spacer(modifier = Modifier.height(33.dp))
 
@@ -163,6 +166,7 @@ fun Identitytest1(
             FlowRow(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom=48.dp)
 
             ) {
                 uiState.identity.options.forEach { keyword ->
@@ -228,6 +232,7 @@ fun Identitytest2(
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom=48.dp)
         ) {
             uiState.identity.options.forEach { keyword ->
                 KeywordChip(
@@ -251,6 +256,7 @@ fun Identitytest2(
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Identitytest3(
     pagerState: PagerState,
@@ -259,15 +265,14 @@ fun Identitytest3(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp)
-            .verticalScroll(scrollState),
+            .padding(24.dp),
         verticalArrangement = Arrangement.Top,
 
         ) {
+
 
         Text(
             text = uiState.identity.question,
@@ -276,9 +281,11 @@ fun Identitytest3(
             modifier = Modifier.padding(top=30.dp, bottom=48.dp)
         )
 
-        Column(
+
+        FlowRow(
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(bottom=24.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom=48.dp)
         ) {
             uiState.identity.options.forEach { keyword ->
                 KeywordChip(
@@ -295,6 +302,7 @@ fun Identitytest3(
             text = "다음으로",
             enabled = true,
             onClick = {
+
                 viewModel.setIdentityTestResult(pagerState, coroutineScope)
             },
         )
@@ -338,6 +346,7 @@ fun Identitytest4(
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom=48.dp)
         ) {
             uiState.interest.options.forEach { keyword ->
                 KeywordChip(
