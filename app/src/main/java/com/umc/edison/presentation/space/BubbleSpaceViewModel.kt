@@ -15,8 +15,21 @@ class BubbleSpaceViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(BubbleSpaceState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
+
+    fun updateBubbleSpaceMode(mode: BubbleSpaceMode) {
+        _uiState.update { it.copy(mode = mode) }
+    }
+
+    fun updateSelectedTabIndex(index: Int) {
+        _uiState.update { it.copy(selectedTabIndex = index) }
+    }
+
     fun selectBubble(bubble: BubbleModel?) {
         _uiState.update { it.copy(selectedBubble = bubble) }
+    }
+
+    fun searchBubbles(query: String) {
+        // 검색 USE CASE 호출
     }
 
     override fun clearToastMessage() {

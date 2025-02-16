@@ -21,9 +21,9 @@ import com.umc.edison.ui.theme.White000
 fun BubblesLayout(
     bubbles: List<BubbleModel>,
     onBubbleClick: (BubbleModel) -> Unit,
-    onBubbleLongClick: (BubbleModel) -> Unit,
+    onBubbleLongClick: (BubbleModel) -> Unit = {},
     isBlur: Boolean = false,
-    selectedBubble: List<BubbleModel>,
+    selectedBubble: List<BubbleModel> = emptyList(),
 ) {
     val bubbleOffsets = remember { mutableStateMapOf<BubbleModel, Dp>() }
 
