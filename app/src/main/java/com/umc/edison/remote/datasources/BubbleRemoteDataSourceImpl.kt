@@ -4,11 +4,10 @@ import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.PositionedBubbleEntity
-import com.umc.edison.data.model.PositionedGroupEntity
 import com.umc.edison.remote.api.BubbleSpaceApiService
 import com.umc.edison.remote.api.MyPageApiService
 import com.umc.edison.remote.api.SyncApiService
-import com.umc.edison.remote.model.bubble_space.GetBubblePositionResponse
+import com.umc.edison.remote.model.space.GetBubblePositionResponse
 import com.umc.edison.remote.model.mypage.GetDeletedBubbleListResponse
 import com.umc.edison.remote.model.sync.toSyncBubbleRequest
 import javax.inject.Inject
@@ -69,24 +68,6 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
         }
 
         return result
-    }
-
-    override suspend fun getBubbleGroupPosition(): List<PositionedGroupEntity> {
-        return listOf(
-            PositionedGroupEntity(
-                groupId = 1,
-                x = 0.0f,
-                y = 0.0f,
-                radius = 2.1213202f
-            ),
-            PositionedGroupEntity(
-                groupId = 2,
-                x = 0.0f,
-                y = 0.5f,
-                radius = 1.118034f
-            )
-        )
-//        return bubbleSpaceApiService.getBubbleGroupPosition().data.map { it.toData() }
     }
 
     override suspend fun syncBubble(bubble: BubbleEntity): BubbleEntity {

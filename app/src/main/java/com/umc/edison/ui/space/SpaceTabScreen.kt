@@ -1,6 +1,9 @@
 package com.umc.edison.ui.space
 
+import android.graphics.BlurMaskFilter
+import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Shader
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
@@ -24,6 +27,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -35,10 +40,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.umc.edison.presentation.space.BubbleGraphViewModel
 import com.umc.edison.ui.components.BubblePreview
 import com.umc.edison.ui.components.calculateBubblePreviewSize
+import com.umc.edison.ui.components.extractPlainText
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 @Composable
 fun SpaceTabScreen() {
@@ -95,6 +103,26 @@ fun BubbleGraphScreen(
                         transformOrigin = TransformOrigin(0f, 0f)
                     )
             ) {
+                // 클러스터 구름 그리기
+                uiState.clusters.forEach { cluster ->
+                    if (cluster.colors.size <= 2) {
+                        drawGradientBlurCircle(
+                            center = cluster.position,
+                            radius = cluster.radius,
+                            colors = cluster.colors,
+                            blurRadius = 100f,
+                        )
+                    } else {
+                        drawOverlappingBlurCircles(
+                            center = cluster.position,
+                            bigRadius = cluster.radius,
+                            colors = cluster.colors,
+                            blurRadius = 100f,
+                        )
+                    }
+                }
+
+                // 연결선 그리기
                 uiState.edges.forEach { edge ->
                     val start = uiState.bubbles.find { it.bubble.id == edge.startBubbleId }?.position
                         ?: Offset.Zero
@@ -102,6 +130,8 @@ fun BubbleGraphScreen(
                         ?: Offset.Zero
                     drawLine(color = Gray300, start = start, end = end, strokeWidth = 1.dp.toPx())
                 }
+
+                // 버블 점 그리기
                 val radius = 12f
                 uiState.bubbles.forEach { positionedBubble ->
                     val colors: List<Color> = positionedBubble.bubble.labels.map { it.color }
@@ -123,15 +153,13 @@ fun BubbleGraphScreen(
                         )
                     }
                     drawContext.canvas.nativeCanvas.drawText(
-                        positionedBubble.bubble.title
-                            ?: positionedBubble.bubble.contentBlocks.firstOrNull()?.content?.take(10)
-                            ?: "No Contents",
+                        extractPlainText(positionedBubble.bubble).first.take(10).ifEmpty { "내용 없음" },
                         positionedBubble.position.x,
                         positionedBubble.position.y + radius.dp.toPx() + 10.dp.toPx(),
                         Paint().apply {
                             color = Gray800.toArgb()
                             textSize = 35f
-                            textAlign = Paint.Align.CENTER
+                            textAlign = android.graphics.Paint.Align.CENTER
                         }
                     )
                 }
@@ -141,6 +169,25 @@ fun BubbleGraphScreen(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
+                // 클러스터 구름 그리기
+                uiState.clusters.forEach { cluster ->
+                    if (cluster.colors.size <= 2) {
+                        drawGradientBlurCircle(
+                            center = cluster.position * scale + offset,
+                            radius = cluster.radius * scale,
+                            colors = cluster.colors,
+                            blurRadius = 100f,
+                        )
+                    } else {
+                        drawOverlappingBlurCircles(
+                            center = cluster.position * scale + offset,
+                            bigRadius = cluster.radius * scale,
+                            colors = cluster.colors,
+                            blurRadius = 100f,
+                        )
+                    }
+                }
+
                 uiState.edges.forEach { edge ->
                     val startBubble = uiState.bubbles.find { it.bubble.id == edge.startBubbleId }
                     val endBubble = uiState.bubbles.find { it.bubble.id == edge.endBubbleId }
@@ -179,4 +226,73 @@ fun BubbleGraphScreen(
     }
 }
 
+private fun DrawScope.drawGradientBlurCircle(
+    center: Offset,
+    radius: Float,
+    colors: List<Color>,
+    blurRadius: Float,
+) {
+    drawIntoCanvas { canvas ->
+        val paint = Paint().apply {
+            isAntiAlias = true
+            when (colors.size) {
+                1 -> {
+                    // 단일 색상
+                    shader = LinearGradient(
+                        center.x,
+                        center.y - radius,
+                        center.x,
+                        center.y + radius,
+                        intArrayOf(colors[0].copy(alpha = 0.6f).toArgb(), colors[0].copy(alpha = 0.6f).toArgb()),
+                        floatArrayOf(0f, 1f),
+                        Shader.TileMode.CLAMP
+                    )
+                }
 
+                else ->
+                    shader = LinearGradient(
+                        center.x,
+                        center.y - radius,
+                        center.x,
+                        center.y + radius,
+                        colors.map { it.copy(alpha = 0.6f).toArgb() }.toIntArray(),
+                        null,
+                        Shader.TileMode.CLAMP
+                    )
+            }
+            maskFilter = BlurMaskFilter(
+                blurRadius,
+                BlurMaskFilter.Blur.NORMAL
+            )
+        }
+
+        canvas.nativeCanvas.drawCircle(center.x, center.y, radius, paint)
+    }
+}
+
+private fun DrawScope.drawOverlappingBlurCircles(
+    center: Offset,
+    bigRadius: Float,
+    colors: List<Color>,
+    blurRadius: Float,
+) {
+    // 작은 원의 반지름과 중심으로부터의 거리 (비율은 디자인에 맞게 조정 가능)
+    val smallCircleRadius = bigRadius * 0.6f
+    val distanceFromCenter = bigRadius * 0.5f
+    val count = colors.size
+    for (i in 0 until count) {
+        val angleDegrees = i * (360f / count)
+        val angleRadians = Math.toRadians(angleDegrees.toDouble())
+        val dx = (distanceFromCenter * cos(angleRadians)).toFloat()
+        val dy = (distanceFromCenter * sin(angleRadians)).toFloat()
+        val smallCenter = center + Offset(dx, dy)
+
+        // 각 작은 원은 단일 색상으로 drawGradientBlurCircle을 호출
+        drawGradientBlurCircle(
+            center = smallCenter,
+            radius = smallCircleRadius,
+            colors = listOf(colors[i]),
+            blurRadius = blurRadius
+        )
+    }
+}

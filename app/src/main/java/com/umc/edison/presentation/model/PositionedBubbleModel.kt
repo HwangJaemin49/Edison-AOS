@@ -5,15 +5,17 @@ import com.umc.edison.domain.model.ClusteredBubblePosition
 
 data class PositionedBubbleModel(
     val bubble: BubbleModel,
-    val position: Offset
+    val position: Offset,
+    val groupId: Int
 )
 
 fun ClusteredBubblePosition.toPresentation(): PositionedBubbleModel {
-    val scale = 400f
+    val scale = 700f
 
     return PositionedBubbleModel(
         bubble = bubble.toPresentation(),
-        position = Offset(x * scale, y * scale)
+        position = Offset(x * scale, y * scale),
+        groupId = groupId
     )
 }
 

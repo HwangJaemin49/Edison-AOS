@@ -4,4 +4,5 @@ data class ClusteredBubblePosition(
     val bubble: Bubble,
     val x: Float,
     val y: Float,
+    val groupId: Int
 )

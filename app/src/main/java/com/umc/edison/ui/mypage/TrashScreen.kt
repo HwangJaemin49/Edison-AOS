@@ -43,6 +43,7 @@ import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.CheckBoxButton
 import com.umc.edison.ui.components.RadioButton
+import com.umc.edison.ui.components.extractPlainText
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray500
@@ -269,7 +270,8 @@ private fun TrashItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = bubble.title ?: bubble.contentBlocks.firstOrNull()?.content?.take(10) ?: "내용 없음",
+                text =
+                extractPlainText(bubble).first.ifEmpty { "내용 없음" },
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray800,
                 modifier = Modifier.weight(1f)

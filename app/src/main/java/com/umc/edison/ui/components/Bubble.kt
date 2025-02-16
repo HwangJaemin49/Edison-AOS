@@ -606,7 +606,7 @@ private fun calculateLineCount(text: String, textBoxWidthDp: Dp, fontSizeSp: Flo
 /**
  * 버블의 스타일 지정 안 된 텍스트 추출 함수
  */
-private fun extractPlainText(bubble: BubbleModel): Pair<String, Boolean> {
+fun extractPlainText(bubble: BubbleModel): Pair<String, Boolean> {
     var text = bubble.title ?: ""
     var isTitle = true
 

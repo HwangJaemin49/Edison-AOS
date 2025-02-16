@@ -12,5 +12,6 @@ data class PositionedBubbleEntity(
         bubble = bubble.toDomain(),
         x = x,
         y = y,
+        groupId = group
     )
 }

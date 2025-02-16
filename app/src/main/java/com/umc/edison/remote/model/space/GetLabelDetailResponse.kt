@@ -1,4 +1,4 @@
-package com.umc.edison.remote.model.bubble_space
+package com.umc.edison.remote.model.space
 
 import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName

@@ -37,6 +37,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.umc.edison.R
 import com.umc.edison.ui.label.LabelTabScreen
@@ -72,13 +73,12 @@ fun BubbleSpaceScreen(
             .fillMaxSize()
             .background(White000)
     ) {
-        Spacer(modifier = Modifier.height(30.dp))
-
         Row(
             modifier = Modifier
                 .wrapContentHeight()
-                .padding(horizontal = 24.dp)
-                .align(Alignment.CenterHorizontally),
+                .padding(start = 24.dp, top = 30.dp, end = 24.dp)
+                .align(Alignment.CenterHorizontally)
+                .zIndex(1f),
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_topbar_search),
@@ -127,10 +127,11 @@ fun BubbleSpaceScreen(
         Box(
             modifier = Modifier
                 .height(4.dp)
-                .size(width = 192.dp, height = 4.dp)
+                .width(192.dp)
                 .align(Alignment.CenterHorizontally)
                 .clip(RoundedCornerShape(100.dp))
                 .background(Gray300)
+                .zIndex(1f)
         ) {
             Box(
                 modifier = Modifier
@@ -147,12 +148,12 @@ fun BubbleSpaceScreen(
             )
         }
 
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
+        Box {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(0f)
             ) { page ->
                 selectedTabIndex = pagerState.currentPage
                 when (page) {
