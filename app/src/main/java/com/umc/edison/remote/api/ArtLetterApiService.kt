@@ -4,6 +4,7 @@ package com.umc.edison.remote.api
 import com.umc.edison.remote.model.ResponseWithListData
 import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.artletter.GetAllArtLettersResponse
+import com.umc.edison.remote.model.artletter.GetArtLetterDetailResponse
 import com.umc.edison.remote.model.artletter.GetSortedArtLettersResponse
 import com.umc.edison.remote.model.artletter.PostEditorPickArtLetterResponse
 import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
@@ -25,5 +26,8 @@ interface ArtLetterApiService {
 
     @POST("/artletters/editor-pick")
     suspend fun postEditorPick(@Body artletterIds: List<Int>): ResponseWithListData<PostEditorPickArtLetterResponse>
+
+    @GET("/artletters/{letterId}")
+    suspend fun getArtLetterDetail(@Path("letterId") letterId: Int): ResponseWithListData<GetArtLetterDetailResponse>
 
 }

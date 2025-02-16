@@ -4,7 +4,7 @@ import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.ArtLetterDetailModel
 
 data class ArtLetterDetailState(
-    val artletters: List<ArtLetterDetailModel>,
+    val artletter: ArtLetterDetailModel,
     override val isLoading: Boolean = false,
     val isLoggedIn: Boolean = false,
     override val error: Throwable? = null,
@@ -12,8 +12,9 @@ data class ArtLetterDetailState(
 ) : BaseState {
     companion object {
         val DEFAULT = ArtLetterDetailState(
-            artletters = emptyList(),
+            artletter = ArtLetterDetailModel.DEFAULT,
             isLoading = false,
+            isLoggedIn = false,
             error = null,
             toastMessage = null
         )

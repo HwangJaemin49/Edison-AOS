@@ -8,6 +8,7 @@ data class Identity(
 
 enum class IdentityCategory(
     val question: String,
+    val questionTip: String? = null,
     val descriptionFirst: String,
     val descriptionSecond: String? = null,
 ) {
@@ -22,6 +23,7 @@ enum class IdentityCategory(
 
     FIELD(
         question = "지금 혹은 미래의 나는\n어떤 필드에 있나요?",
+        questionTip = "여러가지를 골라도 괜찮아요!\n에디슨과 함께 언젠가 내가 이루게 될 꿈들을 체크해주세요!",
         descriptionFirst = "닉네임 님의 아이디어는",
         descriptionSecond = "이런 필드에서 빛을 발할 거예요!",
     ),

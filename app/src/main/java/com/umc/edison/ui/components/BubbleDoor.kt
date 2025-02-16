@@ -471,7 +471,7 @@ private fun BubbleContent(
                         ?: backLink.contentBlocks
                             .filter { it.type == ContentType.TEXT }
                             .firstOrNull { it.content.parseHtml().isNotBlank() }
-                            ?.content?.parseHtml()?.take(5)
+                            ?.content?.parseHtml()?.take(10)
                         ?: "내용 없음"
 
                     val splitTitle = selectedTitle.split("\n")
@@ -525,7 +525,7 @@ private fun BubbleContent(
                     ?: linkedBubble.contentBlocks
                         .filter { it.type == ContentType.TEXT }
                         .firstOrNull { it.content.parseHtml().isNotBlank() }
-                        ?.content?.parseHtml()?.take(5)
+                        ?.content?.parseHtml()?.take(10)
                     ?: "내용 없음"
 
                 val splitTitle = selectedTitle.split("\n")

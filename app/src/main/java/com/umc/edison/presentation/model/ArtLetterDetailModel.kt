@@ -15,8 +15,8 @@ data class ArtLetterDetailModel(
     val thumbnail: String?,
     val likesCnt: Int,
     val scrapsCnt: Int,
-    val createdAt: Date,
-    val updatedAt: Date,
+    val createdAt: String,
+    val updatedAt: String,
     val liked: Boolean,
     val scraped: Boolean,
 ) {
@@ -32,8 +32,8 @@ data class ArtLetterDetailModel(
             thumbnail = null, // Default 썸네일?
             likesCnt = 0,
             scrapsCnt = 0,
-            createdAt = Date(),
-            updatedAt = Date(),
+            createdAt = "20250216",
+            updatedAt = "20250216",
             liked = false,
             scraped = false
         )
@@ -76,8 +76,4 @@ fun ArtLetterDetail.toPresentation(): ArtLetterDetailModel {
         liked = liked,
         scraped = scraped
     )
-}
-
-fun List<ArtLetterDetail>.toPresentation(): List<ArtLetterDetailModel> {
-    return map { it.toPresentation() }
 }

@@ -36,11 +36,16 @@ import com.umc.edison.ui.components.BasicFullButton
 import com.umc.edison.ui.theme.Gray800
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.IntOffset
+import com.umc.edison.domain.model.IdentityCategory
+import com.umc.edison.ui.components.KeywordChip
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray500
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -52,6 +57,8 @@ fun IdentityTestScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val scrollState = rememberScrollState()
+
     val tabs = listOf("아이덴티티 테스트1", "아이덴티티 테스트2", "아이덴티티 테스트3", "아이덴티티 테스트4")
     var selectedTabIndex by remember { mutableStateOf(0) }
     val pagerState = rememberPagerState(
@@ -59,6 +66,10 @@ fun IdentityTestScreen(
         initialPageOffsetFraction = 0f,
         initialPage = 0,
     )
+
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.updateTabIndex(pagerState.currentPage)
+    }
 
     val coroutineScope = rememberCoroutineScope()
     val indicatorOffset by animateDpAsState(
@@ -78,6 +89,7 @@ fun IdentityTestScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
+                .verticalScroll(scrollState)
         ) {
             Spacer(modifier = Modifier.height(33.dp))
 
@@ -110,9 +122,9 @@ fun IdentityTestScreen(
                 ) { page ->
                     selectedTabIndex = pagerState.currentPage
                     when (page) {
-                        0 -> Identitytest1(navHostController, pagerState, coroutineScope)
-                        1 -> Identitytest2(navHostController, pagerState, coroutineScope)
-                        2 -> Identitytest3(navHostController, pagerState, coroutineScope)
+                        0 -> Identitytest1(pagerState, coroutineScope)
+                        1 -> Identitytest2(pagerState, coroutineScope)
+                        2 -> Identitytest3(pagerState, coroutineScope)
                         3 -> Identitytest4(navHostController, pagerState, coroutineScope)
                     }
                 }
@@ -121,196 +133,243 @@ fun IdentityTestScreen(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Identitytest1(
-    navHostController: NavHostController,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel()
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Bottom,
+    val uiState by viewModel.uiState.collectAsState()
 
-        ) {
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = "나를 설명하는\n단어를 골라주세요!",
-            fontSize = 24.sp,
-            color = Gray800,
-            style = MaterialTheme.typography.displayLarge,
+    BaseContent(
+        uiState = uiState,
+        clearToastMessage = { viewModel.clearToastMessage() },
+    ) {
+        Column(
             modifier = Modifier
-                .offset(y = (-37).dp)
-        )
+                .fillMaxWidth()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Top,
 
-        Spacer(modifier = Modifier.height(24.dp))
+            ) {
 
-        Spacer(modifier = Modifier.weight(4f))
+            Text(
+                text = uiState.identity.question,
+                color = Gray800,
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier.padding(top=30.dp, bottom=48.dp)
+            )
 
-        BasicFullButton(
-            text = "다음으로",
-            enabled = true,
-            modifier = Modifier,
-            onClick = {
 
-                coroutineScope.launch {
-                    if (pagerState.currentPage < 3) {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
+            FlowRow(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(bottom=48.dp)
+
+            ) {
+                uiState.identity.options.forEach { keyword ->
+                    KeywordChip(
+                        keyword = keyword.name,
+                        isSelected = uiState.identity.selectedKeywords.contains(keyword),
+                        onClick = { viewModel.toggleIdentityKeyword(keyword) }
+                    )
                 }
-            },
-            textStyle = TextStyle(fontSize = 16.sp)
-        )
+            }
 
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            BasicFullButton(
+                text = "다음으로",
+                enabled = true,
+                onClick = {
+
+                    viewModel.setIdentityTestResult(pagerState, coroutineScope)
+
+                },
+            )
+
+        }
     }
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Identitytest2(
-    navHostController: NavHostController,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel(),
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
+
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Bottom,
+        verticalArrangement = Arrangement.Top,
 
         ) {
 
-        Spacer(modifier = Modifier.weight(1f))
-
         Text(
-            text = "지금, 혹은 미래의 나는\n어떤 필드 위에 서 있나요?",
-            fontSize = 24.sp,
+            text = uiState.identity.question,
             color = Gray800,
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier
-                .offset(y = (-37).dp)
+            modifier = Modifier.padding(top=30.dp, bottom=12.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Text(
+            text = uiState.identity.questionTip ?: "",
+            color = Gray500,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(bottom=48.dp)
+        )
 
-        Spacer(modifier = Modifier.weight(4f))
+        FlowRow(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom=48.dp)
+        ) {
+            uiState.identity.options.forEach { keyword ->
+                KeywordChip(
+                    keyword = keyword.name,
+                    isSelected = uiState.identity.selectedKeywords.contains(keyword),
+                    onClick = { viewModel.toggleIdentityKeyword(keyword) }
+                )
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
 
         BasicFullButton(
             text = "다음으로",
             enabled = true,
-            modifier = Modifier,
             onClick = {
-
-                coroutineScope.launch {
-                    if (pagerState.currentPage < 3) {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                }
+                viewModel.setIdentityTestResult(pagerState, coroutineScope)
             },
-            textStyle = TextStyle(fontSize = 16.sp)
         )
 
     }
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Identitytest3(
-    navHostController: NavHostController,
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Bottom,
+        verticalArrangement = Arrangement.Top,
 
         ) {
 
-        Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "나에게 가장\n영감을 주는 환경은?",
-            fontSize = 24.sp,
+            text = uiState.identity.question,
             color = Gray800,
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier
-                .offset(y = (-37).dp)
+            modifier = Modifier.padding(top=30.dp, bottom=48.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.weight(4f))
+        FlowRow(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom=48.dp)
+        ) {
+            uiState.identity.options.forEach { keyword ->
+                KeywordChip(
+                    keyword = keyword.name,
+                    isSelected = uiState.identity.selectedKeywords.contains(keyword),
+                    onClick = { viewModel.toggleIdentityKeyword(keyword) }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
 
         BasicFullButton(
             text = "다음으로",
             enabled = true,
-            modifier = Modifier,
             onClick = {
 
-                coroutineScope.launch {
-                    if (pagerState.currentPage < 3) {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                }
+                viewModel.setIdentityTestResult(pagerState, coroutineScope)
             },
-            textStyle = TextStyle(fontSize = 16.sp)
         )
 
     }
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Identitytest4(
     navHostController: NavHostController, pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel(),
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp),
-        verticalArrangement = Arrangement.Bottom,
+        verticalArrangement = Arrangement.Top,
 
         ) {
 
-        Spacer(modifier = Modifier.weight(1f))
-
         Text(
-            text = "당신의 상상력을\n자극하는 분야를 골라주세요!",
-            fontSize = 24.sp,
+            text = uiState.interest.question,
             color = Gray800,
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier
-                .offset(y = (-37).dp)
+            modifier = Modifier.padding(top=30.dp, bottom=12.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.weight(4f))
+        Text(
+            text = uiState.interest.questionTip,
+            color = Gray500,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(bottom=48.dp)
+        )
+
+        FlowRow(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom=48.dp)
+        ) {
+            uiState.interest.options.forEach { keyword ->
+                KeywordChip(
+                    keyword = keyword.name,
+                    isSelected = uiState.interest.selectedKeywords.contains(keyword),
+                    onClick = { viewModel.toggleInterestKeyword(keyword) }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
 
         BasicFullButton(
             text = "다음으로",
             enabled = true,
-            modifier = Modifier,
             onClick = {
+                viewModel.setInterestTestResult(navHostController)
                 coroutineScope.launch {
                     if (pagerState.currentPage < 3) {
                         pagerState.animateScrollToPage(pagerState.currentPage + 1)
                     }
-
-                    navHostController.navigate(NavRoute.TermsOfUse.route)
                 }
             },
-            textStyle = TextStyle(fontSize = 16.sp)
         )
 
     }

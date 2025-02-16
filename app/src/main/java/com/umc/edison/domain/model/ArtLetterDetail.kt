@@ -1,6 +1,5 @@
 package com.umc.edison.domain.model
 
-import java.util.Date
 
 class ArtLetterDetail (
     val artletterId: Int,
@@ -13,8 +12,8 @@ class ArtLetterDetail (
     val thumbnail: String?,
     val likesCnt: Int,
     val scrapsCnt: Int,
-    val createdAt: Date,
-    val updatedAt: Date,
+    val createdAt: String,
+    val updatedAt: String,
     val liked: Boolean,
     val scraped: Boolean,
 )

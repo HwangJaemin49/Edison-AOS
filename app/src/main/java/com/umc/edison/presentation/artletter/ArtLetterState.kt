@@ -15,6 +15,7 @@ data class ArtLetterState(
         val DEFAULT = ArtLetterState(
             artletters = emptyList(),
             isLoading = false,
+            isLoggedIn = false,
             error = null,
             toastMessage = null
         )

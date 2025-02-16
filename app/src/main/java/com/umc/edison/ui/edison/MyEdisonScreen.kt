@@ -2,6 +2,7 @@ package com.umc.edison.ui.edison
 
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -22,9 +23,7 @@ import androidx.navigation.NavHostController
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.umc.edison.presentation.edison.MyEdisonViewModel
-import com.umc.edison.presentation.storage.BubbleStorageViewModel
 import com.umc.edison.ui.components.BubbleInput
-import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.login.PrefsHelper
 import com.umc.edison.ui.navigation.NavRoute
 import kotlinx.coroutines.delay
@@ -36,14 +35,10 @@ fun MyEdisonScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: MyEdisonViewModel = hiltViewModel(),
 ) {
-
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var backPressedOnce by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-
-    val sharedViewModel: BubbleStorageViewModel = hiltViewModel()
-
-    val uiState by viewModel.uiState.collectAsState()
 
     BackHandler {
         if (backPressedOnce) {
@@ -58,7 +53,7 @@ fun MyEdisonScreen(
     }
     LaunchedEffect(uiState.bubbles) {
 
-        if(uiState.bubbles.isNotEmpty()){
+        if(viewModel.isBubbleExist()){
             navController.navigate(NavRoute.BubbleStorage.route) {
                 popUpTo(navController.graph.startDestinationId) {saveState=false}
                 launchSingleTop=true
@@ -75,11 +70,6 @@ fun MyEdisonScreen(
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        MyEdisonNavBar(
-            onBubbleClicked = { navController.navigate(NavRoute.BubbleStorage.route) },
-            onMyEdisonClicked = { navController.navigate(NavRoute.MyEdison.route) },
-            onSearchQuerySubmit = { query -> sharedViewModel.fetchSearchBubbles(query) }
-        )
 
         Spacer(modifier = Modifier.weight(0.6f))
 
@@ -88,7 +78,5 @@ fun MyEdisonScreen(
             onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0)) },)
 
         Spacer(modifier = Modifier.weight(1f))
-
-
     }
 }

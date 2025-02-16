@@ -2,12 +2,10 @@ package com.umc.edison.remote.model.artletter
 
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.ArtLetterDetailEntity
-import com.umc.edison.data.model.ArtletterEntity
 import com.umc.edison.remote.model.RemoteMapper
-import java.util.Date
 
 
-data class PostEditorPickArtLetterResponse(
+class GetArtLetterDetailResponse (
     @SerializedName("artletterId") val artletterId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
@@ -20,7 +18,7 @@ data class PostEditorPickArtLetterResponse(
     @SerializedName("scrapsCnt") val scrapsCnt: Int,
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String,
-    @SerializedName("liked") val liked : Boolean,
+    @SerializedName("liked") val liked: Boolean,
     @SerializedName("scraped") val scraped: Boolean
 ) : RemoteMapper<ArtLetterDetailEntity> {
 
@@ -39,7 +37,8 @@ data class PostEditorPickArtLetterResponse(
         updatedAt = updatedAt,
         liked = liked,
         scraped = scraped
+
     )
 }
 
-fun List<PostEditorPickArtLetterResponse>.toData(): List<ArtLetterDetailEntity> = map { it.toData() }
+fun List<GetArtLetterDetailResponse>.toData(): List<ArtLetterDetailEntity> = map { it.toData() }

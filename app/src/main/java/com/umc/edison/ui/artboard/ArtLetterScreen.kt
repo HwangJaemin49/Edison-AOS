@@ -176,7 +176,7 @@ fun TopBar(
 //                }
 //            }
 //
-//            editorPickState.artletters.isEmpty() -> {
+//            editorPickState.artletter.isEmpty() -> {
 //                Box(
 //                    modifier = Modifier
 //                        .fillMaxWidth()
@@ -189,7 +189,7 @@ fun TopBar(
 //            }
 //
 //            else -> {
-//                val pagerState = rememberPagerState(pageCount = { editorPickState.artletters.size })
+//                val pagerState = rememberPagerState(pageCount = { editorPickState.artletter.size })
 //
 //                Box(
 //                    modifier = Modifier
@@ -200,7 +200,7 @@ fun TopBar(
 //                        state = pagerState,
 //                        modifier = Modifier.fillMaxSize()
 //                    ) { page ->
-//                        val artLetter = editorPickState.artletters[page]
+//                        val artLetter = editorPickState.artletter[page]
 //
 //                        Box(
 //                            modifier = Modifier
@@ -224,7 +224,7 @@ fun TopBar(
 //                            .padding(bottom = 8.dp),
 //                        horizontalArrangement = Arrangement.Center
 //                    ) {
-//                        repeat(editorPickState.artletters.size) { index ->
+//                        repeat(editorPickState.artletter.size) { index ->
 //                            Spacer(
 //                                modifier = Modifier
 //                                    .padding(2.dp)
@@ -298,8 +298,8 @@ fun ArtBoardCard(
     Box(
         modifier = modifier
             .aspectRatio(174f / 240f)
-            .clickable { navHostController.navigate(NavRoute.ArtLetterDetail) }
-            .clip(RoundedCornerShape(10.dp))
+            .clickable { navHostController.navigate("art-letter/${uiState.artletterId}")}
+                .clip(RoundedCornerShape(10.dp))
     ) {
         if (uiState.thumbnail.isNullOrBlank()) {
             Image(

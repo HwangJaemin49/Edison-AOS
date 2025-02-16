@@ -14,19 +14,12 @@ data class GetAllArtLettersResponse(
 ) : RemoteMapper<ArtletterEntity> {
 
     override fun toData(): ArtletterEntity {
-        // 로그 추가: 데이터 변환 전 출력
-        Log.d("Mapping", "GetAllArtLettersResponse -> ArtletterEntity 변환 시작: id=$id, title=$title, likes=$likes, scraps=$scraps")
-
-        // 변환 작업
         return ArtletterEntity(
             artletterId = id,
             title = title,
             thumbnail = thumbnail,
             likes = likes,
             scraps = scraps,
-        ).also {
-            // 변환 후 로그 추가
-            Log.d("Mapping", "변환 완료: artletterId=${it.artletterId}, title=${it.title}")
-        }
+        )
     }
 }

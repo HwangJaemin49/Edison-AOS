@@ -4,6 +4,7 @@ package com.umc.edison.presentation.artletter
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.artletter.GetAllArtLettersUseCase
+import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
 import com.umc.edison.domain.usecase.artletter.GetSortedArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.PostEditorPickUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLettersUseCase
@@ -20,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ArtLetterViewModel @Inject constructor(
     private val getAllArtLettersUseCase: GetAllArtLettersUseCase,
+    private val getArtLetterDetailUseCase: GetArtLetterDetailUseCase,
     private val getSortedArtLettersUseCase: GetSortedArtLettersUseCase,
     private val scrapArtLettersUseCase: ScrapArtLettersUseCase,
     private val postEditorPickUseCase: PostEditorPickUseCase,
@@ -27,6 +29,9 @@ class ArtLetterViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(ArtLetterState.DEFAULT)
     val uiState = _uiState.asStateFlow()
+
+    private val _artLetterDetail = MutableStateFlow(ArtLetterDetailState.DEFAULT)
+    val artLetterDetail = _artLetterDetail.asStateFlow()
 
 
     private val _uiEditorPickState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
@@ -45,12 +50,30 @@ class ArtLetterViewModel @Inject constructor(
         collectDataResource(
             flow = getAllArtLettersUseCase(),
             onSuccess = { artletters ->
-                Log.d("ArtLetterViewModel", "성공: ${artletters.size}개의 아트레터를 가져옴")
-                if (artletters.isNotEmpty()) {
-                    Log.d("ArtLetterViewModel", "첫 번째 아트레터 제목: ${artletters.first().title}")
-                }
-
                 _uiState.update { it.copy(artletters = artletters.toPresentation()) }
+            },
+            onError = { error ->
+                Log.e("ArtLetterViewModel", "오류 발생: ${error.message}", error)
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                Log.d("ArtLetterViewModel", "fetchAllArtLetters() 완료됨")
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun fetchArtLetterDetail(latterId: Int) {
+        Log.d("ArtLetterViewModel", "fetchArtLetterDetail() 호출됨")
+
+        collectDataResource(
+            flow = getArtLetterDetailUseCase(latterId),
+            onSuccess = {  artletter ->
+                _artLetterDetail.update {
+                    it.copy(artletter = artletter.toPresentation())}
             },
             onError = { error ->
                 Log.e("ArtLetterViewModel", "오류 발생: ${error.message}", error)
@@ -84,23 +107,23 @@ class ArtLetterViewModel @Inject constructor(
         )
     }
 
-    fun postEditorPick(artletterIds: List<Int>) {
-        collectDataResource(
-            flow = postEditorPickUseCase(artletterIds),
-            onSuccess = { artletters ->
-                _uiEditorPickState.update { it.copy(artletters = artletters.toPresentation()) }
-            },
-            onError = { error ->
-                _uiEditorPickState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiEditorPickState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiEditorPickState.update { it.copy(isLoading = false) }
-            }
-        )
-    }
+//    fun postEditorPick(artletterIds: List<Int>) {
+//        collectDataResource(
+//            flow = postEditorPickUseCase(artletterIds),
+//            onSuccess = { artletter ->
+//                _uiEditorPickState.update { it.copy(artletter = artletter.toPresentation()) }
+//            },
+//            onError = { error ->
+//                _uiEditorPickState.update { it.copy(error = error) }
+//            },
+//            onLoading = {
+//                _uiEditorPickState.update { it.copy(isLoading = true) }
+//            },
+//            onComplete = {
+//                _uiEditorPickState.update { it.copy(isLoading = false) }
+//            }
+//        )
+//    }
 
     fun toggleScrap(artLetterId: Int) {
         Log.d("ArtLetterViewModel", "toggleScrap called with id: $artLetterId")

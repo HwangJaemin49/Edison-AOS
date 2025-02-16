@@ -19,6 +19,11 @@ class ArtLetterRepositoryImpl @Inject constructor(
             dataAction = { artletterRemoteDataSource.getAllArtLetters() }
         )
 
+    override fun getArtLetterDetail(letterId: Int): Flow<DataResource<ArtLetterDetail>> =
+        flowDataResource(
+            dataAction = { artletterRemoteDataSource.getArtLetterDetail(letterId)}
+        )
+
     override fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>> =
         flowDataResource(
             dataAction = { artletterRemoteDataSource.getSortedArtLetters(sortBy) }

@@ -8,6 +8,7 @@ data class TokenResponse(
     @SerializedName("refreshToken")
     val refreshToken: String,
     @SerializedName("email")
-    val email: String
-
+    val email: String,
+    @SerializedName("isNewMember")
+    val isNewMember:Boolean
 )

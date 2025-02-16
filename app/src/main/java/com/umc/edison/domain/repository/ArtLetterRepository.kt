@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface ArtLetterRepository {
     fun getAllArtLetters(): Flow<DataResource<List<ArtLetter>>>
 
+    fun getArtLetterDetail(latterId: Int): Flow<DataResource<ArtLetterDetail>>
+
     fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>>
 
     fun toggleScrap(artLetterId: Int): Flow<DataResource<ScrapArtLettersResult>>

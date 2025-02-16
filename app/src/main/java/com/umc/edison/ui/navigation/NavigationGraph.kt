@@ -56,9 +56,14 @@ fun NavigationGraph(
             ArtLetterSearchScreen()
         }
 
-        composable(NavRoute.ArtLetterDetail.route) {
-            ArtLetterDetailScreen(navHostController)
+        composable(
+            route = "art-letter/{artletterId}",
+            arguments = listOf(navArgument("artletterId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val artletterId = backStackEntry.arguments?.getInt("artletterId") ?: -1
+            ArtLetterDetailScreen(navHostController, artletterId)
         }
+
 
         composable(NavRoute.MyPage.route) {
             MyPageScreen(navHostController, updateShowBottomNav)
