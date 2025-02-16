@@ -1,6 +1,7 @@
 package com.umc.edison.ui.artboard
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -253,16 +257,32 @@ fun ArtboardSection(
             color = Gray800
         )
 
-        uiState.artletters.forEach { artLetter ->
-            ArtBoardCard(
-                navHostController = navHostController,
-                uiState = artLetter,
-                viewModel = viewModel
-            )
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            uiState.artletters.chunked(2).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    rowItems.forEach { artLetter ->
+                        ArtBoardCard(
+                            modifier = Modifier.weight(1f),
+                            navHostController = navHostController,
+                            uiState = artLetter,
+                            viewModel = viewModel
+                        )
+                    }
+                    if (rowItems.size < 2) {
+                        Spacer(modifier = Modifier.weight(1f)) // 아이템이 하나만 있으면 빈 공간 추가
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
-
     }
 }
+
 
 @Composable
 fun ArtBoardCard(
@@ -278,15 +298,24 @@ fun ArtBoardCard(
     Box(
         modifier = modifier
             .aspectRatio(174f / 240f)
-            .clickable { navHostController.navigate(NavRoute.ArtLetterDetail.route) }
+            .clickable { navHostController.navigate(NavRoute.ArtLetterDetail) }
             .clip(RoundedCornerShape(10.dp))
     ) {
-        AsyncImage(
-            model = uiState.thumbnail,
-            contentDescription = "Thumbnail Image",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        if (uiState.thumbnail.isNullOrBlank()) {
+            Image(
+                painter = painterResource(id = R.drawable.delivery),
+                contentDescription = "Default Thumbnail",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            AsyncImage(
+                model = uiState.thumbnail,
+                contentDescription = "Thumbnail Image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
 
         Icon(
             painter = painterResource(id = if (isBookmarked) R.drawable.ic_bookmark else R.drawable.ic_empty_bookmark),

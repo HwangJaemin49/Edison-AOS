@@ -1,12 +1,7 @@
 package com.umc.edison.remote.token
 
-import com.google.gson.Gson
-import com.umc.edison.remote.model.BaseResponse
 import okhttp3.Interceptor
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.Protocol
 import okhttp3.Response
-import okhttp3.ResponseBody.Companion.toResponseBody
 import javax.inject.Inject
 
 class AccessTokenInterceptor @Inject constructor(
@@ -26,6 +21,7 @@ class AccessTokenInterceptor @Inject constructor(
             val request = chain.request().newBuilder()
                 .addHeader(HEADER_AUTHORIZATION, "$TOKEN_TYPE $token")
                 .build()
+
             return chain.proceed(request)
         }
     }
