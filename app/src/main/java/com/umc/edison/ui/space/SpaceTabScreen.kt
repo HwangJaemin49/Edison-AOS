@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -49,7 +51,7 @@ import kotlin.math.sin
 
 @Composable
 fun SpaceTabScreen(
-    showBubble: (Boolean, BubbleModel) -> Unit,
+    showBubble: (BubbleModel) -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -61,7 +63,7 @@ fun SpaceTabScreen(
 
 @Composable
 fun BubbleGraphScreen(
-    showBubble: (Boolean, BubbleModel) -> Unit,
+    showBubble: (BubbleModel) -> Unit,
     viewModel: BubbleGraphViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -70,9 +72,13 @@ fun BubbleGraphScreen(
 
     LaunchedEffect(Unit) { viewModel.fetchClusteredBubbles() }
 
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.dp
+
     BoxWithConstraints(
         modifier = Modifier
-            .fillMaxSize()
+            .size(screenWidth, screenHeight)
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
                     scale = (scale * zoom).coerceIn(0.5f, 3f)
@@ -84,6 +90,7 @@ fun BubbleGraphScreen(
         val screenCenter = with(density) {
             Offset(maxWidth.toPx() / 2, maxHeight.toPx() / 2)
         }
+        val blurRadius = 100f
 
         LaunchedEffect(uiState.bubbles) {
             if (uiState.bubbles.isNotEmpty()) {
@@ -92,7 +99,7 @@ fun BubbleGraphScreen(
             }
         }
 
-        if (scale < 1.5f) {
+        if (scale < 1.6f) {
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -111,14 +118,14 @@ fun BubbleGraphScreen(
                             center = cluster.position,
                             radius = cluster.radius,
                             colors = cluster.colors,
-                            blurRadius = 100f,
+                            blurRadius = blurRadius,
                         )
                     } else {
                         drawOverlappingBlurCircles(
                             center = cluster.position,
                             bigRadius = cluster.radius,
                             colors = cluster.colors,
-                            blurRadius = 100f,
+                            blurRadius = blurRadius,
                         )
                     }
                 }
@@ -177,14 +184,14 @@ fun BubbleGraphScreen(
                             center = cluster.position * scale + offset,
                             radius = cluster.radius * scale,
                             colors = cluster.colors,
-                            blurRadius = 100f,
+                            blurRadius = blurRadius,
                         )
                     } else {
                         drawOverlappingBlurCircles(
                             center = cluster.position * scale + offset,
                             bigRadius = cluster.radius * scale,
                             colors = cluster.colors,
-                            blurRadius = 100f,
+                            blurRadius = blurRadius,
                         )
                     }
                 }
@@ -217,7 +224,7 @@ fun BubbleGraphScreen(
                         bubble = positionedBubble.bubble,
                         size = previewSize,
                         onClick = {
-                            showBubble(true, positionedBubble.bubble)
+                            showBubble(positionedBubble.bubble)
                         },
                     )
                 }
@@ -233,20 +240,13 @@ private fun DrawScope.drawGradientBlurCircle(
     blurRadius: Float,
 ) {
     drawIntoCanvas { canvas ->
+        val alphaRatio = 0.4f
         val paint = Paint().apply {
             isAntiAlias = true
             when (colors.size) {
                 1 -> {
                     // 단일 색상
-                    shader = LinearGradient(
-                        center.x,
-                        center.y - radius,
-                        center.x,
-                        center.y + radius,
-                        intArrayOf(colors[0].copy(alpha = 0.6f).toArgb(), colors[0].copy(alpha = 0.6f).toArgb()),
-                        floatArrayOf(0f, 1f),
-                        Shader.TileMode.CLAMP
-                    )
+                    color = colors.first().copy(alpha = alphaRatio).toArgb()
                 }
 
                 else ->
@@ -255,7 +255,7 @@ private fun DrawScope.drawGradientBlurCircle(
                         center.y - radius,
                         center.x,
                         center.y + radius,
-                        colors.map { it.copy(alpha = 0.6f).toArgb() }.toIntArray(),
+                        colors.map { it.copy(alpha = alphaRatio).toArgb() }.toIntArray(),
                         null,
                         Shader.TileMode.CLAMP
                     )

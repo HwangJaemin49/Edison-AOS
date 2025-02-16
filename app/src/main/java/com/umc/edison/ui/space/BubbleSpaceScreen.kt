@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -45,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
 import com.umc.edison.presentation.space.BubbleSpaceViewModel
+import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.LabelTagList
@@ -53,7 +55,6 @@ import com.umc.edison.ui.label.LabelTabScreen
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.White000
 import kotlinx.coroutines.launch
 
 @Composable
@@ -73,8 +74,8 @@ fun BubbleSpaceScreen(
         initialPageOffsetFraction = 0f,
         initialPage = 0,
     )
-    val coroutineScope = rememberCoroutineScope()
 
+    val coroutineScope = rememberCoroutineScope()
     val indicatorOffset by animateDpAsState(
         targetValue = (192.dp / tabs.size) * selectedTabIndex,
         label = "Indicator Animation"
@@ -98,12 +99,42 @@ fun BubbleSpaceScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(White000)
+    BaseContent(
+        uiState = uiState,
+        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .zIndex(0f)
+        ) { page ->
+            selectedTabIndex = pagerState.currentPage
+            when (page) {
+                0 -> SpaceTabScreen(showBubble = { bubble ->
+                    showBubble = true
+                    viewModel.selectBubble(bubble)
+
+                    val bubbleSize = calculateBubbleSize(bubble)
+
+                    if (bubbleSize == BubbleType.BubbleDoor) {
+                        updateShowBottomNav(false)
+                    }
+                })
+
+                1 -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 66.dp)
+                    ) {
+                        LabelTabScreen(navHostController)
+                    }
+                }
+            }
+        }
+
+        Column(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
             Row(
                 modifier = Modifier
                     .wrapContentHeight()
@@ -177,31 +208,6 @@ fun BubbleSpaceScreen(
                         .clip(RoundedCornerShape(100.dp))
                         .background(Gray800)
                 )
-            }
-
-            Box {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .zIndex(0f)
-                ) { page ->
-                    selectedTabIndex = pagerState.currentPage
-                    when (page) {
-                        0 -> SpaceTabScreen(showBubble = { flag, bubble ->
-                            showBubble = flag
-                            viewModel.selectBubble(bubble)
-
-                            val bubbleSize = calculateBubbleSize(bubble)
-
-                            if (bubbleSize == BubbleType.BubbleDoor) {
-                                updateShowBottomNav(!flag)
-                            }
-                        })
-
-                        1 -> LabelTabScreen(navHostController)
-                    }
-                }
             }
         }
 
