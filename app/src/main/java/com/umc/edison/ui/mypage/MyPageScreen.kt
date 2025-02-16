@@ -42,10 +42,10 @@ import com.umc.edison.presentation.model.InterestModel
 import com.umc.edison.presentation.mypage.MyPageState
 import com.umc.edison.presentation.mypage.MyPageViewModel
 import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.NeedLoginScreen
 import com.umc.edison.ui.components.GrayColumnContainer
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.components.HamburgerMenu
-import com.umc.edison.ui.components.PopUpMulti
 import com.umc.edison.ui.components.WhiteContainerItem
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
@@ -91,20 +91,12 @@ fun MyPageScreen(
         }
 
         if (!uiState.isLoggedIn) {
-            Box(
+            NeedLoginScreen(
+                navHostController = navHostController,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 18.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                PopUpMulti(
-                    title = stringResource(R.string.login_require_title),
-                    detail = stringResource(R.string.login_require_detail),
-                    hintText = stringResource(R.string.login_require_title_hint),
-                    buttonText = stringResource(R.string.google_login),
-                    onButtonClick = { /* TODO: 로그인 화면으로 이동 */ }
-                )
-            }
+            )
         }
     }
 }

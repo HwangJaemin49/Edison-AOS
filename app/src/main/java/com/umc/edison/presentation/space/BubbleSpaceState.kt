@@ -9,6 +9,7 @@ data class BubbleSpaceState(
     val mode: BubbleSpaceMode = BubbleSpaceMode.DEFAULT,
     val selectedBubble: BubbleModel? = null,
     val searchResults: List<BubbleModel> = emptyList(),
+    val isLoggedIn: Boolean = false,
     override val isLoading: Boolean,
     override val error: Throwable?,
     override val toastMessage: String?

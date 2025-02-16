@@ -49,6 +49,7 @@ import com.umc.edison.R
 import com.umc.edison.presentation.space.BubbleSpaceMode
 import com.umc.edison.presentation.space.BubbleSpaceViewModel
 import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.NeedLoginScreen
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
@@ -113,16 +114,27 @@ fun BubbleSpaceScreen(
         ) { page ->
             viewModel.updateSelectedTabIndex(pagerState.currentPage)
             when (page) {
-                0 -> SpaceTabScreen(showBubble = { bubble ->
-                    viewModel.updateBubbleSpaceMode(BubbleSpaceMode.BUBBLE_DETAIL)
-                    viewModel.selectBubble(bubble)
+                0 -> {
+                    if (uiState.isLoggedIn) {
+                        SpaceTabScreen(showBubble = { bubble ->
+                            viewModel.updateBubbleSpaceMode(BubbleSpaceMode.BUBBLE_DETAIL)
+                            viewModel.selectBubble(bubble)
 
-                    val bubbleSize = calculateBubbleSize(bubble)
+                            val bubbleSize = calculateBubbleSize(bubble)
 
-                    if (bubbleSize == BubbleType.BubbleDoor) {
-                        updateShowBottomNav(false)
+                            if (bubbleSize == BubbleType.BubbleDoor) {
+                                updateShowBottomNav(false)
+                            }
+                        })
+                    } else {
+                        NeedLoginScreen(
+                            navHostController = navHostController,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 18.dp, top = 66.dp, end = 18.dp),
+                        )
                     }
-                })
+                }
 
                 1 -> {
                     Box(
@@ -136,9 +148,11 @@ fun BubbleSpaceScreen(
             }
         }
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+        ) {
             Row(
                 modifier = Modifier
                     .wrapContentHeight()
@@ -241,7 +255,7 @@ fun BubbleSpaceScreen(
                         onValueChange = { newQuery ->
                             searchQuery = newQuery
                         },
-                        onSearch = { viewModel.searchBubbles(searchQuery)},
+                        onSearch = { viewModel.searchBubbles(searchQuery) },
                         placeholder = "찰나의 영감을 검색해보세요"
                     )
                 }
