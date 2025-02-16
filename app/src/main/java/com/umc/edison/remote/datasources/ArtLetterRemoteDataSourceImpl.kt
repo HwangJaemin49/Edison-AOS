@@ -22,7 +22,7 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         return artLetterApiService.getSortedArtLetters(sortBy).data.toData()
     }
 
-    override suspend fun getArtLetterDetail(letterId: Int): List<ArtLetterDetailEntity> {
+    override suspend fun getArtLetterDetail(letterId: Int): ArtLetterDetailEntity {
         return artLetterApiService.getArtLetterDetail(letterId).data.toDomain()
     }
 
