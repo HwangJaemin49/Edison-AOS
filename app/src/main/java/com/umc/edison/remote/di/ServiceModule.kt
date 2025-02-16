@@ -36,7 +36,7 @@ internal object ServiceModule {
     @Provides
     @Singleton
     fun provideRefreshTokenService(
-        @NetworkModule.RefreshRetrofit retrofit: Retrofit
+        @NetworkModule.MainRetrofit retrofit: Retrofit
     ): RefreshTokenApiService = retrofit.create(RefreshTokenApiService::class.java)
 
     @Provides

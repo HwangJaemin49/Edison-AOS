@@ -6,6 +6,7 @@ import com.umc.edison.domain.model.IdentityCategory
 data class IdentityModel(
     val id: Int,
     val question: String,
+    val questionTip: String? = null,
     val descriptionFirst: String,
     val descriptionSecond: String? = null,
     val options: List<KeywordModel>,
@@ -24,6 +25,7 @@ fun Identity.toPresentation(): IdentityModel {
     return IdentityModel(
         id = category.ordinal,
         question = category.question,
+        questionTip = category.questionTip,
         descriptionFirst = category.descriptionFirst,
         descriptionSecond = category.descriptionSecond,
         options = options.map { it.toPresentation() },

@@ -12,6 +12,7 @@ data class GetProfileInfoResponse(
     override fun toData(): UserEntity = UserEntity(
         email = email,
         nickname = nickname,
-        profileImage = profileImg
+        profileImage = profileImg,
+        isNewMember = false
     )
 }
