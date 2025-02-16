@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.UserEntity
 
 data class UpdateProfileRequest(
-    @SerializedName("nickname") val nickname: String,
+    @SerializedName("nickname") val nickname: String?,
     @SerializedName("imageUrl") val imageUrl: String?,
 )
 

@@ -15,6 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -25,8 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.R
+import com.umc.edison.presentation.login.IdentityTestViewModel
+import com.umc.edison.presentation.login.TermsOfUseViewModel
+import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BasicFullButton
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray600
@@ -36,11 +42,15 @@ import com.umc.edison.ui.theme.Gray800
 fun TermsOfUseScreen(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit,
+    viewModel: TermsOfUseViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
     }
+    BaseContent(uiState = uiState,
+        clearToastMessage = { viewModel.clearToastMessage() },) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -242,12 +252,13 @@ fun TermsOfUseScreen(
             enabled = true,
             modifier = Modifier.padding(bottom = 24.dp),
             onClick = {
-                navHostController.navigate(NavRoute.MyEdison.route)
+                viewModel.buttonClicked(navHostController)
             },
             textStyle = TextStyle(fontSize = 16.sp)
         )
 
     }
+}
 }
 
 

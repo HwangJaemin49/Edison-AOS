@@ -119,7 +119,7 @@ private fun MyPageContent(
     ) {
         ProfileInfo(
             imageUrl = uiState.user.profileImage,
-            name = uiState.user.nickname,
+            name = uiState.user.nickname?:"",
             navHostController = navHostController,
         )
 

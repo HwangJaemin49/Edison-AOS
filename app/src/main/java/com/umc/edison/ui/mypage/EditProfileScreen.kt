@@ -31,7 +31,7 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var nickname by remember { mutableStateOf(TextFieldValue(uiState.user.nickname)) }
+    var nickname by remember { mutableStateOf(TextFieldValue(uiState.user.nickname ?: "")) }
     var showGallery by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { updateShowBottomNav(false) }

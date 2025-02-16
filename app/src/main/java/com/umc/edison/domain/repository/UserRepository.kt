@@ -14,8 +14,8 @@ interface UserRepository {
     fun getLogInState(): Flow<DataResource<Boolean>>
     fun googleLogin(idToken:String): Flow<DataResource<User>>
     fun makeNickName(nickname: String):Flow<DataResource<Unit>>
-    fun getInterestKeywordsByCategory(category:String):Flow<DataResource<Interest>>
-    fun getIdentityKeywordsByCategory(category:String):Flow<DataResource<Identity>>
+    fun getInterestKeywordsByCategory(interestCategory: InterestCategory):Flow<DataResource<Interest>>
+    fun getIdentityKeywordsByCategory(identityCategory: IdentityCategory):Flow<DataResource<Identity>>
     fun setUserIdentity( identity: Identity):Flow<DataResource<Unit>>
     fun setUserInterest(interest: Interest):Flow<DataResource<Unit>>
 
