@@ -20,7 +20,6 @@ import javax.inject.Inject
 class MakeNickNameViewModel @Inject constructor (
     private val getProfileInfoUseCase: GetProfileInfoUseCase,
     private val makeNickNameUseCase: MakeNickNameUseCase,
-    private val updateUserProfileUseCase: UpdateUserProfileUseCase
 ): BaseViewModel() {
 
     private val _uiState = MutableStateFlow( MakeNickNameState .DEFAULT)
@@ -53,11 +52,12 @@ class MakeNickNameViewModel @Inject constructor (
             flow=makeNickNameUseCase(nickname),
             onSuccess = {
                 _uiState.update { it.copy(user = it.user.copy(nickname = nickname)) }
-                updateUserProfile(navController)
+                CoroutineScope(Dispatchers.Main).launch {
+                    navController.navigate(NavRoute.IdentityTest.route)
+                }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
-                updateUserProfile(navController)
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -67,31 +67,6 @@ class MakeNickNameViewModel @Inject constructor (
             }
         )
 
-    }
-
-    private fun updateUserProfile(navController: NavHostController) {
-
-        collectDataResource(
-            flow = updateUserProfileUseCase(_uiState.value.user.toDomain()),
-            onSuccess = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.update { it.copy(toastMessage = "닉네임 설정 완료") }
-                    navController.navigate(NavRoute.IdentityTest.route)
-                }
-            },
-            onError = { error ->
-                CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.update { it.copy(toastMessage = "닉네임 설정 실패",error = error) }
-                    navController.navigate(NavRoute.IdentityTest.route)
-                }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
     }
 
 

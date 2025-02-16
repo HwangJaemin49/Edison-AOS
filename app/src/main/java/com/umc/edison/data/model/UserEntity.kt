@@ -3,7 +3,7 @@ package com.umc.edison.data.model
 import com.umc.edison.domain.model.User
 
 data class UserEntity(
-    val nickname: String,
+    val nickname: String?,
     val profileImage: String?,
     val email: String,
 ) : DataMapper<User> {

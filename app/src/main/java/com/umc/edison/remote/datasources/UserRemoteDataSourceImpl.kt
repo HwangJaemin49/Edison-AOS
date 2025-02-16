@@ -108,7 +108,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
         return UserEntity(
             email = response.data.email,
-            nickname = "닉네임을 설정해주세요",
+            nickname = null,
             profileImage = null
         )
     }
@@ -126,12 +126,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
             return InterestEntity(
                 categoryNumber = categoryNumber,
-                keywords = myPageApiService.getTestKeyword(categoryNumber).data.map {
-                    KeywordEntity(
-                        id = it.id,
-                        name = it.keyword
-                    )
-                },
+                keywords = emptyList(),
                 options = options.map { it.toData() }
             )
 
@@ -147,12 +142,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
 
             return IdentityEntity(
                 categoryNumber = categoryNumber,
-                keywords = myPageApiService.getTestKeyword(categoryNumber).data.map {
-                    KeywordEntity(
-                        id = it.id,
-                        name = it.keyword
-                    )
-                },
+                keywords =  emptyList(),
                 options = options.map { it.toData() }
             )
 

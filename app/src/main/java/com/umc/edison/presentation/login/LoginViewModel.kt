@@ -32,10 +32,7 @@ class LoginViewModel @Inject constructor(
             },
             onFailure = { message ->
                 _uiState.update { it.copy(toastMessage = message) }
-                CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.update { it.copy(toastMessage = "로그인 실패") }
-                    navController.navigate(NavRoute.MakeNickName.route)
-                }
+
             },
             onLoading = { isLoading ->
                 _uiState.update { it.copy(isLoading = isLoading) }

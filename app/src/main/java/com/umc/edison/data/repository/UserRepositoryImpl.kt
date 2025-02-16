@@ -44,7 +44,7 @@ class UserRepositoryImpl @Inject constructor(
                     it.category == interestCategory
                 }.categoryNumber
 
-                userRemoteDataSource.getMyInterestResult(categoryNumber)
+                userRemoteDataSource.getInterestKeywordsByCategory(categoryNumber)
             }
         )
 
@@ -55,7 +55,7 @@ class UserRepositoryImpl @Inject constructor(
                     it.category == identityCategory
                 }.categoryNumber
 
-                userRemoteDataSource.getMyIdentityResult(categoryNumber)
+                userRemoteDataSource.getIdentityKeywordsByCategory(categoryNumber)
             }
         )
 

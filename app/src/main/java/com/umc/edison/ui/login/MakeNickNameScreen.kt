@@ -45,8 +45,6 @@ fun MakeNickNameScreen(
     val uiState by viewModel.uiState.collectAsState()
     var textState by remember { mutableStateOf("") }
 
-
-
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
     }
@@ -59,21 +57,17 @@ fun MakeNickNameScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),
-            verticalArrangement = Arrangement.Bottom,
+            verticalArrangement = Arrangement.Top,
 
             ) {
 
-            Spacer(modifier = Modifier.weight(1f))
 
             Text(
                 text = "에디슨에서 사용할\n닉네임을 설정해주세요.",
-                fontSize = 24.sp,
                 color = Gray800,
                 style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier
+                modifier = Modifier.padding(top=67.dp, bottom=24.dp)
             )
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             Box(
                 modifier = Modifier
@@ -94,7 +88,7 @@ fun MakeNickNameScreen(
                     placeholder = {
                         Text(
                             text = "닉네임을 입력해주세요. (최대 20자)",
-                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleMedium,
                             color = Gray600
                         )
                     },
@@ -113,9 +107,7 @@ fun MakeNickNameScreen(
 
             }
 
-
-
-            Spacer(modifier = Modifier.weight(4f))
+            Spacer(modifier = Modifier.weight(1f))
 
             BasicFullButton(
                 text = "다음으로",
@@ -124,7 +116,6 @@ fun MakeNickNameScreen(
                 onClick = {
                     viewModel.makeNickName(textState, navHostController)
                 },
-                textStyle = TextStyle(fontSize = 16.sp)
             )
 
         }

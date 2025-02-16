@@ -2,6 +2,7 @@ package com.umc.edison.ui.edison
 
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +35,7 @@ fun MyEdisonScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: MyEdisonViewModel = hiltViewModel(),
 ) {
-
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var backPressedOnce by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -49,7 +51,7 @@ fun MyEdisonScreen(
             }
         }
     }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uiState.bubbles) {
 
         if(viewModel.isBubbleExist()){
             navController.navigate(NavRoute.BubbleStorage.route) {

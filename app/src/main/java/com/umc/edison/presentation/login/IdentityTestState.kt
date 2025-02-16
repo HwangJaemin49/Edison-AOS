@@ -11,6 +11,7 @@ data class IdentityTestState(
     override val error: Throwable? = null,
     val interest: InterestModel,
     val identity: IdentityModel,
+    val selectedTabIndex: Int,
     override val toastMessage: String? = null
 
 ): BaseState {
@@ -35,6 +36,7 @@ data class IdentityTestState(
                 options = emptyList()
             ),
             error = null,
+            selectedTabIndex = 0,
             toastMessage = null
         )
 

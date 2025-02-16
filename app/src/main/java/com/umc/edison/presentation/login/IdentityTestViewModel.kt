@@ -1,6 +1,8 @@
 package com.umc.edison.presentation.login
 
 import android.util.Log
+import androidx.compose.foundation.pager.PagerState
+import androidx.navigation.NavHostController
 import com.umc.edison.domain.model.IdentityCategory
 import com.umc.edison.domain.model.InterestCategory
 import com.umc.edison.domain.usecase.login.GetIdentityKeywordsByCategoryUseCase
@@ -10,10 +12,14 @@ import com.umc.edison.domain.usecase.login.SetUserInterestUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.ui.navigation.NavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,14 +34,36 @@ class IdentityTestViewModel @Inject constructor (
     private val _uiState = MutableStateFlow(IdentityTestState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-    init{
-        getInterestKeyWords(InterestCategory.INSPIRATION)
-        getIdentityKeyWords(IdentityCategory.EXPLAIN)
-        getIdentityKeyWords(IdentityCategory.FIELD)
-        getIdentityKeyWords(IdentityCategory.ENVIRONMENT)
+    fun updateTabIndex(index: Int) {
+        _uiState.update { it.copy(selectedTabIndex = index) }
+
+        if (index < 3) {
+            getIdentityCategoryForTab(index)
+        } else {
+            getInterestCategoryForTab(index)
+        }
     }
 
-    fun getInterestKeyWords(interestCategory: InterestCategory) {
+    private fun getIdentityCategoryForTab(index: Int) {
+
+        val category = when (index) {
+            0 -> IdentityCategory.EXPLAIN
+            1 -> IdentityCategory.FIELD
+            2 -> IdentityCategory.ENVIRONMENT
+            else -> return
+        }
+        getIdentityKeyWords(category)
+    }
+
+    private fun getInterestCategoryForTab(index: Int) {
+        val category = when (index) {
+            3 -> InterestCategory.INSPIRATION
+            else -> return
+        }
+        getInterestKeyWords(category)
+    }
+
+    private fun getInterestKeyWords(interestCategory: InterestCategory) {
 
         collectDataResource(
             flow = getInterestKeywordsByCategoryUseCase(
@@ -60,7 +88,7 @@ class IdentityTestViewModel @Inject constructor (
         )
     }
 
-    fun getIdentityKeyWords(identityCategory : IdentityCategory) {
+    private fun getIdentityKeyWords(identityCategory : IdentityCategory) {
 
         collectDataResource(
             flow = getIdentityKeywordsByCategoryUseCase(
@@ -74,7 +102,6 @@ class IdentityTestViewModel @Inject constructor (
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
-                Log.d("getkeywords","error: $error.throwable}")
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -137,14 +164,17 @@ class IdentityTestViewModel @Inject constructor (
         }
     }
 
-    fun setInterestTestResult(){
+    fun setInterestTestResult(navController: NavHostController){
         collectDataResource(
             flow =setUserInterestUseCase(_uiState.value.interest.toDomain()),
             onSuccess = {
                 _uiState.update { it.copy(interest = it.interest.copy(options = it.interest.selectedKeywords)) }
+                CoroutineScope(Dispatchers.Main).launch {
+                    navController.navigate(NavRoute.TermsOfUse.route)
+                }
             },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update { it.copy(toastMessage = "$error",error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
@@ -155,11 +185,18 @@ class IdentityTestViewModel @Inject constructor (
         )
     }
 
-    fun setIdentityTestResult(){
+    fun setIdentityTestResult(pagerState: PagerState,
+                              coroutineScope: CoroutineScope ){
         collectDataResource(
             flow = setUserIdentityUseCase(_uiState.value.identity.toDomain()),
             onSuccess = {
                 _uiState.update { it.copy(identity = it.identity.copy(options = it.identity.selectedKeywords)) }
+                coroutineScope.launch {
+                    if (pagerState.currentPage < 3) {
+                        pagerState.scrollToPage(pagerState.currentPage + 1)
+                    }
+                }
+
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -172,11 +209,6 @@ class IdentityTestViewModel @Inject constructor (
             }
         )
     }
-
-
-
-
-
 
     override fun clearToastMessage() {
         _uiState.update { it.copy(toastMessage = null) }

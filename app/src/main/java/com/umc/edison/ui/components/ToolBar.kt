@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -289,16 +291,6 @@ private fun CameraPopup(
                     color = Gray800,
                     textAlign = TextAlign.Center
                 )
-
-                HorizontalDivider(modifier = Modifier.border(1.dp, Gray300))
-
-                Text(
-                    text = "배경 설정하기",
-                    modifier = Modifier.clickable { onGalleryOpen() },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Gray800,
-                    textAlign = TextAlign.Center
-                )
             }
         }
     }
@@ -400,10 +392,14 @@ private fun BackLinkPopUp(
                 )
                 .padding(1.dp),
         ) {
+
+            val scrollState = rememberScrollState()
+
             Column(
                 modifier = Modifier
                     .width(150.dp)
-                    .wrapContentHeight()
+                    .heightIn(max = 300.dp)
+                    .verticalScroll(scrollState)
                     .clip(RoundedCornerShape(16.dp))
                     .background(White000)
                     .padding(horizontal = 16.dp, vertical = 14.dp),
@@ -415,7 +411,7 @@ private fun BackLinkPopUp(
                         ?: bubble.contentBlocks
                             .filter { it.type == ContentType.TEXT }
                             .firstOrNull { it.content.parseHtml().isNotBlank() }
-                            ?.content?.parseHtml()?.take(5)
+                            ?.content?.parseHtml()?.take(10)
                         ?: "내용 없음"
 
                     val splitTitle = selectedTitle.split("\n")

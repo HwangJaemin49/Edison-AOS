@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.edison
 
+import android.util.Log
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
@@ -34,8 +35,10 @@ class  MyEdisonViewModel @Inject constructor (
             onSuccess = { bubbles ->
                 _uiState.update { it.copy(bubbles = bubbles.toPresentation().filter {
                         bubble -> bubble.id != _uiState.value.bubble.id
-                }) }
+                })
+                }
             },
+
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
             },
