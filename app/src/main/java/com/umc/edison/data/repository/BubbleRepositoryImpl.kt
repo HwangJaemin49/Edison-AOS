@@ -21,8 +21,18 @@ class BubbleRepositoryImpl @Inject constructor(
         saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
     )
 
+    override fun getStorageBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
+        remoteDataAction = { bubbleRemoteDataSource.getStorageBubbles()},
+        localDataAction = { bubbleLocalDataSource.getStorageBubbles()},
+        saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
+    )
+
     override fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
         dataAction = { bubbleLocalDataSource.addBubbles(bubbles.toData()) }
+    )
+
+    override fun getSearchBubbles(query: String): Flow<DataResource<List<Bubble>>> = flowDataResource(
+        dataAction = { bubbleLocalDataSource.getSearchBubbles(query) }
     )
 
     override fun softDeleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> =

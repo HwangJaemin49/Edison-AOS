@@ -1,13 +1,9 @@
 package com.umc.edison.domain.model
 
 data class ArtLetter(
-    val id: Int,
+    val artletterId: Int,
     val title: String,
-    val thumbnail: String,
-    val content: String,
-    val category: ArtLetterCategory,
-    val likeCnt: Int,
-    val scrapCnt: Int,
-    val isLike: Boolean,
-    val isScrapped: Boolean,
+    val thumbnail: String?,
+    val likes: Int,
+    val scraps: Int,
 )

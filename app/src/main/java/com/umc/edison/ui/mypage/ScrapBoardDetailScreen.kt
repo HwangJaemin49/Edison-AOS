@@ -61,26 +61,26 @@ fun ScrapBoardDetailScreen(
             )
         }
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val items = List(4) { it }
-            items.chunked(2).forEach { rowItems ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    rowItems.forEach { _ ->
-                        ArtBoardCard(modifier = Modifier.weight(1f),
-                            navHostController = navHostController)
-                    }
-                    if (rowItems.size < 2) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
+//        Column(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            val items = List(4) { it }
+//            items.chunked(2).forEach { rowItems ->
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                ) {
+//                    rowItems.forEach { _ ->
+//                        ArtBoardCard(modifier = Modifier.weight(1f),
+//                            navHostController = navHostController)
+//                    }
+//                    if (rowItems.size < 2) {
+//                        Spacer(modifier = Modifier.weight(1f))
+//                    }
+//                }
+//                Spacer(modifier = Modifier.height(8.dp))
+//            }
+//        }
 
     }
 }
