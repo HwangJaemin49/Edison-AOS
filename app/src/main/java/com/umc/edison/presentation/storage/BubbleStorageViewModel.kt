@@ -24,7 +24,8 @@ class BubbleStorageViewModel @Inject constructor(
         collectDataResource(
             flow = getStorageBubbleUseCase(),
             onSuccess = { bubbles ->
-                _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
+                val sortedBubbles = bubbles.sortedBy { it.date }
+                _uiState.update { it.copy(bubbles = sortedBubbles.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

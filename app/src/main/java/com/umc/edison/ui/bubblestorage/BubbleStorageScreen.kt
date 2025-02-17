@@ -1,6 +1,7 @@
 package com.umc.edison.ui.bubblestorage
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,6 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -36,6 +40,7 @@ import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Gray900
+import com.umc.edison.ui.theme.White000
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,16 +121,18 @@ fun BubbleStorageScreen(
         }
 
         Box(
-            modifier = Modifier.clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                if (uiState.mode == BubbleStorageMode.EDIT) {
-                    viewModel.updateEditMode(BubbleStorageMode.NONE)
-                    updateViewMode(false)
-                    updateShowBottomNav(true)
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    if (uiState.mode == BubbleStorageMode.EDIT) {
+                        viewModel.updateEditMode(BubbleStorageMode.NONE)
+                        updateViewMode(false)
+                        updateShowBottomNav(true)
+                    }
                 }
-            }
         ) {
             BubblesLayout(
                 bubbles = if (searchKeyword.isEmpty() || searchResults.isEmpty()) uiState.bubbles else searchResults,
@@ -134,7 +141,34 @@ fun BubbleStorageScreen(
                 isBlur = uiState.mode != BubbleStorageMode.NONE,
                 selectedBubble = uiState.selectedBubbles,
                 searchKeyword = searchKeyword,
+                isReversed = true
             )
+
+            if (searchKeyword.isEmpty() || searchResults.isEmpty()) {
+                // Linear Gradient 효과가 적용된 배경
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val gradientHeight = size.height * 0.3f
+
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(White000, White000.copy(alpha = 0f)),
+                            startY = 0f,
+                            endY = gradientHeight
+                        ),
+                        size = Size(size.width, gradientHeight)
+                    )
+
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(White000.copy(alpha = 0f), White000),
+                            startY = size.height - gradientHeight,
+                            endY = size.height
+                        ),
+                        topLeft = Offset(0f, size.height - gradientHeight),
+                        size = Size(size.width, gradientHeight)
+                    )
+                }
+            }
         }
 
         if (uiState.mode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
