@@ -18,8 +18,8 @@ data class PostEditorPickArtLetterResponse(
     @SerializedName("thumbnail") val thumbnail: String?,
     @SerializedName("likesCnt") val likesCnt: Int,
     @SerializedName("scrapsCnt") val scrapsCnt: Int,
-    @SerializedName("createdAt") val createdAt: String,
-    @SerializedName("updatedAt") val updatedAt: String,
+    @SerializedName("createdAt") val createdAt: Date,
+    @SerializedName("updatedAt") val updatedAt: Date,
     @SerializedName("liked") val liked : Boolean,
     @SerializedName("scraped") val scraped: Boolean
 ) : RemoteMapper<ArtLetterDetailEntity> {

@@ -5,6 +5,7 @@ import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.ArtLetter
 import com.umc.edison.domain.model.ArtLetterDetail
+import com.umc.edison.domain.model.ArtLetterMark
 import com.umc.edison.domain.repository.ArtLetterRepository
 import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,11 @@ class ArtLetterRepositoryImpl @Inject constructor(
     override fun getArtLetterDetail(letterId: Int): Flow<DataResource<ArtLetterDetail>> =
         flowDataResource(
             dataAction = { artletterRemoteDataSource.getArtLetterDetail(letterId)}
+        )
+
+    override fun postArtLetterLike(artletterId: Int): Flow<DataResource<ArtLetterMark>> =
+        flowDataResource(
+            dataAction = {artletterRemoteDataSource.postArtLetterLike(artletterId)}
         )
 
     override fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>> =

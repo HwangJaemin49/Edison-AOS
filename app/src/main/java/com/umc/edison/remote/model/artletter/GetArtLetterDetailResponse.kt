@@ -3,6 +3,7 @@ package com.umc.edison.remote.model.artletter
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.remote.model.RemoteMapper
+import com.umc.edison.remote.model.parseIso8601ToDate
 
 
 class GetArtLetterDetailResponse (
@@ -33,12 +34,10 @@ class GetArtLetterDetailResponse (
         thumbnail = thumbnail,
         likesCnt = likesCnt,
         scrapsCnt = scrapsCnt,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
+        createdAt = parseIso8601ToDate(createdAt),
+        updatedAt = parseIso8601ToDate(updatedAt),
         liked = liked,
         scraped = scraped
 
     )
 }
-
-fun List<GetArtLetterDetailResponse>.toData(): List<ArtLetterDetailEntity> = map { it.toData() }

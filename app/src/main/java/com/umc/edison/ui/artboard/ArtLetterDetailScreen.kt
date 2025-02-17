@@ -41,11 +41,14 @@ import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
 import com.umc.edison.presentation.artletter.ArtLetterViewModel
+import com.umc.edison.remote.model.toIso8601String
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun ArtLetterDetailScreen(
@@ -56,9 +59,10 @@ fun ArtLetterDetailScreen(
         viewModel.fetchArtLetterDetail(artletterId)
     }
     val artLetterDetail by viewModel.artLetterDetail.collectAsState()
+    val likeState by viewModel.likeState.collectAsState()
 
     val isBookmarked = remember { mutableStateOf(false) }
-    val isLiked = remember { mutableStateOf(false) }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -120,7 +124,7 @@ fun ArtLetterDetailScreen(
                                     tint = Gray600
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = artLetterDetail.artletter.createdAt, color = Gray600, style = MaterialTheme.typography.labelLarge)
+                                Text(text = artLetterDetail.artletter.createdAt.toIso8601String(), color = Gray600, style = MaterialTheme.typography.labelLarge)
                             }
                         }
                         Row(
@@ -146,7 +150,7 @@ fun ArtLetterDetailScreen(
                                         tint = Gray600
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text(text = "31", color = Gray600, style = MaterialTheme.typography.labelLarge)
+                                    Text(text = artLetterDetail.artletter.likesCnt.toString(), color = Gray600, style = MaterialTheme.typography.labelLarge)
                                 }
                             }
 
@@ -171,29 +175,27 @@ fun ArtLetterDetailScreen(
 
             item {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "배달을 바라보는 시선, '딜리버리 탑서의 구' (2022)", color = Gray800, style = MaterialTheme.typography.displayLarge)
+                    Text(text = artLetterDetail.artletter.title, color = Gray800, style = MaterialTheme.typography.displayLarge)
                     Spacer(modifier = Modifier.height(18.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 8.dp)
-                                .size(width = 72.dp, height = 32.dp)
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(Gray100),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "# 영상아트", color = Gray600, style = MaterialTheme.typography.labelLarge)
-                        }
-                        Box(
-                            modifier = Modifier
-                                .size(width = 72.dp, height = 32.dp)
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(Gray100),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "# 영상아트", color = Gray600, style = MaterialTheme.typography.labelLarge)
+                        // 태그 문자열을 띄어쓰기 기준으로 분할
+                        val tags = artLetterDetail.artletter.tags.split(" ")
+
+                        // 각 태그에 대해 Box 생성
+                        tags.forEach { tag ->
+                            Box(
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .size(width = 72.dp, height = 32.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(Gray100),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = tag, color = Gray600, style = MaterialTheme.typography.labelLarge)
+                            }
                         }
                     }
+
                     Divider(
                         color = Gray300,
                         thickness = 1.dp,
@@ -202,22 +204,21 @@ fun ArtLetterDetailScreen(
                             .padding(top = 20.dp, bottom = 20.dp)
                     )
 
-                    Text(text = "<딜리버리 댄서의 구>(단채널 영상, 약 25분)에는, \n" +
-                            "가상의 서울을 배경으로 끊임없이 갱신되는 배달 앱의 네비게이션 미로에 갇힌 채 질주하는 여성 배달 라이더가 있다. \n" +
-                            "\n" +
-                            "본 프로젝트는 긱 이코노미, 플랫폼 노동뿐 아니라 현실 위에 모바일 스크린의 형태로 포개어진 위상학적 미로–앱을 통해 경험하는 세계와 현실 양쪽에 동시에 거주하는 존재의 양태, 가능세계 이론, (현실의 문제이기도 한) 배달 라이더들의 극단적 각성상태, 신체와 시간에 대한 끊임없는 최적화를 요구하는 가속주의적 촉구 등을 담고 있다.",
+                    Text(text = artLetterDetail.artletter.content,
                         color = Gray800, style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(24.dp))
                     Row(modifier = Modifier.fillMaxWidth(), // Row를 가로로 꽉 채움
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End) {
                         Icon(
-                            painter = painterResource(id = if (isLiked.value) R.drawable.ic_artletter_detail_like else R.drawable.ic_artletter_detail_empty_like),
+                            painter = painterResource(id = if (likeState.result.liked) R.drawable.ic_artletter_detail_like else R.drawable.ic_artletter_detail_empty_like),
                             contentDescription = "Like",
                             tint = Color.Unspecified,
                             modifier = Modifier
                                 .size(24.dp)
-                                .clickable { isLiked.value = !isLiked.value }
+                                .clickable {
+                                    viewModel.postArtLetterLike(artletterId)
+                                }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                     }
