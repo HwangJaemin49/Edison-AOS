@@ -2,7 +2,6 @@ package com.umc.edison.ui.edison
 
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

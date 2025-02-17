@@ -38,7 +38,9 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -54,6 +56,7 @@ import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
+import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 import kotlin.math.cos
@@ -150,9 +153,10 @@ fun Bubble(
 @Composable
 fun BubblePreview(
     onClick: () -> Unit,
-    onLongClick: () -> Unit,
     size: BubbleType.BubbleSize,
-    bubble: BubbleModel
+    bubble: BubbleModel,
+    onLongClick: () -> Unit = {},
+    searchKeyword: String = ""
 ) {
     if (bubble.mainImage != null) {
         ImageBubble(
@@ -171,7 +175,8 @@ fun BubblePreview(
             onClick = onClick,
             onLongClick = onLongClick,
             bubbleSize = size,
-            isPreview = true
+            isPreview = true,
+            searchKeyword = searchKeyword
         )
     } else {
         // 그 외의 경우 - 본문 이미지만 있는 경우
@@ -195,6 +200,7 @@ private fun TextBubble(
     onLongClick: () -> Unit = {},
     bubbleSize: BubbleType.BubbleSize,
     isPreview: Boolean,
+    searchKeyword: String = ""
 ) {
     Box(
         modifier = Modifier
@@ -225,7 +231,12 @@ private fun TextBubble(
         }
 
         // 본문 내용 채우기
-        TextContentBubble(bubble = bubble, bubbleSize = bubbleSize, isPreview = isPreview)
+        TextContentBubble(
+            bubble = bubble,
+            bubbleSize = bubbleSize,
+            isPreview = isPreview,
+            searchKeyword = searchKeyword
+        )
     }
 }
 
@@ -234,20 +245,44 @@ private fun TextBubble(
 private fun TextContentBubble(
     bubble: BubbleModel,
     bubbleSize: BubbleType.BubbleSize,
-    isPreview: Boolean
+    isPreview: Boolean,
+    searchKeyword: String = ""
 ) {
     Box(
-        modifier = Modifier
-            .width(bubbleSize.textBoxWidth)
-            .wrapContentHeight(),
+        modifier = if (bubbleSize == BubbleType.Bubble300)
+            Modifier
+                .size(bubbleSize.textBoxWidth, 96.5.dp)
+        else
+            Modifier
+                .width(bubbleSize.textBoxWidth)
+                .wrapContentHeight(),
         contentAlignment = Alignment.Center
     ) {
         // 미리보기일 때는 제목 or 본문 - 스타일 적용 안 됨
         if (isPreview) {
             val (text, isTitle) = extractPlainText(bubble)
 
+            var annotatedString = buildAnnotatedString {
+                append(text)
+            }
+            if (searchKeyword.isNotEmpty()) {
+                annotatedString = buildAnnotatedString {
+                    val startIndex = text.indexOf(searchKeyword)
+                    val endIndex = startIndex + searchKeyword.length
+                    append(text)
+                    addStyle(
+                        style = SpanStyle(
+                            color = White000,
+                            background = Gray700
+                        ),
+                        start = startIndex,
+                        end = endIndex
+                    )
+                }
+            }
+
             Text(
-                text = text,
+                text = annotatedString,
                 style = if (isTitle) bubbleSize.titleFontStyle else bubbleSize.bodyFontStyle,
                 color = Gray800,
                 textAlign = TextAlign.Center
@@ -606,7 +641,7 @@ private fun calculateLineCount(text: String, textBoxWidthDp: Dp, fontSizeSp: Flo
 /**
  * 버블의 스타일 지정 안 된 텍스트 추출 함수
  */
-private fun extractPlainText(bubble: BubbleModel): Pair<String, Boolean> {
+fun extractPlainText(bubble: BubbleModel): Pair<String, Boolean> {
     var text = bubble.title ?: ""
     var isTitle = true
 

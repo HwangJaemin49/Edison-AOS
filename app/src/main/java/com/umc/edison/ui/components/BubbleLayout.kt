@@ -14,18 +14,17 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.White000
 
 @Composable
 fun BubblesLayout(
     bubbles: List<BubbleModel>,
     onBubbleClick: (BubbleModel) -> Unit,
-    onBubbleLongClick: (BubbleModel) -> Unit,
+    onBubbleLongClick: (BubbleModel) -> Unit = {},
     isBlur: Boolean = false,
-    selectedBubble: List<BubbleModel>,
+    selectedBubble: List<BubbleModel> = emptyList(),
+    searchKeyword: String = ""
 ) {
     val bubbleOffsets = remember { mutableStateMapOf<BubbleModel, Dp>() }
 
@@ -54,7 +53,8 @@ fun BubblesLayout(
                     bubble = bubble,
                     size = bubbleSize,
                     onClick = { onBubbleClick(bubble) },
-                    onLongClick = { onBubbleLongClick(bubble) }
+                    onLongClick = { onBubbleLongClick(bubble) },
+                    searchKeyword = searchKeyword
                 )
 
                 if (isBlur && !selectedBubble.contains(bubble)) {

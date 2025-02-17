@@ -22,7 +22,7 @@ abstract class FLowBaseBoundResource<DomainType, DataType>(
             collector.emit(DataResource.success(data.toDomain()))
 
             successAction?.invoke(data)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             collector.emit(DataResource.error(e))
         }
     }

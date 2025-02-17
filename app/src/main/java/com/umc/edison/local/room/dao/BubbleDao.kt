@@ -29,12 +29,6 @@ interface BubbleDao : BaseDao<BubbleLocal> {
         """)
     suspend fun getSearchBubbles(query: String): List<BubbleLocal>
 
-    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_synced = 0")
-    suspend fun getUnSyncedBubbles(): List<BubbleLocal>
-
-    @Query("UPDATE ${RoomConstant.Table.BUBBLE} SET is_synced = 1 WHERE id = :bubbleId")
-    suspend fun markAsSynced(bubbleId: Int)
-
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE label_id = :labelId) AND is_deleted = 0 AND is_trashed = 0")
     suspend fun getBubblesByLabel(labelId: Int): List<BubbleLocal>
 

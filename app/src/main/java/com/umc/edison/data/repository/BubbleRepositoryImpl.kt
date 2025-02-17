@@ -6,6 +6,7 @@ import com.umc.edison.data.datasources.BubbleRemoteDataSource
 import com.umc.edison.data.model.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Bubble
+import com.umc.edison.domain.model.ClusteredBubblePosition
 import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -68,5 +69,9 @@ class BubbleRepositoryImpl @Inject constructor(
 
     override fun addBubble(bubble: Bubble): Flow<DataResource<Bubble>> = flowDataResource(
         dataAction = { bubbleLocalDataSource.addBubble(bubble.toData()) }
+    )
+
+    override fun getClusteredBubblesPosition(): Flow<DataResource<List<ClusteredBubblePosition>>> = flowDataResource(
+        dataAction = { bubbleRemoteDataSource.getBubblePosition() }
     )
 }

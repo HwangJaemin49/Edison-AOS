@@ -1,6 +1,5 @@
 package com.umc.edison.presentation.edison
 
-import android.util.Log
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation

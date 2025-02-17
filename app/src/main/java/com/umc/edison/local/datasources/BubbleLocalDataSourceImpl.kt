@@ -1,7 +1,6 @@
 package com.umc.edison.local.datasources
 
 import android.icu.util.Calendar
-import android.util.Log
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.local.model.BubbleLocal

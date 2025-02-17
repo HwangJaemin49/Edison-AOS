@@ -2,7 +2,6 @@ package com.umc.edison.presentation.storage
 
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetSearchBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
@@ -31,7 +30,6 @@ class BubbleStorageViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
     val uiState = _uiState.asStateFlow()
-
 
     init {
         val id: Int? = savedStateHandle["id"]

@@ -19,7 +19,7 @@ class FlowCachingBoundResource<DomainType, DataType>(
         withContext(Dispatchers.IO) {
             val result: DataType? = try {
                 localDataAction()
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 null
             }
 
