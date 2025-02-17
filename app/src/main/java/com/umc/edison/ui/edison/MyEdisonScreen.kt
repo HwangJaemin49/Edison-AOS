@@ -44,6 +44,8 @@ fun MyEdisonScreen(
     viewModel: MyEdisonViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var isViewMode by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
     var backPressedOnce by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -111,6 +113,7 @@ fun MyEdisonScreen(
                         updateShowBottomNav = updateShowBottomNav,
                         searchResults = uiState.searchResults,
                         searchKeyword = uiState.query,
+                        updateViewMode = { flag -> isViewMode = flag },
                     )
                 }
             }
@@ -128,22 +131,26 @@ fun MyEdisonScreen(
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(1)
                     }
+                    viewModel.resetSearchResults()
                 },
                 onBubbleClick = {
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(0)
                     }
+                    viewModel.resetSearchResults()
                 },
                 onStorageClick = {
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(1)
                     }
+                    viewModel.resetSearchResults()
                 },
                 onSearchQuerySubmit = { query ->
                     viewModel.fetchSearchBubbles(query)
                 },
                 currentPage = pagerState.currentPage,
                 query = uiState.query,
+                isViewMode = isViewMode,
             )
         }
     }

@@ -65,6 +65,10 @@ class MyEdisonViewModel @Inject constructor(
         )
     }
 
+    fun resetSearchResults() {
+        _uiState.update { it.copy(searchResults = emptyList(), query = "") }
+    }
+
     override fun clearToastMessage() {
         _uiState.update { it.copy(toastMessage = null) }
     }

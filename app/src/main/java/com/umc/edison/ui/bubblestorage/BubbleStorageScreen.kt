@@ -44,6 +44,7 @@ fun BubbleStorageScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     searchResults: List<BubbleModel>,
     searchKeyword: String,
+    updateViewMode: (Boolean) -> Unit,
     viewModel: BubbleStorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -51,6 +52,7 @@ fun BubbleStorageScreen(
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
         viewModel.updateEditMode(BubbleStorageMode.NONE)
+        updateViewMode(false)
 
         viewModel.fetchStorageBubbles()
     }
@@ -60,6 +62,7 @@ fun BubbleStorageScreen(
             navHostController.popBackStack()
         } else {
             viewModel.updateEditMode(BubbleStorageMode.NONE)
+            updateViewMode(false)
             updateShowBottomNav(true)
         }
     }
@@ -74,9 +77,11 @@ fun BubbleStorageScreen(
                     showSelectedCnt = true,
                     onButtonClick = {
                         viewModel.updateEditMode(BubbleStorageMode.SHARE)
+                        updateViewMode(false)
                     },
                     onDelete = {
                         viewModel.updateEditMode(BubbleStorageMode.DELETE)
+                        updateViewMode(false)
                     },
                     buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
                     buttonText = "공유하기",
@@ -95,6 +100,7 @@ fun BubbleStorageScreen(
             onBubbleClick = { bubble ->
                 viewModel.selectBubble(bubble)
                 viewModel.updateEditMode(BubbleStorageMode.VIEW)
+                updateViewMode(true)
                 val bubbleSize = calculateBubbleSize(bubble)
 
                 if (bubbleSize == BubbleType.BubbleDoor) {
@@ -104,6 +110,7 @@ fun BubbleStorageScreen(
             onBubbleLongClick = { bubble ->
                 viewModel.selectBubble(bubble)
                 viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                updateViewMode(false)
                 updateShowBottomNav(false)
             }
         }
@@ -115,6 +122,7 @@ fun BubbleStorageScreen(
             ) {
                 if (uiState.mode == BubbleStorageMode.EDIT) {
                     viewModel.updateEditMode(BubbleStorageMode.NONE)
+                    updateViewMode(false)
                     updateShowBottomNav(true)
                 }
             }
@@ -137,6 +145,7 @@ fun BubbleStorageScreen(
                     .background(Gray800.copy(alpha = 0.5f))
                     .clickable(onClick = {
                         viewModel.updateEditMode(BubbleStorageMode.NONE)
+                        updateViewMode(false)
                         updateShowBottomNav(true)
                     })
                     .padding(top = 24.dp),
@@ -164,6 +173,7 @@ fun BubbleStorageScreen(
                 confirmText = "삭제",
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                    updateViewMode(false)
                 },
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
@@ -175,6 +185,7 @@ fun BubbleStorageScreen(
             BottomSheet(
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                    updateViewMode(false)
                 },
                 uiState = uiState,
                 clearToastMessage = { viewModel.clearToastMessage() }

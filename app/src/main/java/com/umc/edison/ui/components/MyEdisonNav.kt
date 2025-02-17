@@ -46,144 +46,156 @@ fun MyEdisonNavBar(
     onSearchQuerySubmit: (String) -> Unit,
     currentPage: Int,
     query: String,
+    isViewMode: Boolean,
 ) {
     var searchActive by remember { mutableStateOf(query.isNotEmpty()) }
     var text by remember { mutableStateOf(query) }
 
-    Row(
+    Box(
         modifier = Modifier
             .wrapContentSize()
             .clip(RoundedCornerShape(30.dp))
-            .background(Gray300)
-            .padding(6.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .background(Gray300),
     ) {
-        if (searchActive) {
-            BasicTextField(
-                value = text,
-                onValueChange = { text = it },
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        onSearchQuerySubmit(text)
-                    }
-                ),
-                maxLines = 1,
-                textStyle = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .weight(1f)
-                    .wrapContentHeight()
-                    .clip(RoundedCornerShape(30.dp))
-                    .background(White000)
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
-                decorationBox = { innerTextField ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_topbar_search),
-                            contentDescription = "Search",
-                            tint = Gray800,
+        Row(
+            modifier = Modifier.padding(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (searchActive) {
+                BasicTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            onSearchQuerySubmit(text)
+                        }
+                    ),
+                    maxLines = 1,
+                    textStyle = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(30.dp))
+                        .background(White000)
+                        .padding(horizontal = 10.dp, vertical = 2.dp),
+                    decorationBox = { innerTextField ->
+                        Row(
                             modifier = Modifier
-                                .size(32.dp)
-                                .clickable {
-                                    onSearchQuerySubmit(text)
-                                }
-                        )
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 6.dp)
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (text.isEmpty()) {
-                                Text(
-                                    text = "검색",
-                                    color = Gray600,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_topbar_search),
+                                contentDescription = "Search",
+                                tint = Gray800,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clickable {
+                                        onSearchQuerySubmit(text)
+                                    }
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 6.dp)
+                            ) {
+                                if (text.isEmpty()) {
+                                    Text(
+                                        text = "검색",
+                                        color = Gray600,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
 
-                            innerTextField()
+                                innerTextField()
+                            }
                         }
                     }
+                )
+            } else {
+                IconButton(
+                    onClick = {
+                        onSearchClick()
+                        searchActive = true
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_topbar_search),
+                        contentDescription = "Search Icon",
+                        tint = Color.Unspecified
+                    )
                 }
+            }
+
+            Box(
+                modifier = Modifier.wrapContentSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (currentPage == 0 && !searchActive) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(White000)
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        onBubbleClick()
+                        searchActive = false
+                        text = ""
+                    },
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_topbar_bubble),
+                        contentDescription = "Profile Icon",
+                        tint = Color.Unspecified
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier.wrapContentSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (currentPage == 1 && !searchActive) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(30.dp))
+                            .background(White000)
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        onStorageClick()
+                        searchActive = false
+                        text = ""
+                    },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_topbar_storage),
+                        contentDescription = "Compass Icon",
+                        tint = Color.Unspecified
+                    )
+                }
+            }
+        }
+
+        if (isViewMode) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Gray800.copy(alpha = 0.5f))
             )
-        } else {
-            IconButton(
-                onClick = {
-                    onSearchClick()
-                    searchActive = true
-                },
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_topbar_search),
-                    contentDescription = "Search Icon",
-                    tint = Color.Unspecified
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier.wrapContentSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            if (currentPage == 0 && !searchActive) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(White000)
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    onBubbleClick()
-                    searchActive = false
-                    text = ""
-                },
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_topbar_bubble),
-                    contentDescription = "Profile Icon",
-                    tint = Color.Unspecified
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier.wrapContentSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            if (currentPage == 1 && !searchActive) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(30.dp))
-                        .background(White000)
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    onStorageClick()
-                    searchActive = false
-                    text = ""
-                },
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_topbar_storage),
-                    contentDescription = "Compass Icon",
-                    tint = Color.Unspecified
-                )
-            }
         }
     }
 }
