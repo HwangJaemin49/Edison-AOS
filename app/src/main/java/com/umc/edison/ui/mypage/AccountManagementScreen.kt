@@ -133,7 +133,11 @@ private fun AccountManagementContent(
                         .wrapContentSize()
                         .clip(RoundedCornerShape(20.dp))
                         .background(Gray100)
-                        .clickable { /* TODO: 로그인하기 기능 */ }
+                        .clickable {
+                            navHostController.navigate(NavRoute.Login.route) {
+                                popUpTo(NavRoute.Login.route) { inclusive = true }
+                            }
+                        }
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(

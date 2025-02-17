@@ -89,7 +89,10 @@ fun NavigationGraph(
             ScrapBoardScreen(navHostController)
         }
 
-        composable(NavRoute.ScrapBoardDetail.route) {
+        composable(
+            route = "${NavRoute.ScrapBoard.route}/categories/{name}",
+            arguments = listOf(navArgument("name") { type = NavType.StringType })
+        ) {
             ScrapBoardDetailScreen(navHostController)
         }
 

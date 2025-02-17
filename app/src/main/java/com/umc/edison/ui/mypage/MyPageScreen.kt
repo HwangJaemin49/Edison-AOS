@@ -264,7 +264,10 @@ private fun ArtLetterScrap(
             columns = 2,
             items = scrapItems,
         ) {
-            ArtLetterCategoryContent(it as ArtLetterCategoryModel)
+            ArtLetterCategoryContent(
+                category = it as ArtLetterCategoryModel,
+                onCategoryClick = {}
+            )
         }
 
         if (scrapItems.isEmpty()) {

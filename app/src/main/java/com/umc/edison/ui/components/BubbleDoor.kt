@@ -565,7 +565,7 @@ private fun BubbleContent(
 }
 
 @Composable
-private fun calculateAspectRatio(content: String): Float {
+fun calculateAspectRatio(content: String): Float {
     var aspectRatio by remember { mutableFloatStateOf(1f) }
 
     val painter = rememberAsyncImagePainter(
