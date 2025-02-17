@@ -19,25 +19,40 @@ class TokenAuthenticator @Inject constructor(
         val errorBody = response.peekBody(Long.MAX_VALUE).string()
         val errorResponse = Gson().fromJson(errorBody, BaseResponse::class.java)
 
-        if (errorResponse?.code == "LOGIN4004") {
-            val refreshToken = tokenManager.loadRefreshToken()
-            val accessToken = tokenManager.loadAccessToken()
+        if (errorResponse?.code != "LOGIN4004") return null
 
+        val currentToken = tokenManager.loadAccessToken()
+        val requestToken = response.request.header("Authorization")?.substringAfter("Bearer ") ?: ""
+
+        if (currentToken != requestToken) {
+            return response.request.newBuilder()
+                .header("Authorization", "Bearer $currentToken")
+                .build()
+        }
+
+        synchronized(tokenManager) {
+            val newToken = tokenManager.loadAccessToken()
+            if (requestToken != newToken) {
+                return response.request.newBuilder()
+                    .header("Authorization", "Bearer $newToken")
+                    .build()
+            }
+
+            val refreshToken = tokenManager.loadRefreshToken()
             if (refreshToken.isNullOrEmpty()) {
                 tokenManager.deleteToken()
                 return null
             }
 
-            val newTokenResponse = refreshTokenApiService.refreshToken(refreshToken, "Bearer $accessToken").execute()
-            val newToken = newTokenResponse.body()?.data?.accessToken ?: return null
+            val newTokenResponse = refreshTokenApiService.refreshToken(refreshToken, "Bearer $currentToken").execute()
+            val refreshedToken = newTokenResponse.body()?.data?.accessToken ?: return null
 
-            tokenManager.setToken(newToken)
+            tokenManager.setToken(refreshedToken)
 
             return response.request.newBuilder()
-                .header("Authorization", "Bearer $newToken")
+                .header("Authorization", "Bearer $refreshedToken")
                 .build()
         }
-        return null
     }
 
     private fun responseCount(response: Response): Int {

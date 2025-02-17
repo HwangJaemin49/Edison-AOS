@@ -24,6 +24,7 @@ fun BubblesLayout(
     onBubbleLongClick: (BubbleModel) -> Unit = {},
     isBlur: Boolean = false,
     selectedBubble: List<BubbleModel> = emptyList(),
+    searchKeyword: String = ""
 ) {
     val bubbleOffsets = remember { mutableStateMapOf<BubbleModel, Dp>() }
 
@@ -52,7 +53,8 @@ fun BubblesLayout(
                     bubble = bubble,
                     size = bubbleSize,
                     onClick = { onBubbleClick(bubble) },
-                    onLongClick = { onBubbleLongClick(bubble) }
+                    onLongClick = { onBubbleLongClick(bubble) },
+                    searchKeyword = searchKeyword
                 )
 
                 if (isBlur && !selectedBubble.contains(bubble)) {

@@ -267,6 +267,7 @@ fun BubbleSpaceScreen(
                     onBubbleClick = { bubble ->
                         viewModel.selectBubble(bubble)
                     },
+                    searchKeyword = uiState.query
                 )
             }
         }
