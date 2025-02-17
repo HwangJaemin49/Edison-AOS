@@ -8,6 +8,7 @@ data class BubbleSpaceState(
     val selectedTabIndex: Int = 0,
     val mode: BubbleSpaceMode = BubbleSpaceMode.DEFAULT,
     val selectedBubble: BubbleModel? = null,
+    val query : String = "",
     val searchResults: List<BubbleModel> = emptyList(),
     val isLoggedIn: Boolean = false,
     override val isLoading: Boolean,
@@ -27,5 +28,4 @@ data class BubbleSpaceState(
 enum class BubbleSpaceMode {
     DEFAULT,
     SEARCH,
-    BUBBLE_DETAIL
 }

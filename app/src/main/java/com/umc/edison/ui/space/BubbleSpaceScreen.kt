@@ -28,10 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -71,7 +69,10 @@ fun BubbleSpaceScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(Unit) { updateShowBottomNav(true) }
+    LaunchedEffect(Unit) {
+        viewModel.checkLoginState()
+        updateShowBottomNav(true)
+    }
 
     // 탭 & 페이지 관련
     val pagerState = rememberPagerState(
@@ -86,12 +87,12 @@ fun BubbleSpaceScreen(
     )
 
     BackHandler {
-        if (uiState.mode == BubbleSpaceMode.BUBBLE_DETAIL) {
-            viewModel.updateBubbleSpaceMode(BubbleSpaceMode.DEFAULT)
+        if (uiState.selectedBubble != null) {
             viewModel.selectBubble(null)
             updateShowBottomNav(true)
         } else if (uiState.mode == BubbleSpaceMode.SEARCH) {
             viewModel.updateBubbleSpaceMode(BubbleSpaceMode.DEFAULT)
+            viewModel.updateQuery("")
         } else if (uiState.selectedTabIndex == 1) {
             viewModel.updateSelectedTabIndex(0)
             coroutineScope.launch {
@@ -117,7 +118,6 @@ fun BubbleSpaceScreen(
                 0 -> {
                     if (uiState.isLoggedIn) {
                         SpaceTabScreen(showBubble = { bubble ->
-                            viewModel.updateBubbleSpaceMode(BubbleSpaceMode.BUBBLE_DETAIL)
                             viewModel.selectBubble(bubble)
 
                             val bubbleSize = calculateBubbleSize(bubble)
@@ -242,7 +242,6 @@ fun BubbleSpaceScreen(
                     .fillMaxSize()
                     .padding(vertical = 20.dp),
             ) {
-                var searchQuery by remember { mutableStateOf("") }
                 // 검색 바
                 Box(
                     modifier = Modifier
@@ -251,11 +250,13 @@ fun BubbleSpaceScreen(
                         .padding(horizontal = 24.dp),
                 ) {
                     SearchBar(
-                        value = searchQuery,
+                        value = uiState.query,
                         onValueChange = { newQuery ->
-                            searchQuery = newQuery
+                            viewModel.updateQuery(newQuery)
                         },
-                        onSearch = { viewModel.searchBubbles(searchQuery) },
+                        onSearch = {
+                            viewModel.searchBubbles()
+                        },
                         placeholder = "찰나의 영감을 검색해보세요"
                     )
                 }
@@ -264,21 +265,19 @@ fun BubbleSpaceScreen(
                 BubblesLayout(
                     bubbles = uiState.searchResults,
                     onBubbleClick = { bubble ->
-                        viewModel.updateBubbleSpaceMode(BubbleSpaceMode.BUBBLE_DETAIL)
                         viewModel.selectBubble(bubble)
                     },
                 )
             }
         }
 
-        if (uiState.mode == BubbleSpaceMode.BUBBLE_DETAIL && uiState.selectedBubble != null) {
+        if (uiState.selectedBubble != null) {
             val bubble = uiState.selectedBubble!!
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Gray800.copy(alpha = 0.5f))
                     .clickable(onClick = {
-                        viewModel.updateBubbleSpaceMode(BubbleSpaceMode.DEFAULT)
                         viewModel.selectBubble(null)
                         updateShowBottomNav(true)
                     })
