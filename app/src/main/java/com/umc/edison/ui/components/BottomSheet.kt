@@ -29,6 +29,7 @@ fun BottomSheet(
     onDismiss: () -> Unit,
     uiState: BaseState,
     clearToastMessage: () -> Unit,
+    showToastMessage: Boolean = true,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable () -> Unit
 ) {
@@ -45,7 +46,7 @@ fun BottomSheet(
         ) {
             content()
 
-            if (uiState.toastMessage != null) {
+            if (uiState.toastMessage != null && showToastMessage) {
                 ToastMessage(
                     message = uiState.toastMessage!!,
                     isVisible = true,

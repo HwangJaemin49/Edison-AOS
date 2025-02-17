@@ -39,6 +39,24 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
+    fun shareImages() {
+        _uiState.update {
+            it.copy(
+                mode = BubbleStorageMode.EDIT,
+                toastMessage = "서비스 준비 중입니다."
+            )
+        }
+    }
+
+    fun shareTexts() {
+        _uiState.update {
+            it.copy(
+                mode = BubbleStorageMode.EDIT,
+                toastMessage = "서비스 준비 중입니다."
+            )
+        }
+    }
+
     override fun refreshDataAfterDeletion() {
         fetchStorageBubbles()
     }

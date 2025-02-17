@@ -222,7 +222,8 @@ fun BubbleStorageScreen(
                     updateViewMode(false)
                 },
                 uiState = uiState,
-                clearToastMessage = { viewModel.clearToastMessage() }
+                clearToastMessage = { viewModel.clearToastMessage() },
+                showToastMessage = false
             ) {
                 Column(
                     modifier = Modifier
@@ -230,7 +231,7 @@ fun BubbleStorageScreen(
                         .padding(vertical = 16.dp)
                 ) {
                     TextButton(
-                        onClick = { /* TODO: 이미지 공유 로직 추가 */ },
+                        onClick = { viewModel.shareImages() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -259,7 +260,7 @@ fun BubbleStorageScreen(
                     }
 
                     TextButton(
-                        onClick = { /* TODO: 텍스트 공유 로직 추가 */ },
+                        onClick = { viewModel.shareTexts() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 10.dp)
