@@ -38,4 +38,3 @@ fun Bubble.toPresentation(): BubbleModel =
     )
 
 fun List<Bubble>.toPresentation(): List<BubbleModel> = map { it.toPresentation() }
-

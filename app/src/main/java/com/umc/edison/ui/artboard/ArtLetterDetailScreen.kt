@@ -24,6 +24,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,8 +36,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.umc.edison.R
+import com.umc.edison.presentation.artletter.ArtLetterViewModel
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray600
@@ -42,7 +48,15 @@ import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
 @Composable
-fun ArtBoardDetailScreen(navHostController: NavHostController) {
+fun ArtLetterDetailScreen(
+    navHostController: NavHostController,
+    artletterId: Int,
+    viewModel: ArtLetterViewModel = hiltViewModel()) {
+    LaunchedEffect(artletterId) {
+        viewModel.fetchArtLetterDetail(artletterId)
+    }
+    val artLetterDetail by viewModel.artLetterDetail.collectAsState()
+
     val isBookmarked = remember { mutableStateOf(false) }
     val isLiked = remember { mutableStateOf(false) }
 
@@ -58,12 +72,21 @@ fun ArtBoardDetailScreen(navHostController: NavHostController) {
                             .height(472.dp)
 
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.delivery),
-                            contentDescription = "Thumbnail Image",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop // 이미지가 박스 크기에 맞게 조정됨
-                        )
+                        if (artLetterDetail.artletter.thumbnail.isNullOrBlank()) {
+                            Image(
+                                painter = painterResource(id = R.drawable.delivery),
+                                contentDescription = "Thumbnail Image",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop // 이미지가 박스 크기에 맞게 조정됨
+                            )
+                        } else {
+                            AsyncImage(
+                                model = artLetterDetail.artletter.thumbnail,
+                                contentDescription = "Thumbnail Image",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                         Icon(
                             painter = painterResource(id = if (isBookmarked.value) R.drawable.ic_artletter_detail_bookmark else R.drawable.ic_artletter_detail_empty_bookmark),
                             contentDescription = "Bookmark",
@@ -97,7 +120,7 @@ fun ArtBoardDetailScreen(navHostController: NavHostController) {
                                     tint = Gray600
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = "13분", color = Gray600, style = MaterialTheme.typography.labelLarge)
+                                Text(text = artLetterDetail.artletter.createdAt, color = Gray600, style = MaterialTheme.typography.labelLarge)
                             }
                         }
                         Row(

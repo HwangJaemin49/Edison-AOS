@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.storage.BubbleStorageMode
@@ -32,6 +33,7 @@ import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTagList
 import com.umc.edison.ui.components.LabelTopAppBar
+import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.components.calculateBubbleSize
 import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
@@ -48,6 +50,9 @@ fun BubbleStorageScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isBlur = uiState.bubbleStorageMode != BubbleStorageMode.NONE
+    val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
+    val currentRoute = currentBackStackEntry?.destination?.route
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
@@ -56,7 +61,7 @@ fun BubbleStorageScreen(
         if (uiState.labelId != null) {
             viewModel.fetchLabelDetail(uiState.labelId!!)
         } else {
-            viewModel.fetchAllBubbles()
+            viewModel.fetchStorageBubbles()
         }
     }
 
@@ -100,7 +105,7 @@ fun BubbleStorageScreen(
                     buttonText = buttonText,
                 )
             }
-        }
+        },
     ) {
         var onBubbleClick: (BubbleModel) -> Unit = {}
         var onBubbleLongClick: (BubbleModel) -> Unit = {}
@@ -126,7 +131,7 @@ fun BubbleStorageScreen(
             }
         }
 
-        Column(
+        Box(
             modifier = Modifier.clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
@@ -136,6 +141,7 @@ fun BubbleStorageScreen(
                 }
             }
         ) {
+
             if (uiState.label != null) {
                 LabelTopAppBar(
                     label = uiState.label!!,
@@ -150,9 +156,14 @@ fun BubbleStorageScreen(
                 onBubbleClick = onBubbleClick,
                 onBubbleLongClick = onBubbleLongClick,
                 isBlur = isBlur,
-                selectedBubble = uiState.selectedBubbles,
+                selectedBubble = uiState.selectedBubbles
             )
-        }
+                MyEdisonNavBar(
+                    onBubbleClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) },
+                    onMyEdisonClicked = { navHostController.navigate(NavRoute.MyEdison.route) },
+                    onSearchQuerySubmit = { query -> viewModel.fetchSearchBubbles(query) }
+                )
+            }
 
         if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
             val bubble = uiState.selectedBubbles.first()

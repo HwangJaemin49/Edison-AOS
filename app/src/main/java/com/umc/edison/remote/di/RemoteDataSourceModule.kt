@@ -1,8 +1,10 @@
 package com.umc.edison.remote.di
 
+import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
 import com.umc.edison.data.datasources.LabelRemoteDataSource
 import com.umc.edison.data.datasources.UserRemoteDataSource
+import com.umc.edison.remote.datasources.ArtLetterRemoteDataSourceImpl
 import com.umc.edison.remote.datasources.BubbleRemoteDataSourceImpl
 import com.umc.edison.remote.datasources.LabelRemoteDataSourceImpl
 import com.umc.edison.remote.datasources.UserRemoteDataSourceImpl
@@ -32,4 +34,10 @@ internal abstract class RemoteDataSourceModule {
     abstract fun bindUserRemoteDataSource(
         userRemoteDataSourceImpl: UserRemoteDataSourceImpl
     ): UserRemoteDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindArtLetterRemoteDataSource(
+        artLetterRemoteDataSourceImpl: ArtLetterRemoteDataSourceImpl
+    ): ArtLetterRemoteDataSource
 }

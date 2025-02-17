@@ -57,7 +57,7 @@ sealed class BottomNavItem(
         title = R.string.artletter,
         icon = R.drawable.ic_art_letter,
         selectedIcon = R.drawable.ic_art_letter_selected,
-        route = NavRoute.ArtBoard.route
+        route = NavRoute.ArtLetter.route
     )
 
     data object MyPage : BottomNavItem(
@@ -97,7 +97,7 @@ fun BottomNavigation(
                 val isSelected = when (navItem) {
                     BottomNavItem.MyEdison -> currentRoute?.startsWith(NavRoute.MyEdison.route) == true
                     BottomNavItem.Space -> currentRoute?.startsWith(NavRoute.Space.route) == true
-                    BottomNavItem.ArtLetter -> currentRoute?.startsWith(NavRoute.ArtBoard.route) == true
+                    BottomNavItem.ArtLetter -> currentRoute?.startsWith(NavRoute.ArtLetter.route) == true
                     BottomNavItem.MyPage -> currentRoute?.startsWith(NavRoute.MyPage.route) == true
                     BottomNavItem.Bubble -> false
                 }

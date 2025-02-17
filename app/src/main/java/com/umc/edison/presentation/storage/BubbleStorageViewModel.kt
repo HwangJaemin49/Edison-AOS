@@ -1,8 +1,9 @@
 package com.umc.edison.presentation.storage
 
 import androidx.lifecycle.SavedStateHandle
-import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.GetSearchBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
@@ -21,7 +22,8 @@ class BubbleStorageViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getLabelDetailUseCase: GetLabelDetailUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
-    private val getAllBubblesUseCase: GetAllBubblesUseCase,
+    private val getStorageBubbleUseCase: GetStorageBubbleUseCase,
+    private val getSearchBubblesUseCase: GetSearchBubblesUseCase,
     private val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
     private val moveBubblesUseCase: MoveBubblesUseCase,
 ) : BaseViewModel() {
@@ -35,7 +37,7 @@ class BubbleStorageViewModel @Inject constructor(
         if (id != null) {
             fetchLabelDetail(id)
         } else {
-            fetchAllBubbles()
+            fetchStorageBubbles()
         }
     }
 
@@ -69,9 +71,27 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
-    fun fetchAllBubbles() { // TODO: 사용하는 비즈니스 로직이 7일간의 버블만 갖고오는 로직이라 이 부분은 UI 구현이 끝난 이후에 수정
+    fun fetchStorageBubbles() {
         collectDataResource(
-            flow = getAllBubblesUseCase(),
+            flow = getStorageBubbleUseCase(),
+            onSuccess = { bubbles ->
+                _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun fetchSearchBubbles(query: String) {
+        collectDataResource(
+            flow = getSearchBubblesUseCase(query),
             onSuccess = { bubbles ->
                 _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
             },
@@ -132,7 +152,7 @@ class BubbleStorageViewModel @Inject constructor(
                 _uiState.value.label?.let { it1 -> fetchLabelDetail(it1.id) }
 
                 if (_uiState.value.label == null) {
-                    fetchAllBubbles()
+                    fetchStorageBubbles()
                 }
             },
             onError = { error ->

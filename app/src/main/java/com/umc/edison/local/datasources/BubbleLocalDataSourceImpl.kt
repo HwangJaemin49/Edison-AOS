@@ -1,5 +1,6 @@
 package com.umc.edison.local.datasources
 
+import android.icu.util.Calendar
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.local.model.BubbleLocal
@@ -26,12 +27,26 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         return convertLocalBubblesToBubbles(localBubbles)
     }
 
+    override suspend fun getStorageBubbles(): List<BubbleEntity> {
+        val sevenDaysAgo = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -7)
+        }.time.time
+        val localBubbles: List<BubbleLocal> = bubbleDao.getStorageBubbles(sevenDaysAgo)
+
+        return convertLocalBubblesToBubbles(localBubbles)
+    }
+
     override suspend fun getBubblesByLabel(labelId: Int): List<BubbleEntity> {
         val localBubbles: List<BubbleLocal> = if (labelId == 0) {
             bubbleDao.getBubblesWithoutLabel()
         } else {
             bubbleDao.getBubblesByLabel(labelId)
         }
+        return convertLocalBubblesToBubbles(localBubbles)
+    }
+
+    override suspend fun getSearchBubbles(query: String): List<BubbleEntity> {
+        val localBubbles: List<BubbleLocal> = bubbleDao.getSearchBubbles(query)
         return convertLocalBubblesToBubbles(localBubbles)
     }
 

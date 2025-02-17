@@ -4,6 +4,8 @@ import com.umc.edison.data.model.BubbleEntity
 
 interface BubbleLocalDataSource {
     suspend fun getAllBubbles(): List<BubbleEntity>
+    suspend fun getStorageBubbles(): List<BubbleEntity>
+    suspend fun getSearchBubbles(query: String): List<BubbleEntity>
     suspend fun addBubbles(bubbles: List<BubbleEntity>)
     suspend fun addBubble(bubble: BubbleEntity) : BubbleEntity
 

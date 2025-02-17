@@ -30,6 +30,7 @@ fun BubblesLayout(
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(8.dp)
     ) {
+
         items(bubbles.size) { index ->
             val bubble = bubbles[index]
 
@@ -39,12 +40,14 @@ fun BubblesLayout(
 
             val bubbleSize = calculateBubblePreviewSize(bubble)
 
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = xOffset)
                     .size(bubbleSize.size + 4.dp)
             ) {
+
                 BubblePreview(
                     bubble = bubble,
                     size = bubbleSize,

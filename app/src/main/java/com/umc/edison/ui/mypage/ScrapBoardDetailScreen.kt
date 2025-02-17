@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.umc.edison.R
-import com.umc.edison.ui.artboard.ArtBoardCard
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -61,26 +59,26 @@ fun ScrapBoardDetailScreen(
             )
         }
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val items = List(4) { it }
-            items.chunked(2).forEach { rowItems ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    rowItems.forEach { _ ->
-                        ArtBoardCard(modifier = Modifier.weight(1f),
-                            navHostController = navHostController)
-                    }
-                    if (rowItems.size < 2) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
+//        Column(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            val items = List(4) { it }
+//            items.chunked(2).forEach { rowItems ->
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                ) {
+//                    rowItems.forEach { _ ->
+//                        ArtBoardCard(modifier = Modifier.weight(1f),
+//                            navHostController = navHostController)
+//                    }
+//                    if (rowItems.size < 2) {
+//                        Spacer(modifier = Modifier.weight(1f))
+//                    }
+//                }
+//                Spacer(modifier = Modifier.height(8.dp))
+//            }
+//        }
 
     }
 }
