@@ -31,7 +31,6 @@ import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTagList
-import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.components.calculateBubbleSize
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
@@ -43,6 +42,8 @@ import com.umc.edison.ui.theme.Gray900
 fun BubbleStorageScreen(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit,
+    searchResults: List<BubbleModel>,
+    searchKeyword: String,
     viewModel: BubbleStorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -119,17 +120,12 @@ fun BubbleStorageScreen(
             }
         ) {
             BubblesLayout(
-                bubbles = uiState.bubbles,
+                bubbles = if (searchKeyword.isEmpty() || searchResults.isEmpty()) uiState.bubbles else searchResults,
                 onBubbleClick = onBubbleClick,
                 onBubbleLongClick = onBubbleLongClick,
                 isBlur = uiState.mode != BubbleStorageMode.NONE,
-                selectedBubble = uiState.selectedBubbles
-            )
-
-            MyEdisonNavBar(
-                onBubbleClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) },
-                onMyEdisonClicked = { navHostController.navigate(NavRoute.MyEdison.route) },
-                onSearchQuerySubmit = { query -> viewModel.fetchSearchBubbles(query) }
+                selectedBubble = uiState.selectedBubbles,
+                searchKeyword = searchKeyword,
             )
         }
 

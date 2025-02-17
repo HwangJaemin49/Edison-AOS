@@ -7,9 +7,7 @@ sealed class NavRoute(val route: String) {
     data object ArtLetterSearch : NavRoute("art-letter/search")
     data class ArtLetterDetail(val artletterId: Int) : NavRoute("art-letter/{artletterId}")
     data object MyPage : NavRoute("my-page")
-    data object BubbleStorage: NavRoute("my-edison/bubble-storage")
     data object SpaceLabel : NavRoute("space/labels")
-
 
     data object Splash : NavRoute("login/splash")
     data object Login : NavRoute("login")

@@ -9,7 +9,6 @@ import androidx.navigation.navArgument
 import com.umc.edison.ui.artboard.ArtLetterScreen
 import com.umc.edison.ui.artboard.ArtLetterDetailScreen
 import com.umc.edison.ui.artboard.ArtLetterSearchScreen
-import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
@@ -39,10 +38,6 @@ fun NavigationGraph(
         // bottom navigation
         composable(NavRoute.MyEdison.route) {
             MyEdisonScreen(navHostController, updateShowBottomNav)
-        }
-
-        composable(NavRoute.BubbleStorage.route) {
-            BubbleStorageScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.Space.route) {
