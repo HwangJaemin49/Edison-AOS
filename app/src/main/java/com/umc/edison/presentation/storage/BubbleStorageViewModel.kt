@@ -1,15 +1,10 @@
 package com.umc.edison.presentation.storage
 
-import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetSearchBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
-import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
-import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
-import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
-import com.umc.edison.presentation.base.BaseViewModel
-import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
+import com.umc.edison.presentation.baseBubble.BubbleStorageMode
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,57 +14,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BubbleStorageViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    private val getLabelDetailUseCase: GetLabelDetailUseCase,
-    private val getAllLabelsUseCase: GetAllLabelsUseCase,
     private val getStorageBubbleUseCase: GetStorageBubbleUseCase,
     private val getSearchBubblesUseCase: GetSearchBubblesUseCase,
-    private val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
-    private val moveBubblesUseCase: MoveBubblesUseCase,
-) : BaseViewModel() {
+    override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
+) : BaseBubbleViewModel<BubbleStorageMode, BubbleStorageState>() {
 
-    private val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
-    val uiState = _uiState.asStateFlow()
-
-    init {
-        val id: Int? = savedStateHandle["id"]
-
-        if (id != null) {
-            fetchLabelDetail(id)
-        } else {
-            fetchStorageBubbles()
-        }
-    }
-
-    fun fetchLabelDetail(id: Int) {
-        _uiState.update { BubbleStorageState.DEFAULT }
-
-        collectDataResource(
-            flow = getLabelDetailUseCase(id),
-            onSuccess = { label ->
-                val shuffledBubbles = label.bubbles.shuffled().toPresentation()
-                _uiState.update {
-                    it.copy(
-                        label = label.toPresentation().copy(bubbles = shuffledBubbles)
-                    )
-                }
-            },
-            onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false, labelId = id) }
-            }
-        )
-    }
+    override val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
+    override val uiState = _uiState.asStateFlow()
 
     fun fetchStorageBubbles() {
         collectDataResource(
@@ -107,126 +58,7 @@ class BubbleStorageViewModel @Inject constructor(
         )
     }
 
-    fun updateEditMode(mode: BubbleStorageMode) {
-        if (mode == BubbleStorageMode.NONE) {
-            _uiState.update {
-                it.copy(
-                    bubbleStorageMode = mode,
-                    selectedBubbles = emptyList()
-                )
-            }
-        } else {
-            _uiState.update { it.copy(bubbleStorageMode = mode) }
-        }
+    override fun refreshDataAfterDeletion() {
+        fetchStorageBubbles()
     }
-
-    fun selectBubble(bubble: BubbleModel) {
-        _uiState.update {
-            it.copy(
-                selectedBubbles = listOf(bubble)
-            )
-        }
-    }
-
-    fun toggleSelectBubble(bubble: BubbleModel) {
-        _uiState.update {
-            if (it.selectedBubbles.contains(bubble)) {
-                it.copy(
-                    selectedBubbles = it.selectedBubbles - bubble
-                )
-            } else {
-                it.copy(
-                    selectedBubbles = it.selectedBubbles + bubble
-                )
-            }
-        }
-    }
-
-    fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
-        collectDataResource(
-            flow = softDeleteBubblesUseCase(_uiState.value.selectedBubbles.toSet().map { it.toDomain() }),
-            onSuccess = {
-                updateEditMode(BubbleStorageMode.NONE)
-                showBottomNav(true)
-
-                _uiState.value.label?.let { it1 -> fetchLabelDetail(it1.id) }
-
-                if (_uiState.value.label == null) {
-                    fetchStorageBubbles()
-                }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
-    }
-
-    fun getMovableLabels() {
-        collectDataResource(
-            flow = getAllLabelsUseCase(),
-            onSuccess = { allLabels ->
-                val movableLabels = allLabels.toPresentation().filter { label ->
-                    _uiState.value.label?.id != label.id
-                }
-
-                _uiState.update { it.copy(movableLabels = movableLabels) }
-            },
-            onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
-    }
-
-    fun moveSelectedBubbles(label: LabelModel, showBottomNav: (Boolean) -> Unit) {
-        if (_uiState.value.label == null) return
-
-        collectDataResource(
-            flow = moveBubblesUseCase(
-                bubbles = _uiState.value.selectedBubbles.toSet().map { it.toDomain() },
-                moveFrom = _uiState.value.label!!.toDomain(),
-                moveTo = label.toDomain()
-            ),
-            onSuccess = {
-                updateEditMode(BubbleStorageMode.NONE)
-                showBottomNav(true)
-                _uiState.value.label?.let { it1 -> fetchLabelDetail(it1.id) }
-            },
-            onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = error.message
-                    )
-                }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

@@ -1,23 +1,26 @@
-package com.umc.edison.presentation.storage
+package com.umc.edison.presentation.label
 
 import com.umc.edison.presentation.baseBubble.BaseBubbleMode
 import com.umc.edison.presentation.baseBubble.BaseBubbleState
-import com.umc.edison.presentation.baseBubble.BubbleStorageMode
+import com.umc.edison.presentation.baseBubble.LabelDetailMode
 import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.presentation.model.LabelModel
 
-data class BubbleStorageState(
-    val bubbles: List<BubbleModel>,
+data class LabelDetailState(
+    val label: LabelModel,
+    val movableLabels: List<LabelModel>,
     override val selectedBubbles: List<BubbleModel>,
     override val mode: BaseBubbleMode,
     override val isLoading: Boolean,
     override val error: Throwable?,
     override val toastMessage: String?
-) : BaseBubbleState<BubbleStorageMode>(selectedBubbles, mode, isLoading, error, toastMessage) {
+) : BaseBubbleState<LabelDetailMode>(selectedBubbles, mode, isLoading, error, toastMessage) {
     companion object {
-        val DEFAULT = BubbleStorageState(
-            bubbles = emptyList(),
+        val DEFAULT = LabelDetailState(
+            label = LabelModel.DEFAULT,
+            movableLabels = emptyList(),
             selectedBubbles = emptyList(),
-            mode = BubbleStorageMode.NONE,
+            mode = LabelDetailMode.NONE,
             isLoading = false,
             error = null,
             toastMessage = null
@@ -30,7 +33,7 @@ data class BubbleStorageState(
         isLoading: Boolean,
         error: Throwable?,
         toastMessage: String?
-    ): BaseBubbleState<BubbleStorageMode> {
+    ): BaseBubbleState<LabelDetailMode> {
         return copy(
             selectedBubbles = selectedBubbles,
             mode = mode,
@@ -40,4 +43,3 @@ data class BubbleStorageState(
         )
     }
 }
-
