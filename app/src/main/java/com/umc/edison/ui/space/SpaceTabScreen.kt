@@ -244,6 +244,9 @@ private fun DrawScope.drawGradientBlurCircle(
         val paint = Paint().apply {
             isAntiAlias = true
             when (colors.size) {
+                0 -> {
+                    color = Gray300.copy(alpha = alphaRatio).toArgb()
+                }
                 1 -> {
                     // 단일 색상
                     color = colors.first().copy(alpha = alphaRatio).toArgb()
