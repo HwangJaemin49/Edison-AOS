@@ -15,8 +15,8 @@ data class ArtLetterDetailEntity(
     val thumbnail: String?,
     val likesCnt: Int,
     val scrapsCnt: Int,
-    val createdAt: String,
-    val updatedAt: String,
+    val createdAt: Date,
+    val updatedAt: Date,
     val liked: Boolean,
     val scraped: Boolean
 ) : DataMapper<ArtLetterDetail> {

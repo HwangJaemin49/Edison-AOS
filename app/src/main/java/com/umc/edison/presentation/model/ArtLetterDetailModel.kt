@@ -2,7 +2,9 @@ package com.umc.edison.presentation.model
 
 
 import com.umc.edison.domain.model.ArtLetterDetail
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 data class ArtLetterDetailModel(
     val artletterId: Int,
@@ -15,12 +17,14 @@ data class ArtLetterDetailModel(
     val thumbnail: String?,
     val likesCnt: Int,
     val scrapsCnt: Int,
-    val createdAt: String,
-    val updatedAt: String,
+    val createdAt: Date,
+    val updatedAt: Date,
     val liked: Boolean,
     val scraped: Boolean,
 ) {
     companion object {
+        private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
         val DEFAULT = ArtLetterDetailModel(
             artletterId = 1,
             title = "제목",
@@ -29,11 +33,11 @@ data class ArtLetterDetailModel(
             readTime = 0,
             writer = "작가",
             tags = "태그",
-            thumbnail = null, // Default 썸네일?
+            thumbnail = null,
             likesCnt = 0,
             scrapsCnt = 0,
-            createdAt = "20250216",
-            updatedAt = "20250216",
+            createdAt = dateFormat.parse("2025-02-16 15:30:45") ?: Date(),
+            updatedAt = dateFormat.parse("2025-02-16 15:30:45") ?: Date(),
             liked = false,
             scraped = false
         )

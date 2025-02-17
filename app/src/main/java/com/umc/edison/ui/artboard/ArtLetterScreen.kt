@@ -298,7 +298,7 @@ fun ArtBoardCard(
     Box(
         modifier = modifier
             .aspectRatio(174f / 240f)
-            .clickable { navHostController.navigate("art-letter/${uiState.artletterId}")}
+            .clickable { navHostController.navigate(NavRoute.ArtLetterDetail.createRoute(uiState.artletterId))}
                 .clip(RoundedCornerShape(10.dp))
     ) {
         if (uiState.thumbnail.isNullOrBlank()) {

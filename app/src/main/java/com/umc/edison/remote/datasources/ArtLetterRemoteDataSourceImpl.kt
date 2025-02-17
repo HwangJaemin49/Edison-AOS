@@ -2,6 +2,7 @@ package com.umc.edison.remote.datasources
 
 import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.data.model.ArtLetterDetailEntity
+import com.umc.edison.data.model.ArtLetterMarkEntity
 import com.umc.edison.data.model.ArtletterEntity
 import com.umc.edison.data.model.toDomain
 import com.umc.edison.remote.api.ArtLetterApiService
@@ -23,7 +24,11 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getArtLetterDetail(letterId: Int): ArtLetterDetailEntity {
-        return artLetterApiService.getArtLetterDetail(letterId).data.toDomain()
+        return artLetterApiService.getArtLetterDetail(letterId).data.toData()
+    }
+
+    override suspend fun postArtLetterLike(artletterId: Int): ArtLetterMarkEntity {
+        return artLetterApiService.postArtLetterLike(artletterId).data.toData()
     }
 
     override suspend fun toggleScrap(artLetterId: Int): ScrapArtLettersResult {

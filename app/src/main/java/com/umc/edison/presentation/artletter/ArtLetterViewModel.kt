@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.artletter.GetAllArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
 import com.umc.edison.domain.usecase.artletter.GetSortedArtLettersUseCase
+import com.umc.edison.domain.usecase.artletter.PostArtLetterLikeUseCase
 import com.umc.edison.domain.usecase.artletter.PostEditorPickUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLettersUseCase
 import com.umc.edison.presentation.base.BaseViewModel
@@ -14,16 +15,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 
 @HiltViewModel
 class ArtLetterViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val getAllArtLettersUseCase: GetAllArtLettersUseCase,
     private val getArtLetterDetailUseCase: GetArtLetterDetailUseCase,
     private val getSortedArtLettersUseCase: GetSortedArtLettersUseCase,
     private val scrapArtLettersUseCase: ScrapArtLettersUseCase,
+    private val postArtLetterLikeUseCase: PostArtLetterLikeUseCase,
     private val postEditorPickUseCase: PostEditorPickUseCase,
 ) : BaseViewModel() {
 
@@ -33,6 +37,9 @@ class ArtLetterViewModel @Inject constructor(
     private val _artLetterDetail = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val artLetterDetail = _artLetterDetail.asStateFlow()
 
+    private val _likeState = MutableStateFlow(ArtLetterMarkState.DEFAULT)
+    val likeState = _likeState.asStateFlow()
+
 
     private val _uiEditorPickState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiEditorPickState = _uiEditorPickState.asStateFlow()
@@ -41,7 +48,12 @@ class ArtLetterViewModel @Inject constructor(
     val scrapStatus: StateFlow<Map<Int, Boolean>> = _scrapStatus.asStateFlow()
 
     init {
-        fetchAllArtLetters()
+        val artletterId: Int? = savedStateHandle["artletterId"]
+        if (artletterId != null) {
+            fetchArtLetterDetail(artletterId)
+        } else {
+            fetchAllArtLetters()
+        }
     }
 
     private fun fetchAllArtLetters() {
@@ -74,17 +86,36 @@ class ArtLetterViewModel @Inject constructor(
             onSuccess = {  artletter ->
                 _artLetterDetail.update {
                     it.copy(artletter = artletter.toPresentation())}
+                Log.d("ArtLetterViewModel", "fetchArtLetterDetail(): $artletter")
             },
             onError = { error ->
-                Log.e("ArtLetterViewModel", "오류 발생: ${error.message}", error)
                 _uiState.update { it.copy(error = error) }
             },
             onLoading = {
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                Log.d("ArtLetterViewModel", "fetchAllArtLetters() 완료됨")
+                Log.d("ArtLetterViewModel", "fetchArtLetterDetail() 완료됨")
                 _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun postArtLetterLike(artletterId: Int) {
+        collectDataResource(
+            flow = postArtLetterLikeUseCase(artletterId),
+            onSuccess = { result ->
+                _likeState.update { it.copy(result = result.toPresentation()) }
+                Log.d("LikeTest", "isLiked: ${result.liked}")
+            },
+            onError = { error ->
+                _likeState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _likeState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _likeState.update { it.copy(isLoading = false) }
             }
         )
     }
