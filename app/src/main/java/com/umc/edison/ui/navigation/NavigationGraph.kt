@@ -9,11 +9,11 @@ import androidx.navigation.navArgument
 import com.umc.edison.ui.artboard.ArtLetterScreen
 import com.umc.edison.ui.artboard.ArtLetterDetailScreen
 import com.umc.edison.ui.artboard.ArtLetterSearchScreen
-import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.edison.MyEdisonScreen
 import com.umc.edison.ui.mypage.MyPageScreen
 import com.umc.edison.ui.space.BubbleSpaceScreen
 import com.umc.edison.ui.edison.BubbleInputScreen
+import com.umc.edison.ui.label.LabelDetailScreen
 import com.umc.edison.ui.login.IdentityTestScreen
 import com.umc.edison.ui.login.LoginScreen
 import com.umc.edison.ui.login.MakeNickNameScreen
@@ -38,10 +38,6 @@ fun NavigationGraph(
         // bottom navigation
         composable(NavRoute.MyEdison.route) {
             MyEdisonScreen(navHostController, updateShowBottomNav)
-        }
-
-        composable(NavRoute.BubbleStorage.route) {
-            BubbleStorageScreen(navHostController, updateShowBottomNav)
         }
 
         composable(NavRoute.Space.route) {
@@ -136,7 +132,7 @@ fun NavigationGraph(
             route = "${NavRoute.SpaceLabel.route}/labels/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
-            BubbleStorageScreen(navHostController, updateShowBottomNav)
+            LabelDetailScreen(navHostController, updateShowBottomNav)
         }
 
         composable(

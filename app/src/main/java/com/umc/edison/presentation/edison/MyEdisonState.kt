@@ -9,8 +9,9 @@ data class  MyEdisonState(
     override val toastMessage: String? = null,
     val bubble: BubbleModel,
     val bubbles: List<BubbleModel>,
-
-    ): BaseState {
+    val query : String = "",
+    val searchResults: List<BubbleModel> = emptyList(),
+): BaseState {
     companion object {
         val DEFAULT =  MyEdisonState(
             isLoading = false,

@@ -1,6 +1,7 @@
 package com.umc.edison.ui.bubblestorage
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,13 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.umc.edison.ui.components.Bubble
 import com.umc.edison.presentation.model.BubbleModel
-import com.umc.edison.presentation.storage.BubbleStorageMode
+import com.umc.edison.presentation.baseBubble.BubbleStorageMode
 import com.umc.edison.presentation.storage.BubbleStorageViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BottomSheet
@@ -32,44 +35,40 @@ import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.BubbleType
 import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTagList
-import com.umc.edison.ui.components.LabelTopAppBar
-import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.components.calculateBubbleSize
-import com.umc.edison.ui.label.LabelSelectModalContent
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Gray900
+import com.umc.edison.ui.theme.White000
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BubbleStorageScreen(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit,
+    searchResults: List<BubbleModel>,
+    searchKeyword: String,
+    updateViewMode: (Boolean) -> Unit,
     viewModel: BubbleStorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val isBlur = uiState.bubbleStorageMode != BubbleStorageMode.NONE
-    val navController = rememberNavController()
-    val currentBackStackEntry by navController.currentBackStackEntryFlow.collectAsState(initial = null)
-    val currentRoute = currentBackStackEntry?.destination?.route
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
         viewModel.updateEditMode(BubbleStorageMode.NONE)
+        updateViewMode(false)
 
-        if (uiState.labelId != null) {
-            viewModel.fetchLabelDetail(uiState.labelId!!)
-        } else {
-            viewModel.fetchStorageBubbles()
-        }
+        viewModel.fetchStorageBubbles()
     }
 
     BackHandler(enabled = true) {
-        if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
+        if (uiState.mode == BubbleStorageMode.NONE) {
             navHostController.popBackStack()
         } else {
-            resetEditMode(viewModel, updateShowBottomNav)
+            viewModel.updateEditMode(BubbleStorageMode.NONE)
+            updateViewMode(false)
+            updateShowBottomNav(true)
         }
     }
 
@@ -77,32 +76,20 @@ fun BubbleStorageScreen(
         uiState = uiState,
         clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
-            if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
-                val onButtonClick: () -> Unit
-                val buttonText: String
-
-                if (uiState.label == null) {
-                    onButtonClick = {
-                        viewModel.updateEditMode(BubbleStorageMode.SHARE)
-                    }
-                    buttonText = "공유하기"
-                } else {
-                    onButtonClick = {
-                        viewModel.getMovableLabels()
-                        viewModel.updateEditMode(BubbleStorageMode.MOVE)
-                    }
-                    buttonText = "버블 이동"
-                }
-
+            if (uiState.mode == BubbleStorageMode.EDIT) {
                 BottomSheetForDelete(
                     selectedCnt = uiState.selectedBubbles.size,
                     showSelectedCnt = true,
-                    onButtonClick = onButtonClick,
+                    onButtonClick = {
+                        viewModel.updateEditMode(BubbleStorageMode.SHARE)
+                        updateViewMode(false)
+                    },
                     onDelete = {
                         viewModel.updateEditMode(BubbleStorageMode.DELETE)
+                        updateViewMode(false)
                     },
                     buttonEnabled = uiState.selectedBubbles.isNotEmpty(),
-                    buttonText = buttonText,
+                    buttonText = "공유하기",
                 )
             }
         },
@@ -110,14 +97,15 @@ fun BubbleStorageScreen(
         var onBubbleClick: (BubbleModel) -> Unit = {}
         var onBubbleLongClick: (BubbleModel) -> Unit = {}
 
-        if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
+        if (uiState.mode == BubbleStorageMode.EDIT) {
             onBubbleClick = { bubble ->
                 viewModel.toggleSelectBubble(bubble)
             }
-        } else if (uiState.bubbleStorageMode == BubbleStorageMode.NONE) {
+        } else if (uiState.mode == BubbleStorageMode.NONE) {
             onBubbleClick = { bubble ->
                 viewModel.selectBubble(bubble)
                 viewModel.updateEditMode(BubbleStorageMode.VIEW)
+                updateViewMode(true)
                 val bubbleSize = calculateBubbleSize(bubble)
 
                 if (bubbleSize == BubbleType.BubbleDoor) {
@@ -127,45 +115,63 @@ fun BubbleStorageScreen(
             onBubbleLongClick = { bubble ->
                 viewModel.selectBubble(bubble)
                 viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                updateViewMode(false)
                 updateShowBottomNav(false)
             }
         }
 
         Box(
-            modifier = Modifier.clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                if (uiState.bubbleStorageMode == BubbleStorageMode.EDIT) {
-                    resetEditMode(viewModel, updateShowBottomNav)
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    if (uiState.mode == BubbleStorageMode.EDIT) {
+                        viewModel.updateEditMode(BubbleStorageMode.NONE)
+                        updateViewMode(false)
+                        updateShowBottomNav(true)
+                    }
                 }
-            }
         ) {
-
-            if (uiState.label != null) {
-                LabelTopAppBar(
-                    label = uiState.label!!,
-                    onBackClick = {
-                        resetEditMode(viewModel, updateShowBottomNav)
-                        navHostController.popBackStack()}
-                )
-            }
-
             BubblesLayout(
-                bubbles = uiState.label?.bubbles ?: uiState.bubbles,
+                bubbles = if (searchKeyword.isEmpty() || searchResults.isEmpty()) uiState.bubbles else searchResults,
                 onBubbleClick = onBubbleClick,
                 onBubbleLongClick = onBubbleLongClick,
-                isBlur = isBlur,
-                selectedBubble = uiState.selectedBubbles
+                isBlur = uiState.mode != BubbleStorageMode.NONE,
+                selectedBubble = uiState.selectedBubbles,
+                searchKeyword = searchKeyword,
+                isReversed = true
             )
-                MyEdisonNavBar(
-                    onBubbleClicked = { navHostController.navigate(NavRoute.BubbleStorage.route) },
-                    onMyEdisonClicked = { navHostController.navigate(NavRoute.MyEdison.route) },
-                    onSearchQuerySubmit = { query -> viewModel.fetchSearchBubbles(query) }
-                )
-            }
 
-        if (uiState.bubbleStorageMode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
+            if (searchKeyword.isEmpty() || searchResults.isEmpty()) {
+                // Linear Gradient 효과가 적용된 배경
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    val gradientHeight = size.height * 0.3f
+
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(White000, White000.copy(alpha = 0f)),
+                            startY = 0f,
+                            endY = gradientHeight
+                        ),
+                        size = Size(size.width, gradientHeight)
+                    )
+
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(White000.copy(alpha = 0f), White000),
+                            startY = size.height - gradientHeight,
+                            endY = size.height
+                        ),
+                        topLeft = Offset(0f, size.height - gradientHeight),
+                        size = Size(size.width, gradientHeight)
+                    )
+                }
+            }
+        }
+
+        if (uiState.mode == BubbleStorageMode.VIEW && uiState.selectedBubbles.isNotEmpty()) {
             val bubble = uiState.selectedBubbles.first()
             Box(
                 modifier = Modifier
@@ -173,6 +179,7 @@ fun BubbleStorageScreen(
                     .background(Gray800.copy(alpha = 0.5f))
                     .clickable(onClick = {
                         viewModel.updateEditMode(BubbleStorageMode.NONE)
+                        updateViewMode(false)
                         updateShowBottomNav(true)
                     })
                     .padding(top = 24.dp),
@@ -193,31 +200,14 @@ fun BubbleStorageScreen(
                     modifier = Modifier.align(Alignment.BottomStart)
                 )
             }
-        } else if (uiState.bubbleStorageMode == BubbleStorageMode.MOVE) {
-            BottomSheet(
-                uiState = uiState,
-                clearToastMessage = { viewModel.clearToastMessage() },
-                onDismiss = {
-                    viewModel.updateEditMode(BubbleStorageMode.EDIT)
-                },
-            ) {
-                LabelSelectModalContent(
-                    labels = uiState.movableLabels,
-                    onDismiss = {
-                        viewModel.updateEditMode(BubbleStorageMode.EDIT)
-                    },
-                    onConfirm = { labelList ->
-                        viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
-                    },
-                )
-            }
-        } else if (uiState.bubbleStorageMode == BubbleStorageMode.DELETE) {
+        } else if (uiState.mode == BubbleStorageMode.DELETE) {
             BottomSheetPopUp(
                 title = "${uiState.selectedBubbles.size} 개의 버블을 삭제하시겠습니까?",
                 cancelText = "취소",
                 confirmText = "삭제",
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                    updateViewMode(false)
                 },
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
@@ -225,13 +215,15 @@ fun BubbleStorageScreen(
                 uiState = uiState,
                 clearToastMessage = { viewModel.clearToastMessage() }
             )
-        } else if (uiState.bubbleStorageMode == BubbleStorageMode.SHARE) {
+        } else if (uiState.mode == BubbleStorageMode.SHARE) {
             BottomSheet(
                 onDismiss = {
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
+                    updateViewMode(false)
                 },
                 uiState = uiState,
-                clearToastMessage = { viewModel.clearToastMessage() }
+                clearToastMessage = { viewModel.clearToastMessage() },
+                showToastMessage = false
             ) {
                 Column(
                     modifier = Modifier
@@ -239,7 +231,7 @@ fun BubbleStorageScreen(
                         .padding(vertical = 16.dp)
                 ) {
                     TextButton(
-                        onClick = { /* TODO: 이미지 공유 로직 추가 */ },
+                        onClick = { viewModel.shareImages() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 10.dp)
@@ -268,7 +260,7 @@ fun BubbleStorageScreen(
                     }
 
                     TextButton(
-                        onClick = { /* TODO: 텍스트 공유 로직 추가 */ },
+                        onClick = { viewModel.shareTexts() },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 10.dp)
@@ -288,12 +280,4 @@ fun BubbleStorageScreen(
             }
         }
     }
-}
-
-private fun resetEditMode(
-    viewModel: BubbleStorageViewModel,
-    updateShowBottomNav: (Boolean) -> Unit
-) {
-    viewModel.updateEditMode(BubbleStorageMode.NONE)
-    updateShowBottomNav(true)
 }

@@ -2,11 +2,14 @@ package com.umc.edison.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlurEffect
@@ -16,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.ui.theme.White000
+import kotlinx.coroutines.launch
 
 @Composable
 fun BubblesLayout(
@@ -24,13 +28,32 @@ fun BubblesLayout(
     onBubbleLongClick: (BubbleModel) -> Unit = {},
     isBlur: Boolean = false,
     selectedBubble: List<BubbleModel> = emptyList(),
-    searchKeyword: String = ""
+    searchKeyword: String = "",
+    isReversed: Boolean = false
 ) {
     val bubbleOffsets = remember { mutableStateMapOf<BubbleModel, Dp>() }
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(bubbles.size) {
+        if (bubbles.isNotEmpty() && isReversed) {
+            coroutineScope.launch {
+                listState.animateScrollToItem(bubbles.size - 1)
+            }
+        }
+    }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(8.dp)
+        state = listState,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
     ) {
+        if (isReversed) {
+            item {
+                Spacer(modifier = Modifier.height(50.dp))
+            }
+        }
 
         items(bubbles.size) { index ->
             val bubble = bubbles[index]
@@ -41,14 +64,12 @@ fun BubblesLayout(
 
             val bubbleSize = calculateBubblePreviewSize(bubble)
 
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = xOffset)
                     .size(bubbleSize.size + 4.dp)
             ) {
-
                 BubblePreview(
                     bubble = bubble,
                     size = bubbleSize,
@@ -70,6 +91,12 @@ fun BubblesLayout(
                             }
                     )
                 }
+            }
+        }
+
+        if (isReversed) {
+            item {
+                Spacer(modifier = Modifier.height(50.dp))
             }
         }
     }

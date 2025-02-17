@@ -1,12 +1,17 @@
 package com.umc.edison.ui.edison
 
-
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,9 +25,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.umc.edison.presentation.edison.MyEdisonViewModel
+import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.components.BubbleInput
+import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.login.PrefsHelper
 import com.umc.edison.ui.navigation.NavRoute
 import kotlinx.coroutines.delay
@@ -35,9 +44,17 @@ fun MyEdisonScreen(
     viewModel: MyEdisonViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var isViewMode by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
     var backPressedOnce by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
+    val pagerState = rememberPagerState(
+        pageCount = { 2 },
+        initialPageOffsetFraction = 0f,
+        initialPage = 0,
+    )
 
     BackHandler {
         if (backPressedOnce) {
@@ -50,32 +67,91 @@ fun MyEdisonScreen(
             }
         }
     }
-    LaunchedEffect(uiState.bubbles) {
 
-        if(viewModel.isBubbleExist()){
-            navController.navigate(NavRoute.BubbleStorage.route) {
-                popUpTo(navController.graph.startDestinationId) {saveState=false}
-                launchSingleTop=true
-            }
-        }
-
+    LaunchedEffect(Unit) {
+        viewModel.fetchBubbles()
         updateShowBottomNav(true)
         PrefsHelper.setMainScreenVisited(context)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
+    LaunchedEffect(uiState.bubbles) {
+        if (uiState.bubbles.isNotEmpty()) {
+            pagerState.animateScrollToPage(1)
+        }
+    }
+
+    BaseContent(
+        uiState = uiState,
+        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+        ) { page ->
+            when (page) {
+                0 -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
 
-        Spacer(modifier = Modifier.weight(0.6f))
+                        Spacer(modifier = Modifier.weight(0.6f))
 
+                        BubbleInput(
+                            onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0)) },
+                        )
 
-        BubbleInput(
-            onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0)) },)
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
 
-        Spacer(modifier = Modifier.weight(1f))
+                1 -> {
+                    BubbleStorageScreen(
+                        navHostController = navController,
+                        updateShowBottomNav = updateShowBottomNav,
+                        searchResults = uiState.searchResults,
+                        searchKeyword = uiState.query,
+                        updateViewMode = { flag -> isViewMode = flag },
+                    )
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(15.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            MyEdisonNavBar(
+                onSearchClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(1)
+                    }
+                    viewModel.resetSearchResults()
+                },
+                onBubbleClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(0)
+                    }
+                    viewModel.resetSearchResults()
+                },
+                onStorageClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(1)
+                    }
+                    viewModel.resetSearchResults()
+                },
+                onSearchQuerySubmit = { query ->
+                    viewModel.fetchSearchBubbles(query)
+                },
+                currentPage = pagerState.currentPage,
+                query = uiState.query,
+                isViewMode = isViewMode,
+            )
+        }
     }
 }
