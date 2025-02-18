@@ -328,7 +328,7 @@ class BubbleInputViewModel @Inject constructor(
             _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
 
             // 마지막 블록이 이미지 블록이면 텍스트 블록 추가
-            if (currentBubble.contentBlocks.last().type == ContentType.IMAGE) {
+            if (contentBlocks.last().type == ContentType.IMAGE) {
                 addTextBlock()
             }
             return
