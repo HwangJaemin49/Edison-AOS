@@ -3,7 +3,6 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
@@ -266,22 +265,19 @@ class BubbleInputViewModel @Inject constructor(
 
         val newImageBlocks = mutableListOf<ContentBlockModel>()
 
-        imagePaths.forEachIndexed { index,imagePath ->
+        imagePaths.forEach { imagePath ->
             val newImageBlock = ContentBlockModel(
                 type = ContentType.IMAGE,
                 content = imagePath.toString(),
             )
 
-
             newImageBlocks.add(newImageBlock)
-
         }
 
         _uiState.update {
             it.copy(
                 bubble = it.bubble.copy(
-                    contentBlocks = it.bubble.contentBlocks + newImageBlocks,
-                    mainImage =  it.bubble.mainImage
+                    contentBlocks = it.bubble.contentBlocks + newImageBlocks
                 ),
                 isGalleryOpen = false,
                 selectedIcon = IconType.NONE
@@ -305,19 +301,15 @@ class BubbleInputViewModel @Inject constructor(
         checkCanSave()
     }
 
-    fun deleteContentBlock(targetIndex: Int) {
+    fun deleteContentBlock(contentBlock: ContentBlockModel) {
+        if (contentBlock.type != ContentType.IMAGE) return
+
         val currentBubble = _uiState.value.bubble
         val contentBlocks = currentBubble.contentBlocks.toMutableList()
 
-        // 유효한 인덱스인지 확인
-        if (targetIndex !in contentBlocks.indices) return
+        val targetIndex = contentBlocks.indexOf(contentBlock)
 
-        val targetBlock = contentBlocks[targetIndex] // 직접 해당 블록 가져오기
-
-        if (targetBlock.type != ContentType.IMAGE) return
-
-        // 🔹 이미지 블록 로그 출력
-        Log.d("delete", "삭제할 이미지 블록 index: $targetIndex, 내용: ${targetBlock.content}")
+        if (targetIndex == -1) return
 
         // 이미지가 첫 번째 블록일 때
         if (targetIndex == 0) {
@@ -336,7 +328,7 @@ class BubbleInputViewModel @Inject constructor(
             _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
 
             // 마지막 블록이 이미지 블록이면 텍스트 블록 추가
-            if (contentBlocks.isNotEmpty() && contentBlocks.last().type == ContentType.IMAGE) {
+            if (currentBubble.contentBlocks.last().type == ContentType.IMAGE) {
                 addTextBlock()
             }
             return
@@ -344,30 +336,17 @@ class BubbleInputViewModel @Inject constructor(
 
         // 이미지가 중간 블럭일 때 이전 블록과 다음 블록이 TEXT일 경우 연결
         if (contentBlocks[targetIndex - 1].type == ContentType.TEXT && contentBlocks[targetIndex + 1].type == ContentType.TEXT) {
+            contentBlocks[targetIndex - 1] = contentBlocks[targetIndex - 1].copy(
+                content = contentBlocks[targetIndex - 1].content + contentBlocks[targetIndex + 1].content
+            )
 
-            val previousTextBlock = contentBlocks[targetIndex - 1]
-            val nextTextBlock = contentBlocks[targetIndex + 1]
+            contentBlocks.removeAt(targetIndex) // 제거하려는 이미지 블록 삭제
+            contentBlocks.removeAt(targetIndex) // 다음 TEXT 블록 삭제
 
-            Log.d("delete","${previousTextBlock}, ${nextTextBlock}")
-
-            val mergedContent = previousTextBlock.content + nextTextBlock.content
-
-            val newContentBlocks = contentBlocks.filterIndexed { index, _ ->
-                index != targetIndex && index != targetIndex + 1 // 이미지 블록과 다음 텍스트 블록 제거
-            }.toMutableList()
-
-            // 🔹 병합된 텍스트 블록을 이전 텍스트 위치에 추가
-            newContentBlocks[targetIndex - 1] = previousTextBlock.copy(content = mergedContent)
-
-            // 🔹 최종 업데이트
-            _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = newContentBlocks)) }
-
-            Log.d("delete", "✅ 병합 완료: ${newContentBlocks[targetIndex - 1].content}")
+            _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
             return
         }
 
-
-        // 기본적인 이미지 블록 삭제
         contentBlocks.removeAt(targetIndex)
         _uiState.update {
             it.copy(
@@ -375,8 +354,6 @@ class BubbleInputViewModel @Inject constructor(
             )
         }
     }
-
-
 
     fun updateBubbleWithLink() {
         saveBubble(true)
@@ -534,12 +511,19 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun selectMainImage(uri: String?) {
-        _uiState.update {
-            it.copy(
-                bubble = it.bubble.copy(mainImage = uri)
-            )
+        if (_uiState.value.bubble.mainImage == uri) {
+            _uiState.update {
+                it.copy(
+                    bubble = it.bubble.copy(mainImage = null)
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    bubble = it.bubble.copy(mainImage = uri)
+                )
+            }
         }
-        Log.d("대표설정", "대표 이미지 변경됨: ${_uiState.value.bubble.mainImage}")
     }
 
     override fun clearToastMessage() {

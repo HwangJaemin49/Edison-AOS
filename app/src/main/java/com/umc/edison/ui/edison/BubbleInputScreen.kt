@@ -1,6 +1,5 @@
 package com.umc.edison.ui.edison
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -295,8 +294,8 @@ fun BubbleInputContent(
         onBubbleUpdate = { bubble ->
             viewModel.updateBubbleContent(bubble)
         },
-        onImageDeleted = { index->
-            viewModel.deleteContentBlock(index)
+        onImageDeleted = { contentBlock ->
+            viewModel.deleteContentBlock(contentBlock)
         },
         onMainSelected = { uri ->
             viewModel.selectMainImage(uri) },

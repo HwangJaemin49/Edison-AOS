@@ -3,10 +3,8 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -91,7 +89,7 @@ fun BubbleDoor(
     onClick: (() -> Unit)? = null,
     isEditable: Boolean = false,
     onBubbleUpdate: (BubbleModel) -> Unit = {},
-    onImageDeleted: (Int) -> Unit = {},
+    onImageDeleted: (ContentBlockModel) -> Unit = {},
     onMainSelected: (String?) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
     onLinkClick: (Int) -> Unit = {},
@@ -166,7 +164,7 @@ private fun BubbleContent(
     bubble: BubbleModel,
     onBubbleChange: (BubbleModel) -> Unit,
     uiState: BubbleInputState,
-    deleteClicked: (Int)-> Unit,
+    deleteClicked: (ContentBlockModel) -> Unit,
     mainClicked: (String?) -> Unit,
     onLinkClick: (Int) -> Unit,
 ) {
@@ -214,7 +212,7 @@ private fun BubbleContent(
             )
         }
 
-        var deletedImageBlockId by remember { mutableStateOf<Int>(-1 )}
+        var deletedImageBlockId by remember { mutableStateOf<Int?>(null) }
 
         bubble.contentBlocks.forEachIndexed { index, contentBlock ->
             when (contentBlock.type) {
@@ -231,9 +229,9 @@ private fun BubbleContent(
                     val isInitialized = remember(index) { mutableStateOf(false) }
 
                     LaunchedEffect(deletedImageBlockId) {
-                        deletedImageBlockId.let {
+                        deletedImageBlockId?.let {
                             richTextState.setHtml(contentBlock.content)
-                            deletedImageBlockId =-1
+                            deletedImageBlockId = null
                         }
                     }
 
@@ -243,7 +241,6 @@ private fun BubbleContent(
                             isInitialized.value = true
                         }
                     }
-
 
                     LaunchedEffect(richTextState.toHtml()) {
                         onBubbleChange(
@@ -359,86 +356,50 @@ private fun BubbleContent(
                         )
 
                         if (isLongPressed) {
-                            Box(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clickable { isLongPressed = false },
-                                contentAlignment = Alignment.Center
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                if (!isMainImage) {
-                                    Column {
-                                        Button(
-                                            shape = RoundedCornerShape(100.dp),
-                                            onClick = {
-                                                isLongPressed = false
-                                                mainClicked(contentBlock.content)
+                                Button(
+                                    shape = RoundedCornerShape(100.dp),
+                                    onClick = {
+                                        isLongPressed = false
+                                        mainClicked(contentBlock.content)
+                                        deletedImageBlockId = index
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (isMainImage) Gray100 else Gray700,
+                                    )
+                                ) {
+                                    Text(
+                                        text = if (isMainImage) "대표 해제" else "대표 설정",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontSize = 14.sp,
+                                        color = if (isMainImage) Red500 else Gray100
+                                    )
+                                }
 
-                                            },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Gray700,
-                                            )
-                                        ) {
-                                            Text(
-                                                text = "대표 설정",
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    color = Gray100
-                                                ),
-                                                fontSize = 14.sp
-                                            )
-                                        }
+                                Spacer(modifier = Modifier.height(1.dp))
 
-                                        Spacer(modifier = Modifier.height(1.dp))
-
-                                        Button(
-                                            shape = RoundedCornerShape(100.dp),
-                                            onClick = {
-                                                isLongPressed = false
-                                                deleteClicked(index)
-                                                deletedImageBlockId = index
-                                            },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Gray700,
-                                            )
-                                        ) {
-                                            Text(
-                                                text = "삭제하기",
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    color = Red100
-                                                ),
-                                                fontSize = 14.sp
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(Color.White.copy(alpha = 0.4f)),
-                                        contentAlignment = Alignment.Center
-
-                                    ) {
-
-                                        Button(
-                                            shape = RoundedCornerShape(100.dp),
-                                            onClick = {
-                                                isLongPressed = false
-                                                mainClicked(null)
-
-                                            },
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Gray100,
-                                            )
-                                        ) {
-                                            Text(
-                                                text = "대표 해제",
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    color = Red500
-                                                ),
-                                                fontSize = 14.sp
-                                            )
-                                        }
-                                    }
-
+                                Button(
+                                    shape = RoundedCornerShape(100.dp),
+                                    onClick = {
+                                        isLongPressed = false
+                                        deleteClicked(contentBlock)
+                                        deletedImageBlockId = index
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Gray700,
+                                    )
+                                ) {
+                                    Text(
+                                        text = "삭제하기",
+                                        style = MaterialTheme.typography.bodyMedium.copy(color = Red100),
+                                        fontSize = 14.sp
+                                    )
                                 }
                             }
                         }
