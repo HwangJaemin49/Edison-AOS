@@ -58,9 +58,10 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getBubbleUseCase(bubbleId),
             onSuccess = { bubble ->
+                val sortedContentBlocks = bubble.contentBlocks.toPresentation().sortedBy { it.position }
                 _uiState.update {
                     it.copy(
-                        bubble = bubble.toPresentation(),
+                        bubble = bubble.toPresentation().copy(contentBlocks = sortedContentBlocks),
                         selectedLabels = bubble.labels.toPresentation()
                     )
                 }
