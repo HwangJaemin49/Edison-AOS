@@ -87,7 +87,7 @@ fun ImageGallery(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .wrapContentHeight(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -135,8 +135,6 @@ fun ImageGallery(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-
-
                 if (multiSelectMode) {
                     Text(
                         text = "선택",
@@ -151,14 +149,8 @@ fun ImageGallery(
                         style = MaterialTheme.typography.bodySmall,
                         color = if (selectedImages.isEmpty()) Gray500 else Gray800
                     )
-
-
                 }
-
-
             }
-
-
 
             Spacer(modifier = Modifier.height(8.dp))
 
