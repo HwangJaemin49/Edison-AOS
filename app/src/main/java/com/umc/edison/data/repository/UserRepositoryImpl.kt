@@ -6,7 +6,7 @@ import com.umc.edison.data.model.IdentityCategoryMapper
 import com.umc.edison.data.model.InterestCategoryMapper
 import com.umc.edison.data.model.toData
 import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.model.ArtLetter
+import com.umc.edison.domain.model.ArtLetterPreview
 import com.umc.edison.domain.model.ArtLetterCategory
 import com.umc.edison.domain.model.Identity
 import com.umc.edison.domain.model.IdentityCategory
@@ -94,7 +94,7 @@ class UserRepositoryImpl @Inject constructor(
             dataAction = { userRemoteDataSource.getMyScrapArtLetters() }
         )
 
-    override fun getScrapArtLettersByCategory(category: String): Flow<DataResource<List<ArtLetter>>> =
+    override fun getScrapArtLettersByCategory(category: String): Flow<DataResource<List<ArtLetterPreview>>> =
         flowDataResource(
             dataAction = { userRemoteDataSource.getScrapArtLettersByCategory(category) }
         )

@@ -3,47 +3,43 @@ package com.umc.edison.data.repository
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.model.ArtLetter
+import com.umc.edison.domain.model.ArtLetterPreview
 import com.umc.edison.domain.model.ArtLetterDetail
-import com.umc.edison.domain.model.ArtLetterMark
-import com.umc.edison.domain.model.ArtLetterScrap
-import com.umc.edison.domain.model.EditorPickArtLetter
 import com.umc.edison.domain.repository.ArtLetterRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ArtLetterRepositoryImpl @Inject constructor(
-    private val artletterRemoteDataSource: ArtLetterRemoteDataSource,
+    private val artLetterRemoteDataSource: ArtLetterRemoteDataSource,
 ) : ArtLetterRepository {
 
-    override fun getAllArtLetters(): Flow<DataResource<List<ArtLetter>>> =
+    override fun getAllArtLetters(): Flow<DataResource<List<ArtLetterPreview>>> =
         flowDataResource(
-            dataAction = { artletterRemoteDataSource.getAllArtLetters() }
+            dataAction = { artLetterRemoteDataSource.getAllArtLetters() }
         )
 
     override fun getArtLetterDetail(letterId: Int): Flow<DataResource<ArtLetterDetail>> =
         flowDataResource(
-            dataAction = { artletterRemoteDataSource.getArtLetterDetail(letterId)}
+            dataAction = { artLetterRemoteDataSource.getArtLetterDetail(letterId) }
         )
 
-    override fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>> =
+    override fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetterPreview>>> =
         flowDataResource(
-            dataAction = { artletterRemoteDataSource.getSortedArtLetters(sortBy) }
+            dataAction = { artLetterRemoteDataSource.getSortedArtLetters(sortBy) }
         )
 
-    override fun postArtLetterScrap(artletterId: Int): Flow<DataResource<ArtLetterScrap>> =
+    override fun postArtLetterScrap(id: Int): Flow<DataResource<Unit>> =
         flowDataResource(
-            dataAction = { artletterRemoteDataSource.postArtLetterScrap(artletterId) }
+            dataAction = { artLetterRemoteDataSource.postArtLetterScrap(id) }
         )
 
-    override fun postArtLetterLike(artletterId: Int): Flow<DataResource<ArtLetterMark>> =
+    override fun postArtLetterLike(id: Int): Flow<DataResource<Unit>> =
         flowDataResource(
-            dataAction = {artletterRemoteDataSource.postArtLetterLike(artletterId)}
+            dataAction = { artLetterRemoteDataSource.postArtLetterLike(id) }
         )
 
-    override fun postEditorPickArtLetter(artletterIds: List<Int>): Flow<DataResource<List<EditorPickArtLetter>>> =
+    override fun getEditorPickArtLetters(): Flow<DataResource<List<ArtLetterPreview>>> =
         flowDataResource(
-            dataAction = { artletterRemoteDataSource.postEditorPickArtLetter(artletterIds) }
+            dataAction = { artLetterRemoteDataSource.postEditorPickArtLetter() }
         )
-
 }
