@@ -21,8 +21,8 @@ interface ArtLetterApiService {
     @GET("/artletters")
     suspend fun getAllArtLetters(): ResponseWithPagination<GetAllArtLettersResponse>
 
-    @GET("/artletters/sorted")
-    suspend fun getSortedArtLetters(@Query("sortBy") sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
+    @GET("/artletters")
+    suspend fun getSortedArtLetters(@Query("sortType") sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
 
     @POST("/artletters/{artletterId}/scrap")
     suspend fun postArtLetterScrap(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterScrapResponse>
