@@ -1,15 +1,11 @@
 package com.umc.edison.remote.model.artletter
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.ArtLetterDetailEntity
-import com.umc.edison.data.model.ArtletterEntity
-import com.umc.edison.data.model.EditorPickArtLetterEntity
+import com.umc.edison.data.model.ArtLetterPreviewEntity
 import com.umc.edison.remote.model.RemoteMapper
-import com.umc.edison.remote.model.parseIso8601ToDate
-import java.util.Date
 
 
-data class PostEditorPickArtLetterResponse(
+data class GetEditorPickArtLetterResponse(
     @SerializedName("artletterId") val artletterId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
@@ -24,24 +20,13 @@ data class PostEditorPickArtLetterResponse(
     @SerializedName("updatedAt") val updatedAt: String,
     @SerializedName("liked") val liked : Boolean,
     @SerializedName("scraped") val scraped: Boolean
-) : RemoteMapper<EditorPickArtLetterEntity> {
-
-    override fun toData(): EditorPickArtLetterEntity = EditorPickArtLetterEntity(
-        artletterId = artletterId,
+) : RemoteMapper<ArtLetterPreviewEntity> {
+    override fun toData(): ArtLetterPreviewEntity = ArtLetterPreviewEntity(
+        artLetterId = artletterId,
         title = title,
-        content = content,
-        category = category,
-        readTime = readTime,
-        writer = writer,
-        tags = tags,
-        thumbnail = thumbnail,
-        likesCnt = likesCnt,
-        scrapsCnt = scrapsCnt,
-        createdAt = parseIso8601ToDate(createdAt),
-        updatedAt = parseIso8601ToDate(updatedAt),
-        liked = liked,
+        thumbnail = thumbnail ?: "",
         scraped = scraped
     )
 }
 
-fun List<PostEditorPickArtLetterResponse>.toData(): List<EditorPickArtLetterEntity> = map { it.toData() }
+fun List<GetEditorPickArtLetterResponse>.toData(): List<ArtLetterPreviewEntity> = map { it.toData() }

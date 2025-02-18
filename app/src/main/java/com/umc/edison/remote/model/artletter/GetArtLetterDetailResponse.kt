@@ -3,8 +3,6 @@ package com.umc.edison.remote.model.artletter
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.remote.model.RemoteMapper
-import com.umc.edison.remote.model.parseIso8601ToDate
-
 
 class GetArtLetterDetailResponse (
     @SerializedName("artletterId") val artletterId: Int,
@@ -24,20 +22,16 @@ class GetArtLetterDetailResponse (
 ) : RemoteMapper<ArtLetterDetailEntity> {
 
     override fun toData(): ArtLetterDetailEntity = ArtLetterDetailEntity(
-        artletterId = artletterId,
+        artLetterId = artletterId,
         title = title,
         content = content,
         category = category,
         readTime = readTime,
         writer = writer,
         tags = tags,
-        thumbnail = thumbnail,
+        thumbnail = thumbnail ?: "",
         likesCnt = likesCnt,
-        scrapsCnt = scrapsCnt,
-        createdAt = parseIso8601ToDate(createdAt),
-        updatedAt = parseIso8601ToDate(updatedAt),
         liked = liked,
         scraped = scraped
-
     )
 }
