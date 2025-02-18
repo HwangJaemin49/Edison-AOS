@@ -5,12 +5,12 @@ import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.remote.model.toIso8601String
 
 data class SyncBubbleRequest(
-    @SerializedName("bubbleId") val bubbleId: Int,
+    @SerializedName("localIdx") val bubbleId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
     @SerializedName("mainImageUrl") val mainImageUrl: String,
     @SerializedName("backlinkIds") val backlinkIds: List<Int>,
-    @SerializedName("labelIds") val labelIds: List<Int>,
+    @SerializedName("labelIdxs") val labelIds: List<Int>,
     @SerializedName("isDeleted") val isDeleted: Boolean,
     @SerializedName("isTrashed") val isTrashed: Boolean,
     @SerializedName("createdAt") val createdAt: String,

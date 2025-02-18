@@ -1,23 +1,24 @@
 package com.umc.edison.remote.model.sync
 
 import androidx.compose.ui.graphics.Color
+import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
 import com.umc.edison.remote.model.parseIso8601ToDate
 
 data class SyncBubbleResponse(
-    val bubbleId: Int,
-    val title: String,
-    val content: String,
-    val mainImageUrl: String,
-    val labels: List<Label>,
-    val backlinkIds: List<Int>,
-    val isDeleted: Boolean,
-    val isTrashed: Boolean,
-    val createdAt: String,
-    val updatedAt: String,
-    val deletedAt: String?
+    @SerializedName("localIdx") val bubbleId: Int,
+    @SerializedName("title") val title: String,
+    @SerializedName("content") val content: String,
+    @SerializedName("mainImageUrl") val mainImageUrl: String,
+    @SerializedName("labels") val labels: List<Label>,
+    @SerializedName("backlinkIds") val backlinkIds: List<Int>,
+    @SerializedName("isDeleted") val isDeleted: Boolean,
+    @SerializedName("isTrashed") val isTrashed: Boolean,
+    @SerializedName("createdAt") val createdAt: String,
+    @SerializedName("updatedAt") val updatedAt: String,
+    @SerializedName("deletedAt") val deletedAt: String?
 ) : RemoteMapper<BubbleEntity> {
     override fun toData(): BubbleEntity {
         return BubbleEntity(
@@ -36,9 +37,9 @@ data class SyncBubbleResponse(
     }
 
     data class Label(
-        val labelId: Int,
-        val name: String,
-        val color: Int,
+        @SerializedName("localIdx") val labelId: Int,
+        @SerializedName("name") val name: String,
+        @SerializedName("color") val color: Int,
     ) : RemoteMapper<LabelEntity> {
         override fun toData(): LabelEntity = LabelEntity(
             id = labelId,

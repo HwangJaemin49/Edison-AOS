@@ -7,7 +7,7 @@ import com.umc.edison.remote.model.RemoteMapper
 import com.umc.edison.remote.model.parseIso8601ToDate
 
 data class SyncLabelResponse(
-    @SerializedName("labelId") val id: Int,
+    @SerializedName("localIdx") val id: Int,
     @SerializedName("name") val name: String,
     @SerializedName("color") val color: Int,
     @SerializedName("isDeleted") val isDeleted: Boolean,
