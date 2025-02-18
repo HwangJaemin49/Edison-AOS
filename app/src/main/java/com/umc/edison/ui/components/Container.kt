@@ -146,11 +146,12 @@ fun WhiteContainerItem(
 fun GridLayout(
     columns: Int,
     items: List<Any>,
+    modifier: Modifier = Modifier,
     spaceSize: Dp = 12.dp,
     content: @Composable (item: Any) -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(spaceSize)
     ) {

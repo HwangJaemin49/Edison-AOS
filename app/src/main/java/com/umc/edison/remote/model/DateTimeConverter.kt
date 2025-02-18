@@ -12,7 +12,7 @@ fun Date.toIso8601String(): String {
 
 fun parseIso8601ToDate(isoDateTime: String): Date {
     return try {
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
         simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
         simpleDateFormat.parse(isoDateTime)!!
     } catch (e: Exception) {

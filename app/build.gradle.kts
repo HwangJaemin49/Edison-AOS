@@ -26,8 +26,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "BASE_URL", "\"${localProperties["base_url"]}\"")
-
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -40,7 +38,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"${localProperties["base_url"] ?: ""}\"")
+        }
         release {
+            buildConfigField("String", "BASE_URL", "\"${localProperties["base_url"] ?: ""}\"")
+
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

@@ -44,7 +44,6 @@ import com.umc.edison.ui.components.Bubble
 import com.umc.edison.ui.components.CheckBoxButton
 import com.umc.edison.ui.components.RadioButton
 import com.umc.edison.ui.components.extractPlainText
-import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
@@ -225,12 +224,8 @@ private fun TrashContent(
         ) {
             Bubble(
                 bubble = bubble,
-                onBubbleClick = {
-                    navHostController.navigate(NavRoute.BubbleEdit.createRoute(bubble.id))
-                },
-                onLinkedBubbleClick = { linkedBubbleId ->
-                    navHostController.navigate(NavRoute.BubbleEdit.createRoute(linkedBubbleId))
-                }
+                onBubbleClick = {},
+                onLinkedBubbleClick = {}
             )
         }
     }

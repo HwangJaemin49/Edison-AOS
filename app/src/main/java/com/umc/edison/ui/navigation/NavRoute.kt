@@ -32,7 +32,11 @@ sealed class NavRoute(val route: String) {
     data object DeleteAccount : NavRoute("my-page/delete-account")
 
     data object ScrapBoard : NavRoute("my-page/scrap-board")
-    data object ScrapBoardDetail : NavRoute("my-page/scrap-board-detail")
+    data class ScrapBoardDetail(val name: String) : NavRoute("${ScrapBoard.route}/categories/${name}") {
+        companion object {
+            fun createRoute(categoryName: String): String = "${ScrapBoard.route}/categories/${categoryName}"
+        }
+    }
 
     data class BubbleEdit(val id: Int = 0) : NavRoute("${MyEdison.route}/bubbles/${id}") {
         companion object {

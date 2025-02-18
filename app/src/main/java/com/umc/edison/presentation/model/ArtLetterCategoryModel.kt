@@ -4,7 +4,7 @@ import com.umc.edison.domain.model.ArtLetterCategory
 
 data class ArtLetterCategoryModel(
     val title: String,
-    val mainImage: String,
+    val mainImage: String?,
 )
 
 fun ArtLetterCategory.toPresentation(): ArtLetterCategoryModel =

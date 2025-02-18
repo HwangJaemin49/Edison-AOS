@@ -24,6 +24,7 @@ import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.BasicFullButton
 import com.umc.edison.ui.components.CheckBoxButton
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 
@@ -42,7 +43,11 @@ fun DeleteAccountScreen(
 
     LaunchedEffect(uiState.isDeleted) {
         if (uiState.isDeleted) {
-            // TODO: Navigate to login screen
+            navHostController.navigate(NavRoute.Login.route) {
+                popUpTo(NavRoute.Login.route) {
+                    inclusive = true
+                }
+            }
         }
     }
 

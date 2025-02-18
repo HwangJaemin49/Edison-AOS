@@ -6,6 +6,7 @@ import com.umc.edison.remote.model.ResponseWithListData
 import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.artletter.GetAllArtLettersResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterDetailResponse
+import com.umc.edison.remote.model.artletter.GetArtLetterKeywordResponse
 import com.umc.edison.remote.model.artletter.GetSortedArtLettersResponse
 import com.umc.edison.remote.model.artletter.PostArtLetterLikeResponse
 import com.umc.edison.remote.model.artletter.PostEditorPickArtLetterResponse
@@ -36,6 +37,6 @@ interface ArtLetterApiService {
     suspend fun getArtLetterDetail(@Path("letterId") letterId: Int): ResponseWithData<GetArtLetterDetailResponse>
 
     @GET("/artletters/recommend-bar/keyword")
-    suspend fun getRecommendedKeywords(@Query("artletterIds") artletterIds: String): ResponseWithListData<GetArtLetterKeyword>
+    suspend fun getRecommendedKeywords(@Query("artletterIds") artletterIds: String): ResponseWithListData<GetArtLetterKeywordResponse>
 
 }

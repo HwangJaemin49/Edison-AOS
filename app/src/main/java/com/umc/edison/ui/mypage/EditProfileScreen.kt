@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -31,7 +30,6 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var nickname by remember { mutableStateOf(TextFieldValue(uiState.user.nickname ?: "")) }
     var showGallery by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { updateShowBottomNav(false) }
@@ -64,10 +62,10 @@ fun EditProfileScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        EditProfileNameInput(nickname) {
-            nickname = it
-            viewModel.updateUserNickname(nickname.text)
-        }
+        EditProfileNameInput(
+            nickname = uiState.user.nickname ?: "",
+            onValueChange = { viewModel.updateUserNickname(it) }
+        )
 
         if (showGallery) {
             ImageGallery(
@@ -90,14 +88,17 @@ private fun EditProfileImage(
     onImageClick: () -> Unit
 ) {
     Box(
-        modifier = modifier.width(120.dp).height(125.dp)
+        modifier = modifier
+            .width(120.dp)
+            .height(125.dp)
     ) {
         AsyncImage(
             model = user.profileImage ?: R.drawable.ic_profile_default_small,
             contentDescription = "Profile Image",
             modifier = Modifier
                 .size(120.dp)
-                .clip(CircleShape),
+                .clip(CircleShape)
+                .background(Gray300),
             contentScale = ContentScale.Crop
         )
 
@@ -122,8 +123,8 @@ private fun EditProfileImage(
 
 @Composable
 private fun EditProfileNameInput(
-    nickname: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit
+    nickname: String,
+    onValueChange: (String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -146,7 +147,7 @@ private fun EditProfileNameInput(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${nickname.text.length} / 20",
+                text = "${nickname.length} / 20",
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray600
             )
@@ -156,14 +157,14 @@ private fun EditProfileNameInput(
 
         TextField(
             value = nickname,
-            onValueChange = { if (it.text.length <= 20) onValueChange(it) },
+            onValueChange = { if (it.length <= 20) onValueChange(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
                 .background(Gray100),
             placeholder = {
                 Text(
-                    text = nickname.text.ifEmpty { "닉네임을 입력해주세요." },
+                    text = nickname.ifEmpty { "닉네임을 입력해주세요." },
                     style = MaterialTheme.typography.bodyMedium,
                     color = Gray600,
                 )
