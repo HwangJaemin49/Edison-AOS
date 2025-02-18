@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,6 +48,7 @@ import com.umc.edison.presentation.artletter.ArtLetterDetailState
 import com.umc.edison.presentation.artletter.ArtLetterDetailViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.CustomDraggableBottomSheet
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
@@ -96,6 +98,7 @@ fun ArtLetterDetailScreen(
                         modifier = Modifier
                             .clip(CircleShape)
                             .padding(4.dp)
+                            .clickable { viewModel.scrapArtLetter() }
                     )
                 }
             }
@@ -120,7 +123,12 @@ fun ArtLetterDetailScreen(
                         .wrapContentHeight()
                         .align(Alignment.TopCenter)
                         .padding(horizontal = 24.dp)
-                        .offset { IntOffset(x = 0, y = (sheetOffsetPx - 24.dp.roundToPx()).roundToInt()) },
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = (sheetOffsetPx - 24.dp.roundToPx()).roundToInt()
+                            )
+                        },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     // 작성 시간
@@ -232,8 +240,7 @@ fun ArtLetterDetailContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val tags = uiState.artLetter.tags.split(" ")
-        tags.forEach { tag ->
+        uiState.artLetter.tags.forEach { tag ->
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(100.dp))
@@ -303,6 +310,66 @@ fun ArtLetterDetailContent(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(48.dp)
     ) {
-        // 추가 콘텐츠...
+        items(uiState.relatedArtLetters.size) { relatedArtLetter ->
+            val artLetter = uiState.relatedArtLetters[relatedArtLetter]
+            Column(
+                modifier = Modifier
+                    .width(220.dp)
+                    .wrapContentHeight()
+                    .clickable {
+                        navHostController.navigate(
+                            NavRoute.ArtLetterDetail.createRoute(
+                                artLetter.artLetterId
+                            )
+                        )
+                    },
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                val imageUrl = artLetter.thumbnail
+
+                Box(
+                    modifier = Modifier
+                        .height(120.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Gray300)
+                ) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "ArtLetterPreview Category Image",
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = artLetter.title,
+                        style = MaterialTheme.typography.displaySmall,
+                        color = Gray800,
+                    )
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bookmark),
+                        contentDescription = "Bookmark",
+                        tint = if (artLetter.scraped) Color(0xFFFFDE66) else Gray500,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable { viewModel.scrapArtLetter(artLetter.artLetterId) }
+                    )
+                }
+
+                Text(
+                    text = artLetter.tags.joinToString(" "),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Gray800,
+                )
+            }
+        }
     }
 }
