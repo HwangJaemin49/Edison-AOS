@@ -292,8 +292,7 @@ fun ArtBoardCard(
     uiState: ArtLetterModel,
     viewModel: ArtLetterViewModel
 ) {
-    val scrapState by viewModel.scrapState.collectAsState()
-    val isScrapped = rememberSaveable(scrapState.result.scrapped) { mutableStateOf(scrapState.result.scrapped) }
+    var isScrapped by remember { mutableStateOf(uiState.scraped) }
 
     Box(
         modifier = modifier
@@ -319,7 +318,7 @@ fun ArtBoardCard(
         }
 
         Icon(
-            painter = painterResource(id = if (isScrapped.value) R.drawable.ic_bookmark else R.drawable.ic_empty_bookmark),
+            painter = painterResource(id = if (isScrapped) R.drawable.ic_bookmark else R.drawable.ic_empty_bookmark),
             contentDescription = "Bookmark",
             tint = Color.Unspecified,
             modifier = Modifier
@@ -327,9 +326,9 @@ fun ArtBoardCard(
                 .padding(8.dp)
                 .size(24.dp)
                 .clickable {
+                    isScrapped = !isScrapped // 상태 업데이트
                     Log.d("ArtBoardCard", "Bookmark clicked: ${uiState.artletterId}") // 북마크 클릭 로그 추가
                     viewModel.postArtLetterScrap(uiState.artletterId) // 북마크 요청
-                    isScrapped.value = !isScrapped.value // 상태 업데이트
                 }
         )
         Text(

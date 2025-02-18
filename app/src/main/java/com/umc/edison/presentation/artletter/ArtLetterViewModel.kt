@@ -108,6 +108,7 @@ class ArtLetterViewModel @Inject constructor(
             flow = postArtLetterLikeUseCase(artletterId),
             onSuccess = { result ->
                 _likeState.update { it.copy(result = result.toPresentation()) }
+                fetchArtLetterDetail(artletterId)
                 Log.d("LikeTest", "isLiked: ${result.liked}")
             },
             onError = { error ->
@@ -127,6 +128,7 @@ class ArtLetterViewModel @Inject constructor(
             flow = postArtLetterScrapUseCase(artletterId),
             onSuccess = { result ->
                 _scrapState.update { it.copy(result = result.toPresentation()) }
+                fetchArtLetterDetail(artletterId)
                 Log.d("LikeTest", "isLiked: ${result.scrapped}")
             },
             onError = { error ->

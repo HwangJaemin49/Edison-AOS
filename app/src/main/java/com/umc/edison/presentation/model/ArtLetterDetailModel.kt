@@ -24,7 +24,7 @@ data class ArtLetterDetailModel(
     val scraped: Boolean,
 ) {
     companion object {
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
         val DEFAULT = ArtLetterDetailModel(
             artletterId = 1,

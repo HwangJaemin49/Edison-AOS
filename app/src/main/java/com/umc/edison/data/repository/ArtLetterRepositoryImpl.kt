@@ -9,7 +9,6 @@ import com.umc.edison.domain.model.ArtLetterMark
 import com.umc.edison.domain.model.ArtLetterScrap
 import com.umc.edison.domain.model.EditorPickArtLetter
 import com.umc.edison.domain.repository.ArtLetterRepository
-import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

@@ -7,7 +7,6 @@ import com.umc.edison.data.model.ArtLetterScrapEntity
 import com.umc.edison.data.model.ArtletterEntity
 import com.umc.edison.data.model.EditorPickArtLetterEntity
 import com.umc.edison.remote.api.ArtLetterApiService
-import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
 import com.umc.edison.remote.model.artletter.toData
 import javax.inject.Inject
 

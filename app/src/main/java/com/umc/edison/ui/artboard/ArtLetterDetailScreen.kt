@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,9 +61,10 @@ fun ArtLetterDetailScreen(
         viewModel.fetchArtLetterDetail(artletterId)
     }
     val artLetterDetail by viewModel.artLetterDetail.collectAsState()
-    val likeState by viewModel.likeState.collectAsState()
 
-    val isBookmarked = remember { mutableStateOf(false) }
+    val isScrapped = artLetterDetail.artletter.scraped
+    val isLiked = artLetterDetail.artletter.liked
+
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -93,14 +95,15 @@ fun ArtLetterDetailScreen(
                             )
                         }
                         Icon(
-                            painter = painterResource(id = if (isBookmarked.value) R.drawable.ic_artletter_detail_bookmark else R.drawable.ic_artletter_detail_empty_bookmark),
+                            painter = painterResource(id = if (isScrapped) R.drawable.ic_artletter_detail_bookmark else R.drawable.ic_artletter_detail_empty_bookmark),
                             contentDescription = "Bookmark",
                             tint = Color.Unspecified,
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(16.dp)
                                 .size(48.dp)
-                                .clickable { isBookmarked.value = !isBookmarked.value }
+                                .clickable {
+                                    viewModel.postArtLetterScrap(artLetterDetail.artletter.artletterId) }
                         )
                     }
                     Row(
@@ -211,16 +214,14 @@ fun ArtLetterDetailScreen(
                     Row(modifier = Modifier.fillMaxWidth(), // Row를 가로로 꽉 채움
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End) {
-                        val isLiked = rememberSaveable { mutableStateOf(likeState.result.liked) }
                         Icon(
-                            painter = painterResource(id = if (isLiked.value) R.drawable.ic_artletter_detail_empty_like else R.drawable.ic_artletter_detail_like),
+                            painter = painterResource(id = if (isLiked) R.drawable.ic_artletter_detail_like else R.drawable.ic_artletter_detail_empty_like),
                             contentDescription = "Like",
                             tint = Color.Unspecified,
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
-                                    viewModel.postArtLetterLike(artletterId)
-                                    isLiked.value = !isLiked.value  // UI 상태 업데이트
+                                    viewModel.postArtLetterLike(artLetterDetail.artletter.artletterId)
                                 }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
