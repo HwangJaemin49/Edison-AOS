@@ -200,6 +200,7 @@ class BubbleInputViewModel @Inject constructor(
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "",
+            position = _uiState.value.bubble.contentBlocks.size
         )
 
         if (_uiState.value.bubble.contentBlocks.isEmpty()) {
@@ -238,10 +239,16 @@ class BubbleInputViewModel @Inject constructor(
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "",
+            position = 0
         )
 
+        // 기존 contentBlock의 position을 1씩 증가시킴
+        val currentContentBlocks = _uiState.value.bubble.contentBlocks.map {
+            it.copy(position = it.position + 1)
+        }
+
         _uiState.update {
-            val updatedContentBlocks = listOf(newTextBlock) + it.bubble.contentBlocks
+            val updatedContentBlocks = listOf(newTextBlock) + currentContentBlocks
             it.copy(
                 bubble = it.bubble.copy(
                     contentBlocks = updatedContentBlocks
@@ -265,26 +272,31 @@ class BubbleInputViewModel @Inject constructor(
 
         val newImageBlocks = mutableListOf<ContentBlockModel>()
 
-        imagePaths.forEach { imagePath ->
+        imagePaths.forEachIndexed { idx, imagePath ->
             val newImageBlock = ContentBlockModel(
                 type = ContentType.IMAGE,
                 content = imagePath.toString(),
+                position = _uiState.value.bubble.contentBlocks.size + idx
             )
 
             newImageBlocks.add(newImageBlock)
         }
 
+        val newTextBlock = ContentBlockModel(
+            type = ContentType.TEXT,
+            content = "",
+            position = _uiState.value.bubble.contentBlocks.size + imagePaths.size
+        )
+
         _uiState.update {
             it.copy(
                 bubble = it.bubble.copy(
-                    contentBlocks = it.bubble.contentBlocks + newImageBlocks
+                    contentBlocks = it.bubble.contentBlocks + newImageBlocks + newTextBlock
                 ),
                 isGalleryOpen = false,
                 selectedIcon = IconType.NONE
             )
         }
-
-        addTextBlock()
     }
 
     fun closeGallery() {
@@ -305,9 +317,9 @@ class BubbleInputViewModel @Inject constructor(
         if (contentBlock.type != ContentType.IMAGE) return
 
         val currentBubble = _uiState.value.bubble
-        val contentBlocks = currentBubble.contentBlocks.toMutableList()
+        val contentBlocks = currentBubble.contentBlocks.sortedBy { it.position }.toMutableList()
 
-        val targetIndex = contentBlocks.indexOf(contentBlock)
+        val targetIndex = contentBlocks.indexOfFirst { it.position == contentBlock.position }
 
         if (targetIndex == -1) return
 
