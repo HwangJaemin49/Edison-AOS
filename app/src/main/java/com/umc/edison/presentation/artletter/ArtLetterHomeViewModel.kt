@@ -41,7 +41,7 @@ class ArtLetterHomeViewModel @Inject constructor(
         )
     }
 
-    private fun fetchAllArtLetters() {
+    fun fetchAllArtLetters() {
         collectDataResource(
             flow = getAllArtLettersUseCase(),
             onSuccess = { artLetters ->
@@ -105,7 +105,7 @@ class ArtLetterHomeViewModel @Inject constructor(
         )
     }
 
-    fun getEditorsPick() {
+    fun fetchEditorsPick() {
         collectDataResource(
             flow = getEditorPickUseCase(),
             onSuccess = { artLetters ->

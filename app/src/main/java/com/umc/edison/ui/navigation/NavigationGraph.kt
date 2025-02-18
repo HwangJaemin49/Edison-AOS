@@ -6,7 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.umc.edison.ui.artboard.ArtLetterScreen
+import com.umc.edison.ui.artboard.ArtLetterHomeScreen
 import com.umc.edison.ui.artboard.ArtLetterDetailScreen
 import com.umc.edison.ui.artboard.ArtLetterSearchScreen
 import com.umc.edison.ui.edison.MyEdisonScreen
@@ -45,7 +45,7 @@ fun NavigationGraph(
         }
 
         composable(NavRoute.ArtLetter.route) {
-            ArtLetterScreen(navHostController)
+            ArtLetterHomeScreen(navHostController)
         }
 
         composable(NavRoute.ArtLetterSearch.route) {

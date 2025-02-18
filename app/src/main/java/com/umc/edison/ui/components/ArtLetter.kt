@@ -1,4 +1,4 @@
-package com.umc.edison.ui.mypage
+package com.umc.edison.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,9 +27,10 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.umc.edison.R
 import com.umc.edison.presentation.model.ArtLetterCategoryModel
-import com.umc.edison.presentation.model.ArtLetterModel
+import com.umc.edison.presentation.model.ArtLetterPreviewModel
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray400
+import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -57,7 +58,7 @@ fun ArtLetterCategoryContent(
         ) {
             AsyncImage(
                 model = imageUrl,
-                contentDescription = "ArtLetter Category Image",
+                contentDescription = "ArtLetterPreview Category Image",
                 contentScale = ContentScale.Crop,
             )
         }
@@ -73,10 +74,11 @@ fun ArtLetterCategoryContent(
 
 @Composable
 fun ArtLetterCard(
-    artLetter: ArtLetterModel,
-    onArtLetterClick: (ArtLetterModel) -> Unit
+    artLetter: ArtLetterPreviewModel,
+    onArtLetterClick: (ArtLetterPreviewModel) -> Unit,
+    onBookmarkClick: (ArtLetterPreviewModel) -> Unit
 ) {
-    val imageUrl = artLetter.thumbnail ?: ""
+    val imageUrl = artLetter.thumbnail
 
     Box(
         modifier = Modifier
@@ -88,7 +90,7 @@ fun ArtLetterCard(
     ) {
         AsyncImage(
             model = imageUrl,
-            contentDescription = "ArtLetter Category Image",
+            contentDescription = "ArtLetterPreview Category Image",
             contentScale = ContentScale.Crop,
         )
 
@@ -104,8 +106,8 @@ fun ArtLetterCard(
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_empty_bookmark),
                     contentDescription = "Scrap Icon",
-                    tint = Color(0xFFFFDE66),
-                    modifier = Modifier.size(22.dp)
+                    tint = if (artLetter.scraped) Color(0xFFFFDE66) else Gray500,
+                    modifier = Modifier.size(22.dp).clickable { onBookmarkClick(artLetter) }
                 )
             }
 
