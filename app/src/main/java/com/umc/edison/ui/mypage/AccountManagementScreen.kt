@@ -203,7 +203,12 @@ private fun AccountManagementContent(
                     question = stringResource(R.string.logout_question),
                     positiveButtonText = stringResource(R.string.logout),
                     negativeButtonText = stringResource(R.string.cancel),
-                    onPositiveClick = { viewModel.logOut() },
+                    onPositiveClick = {
+                        viewModel.logOut()
+                        navHostController.navigate(NavRoute.MyEdison.route) {
+                            popUpTo(NavRoute.MyEdison.route) { inclusive = true }
+                        }
+                    },
                     onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
                 )
             }
