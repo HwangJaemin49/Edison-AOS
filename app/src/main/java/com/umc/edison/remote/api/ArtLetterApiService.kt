@@ -6,10 +6,12 @@ import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.artletter.GetAllArtLettersResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterDetailResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterKeywordResponse
+import com.umc.edison.remote.model.artletter.GetEditorPickRequest
 import com.umc.edison.remote.model.artletter.GetSortedArtLettersResponse
 import com.umc.edison.remote.model.artletter.PostArtLetterLikeResponse
 import com.umc.edison.remote.model.artletter.PostArtLetterScrapResponse
-import com.umc.edison.remote.model.artletter.GetEditorPickArtLetterResponse
+import com.umc.edison.remote.model.artletter.GetEditorPickResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -29,7 +31,7 @@ interface ArtLetterApiService {
     suspend fun postArtLetterLike(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterLikeResponse>
 
     @POST("/artletters/editor-pick")
-    suspend fun getEditorPick(): ResponseWithListData<GetEditorPickArtLetterResponse>
+    suspend fun getEditorPick(@Body ids: GetEditorPickRequest): ResponseWithListData<GetEditorPickResponse>
 
     @GET("/artletters/{letterId}")
     suspend fun getArtLetterDetail(@Path("letterId") letterId: Int): ResponseWithData<GetArtLetterDetailResponse>

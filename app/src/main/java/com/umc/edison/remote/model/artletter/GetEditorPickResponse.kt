@@ -4,9 +4,8 @@ import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.ArtLetterPreviewEntity
 import com.umc.edison.remote.model.RemoteMapper
 
-
-data class GetEditorPickArtLetterResponse(
-    @SerializedName("artletterId") val artletterId: Int,
+data class GetEditorPickResponse(
+    @SerializedName("artletterId") val artLetterId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
     @SerializedName("category") val category: String,
@@ -22,11 +21,11 @@ data class GetEditorPickArtLetterResponse(
     @SerializedName("scraped") val scraped: Boolean
 ) : RemoteMapper<ArtLetterPreviewEntity> {
     override fun toData(): ArtLetterPreviewEntity = ArtLetterPreviewEntity(
-        artLetterId = artletterId,
+        artLetterId = artLetterId,
         title = title,
         thumbnail = thumbnail ?: "",
         scraped = scraped
     )
 }
 
-fun List<GetEditorPickArtLetterResponse>.toData(): List<ArtLetterPreviewEntity> = map { it.toData() }
+fun List<GetEditorPickResponse>.toData(): List<ArtLetterPreviewEntity> = map { it.toData() }

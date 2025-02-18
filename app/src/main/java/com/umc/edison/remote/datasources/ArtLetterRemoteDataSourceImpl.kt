@@ -4,6 +4,7 @@ import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.data.model.ArtLetterPreviewEntity
 import com.umc.edison.remote.api.ArtLetterApiService
+import com.umc.edison.remote.model.artletter.GetEditorPickRequest
 import com.umc.edison.remote.model.artletter.toData
 import javax.inject.Inject
 
@@ -33,6 +34,7 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun postEditorPickArtLetter(): List<ArtLetterPreviewEntity> {
-        return artLetterApiService.getEditorPick().data.map { it.toData() }
+        val request = GetEditorPickRequest(listOf(6, 7, 8))
+        return artLetterApiService.getEditorPick(request).data.map { it.toData() }
     }
 }
