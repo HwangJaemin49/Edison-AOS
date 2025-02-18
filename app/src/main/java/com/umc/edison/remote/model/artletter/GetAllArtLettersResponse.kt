@@ -6,7 +6,7 @@ import com.umc.edison.data.model.ArtletterEntity
 import com.umc.edison.remote.model.RemoteMapper
 
 data class GetAllArtLettersResponse(
-    @SerializedName("id") val id: Int,
+    @SerializedName("artletterId") val artletterId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("thumbnail") val thumbnail: String,
     @SerializedName("likes") val likes: Int,
@@ -15,7 +15,7 @@ data class GetAllArtLettersResponse(
 
     override fun toData(): ArtletterEntity {
         return ArtletterEntity(
-            artletterId = id,
+            artletterId = artletterId,
             title = title,
             thumbnail = thumbnail,
             likes = likes,

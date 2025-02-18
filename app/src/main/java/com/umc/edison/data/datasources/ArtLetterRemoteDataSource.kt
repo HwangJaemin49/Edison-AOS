@@ -2,8 +2,9 @@ package com.umc.edison.data.datasources
 
 import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.data.model.ArtLetterMarkEntity
+import com.umc.edison.data.model.ArtLetterScrapEntity
 import com.umc.edison.data.model.ArtletterEntity
-import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
+import com.umc.edison.data.model.EditorPickArtLetterEntity
 
 interface ArtLetterRemoteDataSource {
     suspend fun getAllArtLetters(): List<ArtletterEntity>
@@ -12,9 +13,9 @@ interface ArtLetterRemoteDataSource {
 
     suspend fun getSortedArtLetters(sortBy: String): List<ArtletterEntity>
 
-    suspend fun toggleScrap(artLetterId: Int): ScrapArtLettersResult
+    suspend fun postArtLetterScrap(artletterId: Int): ArtLetterScrapEntity
 
     suspend fun postArtLetterLike(artletterId: Int): ArtLetterMarkEntity
 
-    suspend fun postEditorPick(artletterIds: List<Int>): List<ArtLetterDetailEntity>
+    suspend fun postEditorPickArtLetter(artletterIds: List<Int>): List<EditorPickArtLetterEntity>
 }

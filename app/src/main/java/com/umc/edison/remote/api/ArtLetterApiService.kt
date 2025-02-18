@@ -8,6 +8,7 @@ import com.umc.edison.remote.model.artletter.GetAllArtLettersResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterDetailResponse
 import com.umc.edison.remote.model.artletter.GetSortedArtLettersResponse
 import com.umc.edison.remote.model.artletter.PostArtLetterLikeResponse
+import com.umc.edison.remote.model.artletter.PostArtLetterScrapResponse
 import com.umc.edison.remote.model.artletter.PostEditorPickArtLetterResponse
 import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
 import retrofit2.http.Body
@@ -24,7 +25,7 @@ interface ArtLetterApiService {
     suspend fun getSortedArtLetters(@Query("sortBy") sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
 
     @POST("/artletters/{artletterId}/scrap")
-    suspend fun toggleScrap(@Path("artletterId") artletterId: Int): ScrapArtLettersResult
+    suspend fun postArtLetterScrap(@Path("artletterId") artletterId: Int): ResponseWithData<PostArtLetterScrapResponse>
 
     @POST("/artletters/{artletterId}/like")
     suspend fun postArtLetterLike(@Path("artletterId") artletterId: Int): ResponseWithData<PostArtLetterLikeResponse>
@@ -34,8 +35,5 @@ interface ArtLetterApiService {
 
     @GET("/artletters/{letterId}")
     suspend fun getArtLetterDetail(@Path("letterId") letterId: Int): ResponseWithData<GetArtLetterDetailResponse>
-
-    @GET("/artletters/recommend-bar/keyword")
-    suspend fun getRecommendedKeywords(@Query("artletterIds") artletterIds: String): ResponseWithListData<GetArtLetterKeyword>
 
 }

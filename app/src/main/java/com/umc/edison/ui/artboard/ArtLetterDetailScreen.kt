@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -210,14 +211,16 @@ fun ArtLetterDetailScreen(
                     Row(modifier = Modifier.fillMaxWidth(), // Row를 가로로 꽉 채움
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End) {
+                        val isLiked = rememberSaveable { mutableStateOf(likeState.result.liked) }
                         Icon(
-                            painter = painterResource(id = if (likeState.result.liked) R.drawable.ic_artletter_detail_like else R.drawable.ic_artletter_detail_empty_like),
+                            painter = painterResource(id = if (isLiked.value) R.drawable.ic_artletter_detail_empty_like else R.drawable.ic_artletter_detail_like),
                             contentDescription = "Like",
                             tint = Color.Unspecified,
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
                                     viewModel.postArtLetterLike(artletterId)
+                                    isLiked.value = !isLiked.value  // UI 상태 업데이트
                                 }
                         )
                         Spacer(modifier = Modifier.width(4.dp))

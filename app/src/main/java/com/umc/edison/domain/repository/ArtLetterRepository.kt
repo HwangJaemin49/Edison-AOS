@@ -5,7 +5,8 @@ import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.ArtLetter
 import com.umc.edison.domain.model.ArtLetterDetail
 import com.umc.edison.domain.model.ArtLetterMark
-import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
+import com.umc.edison.domain.model.ArtLetterScrap
+import com.umc.edison.domain.model.EditorPickArtLetter
 import kotlinx.coroutines.flow.Flow
 
 interface ArtLetterRepository {
@@ -15,9 +16,9 @@ interface ArtLetterRepository {
 
     fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>>
 
-    fun toggleScrap(artLetterId: Int): Flow<DataResource<ScrapArtLettersResult>>
+    fun postArtLetterScrap(artletterId: Int): Flow<DataResource<ArtLetterScrap>>
 
     fun postArtLetterLike(artletterId: Int): Flow<DataResource<ArtLetterMark>>
 
-    fun postEditorPick(artletterIds: List<Int>): Flow<DataResource<List<ArtLetterDetail>>>
+    fun postEditorPickArtLetter(artletterIds: List<Int>): Flow<DataResource<List<EditorPickArtLetter>>>
 }

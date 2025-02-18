@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -153,7 +154,7 @@ fun TopBar(
 //    val editorPickState by viewModel.uiEditorPickState.collectAsState()
 //
 //    LaunchedEffect(Unit) {
-//        viewModel.postEditorPick(listOf(1)) // ID로 API 호출
+//        viewModel.postEditorPickArtLetter(listOf(1)) // ID로 API 호출
 //    }
 //
 //    Column(modifier = Modifier.fillMaxWidth()) {
@@ -176,7 +177,7 @@ fun TopBar(
 //                }
 //            }
 //
-//            editorPickState.artletter.isEmpty() -> {
+//            editorPickState.artletters.isEmpty() -> {
 //                Box(
 //                    modifier = Modifier
 //                        .fillMaxWidth()
@@ -189,7 +190,7 @@ fun TopBar(
 //            }
 //
 //            else -> {
-//                val pagerState = rememberPagerState(pageCount = { editorPickState.artletter.size })
+//                val pagerState = rememberPagerState(pageCount = { editorPickState.artletters.size })
 //
 //                Box(
 //                    modifier = Modifier
@@ -200,7 +201,7 @@ fun TopBar(
 //                        state = pagerState,
 //                        modifier = Modifier.fillMaxSize()
 //                    ) { page ->
-//                        val artLetter = editorPickState.artletter[page]
+//                        val artLetter = editorPickState.artletters[page]
 //
 //                        Box(
 //                            modifier = Modifier
@@ -224,7 +225,7 @@ fun TopBar(
 //                            .padding(bottom = 8.dp),
 //                        horizontalArrangement = Arrangement.Center
 //                    ) {
-//                        repeat(editorPickState.artletter.size) { index ->
+//                        repeat(editorPickState.artletters.size) { index ->
 //                            Spacer(
 //                                modifier = Modifier
 //                                    .padding(2.dp)
@@ -291,9 +292,8 @@ fun ArtBoardCard(
     uiState: ArtLetterModel,
     viewModel: ArtLetterViewModel
 ) {
-    val scrapStatus by viewModel.scrapStatus.collectAsState()
-    val isBookmarked = scrapStatus[uiState.artletterId] ?: false
-
+    val scrapState by viewModel.scrapState.collectAsState()
+    val isScrapped = rememberSaveable(scrapState.result.scrapped) { mutableStateOf(scrapState.result.scrapped) }
 
     Box(
         modifier = modifier
@@ -301,6 +301,7 @@ fun ArtBoardCard(
             .clickable { navHostController.navigate(NavRoute.ArtLetterDetail.createRoute(uiState.artletterId))}
                 .clip(RoundedCornerShape(10.dp))
     ) {
+
         if (uiState.thumbnail.isNullOrBlank()) {
             Image(
                 painter = painterResource(id = R.drawable.delivery),
@@ -318,7 +319,7 @@ fun ArtBoardCard(
         }
 
         Icon(
-            painter = painterResource(id = if (isBookmarked) R.drawable.ic_bookmark else R.drawable.ic_empty_bookmark),
+            painter = painterResource(id = if (isScrapped.value) R.drawable.ic_bookmark else R.drawable.ic_empty_bookmark),
             contentDescription = "Bookmark",
             tint = Color.Unspecified,
             modifier = Modifier
@@ -327,7 +328,8 @@ fun ArtBoardCard(
                 .size(24.dp)
                 .clickable {
                     Log.d("ArtBoardCard", "Bookmark clicked: ${uiState.artletterId}") // 북마크 클릭 로그 추가
-                    viewModel.toggleScrap(uiState.artletterId) // 북마크 요청
+                    viewModel.postArtLetterScrap(uiState.artletterId) // 북마크 요청
+                    isScrapped.value = !isScrapped.value // 상태 업데이트
                 }
         )
         Text(

@@ -1,13 +1,11 @@
 package com.umc.edison.presentation.model
 
-
-import com.umc.edison.domain.model.ArtLetter
-import com.umc.edison.domain.model.ArtLetterDetail
+import com.umc.edison.domain.model.EditorPickArtLetter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-data class ArtLetterDetailModel(
+data class EditorPickArtLetterModel(
     val artletterId: Int,
     val title: String,
     val content: String,
@@ -26,7 +24,7 @@ data class ArtLetterDetailModel(
     companion object {
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
-        val DEFAULT = ArtLetterDetailModel(
+        val DEFAULT = EditorPickArtLetterModel(
             artletterId = 1,
             title = "제목",
             content = "본문",
@@ -44,8 +42,8 @@ data class ArtLetterDetailModel(
         )
     }
 
-    fun toDomain(): ArtLetterDetail {
-        return ArtLetterDetail(
+    fun toDomain(): EditorPickArtLetter {
+        return EditorPickArtLetter(
             artletterId = artletterId,
             title = title,
             content = content,
@@ -64,8 +62,8 @@ data class ArtLetterDetailModel(
     }
 }
 
-fun ArtLetterDetail.toPresentation(): ArtLetterDetailModel {
-    return ArtLetterDetailModel(
+fun EditorPickArtLetter.toPresentation(): EditorPickArtLetterModel {
+    return EditorPickArtLetterModel(
         artletterId = artletterId,
         title = title,
         content = content,
@@ -83,6 +81,6 @@ fun ArtLetterDetail.toPresentation(): ArtLetterDetailModel {
     )
 }
 
-fun List<ArtLetterDetail>.toPresentation(): List<ArtLetterDetailModel> {
+fun List<EditorPickArtLetter>.toPresentation(): List<EditorPickArtLetterModel> {
     return map { it.toPresentation() }
 }

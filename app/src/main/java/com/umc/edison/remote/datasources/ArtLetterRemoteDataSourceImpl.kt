@@ -3,8 +3,9 @@ package com.umc.edison.remote.datasources
 import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.data.model.ArtLetterMarkEntity
+import com.umc.edison.data.model.ArtLetterScrapEntity
 import com.umc.edison.data.model.ArtletterEntity
-import com.umc.edison.data.model.toDomain
+import com.umc.edison.data.model.EditorPickArtLetterEntity
 import com.umc.edison.remote.api.ArtLetterApiService
 import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
 import com.umc.edison.remote.model.artletter.toData
@@ -31,11 +32,13 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         return artLetterApiService.postArtLetterLike(artletterId).data.toData()
     }
 
-    override suspend fun toggleScrap(artLetterId: Int): ScrapArtLettersResult {
-        return artLetterApiService.toggleScrap(artLetterId)
+    override suspend fun postArtLetterScrap(artletterId: Int): ArtLetterScrapEntity {
+        return artLetterApiService.postArtLetterScrap(artletterId).data.toData()
     }
 
-    override suspend fun postEditorPick(artletterIds: List<Int>): List<ArtLetterDetailEntity> {
-        return artLetterApiService.postEditorPick(artletterIds).data.toData()
+    override suspend fun postEditorPickArtLetter(artletterIds: List<Int>): List<EditorPickArtLetterEntity> {
+        val response = artLetterApiService.postEditorPick(artletterIds).data
+
+        return response.map { it.toData() }
     }
 }

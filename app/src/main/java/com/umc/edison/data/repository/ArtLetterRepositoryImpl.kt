@@ -6,6 +6,8 @@ import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.ArtLetter
 import com.umc.edison.domain.model.ArtLetterDetail
 import com.umc.edison.domain.model.ArtLetterMark
+import com.umc.edison.domain.model.ArtLetterScrap
+import com.umc.edison.domain.model.EditorPickArtLetter
 import com.umc.edison.domain.repository.ArtLetterRepository
 import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
 import kotlinx.coroutines.flow.Flow
@@ -25,26 +27,24 @@ class ArtLetterRepositoryImpl @Inject constructor(
             dataAction = { artletterRemoteDataSource.getArtLetterDetail(letterId)}
         )
 
-    override fun postArtLetterLike(artletterId: Int): Flow<DataResource<ArtLetterMark>> =
-        flowDataResource(
-            dataAction = {artletterRemoteDataSource.postArtLetterLike(artletterId)}
-        )
-
     override fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>> =
         flowDataResource(
             dataAction = { artletterRemoteDataSource.getSortedArtLetters(sortBy) }
         )
 
-    override fun toggleScrap(
-        artLetterId: Int
-    ): Flow<DataResource<ScrapArtLettersResult>> =
+    override fun postArtLetterScrap(artletterId: Int): Flow<DataResource<ArtLetterScrap>> =
         flowDataResource(
-            dataAction = { artletterRemoteDataSource.toggleScrap(artLetterId) }
+            dataAction = { artletterRemoteDataSource.postArtLetterScrap(artletterId) }
         )
 
-    override fun postEditorPick(artletterIds: List<Int>): Flow<DataResource<List<ArtLetterDetail>>> =
+    override fun postArtLetterLike(artletterId: Int): Flow<DataResource<ArtLetterMark>> =
         flowDataResource(
-            dataAction = { artletterRemoteDataSource.postEditorPick(artletterIds) }
+            dataAction = {artletterRemoteDataSource.postArtLetterLike(artletterId)}
+        )
+
+    override fun postEditorPickArtLetter(artletterIds: List<Int>): Flow<DataResource<List<EditorPickArtLetter>>> =
+        flowDataResource(
+            dataAction = { artletterRemoteDataSource.postEditorPickArtLetter(artletterIds) }
         )
 
 }

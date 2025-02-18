@@ -7,15 +7,14 @@ import com.umc.edison.domain.usecase.artletter.GetAllArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
 import com.umc.edison.domain.usecase.artletter.GetSortedArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.PostArtLetterLikeUseCase
+import com.umc.edison.domain.usecase.artletter.PostArtLetterScrapUseCase
 import com.umc.edison.domain.usecase.artletter.PostEditorPickUseCase
-import com.umc.edison.domain.usecase.artletter.ScrapArtLettersUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -26,8 +25,8 @@ class ArtLetterViewModel @Inject constructor(
     private val getAllArtLettersUseCase: GetAllArtLettersUseCase,
     private val getArtLetterDetailUseCase: GetArtLetterDetailUseCase,
     private val getSortedArtLettersUseCase: GetSortedArtLettersUseCase,
-    private val scrapArtLettersUseCase: ScrapArtLettersUseCase,
     private val postArtLetterLikeUseCase: PostArtLetterLikeUseCase,
+    private val postArtLetterScrapUseCase: PostArtLetterScrapUseCase,
     private val postEditorPickUseCase: PostEditorPickUseCase,
 ) : BaseViewModel() {
 
@@ -40,8 +39,11 @@ class ArtLetterViewModel @Inject constructor(
     private val _likeState = MutableStateFlow(ArtLetterMarkState.DEFAULT)
     val likeState = _likeState.asStateFlow()
 
+    private val _scrapState = MutableStateFlow(ArtLetterScrapState.DEFAULT)
+    val scrapState = _scrapState.asStateFlow()
 
-    private val _uiEditorPickState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
+
+    private val _uiEditorPickState = MutableStateFlow(EditorPickArtLetterState.DEFAULT)
     val uiEditorPickState = _uiEditorPickState.asStateFlow()
 
     private val _scrapStatus = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
@@ -120,6 +122,25 @@ class ArtLetterViewModel @Inject constructor(
         )
     }
 
+    fun postArtLetterScrap(artletterId: Int) {
+        collectDataResource(
+            flow = postArtLetterScrapUseCase(artletterId),
+            onSuccess = { result ->
+                _scrapState.update { it.copy(result = result.toPresentation()) }
+                Log.d("LikeTest", "isLiked: ${result.scrapped}")
+            },
+            onError = { error ->
+                _scrapState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _scrapState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _scrapState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
     fun fetchSortedArtLetters(sortBy: String) {
         collectDataResource(
             flow = getSortedArtLettersUseCase(sortBy),
@@ -138,40 +159,20 @@ class ArtLetterViewModel @Inject constructor(
         )
     }
 
-//    fun postEditorPick(artletterIds: List<Int>) {
-//        collectDataResource(
-//            flow = postEditorPickUseCase(artletterIds),
-//            onSuccess = { artletter ->
-//                _uiEditorPickState.update { it.copy(artletter = artletter.toPresentation()) }
-//            },
-//            onError = { error ->
-//                _uiEditorPickState.update { it.copy(error = error) }
-//            },
-//            onLoading = {
-//                _uiEditorPickState.update { it.copy(isLoading = true) }
-//            },
-//            onComplete = {
-//                _uiEditorPickState.update { it.copy(isLoading = false) }
-//            }
-//        )
-//    }
-
-    fun toggleScrap(artLetterId: Int) {
-        Log.d("ArtLetterViewModel", "toggleScrap called with id: $artLetterId")
+    fun postEditorPickArtLetter(artletterIds: List<Int>) {
         collectDataResource(
-            flow = scrapArtLettersUseCase(artLetterId),
-            onSuccess = { response ->
-                _scrapStatus.update { oldStatus -> oldStatus.toMutableMap().apply {
-                            put(response.artLetterId, response.isScrapped)
-                }}},
+            flow = postEditorPickUseCase(artletterIds),
+            onSuccess = { artletters ->
+                _uiEditorPickState.update { it.copy(artletters = artletters.toPresentation()) }
+            },
             onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiEditorPickState.update { it.copy(error = error) }
             },
             onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiEditorPickState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiEditorPickState.update { it.copy(isLoading = false) }
             }
         )
     }
