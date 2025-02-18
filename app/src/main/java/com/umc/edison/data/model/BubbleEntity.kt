@@ -1,5 +1,6 @@
 package com.umc.edison.data.model
 
+import android.util.Log
 import com.umc.edison.domain.model.Bubble
 import com.umc.edison.domain.model.ContentBlock
 import com.umc.edison.domain.model.ContentType
@@ -48,6 +49,11 @@ data class BubbleEntity(
 }
 
 fun BubbleEntity.same(other: BubbleEntity): Boolean {
+    if (this.mainImage?.isEmpty() == true) this.mainImage = null
+    if (other.mainImage?.isEmpty() == true) other.mainImage = null
+
+    Log.d("BubbleEntity", "this: $this,\n other: $other")
+
     return id == other.id &&
             title == other.title &&
             content == other.content &&

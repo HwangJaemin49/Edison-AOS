@@ -6,7 +6,7 @@ import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.remote.model.toIso8601String
 
 data class SyncLabelRequest(
-    @SerializedName("labelId") val id: Int,
+    @SerializedName("localIdx") val id: Int,
     @SerializedName("name") val name: String,
     @SerializedName("color") val color: Int,
     @SerializedName("isDeleted") val isDeleted: Boolean,

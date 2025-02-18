@@ -144,7 +144,7 @@ private fun MyPageContent(
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
-                .size(8.dp)
+                .size(4.dp)
         )
 
         ArtLetterScrap(
@@ -166,7 +166,7 @@ private fun ProfileInfo(
             .clickable {
                 navHostController.navigate(NavRoute.ProfileEdit.route)
             }
-            .padding(vertical = 16.dp),
+            .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(18.dp)
     ) {
@@ -260,13 +260,6 @@ private fun ArtLetterScrap(
             )
         }
 
-        GridLayout(
-            columns = 2,
-            items = scrapItems,
-        ) {
-            ArtLetterCategoryContent(it as ArtLetterCategoryModel)
-        }
-
         if (scrapItems.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -284,6 +277,16 @@ private fun ArtLetterScrap(
                     text = stringResource(R.string.empty_scrap),
                     style = MaterialTheme.typography.titleSmall,
                     color = Gray600
+                )
+            }
+        } else {
+            GridLayout(
+                columns = 2,
+                items = scrapItems,
+            ) {
+                ArtLetterCategoryContent(
+                    category = it as ArtLetterCategoryModel,
+                    onCategoryClick = {}
                 )
             }
         }

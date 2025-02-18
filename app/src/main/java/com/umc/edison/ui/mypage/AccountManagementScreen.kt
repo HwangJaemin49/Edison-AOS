@@ -133,7 +133,11 @@ private fun AccountManagementContent(
                         .wrapContentSize()
                         .clip(RoundedCornerShape(20.dp))
                         .background(Gray100)
-                        .clickable { /* TODO: 로그인하기 기능 */ }
+                        .clickable {
+                            navHostController.navigate(NavRoute.Login.route) {
+                                popUpTo(NavRoute.Login.route) { inclusive = true }
+                            }
+                        }
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
@@ -199,7 +203,12 @@ private fun AccountManagementContent(
                     question = stringResource(R.string.logout_question),
                     positiveButtonText = stringResource(R.string.logout),
                     negativeButtonText = stringResource(R.string.cancel),
-                    onPositiveClick = { viewModel.logOut() },
+                    onPositiveClick = {
+                        viewModel.logOut()
+                        navHostController.navigate(NavRoute.MyEdison.route) {
+                            popUpTo(NavRoute.MyEdison.route) { inclusive = true }
+                        }
+                    },
                     onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
                 )
             }
