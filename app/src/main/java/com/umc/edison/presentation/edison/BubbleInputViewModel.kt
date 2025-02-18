@@ -3,7 +3,6 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
@@ -59,9 +58,10 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getBubbleUseCase(bubbleId),
             onSuccess = { bubble ->
+                val sortedContentBlocks = bubble.contentBlocks.toPresentation().sortedBy { it.position }
                 _uiState.update {
                     it.copy(
-                        bubble = bubble.toPresentation(),
+                        bubble = bubble.toPresentation().copy(contentBlocks = sortedContentBlocks),
                         selectedLabels = bubble.labels.toPresentation()
                     )
                 }
@@ -201,6 +201,7 @@ class BubbleInputViewModel @Inject constructor(
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "",
+            position = _uiState.value.bubble.contentBlocks.size
         )
 
         if (_uiState.value.bubble.contentBlocks.isEmpty()) {
@@ -239,10 +240,16 @@ class BubbleInputViewModel @Inject constructor(
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "",
+            position = 0
         )
 
+        // 기존 contentBlock의 position을 1씩 증가시킴
+        val currentContentBlocks = _uiState.value.bubble.contentBlocks.map {
+            it.copy(position = it.position + 1)
+        }
+
         _uiState.update {
-            val updatedContentBlocks = listOf(newTextBlock) + it.bubble.contentBlocks
+            val updatedContentBlocks = listOf(newTextBlock) + currentContentBlocks
             it.copy(
                 bubble = it.bubble.copy(
                     contentBlocks = updatedContentBlocks
@@ -266,29 +273,31 @@ class BubbleInputViewModel @Inject constructor(
 
         val newImageBlocks = mutableListOf<ContentBlockModel>()
 
-        imagePaths.forEachIndexed { index,imagePath ->
+        imagePaths.forEachIndexed { idx, imagePath ->
             val newImageBlock = ContentBlockModel(
                 type = ContentType.IMAGE,
                 content = imagePath.toString(),
+                position = _uiState.value.bubble.contentBlocks.size + idx
             )
 
-
             newImageBlocks.add(newImageBlock)
-
         }
+
+        val newTextBlock = ContentBlockModel(
+            type = ContentType.TEXT,
+            content = "",
+            position = _uiState.value.bubble.contentBlocks.size + imagePaths.size
+        )
 
         _uiState.update {
             it.copy(
                 bubble = it.bubble.copy(
-                    contentBlocks = it.bubble.contentBlocks + newImageBlocks,
-                    mainImage =  it.bubble.mainImage
+                    contentBlocks = it.bubble.contentBlocks + newImageBlocks + newTextBlock
                 ),
                 isGalleryOpen = false,
                 selectedIcon = IconType.NONE
             )
         }
-
-        addTextBlock()
     }
 
     fun closeGallery() {
@@ -307,10 +316,11 @@ class BubbleInputViewModel @Inject constructor(
 
     fun deleteContentBlock(contentBlock: ContentBlockModel) {
         if (contentBlock.type != ContentType.IMAGE) return
-        val currentBubble = _uiState.value.bubble
-        val contentBlocks = currentBubble.contentBlocks.toMutableList()
 
-        val targetIndex = contentBlocks.indexOf(contentBlock)
+        val currentBubble = _uiState.value.bubble
+        val contentBlocks = currentBubble.contentBlocks.sortedBy { it.position }.toMutableList()
+
+        val targetIndex = contentBlocks.indexOfFirst { it.position == contentBlock.position }
 
         if (targetIndex == -1) return
 
@@ -331,7 +341,7 @@ class BubbleInputViewModel @Inject constructor(
             _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
 
             // 마지막 블록이 이미지 블록이면 텍스트 블록 추가
-            if (currentBubble.contentBlocks.last().type == ContentType.IMAGE) {
+            if (contentBlocks.last().type == ContentType.IMAGE) {
                 addTextBlock()
             }
             return
@@ -514,12 +524,19 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun selectMainImage(uri: String?) {
-        _uiState.update {
-            it.copy(
-                bubble = it.bubble.copy(mainImage = uri)
-            )
+        if (_uiState.value.bubble.mainImage == uri) {
+            _uiState.update {
+                it.copy(
+                    bubble = it.bubble.copy(mainImage = null)
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    bubble = it.bubble.copy(mainImage = uri)
+                )
+            }
         }
-        Log.d("대표설정", "대표 이미지 변경됨: ${_uiState.value.bubble.mainImage}")
     }
 
     override fun clearToastMessage() {
