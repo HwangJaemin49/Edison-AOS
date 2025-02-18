@@ -19,7 +19,7 @@ interface BubbleSpaceApiService {
     @GET("/bubbles/space")
     suspend fun getAllBubbles(): ResponseWithPagination<GetAllBubblesResponse>
 
-    @GET("/spaces")
+    @GET("/bubbles/space")
     suspend fun getBubblePosition(): ResponseWithData<List<GetBubblePositionResponse>>
 
 }
