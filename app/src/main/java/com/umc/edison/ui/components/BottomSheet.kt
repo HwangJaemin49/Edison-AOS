@@ -23,11 +23,11 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -193,6 +193,7 @@ fun BottomSheetForDelete(
 fun CustomDraggableBottomSheet(
     collapsedOffset: Float, // sheet가 collapsed 상태일 때의 y-offset (px)
     expandedOffset: Float,  // sheet가 완전히 펼쳐진 상태일 때의 y-offset (보통 0)
+    onOffsetChanged: (Float) -> Unit = {},
     sheetContent: @Composable (topPadding: Dp) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -201,8 +202,8 @@ fun CustomDraggableBottomSheet(
     // 드래그 진행에 따른 fraction (0: expanded, 1: collapsed)
     val fraction = ((dragOffset.value - expandedOffset) / (collapsedOffset - expandedOffset)).coerceIn(0f, 1f)
 
-    val currentTopPadding = (fraction * 40).dp
-    val currentCornerRadius = (fraction * 20).dp
+    val currentTopPadding = if (fraction == 0f) 0.dp else 40.dp
+    val currentCornerRadius = if (fraction < 0.3f) (fraction * 20).dp else 20.dp
 
     Box(
         modifier = Modifier
@@ -243,6 +244,10 @@ fun CustomDraggableBottomSheet(
                 .padding(start = 24.dp, top = currentTopPadding, end = 24.dp, bottom = 12.dp)
         ) {
             sheetContent(currentTopPadding)
+
+            LaunchedEffect(dragOffset.value) {
+                onOffsetChanged(dragOffset.value)
+            }
         }
     }
 }
