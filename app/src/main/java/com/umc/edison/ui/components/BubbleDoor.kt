@@ -212,7 +212,7 @@ private fun BubbleContent(
             )
         }
 
-        var deletedImageBlockId by remember { mutableStateOf<Int?>(null) }
+        var deletedImageBlockId by remember { mutableStateOf<Int>(-1) }
 
         bubble.contentBlocks.forEachIndexed { index, contentBlock ->
             when (contentBlock.type) {
@@ -231,7 +231,7 @@ private fun BubbleContent(
                     LaunchedEffect(deletedImageBlockId) {
                         deletedImageBlockId?.let {
                             richTextState.setHtml(contentBlock.content)
-                            deletedImageBlockId = null
+                            deletedImageBlockId = -1
                         }
                     }
 
