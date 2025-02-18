@@ -30,6 +30,7 @@ data class SyncBubbleResponse(
             backLinks = emptyList(),
             linkedBubble = null,
             isDeleted = isDeleted,
+            isTrashed = isTrashed,
             createdAt = parseIso8601ToDate(createdAt),
             updatedAt = parseIso8601ToDate(updatedAt),
             deletedAt = deletedAt?.let { parseIso8601ToDate(it) }

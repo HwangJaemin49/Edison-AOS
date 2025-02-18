@@ -2,7 +2,6 @@ package com.umc.edison.data.repository
 
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.LabelLocalDataSource
-import com.umc.edison.data.datasources.LabelRemoteDataSource
 import com.umc.edison.data.model.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.Label
@@ -12,12 +11,9 @@ import javax.inject.Inject
 
 class LabelRepositoryImpl @Inject constructor(
     private val labelLocalDataSource: LabelLocalDataSource,
-    private val labelRemoteDataSource: LabelRemoteDataSource
 ) : LabelRepository {
     override fun getAllLabels(): Flow<DataResource<List<Label>>> = flowDataResource(
-        remoteDataAction = { labelRemoteDataSource.getAllLabels() },
-        localDataAction = { labelLocalDataSource.getAllLabels() },
-        saveCacheAction = { labelLocalDataSource.addLabels(it) },
+        dataAction = { labelLocalDataSource.getAllLabels() },
     )
 
     override fun addLabel(label: Label): Flow<DataResource<Unit>> = flowDataResource (
@@ -33,9 +29,7 @@ class LabelRepositoryImpl @Inject constructor(
     )
 
     override fun getLabelDetail(labelId: Int): Flow<DataResource<Label>> = flowDataResource(
-        remoteDataAction = { labelRemoteDataSource.getLabelDetail(labelId) },
-        localDataAction = { labelLocalDataSource.getLabelDetail(labelId) },
-        saveCacheAction = { labelLocalDataSource.addLabel(it) },
+        dataAction = { labelLocalDataSource.getLabelDetail(labelId) },
     )
 
 }

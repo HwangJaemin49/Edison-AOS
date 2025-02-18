@@ -67,4 +67,14 @@ class SyncRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun syncServerDataToLocal() {
+        withContext(Dispatchers.IO) {
+            val remoteLabels = labelRemoteDataSource.getAllLabels()
+            val remoteBubbles = bubbleRemoteDataSource.getAllBubbles()
+
+            labelLocalDataSource.addLabels(remoteLabels)
+            bubbleLocalDataSource.addBubbles(remoteBubbles)
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.umc.edison.local.datasources
 
 import android.icu.util.Calendar
+import android.util.Log
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.local.model.BubbleLocal
@@ -32,6 +33,8 @@ class BubbleLocalDataSourceImpl @Inject constructor(
             add(Calendar.DAY_OF_YEAR, -7)
         }.time.time
         val localBubbles: List<BubbleLocal> = bubbleDao.getStorageBubbles(sevenDaysAgo)
+
+        Log.d("BubbleLocalDataSourceImpl", "getStorageBubbles: $localBubbles")
 
         return convertLocalBubblesToBubbles(localBubbles)
     }
