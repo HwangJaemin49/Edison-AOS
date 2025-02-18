@@ -305,14 +305,19 @@ class BubbleInputViewModel @Inject constructor(
         checkCanSave()
     }
 
-    fun deleteContentBlock(contentBlock: ContentBlockModel) {
-        if (contentBlock.type != ContentType.IMAGE) return
+    fun deleteContentBlock(targetIndex: Int) {
         val currentBubble = _uiState.value.bubble
         val contentBlocks = currentBubble.contentBlocks.toMutableList()
 
-        val targetIndex = contentBlocks.indexOf(contentBlock)
+        // 유효한 인덱스인지 확인
+        if (targetIndex !in contentBlocks.indices) return
 
-        if (targetIndex == -1) return
+        val targetBlock = contentBlocks[targetIndex] // 직접 해당 블록 가져오기
+
+        if (targetBlock.type != ContentType.IMAGE) return
+
+        // 🔹 이미지 블록 로그 출력
+        Log.d("delete", "삭제할 이미지 블록 index: $targetIndex, 내용: ${targetBlock.content}")
 
         // 이미지가 첫 번째 블록일 때
         if (targetIndex == 0) {
@@ -331,7 +336,7 @@ class BubbleInputViewModel @Inject constructor(
             _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
 
             // 마지막 블록이 이미지 블록이면 텍스트 블록 추가
-            if (currentBubble.contentBlocks.last().type == ContentType.IMAGE) {
+            if (contentBlocks.isNotEmpty() && contentBlocks.last().type == ContentType.IMAGE) {
                 addTextBlock()
             }
             return
@@ -339,17 +344,30 @@ class BubbleInputViewModel @Inject constructor(
 
         // 이미지가 중간 블럭일 때 이전 블록과 다음 블록이 TEXT일 경우 연결
         if (contentBlocks[targetIndex - 1].type == ContentType.TEXT && contentBlocks[targetIndex + 1].type == ContentType.TEXT) {
-            contentBlocks[targetIndex - 1] = contentBlocks[targetIndex - 1].copy(
-                content = contentBlocks[targetIndex - 1].content + contentBlocks[targetIndex + 1].content
-            )
 
-            contentBlocks.removeAt(targetIndex) // 제거하려는 이미지 블록 삭제
-            contentBlocks.removeAt(targetIndex) // 다음 TEXT 블록 삭제
+            val previousTextBlock = contentBlocks[targetIndex - 1]
+            val nextTextBlock = contentBlocks[targetIndex + 1]
 
-            _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = contentBlocks)) }
+            Log.d("delete","${previousTextBlock}, ${nextTextBlock}")
+
+            val mergedContent = previousTextBlock.content + nextTextBlock.content
+
+            val newContentBlocks = contentBlocks.filterIndexed { index, _ ->
+                index != targetIndex && index != targetIndex + 1 // 이미지 블록과 다음 텍스트 블록 제거
+            }.toMutableList()
+
+            // 🔹 병합된 텍스트 블록을 이전 텍스트 위치에 추가
+            newContentBlocks[targetIndex - 1] = previousTextBlock.copy(content = mergedContent)
+
+            // 🔹 최종 업데이트
+            _uiState.update { it.copy(bubble = it.bubble.copy(contentBlocks = newContentBlocks)) }
+
+            Log.d("delete", "✅ 병합 완료: ${newContentBlocks[targetIndex - 1].content}")
             return
         }
 
+
+        // 기본적인 이미지 블록 삭제
         contentBlocks.removeAt(targetIndex)
         _uiState.update {
             it.copy(
@@ -357,6 +375,8 @@ class BubbleInputViewModel @Inject constructor(
             )
         }
     }
+
+
 
     fun updateBubbleWithLink() {
         saveBubble(true)

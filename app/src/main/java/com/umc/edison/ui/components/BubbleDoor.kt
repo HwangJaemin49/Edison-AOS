@@ -3,6 +3,7 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -90,7 +91,7 @@ fun BubbleDoor(
     onClick: (() -> Unit)? = null,
     isEditable: Boolean = false,
     onBubbleUpdate: (BubbleModel) -> Unit = {},
-    onImageDeleted: (ContentBlockModel) -> Unit = {},
+    onImageDeleted: (Int) -> Unit = {},
     onMainSelected: (String?) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
     onLinkClick: (Int) -> Unit = {},
@@ -165,7 +166,7 @@ private fun BubbleContent(
     bubble: BubbleModel,
     onBubbleChange: (BubbleModel) -> Unit,
     uiState: BubbleInputState,
-    deleteClicked: (ContentBlockModel) -> Unit,
+    deleteClicked: (Int)-> Unit,
     mainClicked: (String?) -> Unit,
     onLinkClick: (Int) -> Unit,
 ) {
@@ -213,7 +214,7 @@ private fun BubbleContent(
             )
         }
 
-        var deletedImageBlockId by remember { mutableStateOf<Int?>(null) }
+        var deletedImageBlockId by remember { mutableStateOf<Int>(-1 )}
 
         bubble.contentBlocks.forEachIndexed { index, contentBlock ->
             when (contentBlock.type) {
@@ -230,9 +231,9 @@ private fun BubbleContent(
                     val isInitialized = remember(index) { mutableStateOf(false) }
 
                     LaunchedEffect(deletedImageBlockId) {
-                        deletedImageBlockId?.let {
+                        deletedImageBlockId.let {
                             richTextState.setHtml(contentBlock.content)
-                            deletedImageBlockId = null
+                            deletedImageBlockId =-1
                         }
                     }
 
@@ -242,6 +243,7 @@ private fun BubbleContent(
                             isInitialized.value = true
                         }
                     }
+
 
                     LaunchedEffect(richTextState.toHtml()) {
                         onBubbleChange(
@@ -329,7 +331,6 @@ private fun BubbleContent(
                     var isLongPressed by remember { mutableStateOf(false) }
                     val isMainImage = bubble.mainImage == contentBlock.content
 
-
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -392,7 +393,7 @@ private fun BubbleContent(
                                             shape = RoundedCornerShape(100.dp),
                                             onClick = {
                                                 isLongPressed = false
-                                                deleteClicked(contentBlock)
+                                                deleteClicked(index)
                                                 deletedImageBlockId = index
                                             },
                                             colors = ButtonDefaults.buttonColors(
