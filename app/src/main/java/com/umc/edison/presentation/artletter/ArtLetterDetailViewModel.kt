@@ -2,6 +2,7 @@ package com.umc.edison.presentation.artletter
 
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
+import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.LikeArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.presentation.base.BaseViewModel
@@ -26,6 +27,7 @@ class ArtLetterDetailViewModel @Inject constructor(
     init {
         val id = savedStateHandle.get<Int>("id") ?: throw IllegalArgumentException("id is required")
         fetchArtLetterDetail(id)
+        fetchRandomArtLetters()
     }
 
     private fun fetchArtLetterDetail(id: Int) {
@@ -39,6 +41,18 @@ class ArtLetterDetailViewModel @Inject constructor(
             },
             onLoading = { _uiState.update { it.copy(isLoading = true) } },
             onComplete = { _uiState.update { it.copy(isLoading = false) } }
+        )
+    }
+
+    private fun fetchRandomArtLetters() {
+        collectDataResource(
+            flow = getRandomArtLettersUseCase(),
+            onSuccess = { artLetters ->
+                _uiState.update { it.copy(relatedArtLetters = artLetters.toPresentation()) }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            }
         )
     }
 
