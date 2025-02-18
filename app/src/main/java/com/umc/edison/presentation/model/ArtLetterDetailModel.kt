@@ -14,7 +14,23 @@ data class ArtLetterDetailModel(
     val likesCnt: Int,
     val liked: Boolean,
     val scraped: Boolean,
-)
+) {
+    companion object {
+        val DEFAULT = ArtLetterDetailModel(
+            artLetterId = 0,
+            title = "",
+            content = "",
+            category = "",
+            readTime = 0,
+            writer = "",
+            tags = "",
+            thumbnail = "",
+            likesCnt = 0,
+            liked = false,
+            scraped = false,
+        )
+    }
+}
 
 fun ArtLetterDetail.toPresentation(): ArtLetterDetailModel = ArtLetterDetailModel(
     artLetterId = artLetterId,

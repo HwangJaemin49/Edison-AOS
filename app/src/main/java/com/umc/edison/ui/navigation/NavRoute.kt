@@ -5,9 +5,10 @@ sealed class NavRoute(val route: String) {
     data object Space : NavRoute("space")
     data object ArtLetter : NavRoute("art-letter")
     data object ArtLetterSearch : NavRoute("art-letter/search")
-    data class ArtLetterDetail(val artletterId: Int) : NavRoute("art-letter/${artletterId}") {
+
+    data class ArtLetterDetail(val id: Int) : NavRoute("${ArtLetter.route}/${id}") {
         companion object {
-            fun createRoute(artletterId: Int): String = "art-letter/${artletterId}"
+            fun createRoute(id: Int): String = "${ArtLetter.route}/${id}"
         }
     }
     data object MyPage : NavRoute("my-page")

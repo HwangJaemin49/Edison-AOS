@@ -104,7 +104,7 @@ fun ArtLetterCard(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_empty_bookmark),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_bookmark),
                     contentDescription = "Scrap Icon",
                     tint = if (artLetter.scraped) Color(0xFFFFDE66) else Gray500,
                     modifier = Modifier.size(22.dp).clickable { onBookmarkClick(artLetter) }

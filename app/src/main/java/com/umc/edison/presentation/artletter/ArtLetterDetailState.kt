@@ -8,7 +8,7 @@ data class ArtLetterDetailState(
     val isLoggedIn: Boolean = false,
     override val error: Throwable? = null,
     override val toastMessage: String? = null,
-    val artletter: ArtLetterDetailModel,
+    val artLetter: ArtLetterDetailModel,
 ) : BaseState {
     companion object {
         val DEFAULT = ArtLetterDetailState(
@@ -16,7 +16,7 @@ data class ArtLetterDetailState(
             isLoggedIn = false,
             error = null,
             toastMessage = null,
-            artletter = ArtLetterDetailModel.DEFAULT,
+            artLetter = ArtLetterDetailModel.DEFAULT,
         )
     }
 }
