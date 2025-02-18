@@ -170,7 +170,8 @@ fun LabelDetailScreen(
                         viewModel.updateEditMode(LabelDetailMode.EDIT)
                     },
                     onConfirm = { labelList ->
-                        viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
+                        if (labelList.isNotEmpty()) viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
+                        else viewModel.updateEditMode(LabelDetailMode.EDIT)
                     },
                 )
             }
