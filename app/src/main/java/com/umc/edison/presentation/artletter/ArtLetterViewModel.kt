@@ -109,6 +109,7 @@ class ArtLetterViewModel @Inject constructor(
             onSuccess = { result ->
                 _likeState.update { it.copy(result = result.toPresentation()) }
                 fetchArtLetterDetail(artletterId)
+                fetchAllArtLetters()
                 Log.d("LikeTest", "isLiked: ${result.liked}")
             },
             onError = { error ->
@@ -129,6 +130,7 @@ class ArtLetterViewModel @Inject constructor(
             onSuccess = { result ->
                 _scrapState.update { it.copy(result = result.toPresentation()) }
                 fetchArtLetterDetail(artletterId)
+                fetchAllArtLetters()
                 Log.d("LikeTest", "isLiked: ${result.scrapped}")
             },
             onError = { error ->

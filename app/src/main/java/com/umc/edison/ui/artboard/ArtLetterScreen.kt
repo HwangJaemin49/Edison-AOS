@@ -292,7 +292,7 @@ fun ArtBoardCard(
     uiState: ArtLetterModel,
     viewModel: ArtLetterViewModel
 ) {
-    var isScrapped by remember { mutableStateOf(uiState.scraped) }
+    val isScrapped = uiState.scraped
 
     Box(
         modifier = modifier
@@ -326,7 +326,6 @@ fun ArtBoardCard(
                 .padding(8.dp)
                 .size(24.dp)
                 .clickable {
-                    isScrapped = !isScrapped // 상태 업데이트
                     Log.d("ArtBoardCard", "Bookmark clicked: ${uiState.artletterId}") // 북마크 클릭 로그 추가
                     viewModel.postArtLetterScrap(uiState.artletterId) // 북마크 요청
                 }
