@@ -28,6 +28,11 @@ class ArtLetterRepositoryImpl @Inject constructor(
             dataAction = { artLetterRemoteDataSource.getSortedArtLetters(sortBy) }
         )
 
+    override fun getRandomArtLetters(): Flow<DataResource<List<ArtLetterPreview>>> =
+        flowDataResource(
+            dataAction = { artLetterRemoteDataSource.getRandomArtLetters() }
+        )
+
     override fun postArtLetterScrap(id: Int): Flow<DataResource<Unit>> =
         flowDataResource(
             dataAction = { artLetterRemoteDataSource.postArtLetterScrap(id) }

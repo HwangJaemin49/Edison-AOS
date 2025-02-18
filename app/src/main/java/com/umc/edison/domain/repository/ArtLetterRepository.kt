@@ -15,6 +15,8 @@ interface ArtLetterRepository {
 
     fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetterPreview>>>
 
+    fun getRandomArtLetters(): Flow<DataResource<List<ArtLetterPreview>>>
+
     fun postArtLetterScrap(id: Int): Flow<DataResource<Unit>>
 
     fun postArtLetterLike(id: Int): Flow<DataResource<Unit>>

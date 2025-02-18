@@ -16,6 +16,7 @@ data class GetScrapArtLettersByCategoryResponse(
         artLetterId = id,
         title = title,
         thumbnail = thumbnail ?: "",
-        scraped = true
+        scraped = true,
+        tags = emptyList()
     )
 }

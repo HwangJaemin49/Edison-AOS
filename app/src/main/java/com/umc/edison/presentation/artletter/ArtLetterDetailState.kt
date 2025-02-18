@@ -9,6 +9,7 @@ data class ArtLetterDetailState(
     override val error: Throwable? = null,
     override val toastMessage: String? = null,
     val artLetter: ArtLetterDetailModel,
+    val randomArtLetters: List<ArtLetterDetailModel> = emptyList(),
 ) : BaseState {
     companion object {
         val DEFAULT = ArtLetterDetailState(

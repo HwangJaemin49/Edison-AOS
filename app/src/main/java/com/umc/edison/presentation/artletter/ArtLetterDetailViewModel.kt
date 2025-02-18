@@ -17,7 +17,8 @@ class ArtLetterDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getArtLetterDetailUseCase: GetArtLetterDetailUseCase,
     private val likeArtLetterUseCase: LikeArtLetterUseCase,
-    private val scrapArtLetterUseCase: ScrapArtLetterUseCase
+    private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
+    private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()

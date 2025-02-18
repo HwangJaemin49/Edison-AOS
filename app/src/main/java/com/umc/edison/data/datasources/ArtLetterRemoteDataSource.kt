@@ -10,6 +10,8 @@ interface ArtLetterRemoteDataSource {
 
     suspend fun getSortedArtLetters(sortBy: String): List<ArtLetterPreviewEntity>
 
+    suspend fun getRandomArtLetters(): List<ArtLetterPreviewEntity>
+
     suspend fun postArtLetterScrap(id: Int)
 
     suspend fun postArtLetterLike(id: Int)

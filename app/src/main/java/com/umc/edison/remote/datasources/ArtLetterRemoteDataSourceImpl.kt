@@ -21,6 +21,36 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         return artLetterApiService.getSortedArtLetters(sortBy).data.toData()
     }
 
+    override suspend fun getRandomArtLetters(): List<ArtLetterPreviewEntity> {
+        val artLetters = artLetterApiService.getAllArtLetters().data.shuffled()
+        val picked = mutableListOf<ArtLetterPreviewEntity>()
+
+        if (artLetters.size > 3) {
+            picked.add(artLetters[0].toData())
+            picked.add(artLetters[1].toData())
+            picked.add(artLetters[2].toData())
+        } else {
+            picked.addAll(artLetters.map { it.toData() })
+        }
+
+        val result = mutableListOf<ArtLetterPreviewEntity>()
+
+        for (i in 0 until picked.size) {
+            val detail = getArtLetterDetail(picked[i].artLetterId)
+            result.add(
+                ArtLetterPreviewEntity(
+                    artLetterId = picked[i].artLetterId,
+                    title = picked[i].title,
+                    thumbnail = picked[i].thumbnail,
+                    scraped = picked[i].scraped,
+                    tags = detail.tags
+                )
+            )
+        }
+
+        return result
+    }
+
     override suspend fun getArtLetterDetail(id: Int): ArtLetterDetailEntity {
         return artLetterApiService.getArtLetterDetail(id).data.toData()
     }

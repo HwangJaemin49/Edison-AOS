@@ -18,6 +18,7 @@ data class GetAllArtLettersResponse(
         artLetterId = artLetterId,
         title = title,
         thumbnail = thumbnail ?: "",
-        scraped = scraped
+        scraped = scraped,
+        tags = emptyList()
     )
 }

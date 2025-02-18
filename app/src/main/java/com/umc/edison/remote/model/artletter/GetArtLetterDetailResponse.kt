@@ -5,7 +5,7 @@ import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.remote.model.RemoteMapper
 
 class GetArtLetterDetailResponse (
-    @SerializedName("artletterId") val artletterId: Int,
+    @SerializedName("artletterId") val artLetterId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
     @SerializedName("category") val category: String,
@@ -22,13 +22,13 @@ class GetArtLetterDetailResponse (
 ) : RemoteMapper<ArtLetterDetailEntity> {
 
     override fun toData(): ArtLetterDetailEntity = ArtLetterDetailEntity(
-        artLetterId = artletterId,
+        artLetterId = artLetterId,
         title = title,
         content = content,
         category = category,
         readTime = readTime,
         writer = writer,
-        tags = tags,
+        tags = tags.split(" "),
         thumbnail = thumbnail ?: "",
         likesCnt = likesCnt,
         liked = liked,

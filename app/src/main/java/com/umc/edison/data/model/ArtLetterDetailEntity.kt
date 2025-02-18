@@ -9,7 +9,7 @@ data class ArtLetterDetailEntity(
     val category: String,
     val readTime: Int,
     val writer: String,
-    val tags: String,
+    val tags: List<String>,
     val thumbnail: String,
     val likesCnt: Int,
     val liked: Boolean,

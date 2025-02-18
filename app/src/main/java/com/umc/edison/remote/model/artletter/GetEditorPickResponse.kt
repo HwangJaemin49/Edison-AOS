@@ -24,7 +24,8 @@ data class GetEditorPickResponse(
         artLetterId = artLetterId,
         title = title,
         thumbnail = thumbnail ?: "",
-        scraped = scraped
+        scraped = scraped,
+        tags = tags.split(" ")
     )
 }
 

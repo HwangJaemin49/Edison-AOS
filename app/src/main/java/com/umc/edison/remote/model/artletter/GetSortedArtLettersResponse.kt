@@ -18,7 +18,8 @@ data class GetSortedArtLettersResponse(
         artLetterId = artLetterId,
         title = title,
         thumbnail = thumbnail ?: "",
-        scraped = scraped
+        scraped = scraped,
+        tags = emptyList()
     )
 }
 
