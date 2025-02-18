@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetArtLetterDetailUseCase @Inject constructor(
-    private val artletterRepository: ArtLetterRepository
+    private val artLetterRepository: ArtLetterRepository
 ){
-    operator fun invoke(latterId: Int): Flow<DataResource<ArtLetterDetail>> = artletterRepository.getArtLetterDetail(latterId)
+    operator fun invoke(id: Int): Flow<DataResource<ArtLetterDetail>> = artLetterRepository.getArtLetterDetail(id)
 }
