@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,8 +28,8 @@ import coil3.compose.AsyncImage
 import com.umc.edison.R
 import com.umc.edison.presentation.model.ArtLetterCategoryModel
 import com.umc.edison.presentation.model.ArtLetterModel
-import com.umc.edison.ui.components.calculateAspectRatio
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray400
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -47,27 +46,27 @@ fun ArtLetterCategoryContent(
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
 
-        val aspectRatio = calculateAspectRatio(category.mainImage)
+        val imageUrl = category.mainImage ?: ""
+
         Box(
             modifier = Modifier
                 .height(120.dp)
                 .fillMaxWidth()
-                .aspectRatio(aspectRatio)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Gray300)
         ) {
             AsyncImage(
-                model = category.mainImage,
+                model = imageUrl,
                 contentDescription = "ArtLetter Category Image",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
             )
         }
 
         Text(
             text = category.title,
             style = MaterialTheme.typography.titleSmall,
-            color = Gray800
+            color = Gray800,
+            modifier = Modifier.padding(start = 6.dp)
         )
     }
 }
@@ -78,27 +77,20 @@ fun ArtLetterCard(
     onArtLetterClick: (ArtLetterModel) -> Unit
 ) {
     val imageUrl = artLetter.thumbnail ?: ""
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(228.dp)
             .clip(RoundedCornerShape(10.dp))
+            .background(Gray400)
             .clickable { onArtLetterClick(artLetter) },
     ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-        ) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "ArtLetter Category Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Gray300)
-            )
-        }
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = "ArtLetter Category Image",
+            contentScale = ContentScale.Crop,
+        )
 
         Column(
             modifier = Modifier.padding(12.dp),
@@ -106,8 +98,7 @@ fun ArtLetterCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(32.dp)
-                    .padding(horizontal = 4.dp),
+                    .height(32.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Icon(
