@@ -44,6 +44,12 @@ fun InterestEditScreen(
         updateShowBottomNav(false)
     }
 
+    LaunchedEffect(uiState.isEdited) {
+        if (uiState.isEdited) {
+            navHostController.popBackStack()
+        }
+    }
+
     BaseContent(
         uiState = uiState,
         clearToastMessage = { viewModel.clearToastMessage() },
@@ -52,7 +58,6 @@ fun InterestEditScreen(
                 title = "관심사 고르기",
                 onBack = {
                     viewModel.updateIdentity()
-                    navHostController.popBackStack()
                 }
             )
         }
