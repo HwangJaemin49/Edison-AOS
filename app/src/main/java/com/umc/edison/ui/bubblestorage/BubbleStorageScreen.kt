@@ -147,7 +147,7 @@ fun BubbleStorageScreen(
             if (searchKeyword.isEmpty() || searchResults.isEmpty()) {
                 // Linear Gradient 효과가 적용된 배경
                 Canvas(modifier = Modifier.fillMaxSize()) {
-                    val gradientHeight = size.height * 0.3f
+                    val gradientHeight = size.height * 0.2f
 
                     drawRect(
                         brush = Brush.verticalGradient(
