@@ -63,9 +63,7 @@ fun ImageGallery(
     }
 
     LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            permissionLauncher.launch(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
         } else {
             permissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -95,7 +93,7 @@ fun ImageGallery(
 
                 Box {
                     Text(
-                        text = "$selectedFolder ﹀",
+                        text = "$selectedFolder ▼",
                         modifier = Modifier.clickable(
                             onClick = { isExpand = true }
                         ),
