@@ -1,5 +1,6 @@
 package com.umc.edison.ui.mypage
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -49,6 +50,8 @@ fun InterestEditScreen(
             navHostController.popBackStack()
         }
     }
+
+    BackHandler { viewModel.updateIdentity() }
 
     BaseContent(
         uiState = uiState,
