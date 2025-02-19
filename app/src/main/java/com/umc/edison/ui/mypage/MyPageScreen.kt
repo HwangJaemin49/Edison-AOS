@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -176,14 +177,19 @@ private fun ProfileInfo(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(18.dp)
     ) {
-        AsyncImage(
-            model = imageUrl ?: R.drawable.ic_profile_default_small,
-            contentDescription = "Profile Image",
+        Box(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Gray100)
-        )
+        ) {
+            AsyncImage(
+                model = imageUrl ?: R.drawable.ic_profile_default_small,
+                contentDescription = "Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
 
         Text(
             text = name,
