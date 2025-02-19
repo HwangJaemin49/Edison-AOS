@@ -3,6 +3,7 @@ package com.umc.edison.ui.artboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -30,21 +33,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.umc.edison.R
+import com.umc.edison.presentation.artletter.ArtLetterSearchState
 import com.umc.edison.presentation.artletter.ArtLetterSearchViewModel
 import com.umc.edison.presentation.model.ArtLetterPreviewModel
 import com.umc.edison.ui.components.ArtLetterCard
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.components.SearchBar
 import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray400
+import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 
@@ -54,6 +63,7 @@ fun ArtLetterSearchScreen(
     viewModel: ArtLetterSearchViewModel = hiltViewModel()
 ) {
     val searchQuery = remember { mutableStateOf("") }
+    val lastSearchedQuery = remember { mutableStateOf("") } // 마지막 검색어 저장
     val uiState by viewModel.uiState.collectAsState()
     val searchHistory by viewModel.searchHistory.collectAsState()
     val isSearchActivated = remember { mutableStateOf(false) }
@@ -65,20 +75,21 @@ fun ArtLetterSearchScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(Color.White)
-        )
-        {
+
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(16.dp),
-            ){
+            ) {
                 // 검색창
                 SearchBar(
                     value = searchQuery.value,
                     onValueChange = { searchQuery.value = it },
                     onSearch = {
                         isSearchActivated.value = true
+                        lastSearchedQuery.value = searchQuery.value
                         viewModel.searchArtLetters(searchQuery.value, "default") // 기본 정렬 사용
                     },
                     placeholder = "찰나의 영감을 검색해보세요"
@@ -94,7 +105,11 @@ fun ArtLetterSearchScreen(
                     searchHistory.forEach { history ->
                         SearchChip(
                             text = history,
-                            onDelete = { viewModel.removeSearchHistory(history) } // 검색어 삭제
+                            onDelete = { viewModel.removeSearchHistory(history) }, // 검색어 삭제
+                            onSearch = {
+                                viewModel.searchArtLetters(history, "default")
+                                lastSearchedQuery.value = history
+                            }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
@@ -102,18 +117,6 @@ fun ArtLetterSearchScreen(
             }
 
             Spacer(modifier = Modifier.height(48.dp))
-
-            // 스크롤 가능한 추천 키워드 & 카테고리
-//            LazyColumn(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(horizontal = 16.dp)
-//            ) {
-//                item { KeywordSection() }
-//                item { Spacer(modifier = Modifier.height(16.dp)) }
-//                item { CategorySection() }
-//            }
-
 
             LazyColumn(
                 modifier = Modifier
@@ -127,40 +130,45 @@ fun ArtLetterSearchScreen(
                         item { CategorySection() }
                     }
 
-                    uiState.artLetters.isEmpty() -> {}
+                    uiState.artLetters.isEmpty() -> {
+                        item { NoResultSection(lastSearchedQuery.value) }
+                        item { Recommend(viewModel, uiState, navHostController) }
+                    }
 
                     else -> {
                         item {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                ResultChip(text = "#${searchQuery.value}")
+                                ResultChip(text = "# ${lastSearchedQuery.value}")
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "에 관련된 아트레터",
                                     color = Gray800,
                                     style = MaterialTheme.typography.displayMedium
                                 )
-                            }}
-
-                        item {Spacer(modifier = Modifier.height(16.dp))}
-
-                        item {GridLayout(
-                            columns = 2,
-                            items = uiState.artLetters,
-                        ) { artLetter ->
-                            ArtLetterCard(
-                                artLetter = artLetter as ArtLetterPreviewModel,
-                                onArtLetterClick = { selectedArtLetter ->
-                                    navHostController.navigate(
-                                        NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
-                                    )
-                                },
-                                onBookmarkClick = { artLetter ->
-                                    viewModel.postArtLetterScrap(artLetter.artLetterId)
-                                }
-                            )
+                            }
                         }
+
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
+
+                        item {
+                            GridLayout(
+                                columns = 2,
+                                items = uiState.artLetters,
+                            ) { artLetter ->
+                                ArtLetterCard(
+                                    artLetter = artLetter as ArtLetterPreviewModel,
+                                    onArtLetterClick = { selectedArtLetter ->
+                                        navHostController.navigate(
+                                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
+                                        )
+                                    },
+                                    onBookmarkClick = { artLetter ->
+                                        viewModel.postArtLetterScrap(artLetter.artLetterId)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -169,14 +177,13 @@ fun ArtLetterSearchScreen(
     }
 }
 
-
 // 오늘 당신을 자극할 키워드
 @Composable
 fun KeywordSection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
+            .background(Color.LightGray.copy(alpha = 0.2f), shape = RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
         Row(
@@ -208,7 +215,7 @@ fun CategorySection() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray.copy(alpha = 0.2f), shape = RoundedCornerShape(12.dp))
+            .background(Color.LightGray.copy(alpha = 0.2f), shape = RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
         Row(
@@ -237,11 +244,12 @@ fun CategorySection() {
 
 // 검색기록
 @Composable
-fun SearchChip(text: String, onDelete: () -> Unit) {
+fun SearchChip(text: String, onDelete: () -> Unit, onSearch: () -> Unit) {
     Row(
         modifier = Modifier
-            .background(Gray300.copy(alpha = 0.2f), shape = RoundedCornerShape(10.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .background(Gray300, shape = RoundedCornerShape(10.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .clickable{ onSearch()},
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -254,6 +262,35 @@ fun SearchChip(text: String, onDelete: () -> Unit) {
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(text = text, style = MaterialTheme.typography.bodySmall.copy(color = Gray800))
+    }
+}
+
+
+// 검색 결과 없음
+@Composable
+fun NoResultSection(text: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(20.dp))
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ){
+            Box(
+                modifier = Modifier
+                    .background(Gray100, shape = RoundedCornerShape(10.dp))
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(text = "# " + text,
+                    style = MaterialTheme.typography.displayMedium.copy(color = Gray800))
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("와", style = MaterialTheme.typography.headlineSmall, color = Gray800)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("관련된 아트레터를 찾을 수 없어요.", style = MaterialTheme.typography.headlineSmall, color = Gray800)
     }
 }
 
@@ -283,3 +320,41 @@ fun ResultChip(text: String) {
     }
 }
 
+@Composable
+fun Recommend(
+    viewModel: ArtLetterSearchViewModel,
+    uiState: ArtLetterSearchState,
+    navHostController: NavHostController,
+){
+    Spacer(modifier = Modifier.height(160.dp))
+    Text(
+        text = "이런 아트레터는 어떤가요?",
+        color = Gray800,
+        style = MaterialTheme.typography.displayMedium
+    )
+    Spacer(modifier = Modifier.height(18.dp))
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(uiState.recommendedArtLetters) { artLetter ->
+            Box(
+                modifier = Modifier
+                    .width(160.dp)
+            ) {
+                ArtLetterCard(
+                    artLetter = artLetter as ArtLetterPreviewModel,
+                    onArtLetterClick = { selectedArtLetter ->
+                        navHostController.navigate(
+                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
+                        )
+                    },
+                    onBookmarkClick = { artLetter ->
+                        viewModel.postArtLetterScrap(artLetter.artLetterId)
+                    }
+                )
+            }
+        }
+    }
+}
