@@ -22,14 +22,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,31 +38,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil3.compose.AsyncImage
 import com.umc.edison.R
-import com.umc.edison.presentation.artletter.ArtLetterHomeViewModel
 import com.umc.edison.presentation.artletter.ArtLetterSearchState
 import com.umc.edison.presentation.artletter.ArtLetterSearchViewModel
 import com.umc.edison.presentation.model.ArtLetterPreviewModel
+import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.ArtLetterCard
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.components.SearchBar
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
-import com.umc.edison.ui.theme.Gray400
-import com.umc.edison.ui.theme.Gray500
-import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 
@@ -74,19 +65,19 @@ fun ArtLetterSearchScreen(
     navHostController: NavHostController,
     viewModel: ArtLetterSearchViewModel = hiltViewModel()
 ) {
-    val searchQuery = remember { mutableStateOf("") }
-    val lastSearchedQuery = remember { mutableStateOf("") } // 마지막 검색어 저장
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val lastSearchedQuery by viewModel.lastSearchedQuery.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val searchHistory by viewModel.searchHistory.collectAsState()
     val isSearchActivated = remember { mutableStateOf(false) }
 
-    Scaffold(
-    ) { paddingValues ->
+    BaseContent (
+        uiState = uiState,
+        clearToastMessage = { viewModel.clearToastMessage() }
+    ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color.White)
 
         ) {
             Box(
@@ -97,12 +88,11 @@ fun ArtLetterSearchScreen(
             ) {
                 // 검색창
                 SearchBar(
-                    value = searchQuery.value,
-                    onValueChange = { searchQuery.value = it },
+                    value = searchQuery,
+                    onValueChange = { viewModel.updateSearchQuery(it) },
                     onSearch = {
                         isSearchActivated.value = true
-                        lastSearchedQuery.value = searchQuery.value
-                        viewModel.searchArtLetters(searchQuery.value, "default") // 기본 정렬 사용
+                        viewModel.searchArtLetters(searchQuery, "default") // 기본 정렬 사용
                     },
                     placeholder = "찰나의 영감을 검색해보세요"
                 )
@@ -120,7 +110,6 @@ fun ArtLetterSearchScreen(
                             onDelete = { viewModel.removeSearchHistory(history) }, // 검색어 삭제
                             onSearch = {
                                 viewModel.searchArtLetters(history, "default")
-                                lastSearchedQuery.value = history
                             }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -143,13 +132,13 @@ fun ArtLetterSearchScreen(
                     }
 
                     uiState.artLetters.isEmpty() -> {
-                        item { NoResultSection(lastSearchedQuery.value) }
+                        item { NoResultSection(lastSearchedQuery) }
                         item { Recommend(viewModel, uiState, navHostController) }
                     }
 
                     else -> {
                         item {
-                            SearchResultBar(viewModel, lastSearchedQuery.value)
+                            SearchResultBar(viewModel, lastSearchedQuery)
                         }
 
                         item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -177,6 +166,8 @@ fun ArtLetterSearchScreen(
             }
         }
     }
+
+
 }
 
 // 검색 완료 헤더
@@ -406,7 +397,7 @@ fun NoResultSection(text: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, shape = RoundedCornerShape(20.dp))
+            .background(Color(0xFFFFFF), shape = RoundedCornerShape(20.dp))
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

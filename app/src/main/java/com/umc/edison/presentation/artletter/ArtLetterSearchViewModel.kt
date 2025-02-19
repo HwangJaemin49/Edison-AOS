@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.artletter
 
+
 import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.GetSearchArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
@@ -24,14 +25,21 @@ class ArtLetterSearchViewModel @Inject constructor(
     private val _searchHistory = MutableStateFlow<List<String>>(emptyList())
     val searchHistory = _searchHistory.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    private val _lastSearchedQuery = MutableStateFlow("")
+    val lastSearchedQuery = _lastSearchedQuery.asStateFlow()
+
     init {
-        fetchRecommendedArtLetters()
         fetchRecommendedArtLetters()
     }
 
     fun searchArtLetters(keyword: String, sortBy: String) {
 
         if (keyword.isNotBlank()) {
+            _searchQuery.value = keyword
+            _lastSearchedQuery.value = keyword
             addSearchHistory(keyword)
         }
 
@@ -52,9 +60,13 @@ class ArtLetterSearchViewModel @Inject constructor(
         )
     }
 
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
     private fun addSearchHistory(keyword: String) {
         _searchHistory.update { currentList ->
-            val newList = listOf(keyword) + currentList.filter { it != keyword } // 중복 제거
+            val newList = listOf(keyword) + currentList
             newList.take(5) // 최근 검색어 최대 5개 유지
         }
     }

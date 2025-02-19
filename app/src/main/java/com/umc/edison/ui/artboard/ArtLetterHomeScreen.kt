@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -54,9 +55,11 @@ import com.umc.edison.R
 import com.umc.edison.presentation.artletter.ArtLetterHomeState
 import com.umc.edison.presentation.artletter.ArtLetterHomeViewModel
 import com.umc.edison.presentation.model.ArtLetterPreviewModel
+import com.umc.edison.presentation.mypage.AccountManagementMode
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.ArtLetterCard
 import com.umc.edison.ui.components.GridLayout
+import com.umc.edison.ui.components.PopUpDecision
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
@@ -286,7 +289,11 @@ fun ArtBoardSection(
                     )
                 },
                 onBookmarkClick = { artLetter ->
-                    viewModel.postArtLetterScrap(artLetter.artLetterId)
+                    if (uiState.isLoggedIn) {
+                        viewModel.postArtLetterScrap(artLetter.artLetterId)
+                    } else {
+                        // TODO: 팝업 창
+                    }
                 }
             )
         }
