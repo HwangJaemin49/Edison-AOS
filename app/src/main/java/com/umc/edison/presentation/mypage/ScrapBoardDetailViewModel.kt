@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.mypage
 
 import androidx.lifecycle.SavedStateHandle
+import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.domain.usecase.mypage.GetScrapArtLettersByCategoryUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
@@ -13,7 +14,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ScrapBoardDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getScrapArtLettersByCategoryUseCase: GetScrapArtLettersByCategoryUseCase
+    private val getScrapArtLettersByCategoryUseCase: GetScrapArtLettersByCategoryUseCase,
+    private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ScrapBoardDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -41,6 +43,33 @@ class ScrapBoardDetailViewModel @Inject constructor(
         )
     }
 
+    fun toggleScrap(id: Int) {
+        collectDataResource(
+            flow = scrapArtLetterUseCase(id),
+            onSuccess = {
+                _uiState.update {
+                    it.copy(
+                        artLetters = it.artLetters.map { artLetter ->
+                            if (artLetter.artLetterId == id) {
+                                artLetter.copy(scraped = !artLetter.scraped)
+                            } else {
+                                artLetter
+                            }
+                        }
+                    )
+                }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
 
     override fun clearToastMessage() {
         _uiState.update { it.copy(toastMessage = null) }

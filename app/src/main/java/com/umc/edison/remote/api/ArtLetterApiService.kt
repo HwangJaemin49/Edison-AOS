@@ -1,16 +1,16 @@
 package com.umc.edison.remote.api
 
-
 import com.umc.edison.remote.model.ResponseWithData
 import com.umc.edison.remote.model.ResponseWithListData
 import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.artletter.GetAllArtLettersResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterDetailResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterKeywordResponse
+import com.umc.edison.remote.model.artletter.GetEditorPickRequest
 import com.umc.edison.remote.model.artletter.GetSortedArtLettersResponse
 import com.umc.edison.remote.model.artletter.PostArtLetterLikeResponse
-import com.umc.edison.remote.model.artletter.PostEditorPickArtLetterResponse
-import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
+import com.umc.edison.remote.model.artletter.PostArtLetterScrapResponse
+import com.umc.edison.remote.model.artletter.GetEditorPickResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -21,17 +21,17 @@ interface ArtLetterApiService {
     @GET("/artletters")
     suspend fun getAllArtLetters(): ResponseWithPagination<GetAllArtLettersResponse>
 
-    @GET("/artletters/sorted")
-    suspend fun getSortedArtLetters(@Query("sortBy") sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
+    @GET("/artletters")
+    suspend fun getSortedArtLetters(@Query("sortType") sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
 
     @POST("/artletters/{artletterId}/scrap")
-    suspend fun toggleScrap(@Path("artletterId") artletterId: Int): ScrapArtLettersResult
+    suspend fun postArtLetterScrap(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterScrapResponse>
 
     @POST("/artletters/{artletterId}/like")
-    suspend fun postArtLetterLike(@Path("artletterId") artletterId: Int): ResponseWithData<PostArtLetterLikeResponse>
+    suspend fun postArtLetterLike(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterLikeResponse>
 
     @POST("/artletters/editor-pick")
-    suspend fun postEditorPick(@Body artletterIds: List<Int>): ResponseWithListData<PostEditorPickArtLetterResponse>
+    suspend fun getEditorPick(@Body ids: GetEditorPickRequest): ResponseWithListData<GetEditorPickResponse>
 
     @GET("/artletters/{letterId}")
     suspend fun getArtLetterDetail(@Path("letterId") letterId: Int): ResponseWithData<GetArtLetterDetailResponse>

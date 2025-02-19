@@ -1,7 +1,7 @@
 package com.umc.edison.domain.repository
 
 import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.model.ArtLetter
+import com.umc.edison.domain.model.ArtLetterPreview
 import com.umc.edison.domain.model.ArtLetterCategory
 import com.umc.edison.domain.model.Identity
 import com.umc.edison.domain.model.IdentityCategory
@@ -24,7 +24,7 @@ interface UserRepository {
     fun getAllMyIdentityResults(): Flow<DataResource<List<Identity>>>
     fun getMyInterestResult(interestCategory: InterestCategory): Flow<DataResource<Interest>>
     fun getMyScrapArtLetters(): Flow<DataResource<List<ArtLetterCategory>>>
-    fun getScrapArtLettersByCategory(category: String): Flow<DataResource<List<ArtLetter>>>
+    fun getScrapArtLettersByCategory(category: String): Flow<DataResource<List<ArtLetterPreview>>>
 
     fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>>
 

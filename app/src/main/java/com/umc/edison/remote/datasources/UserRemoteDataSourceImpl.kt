@@ -2,7 +2,7 @@ package com.umc.edison.remote.datasources
 
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.ArtLetterCategoryEntity
-import com.umc.edison.data.model.ArtletterEntity
+import com.umc.edison.data.model.ArtLetterPreviewEntity
 import com.umc.edison.data.model.IdentityCategoryMapper
 import com.umc.edison.data.model.IdentityEntity
 import com.umc.edison.data.model.InterestCategoryMapper
@@ -169,7 +169,7 @@ class UserRemoteDataSourceImpl @Inject constructor(
         return myPageApiService.getProfileInfo().data.toData()
     }
 
-    override suspend fun getScrapArtLettersByCategory(category: String): List<ArtletterEntity> {
+    override suspend fun getScrapArtLettersByCategory(category: String): List<ArtLetterPreviewEntity> {
          return myPageApiService.getScrapArtLettersByCategory(category).data.map { it.toData() }
     }
 

@@ -1,20 +1,20 @@
 package com.umc.edison.data.datasources
 
 import com.umc.edison.data.model.ArtLetterDetailEntity
-import com.umc.edison.data.model.ArtLetterMarkEntity
-import com.umc.edison.data.model.ArtletterEntity
-import com.umc.edison.remote.model.artletter.ScrapArtLettersResult
+import com.umc.edison.data.model.ArtLetterPreviewEntity
 
 interface ArtLetterRemoteDataSource {
-    suspend fun getAllArtLetters(): List<ArtletterEntity>
+    suspend fun getAllArtLetters(): List<ArtLetterPreviewEntity>
 
-    suspend fun getArtLetterDetail(letterId: Int): ArtLetterDetailEntity
+    suspend fun getArtLetterDetail(id: Int): ArtLetterDetailEntity
 
-    suspend fun getSortedArtLetters(sortBy: String): List<ArtletterEntity>
+    suspend fun getSortedArtLetters(sortBy: String): List<ArtLetterPreviewEntity>
 
-    suspend fun toggleScrap(artLetterId: Int): ScrapArtLettersResult
+    suspend fun getRandomArtLetters(): List<ArtLetterPreviewEntity>
 
-    suspend fun postArtLetterLike(artletterId: Int): ArtLetterMarkEntity
+    suspend fun postArtLetterScrap(id: Int)
 
-    suspend fun postEditorPick(artletterIds: List<Int>): List<ArtLetterDetailEntity>
+    suspend fun postArtLetterLike(id: Int)
+
+    suspend fun postEditorPickArtLetter(): List<ArtLetterPreviewEntity>
 }

@@ -43,6 +43,7 @@ import com.umc.edison.presentation.mypage.MyPageState
 import com.umc.edison.presentation.mypage.MyPageViewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.NeedLoginScreen
+import com.umc.edison.ui.components.ArtLetterCategoryContent
 import com.umc.edison.ui.components.GrayColumnContainer
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.components.HamburgerMenu

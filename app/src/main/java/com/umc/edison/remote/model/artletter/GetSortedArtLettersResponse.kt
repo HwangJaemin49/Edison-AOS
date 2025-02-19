@@ -1,24 +1,26 @@
 package com.umc.edison.remote.model.artletter
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.ArtletterEntity
+import com.umc.edison.data.model.ArtLetterPreviewEntity
 import com.umc.edison.remote.model.RemoteMapper
 
 data class GetSortedArtLettersResponse(
-    @SerializedName("artletterId") val id: Int,
+    @SerializedName("artletterId") val artLetterId: Int,
     @SerializedName("title") val title: String,
-    @SerializedName("thumbnail") val thumbnail: String,
-    @SerializedName("likes") val likes: Int,
-    @SerializedName("scraps") val scraps: Int
-) : RemoteMapper<ArtletterEntity> {
-
-    override fun toData(): ArtletterEntity = ArtletterEntity(
-        artletterId = id,
+    @SerializedName("thumbnail") val thumbnail: String?,
+    @SerializedName("likesCnt") val likesCnt: Int,
+    @SerializedName("scrapsCnt") val scrapsCnt: Int,
+    @SerializedName("updatedAt") val updatedAt: String,
+    @SerializedName("liked") val liked: Boolean,
+    @SerializedName("scraped") val scraped: Boolean,
+) : RemoteMapper<ArtLetterPreviewEntity> {
+    override fun toData(): ArtLetterPreviewEntity = ArtLetterPreviewEntity(
+        artLetterId = artLetterId,
         title = title,
-        thumbnail = thumbnail,
-        likes = likes,
-        scraps = scraps
+        thumbnail = thumbnail ?: "",
+        scraped = scraped,
+        tags = emptyList()
     )
 }
 
-fun List<GetSortedArtLettersResponse>.toData(): List<ArtletterEntity> = map { it.toData() }
+fun List<GetSortedArtLettersResponse>.toData(): List<ArtLetterPreviewEntity> = map { it.toData() }

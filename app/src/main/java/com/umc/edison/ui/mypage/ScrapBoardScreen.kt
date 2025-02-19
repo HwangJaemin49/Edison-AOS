@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import com.umc.edison.presentation.model.ArtLetterCategoryModel
 import com.umc.edison.presentation.mypage.ScrapBoardViewModel
 import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.components.ArtLetterCategoryContent
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.navigation.NavRoute

@@ -10,9 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.umc.edison.presentation.model.ArtLetterModel
+import com.umc.edison.presentation.model.ArtLetterPreviewModel
 import com.umc.edison.presentation.mypage.ScrapBoardDetailViewModel
 import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.components.ArtLetterCard
 import com.umc.edison.ui.components.BackButtonTopBar
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.navigation.NavRoute
@@ -44,13 +45,16 @@ fun ScrapBoardDetailScreen(
                 .verticalScroll(scrollState)
         ) {
             ArtLetterCard(
-                artLetter = it as ArtLetterModel,
+                artLetter = it as ArtLetterPreviewModel,
                 onArtLetterClick = { artLetter ->
                     navHostController.navigate(
                         NavRoute.ArtLetterDetail.createRoute(
-                            artLetter.artletterId
+                            artLetter.artLetterId
                         )
                     )
+                },
+                onBookmarkClick = { artLetter ->
+                    viewModel.toggleScrap(artLetter.artLetterId)
                 }
             )
         }

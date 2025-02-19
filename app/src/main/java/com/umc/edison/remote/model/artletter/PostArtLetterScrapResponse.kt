@@ -2,8 +2,8 @@ package com.umc.edison.remote.model.artletter
 
 import com.google.gson.annotations.SerializedName
 
-class PostArtLetterLikeResponse (
+class PostArtLetterScrapResponse (
     @SerializedName("artletterId") val artLetterId: Int,
-    @SerializedName("likesCnt") val likesCnt: Int,
-    @SerializedName("liked") val liked: Boolean,
+    @SerializedName("scrapsCnt") val scrapsCnt: Int,
+    @SerializedName("scrapped") val scrapped: Boolean,
 )

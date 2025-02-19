@@ -1,305 +1,375 @@
 package com.umc.edison.ui.artboard
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.umc.edison.R
-import com.umc.edison.presentation.artletter.ArtLetterViewModel
-import com.umc.edison.remote.model.toIso8601String
+import com.umc.edison.presentation.artletter.ArtLetterDetailState
+import com.umc.edison.presentation.artletter.ArtLetterDetailViewModel
+import com.umc.edison.ui.BaseContent
+import com.umc.edison.ui.components.CustomDraggableBottomSheet
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
-import com.umc.edison.ui.theme.White000
-import java.text.SimpleDateFormat
-import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun ArtLetterDetailScreen(
     navHostController: NavHostController,
-    artletterId: Int,
-    viewModel: ArtLetterViewModel = hiltViewModel()) {
-    LaunchedEffect(artletterId) {
-        viewModel.fetchArtLetterDetail(artletterId)
-    }
-    val artLetterDetail by viewModel.artLetterDetail.collectAsState()
-    val likeState by viewModel.likeState.collectAsState()
+    viewModel: ArtLetterDetailViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    val isBookmarked = remember { mutableStateOf(false) }
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val screenHeightPx = with(LocalDensity.current) { screenHeight.toPx() }
+    val collapsedOffset = screenHeightPx * 0.4f
+    val expandedOffset = 0f
 
+    var sheetOffsetPx by remember { mutableFloatStateOf(collapsedOffset) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().background(White000)
-        ) {
-            item {
-                Column {
-                    Box(
+    BaseContent(
+        uiState = uiState,
+        clearToastMessage = { viewModel.clearToastMessage() }
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(420.dp)
+            ) {
+                AsyncImage(
+                    model = uiState.artLetter.thumbnail,
+                    contentDescription = "Background Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(24.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bookmark),
+                        contentDescription = "Bookmark",
+                        tint = if (uiState.artLetter.scraped) Color(0xFFFFDE66) else Gray500,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(472.dp)
+                            .clip(CircleShape)
+                            .padding(4.dp)
+                            .clickable { viewModel.scrapArtLetter() }
+                    )
+                }
+            }
 
-                    ) {
-                        if (artLetterDetail.artletter.thumbnail.isNullOrBlank()) {
-                            Image(
-                                painter = painterResource(id = R.drawable.delivery),
-                                contentDescription = "Thumbnail Image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop // 이미지가 박스 크기에 맞게 조정됨
+            CustomDraggableBottomSheet(
+                collapsedOffset = collapsedOffset,
+                expandedOffset = expandedOffset,
+                onOffsetChanged = { sheetOffsetPx = it },
+            ) { animatedTopPadding ->
+                ArtLetterDetailContent(
+                    viewModel = viewModel,
+                    uiState = uiState,
+                    navHostController = navHostController,
+                    topPadding = animatedTopPadding
+                )
+            }
+
+            if (sheetOffsetPx > 10f) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = 24.dp)
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = (sheetOffsetPx - 24.dp.roundToPx()).roundToInt()
                             )
-                        } else {
-                            AsyncImage(
-                                model = artLetterDetail.artletter.thumbnail,
-                                contentDescription = "Thumbnail Image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-                        Icon(
-                            painter = painterResource(id = if (isBookmarked.value) R.drawable.ic_artletter_detail_bookmark else R.drawable.ic_artletter_detail_empty_bookmark),
-                            contentDescription = "Bookmark",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(16.dp)
-                                .size(48.dp)
-                                .clickable { isBookmarked.value = !isBookmarked.value }
-                        )
-                    }
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    // 작성 시간
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 작성 시간
-                        Box(
-                            modifier = Modifier
-                                .size(width = 73.dp, height = 32.dp)
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(Gray300),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_artletter_detail_time),
-                                    contentDescription = "Time",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Gray600
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(text = artLetterDetail.artletter.createdAt.toIso8601String(), color = Gray600, style = MaterialTheme.typography.labelLarge)
-                            }
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // 좋아요 수
-                            Box(
-                                modifier = Modifier
-                                    .size(width = 72.dp, height = 32.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(Gray300),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_artletter_detail_likes),
-                                        contentDescription = "Likes",
-                                        modifier = Modifier.size(20.dp),
-                                        tint = Gray600
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(text = artLetterDetail.artletter.likesCnt.toString(), color = Gray600, style = MaterialTheme.typography.labelLarge)
-                                }
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(Gray300),
-                                contentAlignment = Alignment.Center
-                            ){
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_artletter_detail_share),
-                                    contentDescription = "Share",
-                                    tint = Gray600,
-                                )
-                            }
-                        }
-
-                    }
-                }
-            }
-
-            item {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = artLetterDetail.artletter.title, color = Gray800, style = MaterialTheme.typography.displayLarge)
-                    Spacer(modifier = Modifier.height(18.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // 태그 문자열을 띄어쓰기 기준으로 분할
-                        val tags = artLetterDetail.artletter.tags.split(" ")
-
-                        // 각 태그에 대해 Box 생성
-                        tags.forEach { tag ->
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(width = 72.dp, height = 32.dp)
-                                    .clip(RoundedCornerShape(20.dp))
-                                    .background(Gray100),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = tag, color = Gray600, style = MaterialTheme.typography.labelLarge)
-                            }
-                        }
-                    }
-
-                    Divider(
-                        color = Gray300,
-                        thickness = 1.dp,
-                        modifier = Modifier
-                            .width(450.dp)
-                            .padding(top = 20.dp, bottom = 20.dp)
-                    )
-
-                    Text(text = artLetterDetail.artletter.content,
-                        color = Gray800, style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), // Row를 가로로 꽉 채움
+                            .wrapContentSize()
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Gray300)
+                            .padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End) {
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
                         Icon(
-                            painter = painterResource(id = if (likeState.result.liked) R.drawable.ic_artletter_detail_like else R.drawable.ic_artletter_detail_empty_like),
-                            contentDescription = "Like",
-                            tint = Color.Unspecified,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable {
-                                    viewModel.postArtLetterLike(artletterId)
-                                }
+                            painter = painterResource(id = R.drawable.ic_time),
+                            contentDescription = "Time",
+                            modifier = Modifier.size(24.dp),
+                            tint = Gray600
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = "${uiState.artLetter.readTime}분",
+                            color = Gray600,
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
-                    Divider(
-                        color = Gray300,
-                        thickness = 1.dp,
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Row(
                         modifier = Modifier
-                            .width(450.dp)
-                            .padding(top = 20.dp, bottom = 20.dp)
-                    )
+                            .wrapContentSize()
+                            .clip(RoundedCornerShape(100.dp))
+                            .background(Gray300)
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "${uiState.artLetter.likesCnt}",
+                            color = Gray600,
+                            style = MaterialTheme.typography.labelLarge
+                        )
 
-                    Text(
-                        text = "아트레터 더보기",
-                        style = MaterialTheme.typography.displayMedium,
-                        color = Gray800
-                    )
-                    Spacer(modifier = Modifier.height(12.dp)) // 텍스트와 리스트 사이 여백
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_like),
+                            contentDescription = "Likes",
+                            modifier = Modifier.size(16.dp),
+                            tint = Gray600
+                        )
+                    }
 
-                }
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(48.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 8.dp)
-                ) {
-                    items(3) { index ->
-                        val isBookmarked = remember { mutableStateOf(false) }
-                        Column(
-                            modifier = Modifier
-                                .width(220.dp)
-                                .height(187.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                        ) {
-                            Box( // 이미지 자리
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(120.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Gray300)
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.thum_1302041), // 이미지 추가
-                                    contentDescription = "Thumbnail",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop // 이미지 크기를 Box에 맞춤
-                                ) }
+                    Spacer(modifier = Modifier.width(8.dp))
 
-                            Spacer(modifier = Modifier.height(18.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "펠릭스 곤잘레스의 연인",
-                                    style = MaterialTheme.typography.displaySmall,
-                                    color = Gray800
-                                )
-
-                                Icon(
-                                    painter = painterResource(id = if (isBookmarked.value) R.drawable.ic_artletter_detail_bookmark else R.drawable.ic_artletter_detail_empty_bookmark),
-                                    contentDescription = "Bookmark",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier
-                                        .size(16.dp)
-                                        .clickable { isBookmarked.value = !isBookmarked.value }
-                                )
-                            }
-
-                            Text(
-                                text = "#개념미술",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = Gray800
-                            )
-
-                        }
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clip(CircleShape)
+                            .background(Gray300)
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_share),
+                            contentDescription = "Share",
+                            modifier = Modifier.size(24.dp),
+                            tint = Gray600,
+                        )
                     }
                 }
             }
-
         }
+    }
+}
 
+@Composable
+fun ArtLetterDetailContent(
+    viewModel: ArtLetterDetailViewModel,
+    uiState: ArtLetterDetailState,
+    navHostController: NavHostController,
+    topPadding: Dp
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = uiState.artLetter.title,
+            color = Gray800,
+            style = MaterialTheme.typography.displayLarge,
+        )
+
+        if (topPadding == 0.dp) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_bookmark),
+                contentDescription = "BookMark",
+                tint = if (uiState.artLetter.scraped) Color(0xFFFFDE66) else Gray500,
+                modifier = Modifier.clickable { viewModel.scrapArtLetter() }
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        uiState.artLetter.tags.forEach { tag ->
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(100.dp))
+                    .background(Gray100)
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = tag,
+                    color = Gray800,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+
+    HorizontalDivider(
+        color = Gray300,
+        thickness = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp)
+    )
+
+    Text(
+        text = uiState.artLetter.content,
+        color = Gray800,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.padding(vertical = 8.dp)
+    )
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_like),
+            contentDescription = "Like",
+            tint = if (uiState.artLetter.liked) Gray800 else Gray500,
+            modifier = Modifier
+                .size(26.dp)
+                .clickable { viewModel.likeArtLetter() }
+        )
+    }
+
+    HorizontalDivider(
+        color = Gray300,
+        thickness = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp)
+    )
+
+    Text(
+        text = "아트레터 더보기",
+        style = MaterialTheme.typography.displayMedium,
+        color = Gray800
+    )
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(48.dp)
+    ) {
+        items(uiState.relatedArtLetters.size) { relatedArtLetter ->
+            val artLetter = uiState.relatedArtLetters[relatedArtLetter]
+            Column(
+                modifier = Modifier
+                    .width(220.dp)
+                    .wrapContentHeight()
+                    .clickable {
+                        navHostController.navigate(
+                            NavRoute.ArtLetterDetail.createRoute(
+                                artLetter.artLetterId
+                            )
+                        )
+                    },
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                val imageUrl = artLetter.thumbnail
+
+                Box(
+                    modifier = Modifier
+                        .height(120.dp)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Gray300)
+                ) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "ArtLetterPreview Category Image",
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = artLetter.title,
+                        style = MaterialTheme.typography.displaySmall,
+                        color = Gray800,
+                    )
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bookmark),
+                        contentDescription = "Bookmark",
+                        tint = if (artLetter.scraped) Color(0xFFFFDE66) else Gray500,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable { viewModel.scrapArtLetter(artLetter.artLetterId) }
+                    )
+                }
+
+                Text(
+                    text = artLetter.tags.joinToString(" "),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Gray800,
+                )
+            }
+        }
     }
 }
