@@ -48,7 +48,8 @@ class ArtLetterDetailViewModel @Inject constructor(
         collectDataResource(
             flow = getRandomArtLettersUseCase(),
             onSuccess = { artLetters ->
-                _uiState.update { it.copy(relatedArtLetters = artLetters.toPresentation()) }
+                val unique = artLetters.filter { it.artLetterId != _uiState.value.artLetter.artLetterId }
+                _uiState.update { it.copy(relatedArtLetters = unique.toPresentation()) }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -89,6 +90,34 @@ class ArtLetterDetailViewModel @Inject constructor(
             },
             onError = { error -> _uiState.update { it.copy(error = error) } }
         )
+    }
+
+    fun scrapArtLetter(id: Int) {
+        if (id == _uiState.value.artLetter.artLetterId) {
+            scrapArtLetter()
+        } else {
+            val relatedArtLetter = _uiState.value.relatedArtLetters.find { it.artLetterId == id }
+
+            if (relatedArtLetter != null) {
+                collectDataResource(
+                    flow = scrapArtLetterUseCase(id),
+                    onSuccess = {
+                        _uiState.update {
+                            it.copy(
+                                relatedArtLetters = it.relatedArtLetters.map { artLetter ->
+                                    if (artLetter.artLetterId == id) {
+                                        artLetter.copy(scraped = !artLetter.scraped)
+                                    } else {
+                                        artLetter
+                                    }
+                                }
+                            )
+                        }
+                    },
+                    onError = { error -> _uiState.update { it.copy(error = error) } }
+                )
+            }
+        }
     }
 
     override fun clearToastMessage() {

@@ -1,5 +1,6 @@
 package com.umc.edison.ui.artboard
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -71,6 +72,10 @@ fun ArtLetterHomeScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchAllArtLetters()
         viewModel.fetchEditorsPick()
+    }
+
+    BackHandler(enabled = true) {
+        navHostController.navigate(NavRoute.MyEdison.route)
     }
 
     BaseContent(
