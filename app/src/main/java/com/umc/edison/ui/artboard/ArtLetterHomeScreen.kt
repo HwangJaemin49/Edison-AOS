@@ -178,7 +178,7 @@ fun EditorPickSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(180.dp),
+                .height(184.dp),
             contentAlignment = Alignment.Center
         ) {
             HorizontalPager(
@@ -191,7 +191,13 @@ fun EditorPickSection(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Gray300)
-                        .clickable { navHostController.navigate(NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)) },
+                        .clickable {
+                            navHostController.navigate(
+                                NavRoute.ArtLetterDetail.createRoute(
+                                    artLetter.artLetterId
+                                )
+                            )
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     AsyncImage(
@@ -200,6 +206,29 @@ fun EditorPickSection(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
+
+                    val lines = artLetter.title.split(", ")
+
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .align(Alignment.BottomStart)
+                            .padding(bottom = 32.dp),
+                    ){
+                        Text(
+                            text = "${lines[0]},",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = White000,
+                        )
+
+                        if (lines.size > 1) {
+                            Text(
+                                text = lines[1],
+                                style = MaterialTheme.typography.displayMedium,
+                                color = White000,
+                            )
+                        }
+                    }
                 }
             }
 
@@ -232,7 +261,9 @@ fun ArtBoardSection(
     navHostController: NavHostController,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
         Text(

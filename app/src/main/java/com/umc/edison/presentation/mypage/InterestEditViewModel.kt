@@ -79,7 +79,12 @@ class InterestEditViewModel @Inject constructor(
         collectDataResource(
             flow = updateInterestUseCase(_uiState.value.interest.toDomain()),
             onSuccess = {
-                _uiState.update { it.copy(interest = it.interest.copy(options = it.interest.selectedKeywords)) }
+                _uiState.update {
+                    it.copy(
+                        interest = it.interest.copy(options = it.interest.selectedKeywords),
+                        isEdited = true
+                    )
+                }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }

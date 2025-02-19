@@ -6,9 +6,10 @@ import com.umc.edison.presentation.model.IdentityModel
 
 data class IdentityEditState(
     override val isLoading: Boolean,
-    val identity: IdentityModel,
     override val error: Throwable? = null,
-    override val toastMessage: String? = null
+    override val toastMessage: String? = null,
+    val identity: IdentityModel,
+    val isEdited: Boolean = false
 ) : BaseState {
     companion object {
         val DEFAULT = IdentityEditState(

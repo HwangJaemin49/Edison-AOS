@@ -79,7 +79,12 @@ class IdentityEditViewModel @Inject constructor(
         collectDataResource(
             flow = updateIdentityUseCase(_uiState.value.identity.toDomain()),
             onSuccess = {
-                _uiState.update { it.copy(identity = it.identity.copy(options = it.identity.selectedKeywords)) }
+                _uiState.update {
+                    it.copy(
+                        identity = it.identity.copy(options = it.identity.selectedKeywords),
+                        isEdited = true
+                    )
+                }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
