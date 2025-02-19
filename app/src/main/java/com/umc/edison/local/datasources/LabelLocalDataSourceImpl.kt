@@ -81,6 +81,12 @@ class LabelLocalDataSourceImpl @Inject constructor(
         return label
     }
 
+    override suspend fun syncLabels(labels: List<LabelEntity>) {
+        labels.forEach {
+            labelDao.sync(it.toLocal())
+        }
+    }
+
     override suspend fun getUnSyncedLabels(): List<LabelEntity> {
         return getUnSyncedDatas(tableName).map { it.toData() }
     }

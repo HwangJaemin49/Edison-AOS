@@ -5,6 +5,7 @@ import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
 import com.umc.edison.data.datasources.LabelLocalDataSource
 import com.umc.edison.data.datasources.LabelRemoteDataSource
+import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.BubbleEntity
 import com.umc.edison.data.model.LabelEntity
 import com.umc.edison.data.model.same
@@ -18,9 +19,15 @@ class SyncRepositoryImpl @Inject constructor(
     private val labelLocalDataSource: LabelLocalDataSource,
     private val bubbleRemoteDataSource: BubbleRemoteDataSource,
     private val labelRemoteDataSource: LabelRemoteDataSource,
+    private val userRemoteDataSource: UserRemoteDataSource,
 ) : SyncRepository {
     override suspend fun syncLabelData() {
         withContext(Dispatchers.IO) {
+            val loginState = userRemoteDataSource.getLogInState()
+            if (!loginState) {
+                return@withContext
+            }
+
             val unSyncedLocalLabels: List<LabelEntity> = labelLocalDataSource.getUnSyncedLabels()
             unSyncedLocalLabels.forEach { label ->
                 try {
@@ -44,6 +51,11 @@ class SyncRepositoryImpl @Inject constructor(
 
     override suspend fun syncBubbleData() {
         withContext(Dispatchers.IO) {
+            val loginState = userRemoteDataSource.getLogInState()
+            if (!loginState) {
+                return@withContext
+            }
+
             val unSyncedLocalBubbles: List<BubbleEntity> =
                 bubbleLocalDataSource.getUnSyncedBubbles()
             unSyncedLocalBubbles.forEach { bubble ->
@@ -70,11 +82,22 @@ class SyncRepositoryImpl @Inject constructor(
 
     override suspend fun syncServerDataToLocal() {
         withContext(Dispatchers.IO) {
-            val remoteLabels = labelRemoteDataSource.getAllLabels()
-            val remoteBubbles = bubbleRemoteDataSource.getAllBubbles()
+            val loginState = userRemoteDataSource.getLogInState()
+            if (!loginState) {
+                return@withContext
+            }
 
-            labelLocalDataSource.addLabels(remoteLabels)
-            bubbleLocalDataSource.addBubbles(remoteBubbles)
+            try {
+                labelRemoteDataSource.syncLabelToLocal()
+            } catch (e: Throwable) {
+                Log.e("SyncRepositoryImpl", "Failed to sync server's label data", e)
+            }
+
+            try {
+                bubbleRemoteDataSource.syncBubbleToLocal()
+            } catch (e: Throwable) {
+                Log.e("SyncRepositoryImpl", "Failed to sync server's bubble data", e)
+            }
         }
     }
 }

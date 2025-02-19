@@ -12,6 +12,7 @@ interface LabelLocalDataSource {
 
     suspend fun getLabelDetail(labelId: Int): LabelEntity
 
+    suspend fun syncLabels(labels: List<LabelEntity>)
     suspend fun getUnSyncedLabels(): List<LabelEntity>
     suspend fun markAsSynced(label: LabelEntity)
 }
