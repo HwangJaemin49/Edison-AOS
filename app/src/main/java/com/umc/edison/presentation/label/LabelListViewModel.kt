@@ -33,7 +33,8 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                val sortedLabels = labels.sortedByDescending { it.bubbles.size }
+                val sortedLabels = labels.sortedWith(compareBy({ it.id == 0 }, { it.bubbles.size })).reversed()
+
                 _uiState.update { it.copy(labels = sortedLabels.toPresentation()) }
             },
             onError = { error ->
