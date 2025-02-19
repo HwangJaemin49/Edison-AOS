@@ -41,7 +41,7 @@ data class BubbleEntity(
             id,
             title,
             contentBlocks,
-            mainImage,
+            mainImage?.ifEmpty { null },
             labels.toDomain(),
             backLinks.toDomain(),
             linkedBubble?.toDomain(),
