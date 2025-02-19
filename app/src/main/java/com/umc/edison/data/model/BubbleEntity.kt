@@ -18,7 +18,8 @@ data class BubbleEntity(
     val isTrashed: Boolean = false,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
-    val deletedAt: Date? = null
+    val deletedAt: Date? = null,
+    val isSynced: Boolean = false
 ) : DataMapper<Bubble> {
     override fun toDomain(): Bubble {
         // Text 타입의 경우 앞에 %<TEXT>와 뒤에 </TEXT>%가 붙어있고

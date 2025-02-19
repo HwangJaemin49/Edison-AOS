@@ -20,6 +20,7 @@ data class GetLabelResponse(
         id = id,
         name = name,
         color = Color(color),
-        bubbles = List(bubbleCnt) { BubbleEntity(id = 0, labels = emptyList()) }
+        bubbles = List(bubbleCnt) { BubbleEntity(id = 0, labels = emptyList()) },
+        isSynced = true
     )
 }

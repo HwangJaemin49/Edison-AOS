@@ -39,5 +39,6 @@ data class GetAllBubblesResponse(
         labels = labels.map { it.toData() },
         createdAt = parseIso8601ToDate(createdAt),
         updatedAt = parseIso8601ToDate(updatedAt),
+        isSynced = true
     )
 }

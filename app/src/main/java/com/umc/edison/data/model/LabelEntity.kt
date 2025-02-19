@@ -13,7 +13,8 @@ data class LabelEntity(
     val isDeleted: Boolean = false,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
-    val deletedAt: Date? = null
+    val deletedAt: Date? = null,
+    val isSynced: Boolean = false
 ) : DataMapper<Label> {
     override fun toDomain(): Label = Label(
         id = id,
