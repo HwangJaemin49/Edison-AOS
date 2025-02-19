@@ -17,15 +17,11 @@ class BubbleRepositoryImpl @Inject constructor(
 ) : BubbleRepository {
 
     override fun getAllBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
-        remoteDataAction = { bubbleRemoteDataSource.getAllBubbles() },
-        localDataAction = { bubbleLocalDataSource.getAllBubbles() },
-        saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
+        dataAction = { bubbleLocalDataSource.getAllBubbles() },
     )
 
     override fun getStorageBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
-        remoteDataAction = { bubbleRemoteDataSource.getStorageBubbles()},
-        localDataAction = { bubbleLocalDataSource.getStorageBubbles()},
-        saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
+        dataAction = { bubbleLocalDataSource.getStorageBubbles()},
     )
 
     override fun addBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> = flowDataResource(
@@ -50,9 +46,7 @@ class BubbleRepositoryImpl @Inject constructor(
     )
 
     override fun getTrashedBubbles(): Flow<DataResource<List<Bubble>>> = flowDataResource(
-        remoteDataAction = { bubbleRemoteDataSource.getTrashedBubbles() },
-        localDataAction = { bubbleLocalDataSource.getTrashedBubbles() },
-        saveCacheAction = { bubbleLocalDataSource.addBubbles(it) }
+        dataAction = { bubbleLocalDataSource.getTrashedBubbles() },
     )
 
     override fun getBubble(bubbleId: Int): Flow<DataResource<Bubble>> = flowDataResource(

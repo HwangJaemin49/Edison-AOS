@@ -5,13 +5,3 @@ fun <DomainType, DataType> flowDataResource(
 ) = FlowBoundResource<DomainType, DataType>(
     dataAction = dataAction,
 )
-
-fun <DomainType, DataType> flowDataResource(
-    remoteDataAction: suspend () -> DataType,
-    localDataAction: suspend () -> DataType,
-    saveCacheAction: suspend (DataType) -> Unit,
-) = FlowCachingBoundResource<DomainType, DataType>(
-    remoteDataAction = remoteDataAction,
-    localDataAction = localDataAction,
-    saveCacheAction = saveCacheAction,
-)

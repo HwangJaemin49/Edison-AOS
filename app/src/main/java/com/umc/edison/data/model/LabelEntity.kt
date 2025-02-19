@@ -1,5 +1,6 @@
 package com.umc.edison.data.model
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.umc.edison.domain.model.Label
 import java.util.Date
@@ -23,6 +24,7 @@ data class LabelEntity(
 }
 
 fun LabelEntity.same(other: LabelEntity): Boolean {
+    Log.d("LabelEntity", "this: $this,\nother: $other")
     return id == other.id &&
         name == other.name &&
         color == other.color &&

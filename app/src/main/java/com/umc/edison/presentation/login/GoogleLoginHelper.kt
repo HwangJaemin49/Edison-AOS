@@ -12,6 +12,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.umc.edison.R
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.usecase.login.GoogleLoginUseCase
+import com.umc.edison.domain.usecase.sync.GetServerDataUseCase
 import com.umc.edison.presentation.model.UserModel
 import com.umc.edison.presentation.model.toPresentation
 import kotlinx.coroutines.MainScope
@@ -21,7 +22,8 @@ import javax.inject.Singleton
 
 @Singleton
 class GoogleLoginHelper @Inject constructor(
-    private val googleLoginUseCase: GoogleLoginUseCase
+    private val googleLoginUseCase: GoogleLoginUseCase,
+    private val getServerDataUseCase: GetServerDataUseCase,
 ) {
     private val coroutineScope = MainScope()
 
@@ -116,6 +118,7 @@ class GoogleLoginHelper @Inject constructor(
                         Log.d("Google SignIn", "서버 로그인 성공: ${result.data}")
                         onLoading(false)
                         onSuccess(result.data.toPresentation())
+                        getServerDataUseCase()
                     }
 
                     is DataResource.Error -> {
