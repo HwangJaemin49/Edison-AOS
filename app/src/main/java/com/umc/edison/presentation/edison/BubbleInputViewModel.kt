@@ -453,10 +453,7 @@ class BubbleInputViewModel @Inject constructor(
                 }
 
                 if (newContent.parseHtml().trim().isNotEmpty()) {
-                    val updatedContentBlock = contentBlock.copy(
-                        content = newContent,
-                    )
-                    updatedContentBlocks.add(updatedContentBlock)
+                    updatedContentBlocks.add(contentBlock)
                 }
             } else {
                 updatedContentBlocks.add(contentBlock)
