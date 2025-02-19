@@ -106,6 +106,7 @@ fun LabelDetailScreen(
                 interactionSource = remember { MutableInteractionSource() }
             ) {
                 if (uiState.mode == LabelDetailMode.EDIT) {
+                    viewModel.updateEditMode(LabelDetailMode.NONE)
                     updateShowBottomNav(true)
                 }
             }
