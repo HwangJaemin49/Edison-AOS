@@ -31,7 +31,7 @@ class LabelDetailViewModel @Inject constructor(
         fetchLabelDetail(id)
     }
 
-    private fun fetchLabelDetail(id: Int) {
+    fun fetchLabelDetail(id: Int) {
         _uiState.update { LabelDetailState.DEFAULT }
 
         collectDataResource(

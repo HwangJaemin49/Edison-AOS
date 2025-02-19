@@ -43,7 +43,7 @@ fun LabelDetailScreen(
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
-        viewModel.updateEditMode(LabelDetailMode.NONE)
+        viewModel.fetchLabelDetail(uiState.label.id)
     }
 
     BackHandler(enabled = true) {
