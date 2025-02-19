@@ -47,7 +47,6 @@ fun MyEdisonScreen(
     var isViewMode by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    var backPressedOnce by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState(
@@ -57,15 +56,7 @@ fun MyEdisonScreen(
     )
 
     BackHandler {
-        if (backPressedOnce) {
-            (context as? Activity)?.finish()
-        } else {
-            backPressedOnce = true
-            coroutineScope.launch {
-                delay(2000)
-                backPressedOnce = false
-            }
-        }
+        (context as? Activity)?.finish()
     }
 
     LaunchedEffect(Unit) {

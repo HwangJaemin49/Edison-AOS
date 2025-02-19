@@ -1,5 +1,6 @@
 package com.umc.edison.ui.bubblestorage
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -53,6 +55,8 @@ fun BubbleStorageScreen(
     viewModel: BubbleStorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
@@ -70,6 +74,7 @@ fun BubbleStorageScreen(
             updateViewMode(false)
             updateShowBottomNav(true)
         }
+        (context as? Activity)?.finish()
     }
 
     BaseContent(

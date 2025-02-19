@@ -1,5 +1,6 @@
 package com.umc.edison.ui.edison
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,6 +56,7 @@ fun BubbleInputScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
     }
@@ -77,6 +79,8 @@ fun BubbleInputScreen(
             }
             navHostController.popBackStack()
         }
+        updateShowBottomNav(true)
+
     }
 
     BaseContent(
