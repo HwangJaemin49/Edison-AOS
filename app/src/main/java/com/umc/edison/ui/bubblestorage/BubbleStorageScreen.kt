@@ -55,9 +55,12 @@ fun BubbleStorageScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        updateShowBottomNav(true)
-        viewModel.updateEditMode(BubbleStorageMode.NONE)
-        updateViewMode(false)
+        if (uiState.mode == BubbleStorageMode.VIEW) {
+            updateViewMode(true)
+        } else {
+            updateViewMode(false)
+            updateShowBottomNav(true)
+        }
 
         viewModel.fetchStorageBubbles()
     }
