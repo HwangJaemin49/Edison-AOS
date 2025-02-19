@@ -232,7 +232,7 @@ fun ArtLetterDetailContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val tags = uiState.artLetter.tags.split(" ")
+        val tags = uiState.artLetter.tags
         tags.forEach { tag ->
             Box(
                 modifier = Modifier

@@ -17,4 +17,6 @@ interface ArtLetterRemoteDataSource {
     suspend fun postArtLetterLike(id: Int)
 
     suspend fun postEditorPickArtLetter(): List<ArtLetterPreviewEntity>
+
+    suspend fun getSearchArtLetters(keyword: String, sortType: String): List<ArtLetterPreviewEntity>
 }

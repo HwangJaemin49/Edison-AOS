@@ -67,4 +67,9 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         val request = GetEditorPickRequest(listOf(6, 7, 8))
         return artLetterApiService.getEditorPick(request).data.map { it.toData() }
     }
+
+    override suspend fun getSearchArtLetters(keyword: String,sortType: String): List<ArtLetterPreviewEntity> {
+        val response = artLetterApiService.getSearchArtLetters(keyword, sortType).data
+        return response.map { it.toData() }
+    }
 }

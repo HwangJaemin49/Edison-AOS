@@ -11,6 +11,7 @@ import com.umc.edison.remote.model.artletter.GetSortedArtLettersResponse
 import com.umc.edison.remote.model.artletter.PostArtLetterLikeResponse
 import com.umc.edison.remote.model.artletter.PostArtLetterScrapResponse
 import com.umc.edison.remote.model.artletter.GetEditorPickResponse
+import com.umc.edison.remote.model.artletter.GetSearchArtLettersResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -38,5 +39,8 @@ interface ArtLetterApiService {
 
     @GET("/artletters/recommend-bar/keyword")
     suspend fun getRecommendedKeywords(@Query("artletterIds") artletterIds: String): ResponseWithListData<GetArtLetterKeywordResponse>
+
+    @GET("/artletters/search")
+    suspend fun getSearchArtLetters(@Query("keyword") keyword: String, @Query("sortType") sortType: String): ResponseWithPagination<GetSearchArtLettersResponse>
 
 }

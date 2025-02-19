@@ -49,7 +49,7 @@ fun NavigationGraph(
         }
 
         composable(NavRoute.ArtLetterSearch.route) {
-            ArtLetterSearchScreen()
+            ArtLetterSearchScreen(navHostController)
         }
 
         composable(

@@ -47,4 +47,9 @@ class ArtLetterRepositoryImpl @Inject constructor(
         flowDataResource(
             dataAction = { artLetterRemoteDataSource.postEditorPickArtLetter() }
         )
+
+    override fun getSearchArtLetters(keyword: String, sortType: String): Flow<DataResource<List<ArtLetterPreview>>> =
+        flowDataResource(
+            dataAction = { artLetterRemoteDataSource.getSearchArtLetters(keyword, sortType)}
+        )
 }

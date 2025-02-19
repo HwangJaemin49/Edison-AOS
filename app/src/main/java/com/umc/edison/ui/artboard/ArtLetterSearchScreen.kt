@@ -1,6 +1,8 @@
 package com.umc.edison.ui.artboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
@@ -19,6 +24,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,15 +34,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.umc.edison.R
+import com.umc.edison.presentation.artletter.ArtLetterSearchViewModel
+import com.umc.edison.presentation.model.ArtLetterPreviewModel
+import com.umc.edison.ui.components.ArtLetterCard
+import com.umc.edison.ui.components.GridLayout
+import com.umc.edison.ui.components.SearchBar
+import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray400
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 
 @Composable
-fun ArtLetterSearchScreen() {
+fun ArtLetterSearchScreen(
+    navHostController: NavHostController,
+    viewModel: ArtLetterSearchViewModel = hiltViewModel()
+) {
     val searchQuery = remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    val searchHistory by viewModel.searchHistory.collectAsState()
+    val isSearchActivated = remember { mutableStateOf(false) }
 
     Scaffold(
     ) { paddingValues ->
@@ -44,76 +65,106 @@ fun ArtLetterSearchScreen() {
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(Color.White)
-        ) {
-            // 검색창
-            SearchBar(searchQuery)
+        )
+        {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(16.dp),
+            ){
+                // 검색창
+                SearchBar(
+                    value = searchQuery.value,
+                    onValueChange = { searchQuery.value = it },
+                    onSearch = {
+                        isSearchActivated.value = true
+                        viewModel.searchArtLetters(searchQuery.value, "default") // 기본 정렬 사용
+                    },
+                    placeholder = "찰나의 영감을 검색해보세요"
+                )
+            }
+
+            if (searchHistory.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .horizontalScroll(rememberScrollState()) // 가로 스크롤 가능
+                ) {
+                    searchHistory.forEach { history ->
+                        SearchChip(
+                            text = history,
+                            onDelete = { viewModel.removeSearchHistory(history) } // 검색어 삭제
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(48.dp))
 
             // 스크롤 가능한 추천 키워드 & 카테고리
+//            LazyColumn(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(horizontal = 16.dp)
+//            ) {
+//                item { KeywordSection() }
+//                item { Spacer(modifier = Modifier.height(16.dp)) }
+//                item { CategorySection() }
+//            }
+
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-                item { KeywordSection() }
-                item { Spacer(modifier = Modifier.height(16.dp)) }
-                item { CategorySection() }
-            }
-        }
-    }
-}
+                when {
+                    !isSearchActivated.value -> {
+                        item { KeywordSection() }
+                        item { Spacer(modifier = Modifier.height(16.dp)) }
+                        item { CategorySection() }
+                    }
 
-@Composable
-fun SearchBar(searchQuery: MutableState<String>) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        BasicTextField(
-            value = searchQuery.value,
-            onValueChange = { searchQuery.value = it },
-            singleLine = true,
-            textStyle = MaterialTheme.typography.bodySmall.copy(color = Gray800),
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Gray300, shape = RoundedCornerShape(100.dp))
-                .padding(horizontal = 16.dp),
-            decorationBox = { innerTextField ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 12.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_topbar_search),
-                        contentDescription = "검색 아이콘",
-                        tint = Gray800,
-                    )
+                    uiState.artLetters.isEmpty() -> {}
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    else -> {
+                        item {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                ResultChip(text = "#${searchQuery.value}")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "에 관련된 아트레터",
+                                    color = Gray800,
+                                    style = MaterialTheme.typography.displayMedium
+                                )
+                            }}
 
-                    Box(contentAlignment = Alignment.CenterStart) {
-                        if (searchQuery.value.isEmpty()) {
-                            Text(
-                                style = MaterialTheme.typography.bodySmall,
-                                text = "찰나의 영감을 검색해보세요",
-                                color = Gray600,
-                                fontSize = 16.sp
+                        item {Spacer(modifier = Modifier.height(16.dp))}
+
+                        item {GridLayout(
+                            columns = 2,
+                            items = uiState.artLetters,
+                        ) { artLetter ->
+                            ArtLetterCard(
+                                artLetter = artLetter as ArtLetterPreviewModel,
+                                onArtLetterClick = { selectedArtLetter ->
+                                    navHostController.navigate(
+                                        NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
+                                    )
+                                },
+                                onBookmarkClick = { artLetter ->
+                                    viewModel.postArtLetterScrap(artLetter.artLetterId)
+                                }
                             )
                         }
-                        innerTextField()
+                        }
                     }
                 }
             }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row {
-            SearchChip(text = "디자이너")
-            Spacer(modifier = Modifier.width(8.dp))
-            SearchChip(text = "시간")
         }
     }
 }
@@ -186,25 +237,23 @@ fun CategorySection() {
 
 // 검색기록
 @Composable
-fun SearchChip(text: String) {
-    Box(
+fun SearchChip(text: String, onDelete: () -> Unit) {
+    Row(
         modifier = Modifier
-            .background(Gray400.copy(alpha = 0.2f), shape = RoundedCornerShape(16.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .background(Gray300.copy(alpha = 0.2f), shape = RoundedCornerShape(10.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ){
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = "삭제 아이콘",
-                tint = Gray800,
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(text = text,
-                style = MaterialTheme.typography.bodySmall.copy(color = Gray800))
-        }
-
+        Icon(
+            painter = painterResource(id = R.drawable.ic_close),
+            contentDescription = "삭제 아이콘",
+            tint = Gray800,
+            modifier = Modifier
+                .size(16.dp)
+                .clickable { onDelete() }
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = text, style = MaterialTheme.typography.bodySmall.copy(color = Gray800))
     }
 }
 
@@ -214,11 +263,23 @@ fun SearchChip(text: String) {
 fun Chip(text: String) {
     Box(
         modifier = Modifier
-            .background(Gray400.copy(alpha = 0.2f), shape = RoundedCornerShape(16.dp))
+            .background(Gray300.copy(alpha = 0.2f), shape = RoundedCornerShape(10.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         Text(text = text,
             style = MaterialTheme.typography.bodySmall.copy(color = Gray800))
+    }
+}
+
+@Composable
+fun ResultChip(text: String) {
+    Box(
+        modifier = Modifier
+            .background(Gray300.copy(alpha = 0.2f), shape = RoundedCornerShape(10.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Text(text = text,
+            style = MaterialTheme.typography.displaySmall.copy(color = Gray800))
     }
 }
 
