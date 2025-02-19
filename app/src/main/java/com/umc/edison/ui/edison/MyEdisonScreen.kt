@@ -67,7 +67,7 @@ fun MyEdisonScreen(
 
     LaunchedEffect(uiState.bubbles) {
         if (uiState.bubbles.isNotEmpty()) {
-            pagerState.animateScrollToPage(1)
+            pagerState.scrollToPage(1)
         }
     }
 
@@ -120,19 +120,19 @@ fun MyEdisonScreen(
             MyEdisonNavBar(
                 onSearchClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(1)
+                        pagerState.scrollToPage(1)
                     }
                     viewModel.resetSearchResults()
                 },
                 onBubbleClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(0)
+                        pagerState.scrollToPage(0)
                     }
                     viewModel.resetSearchResults()
                 },
                 onStorageClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(1)
+                        pagerState.scrollToPage(1)
                     }
                     viewModel.resetSearchResults()
                 },
