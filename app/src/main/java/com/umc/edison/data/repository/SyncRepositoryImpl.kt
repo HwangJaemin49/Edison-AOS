@@ -33,7 +33,8 @@ class SyncRepositoryImpl @Inject constructor(
                 try {
                     val syncedLabel = labelRemoteDataSource.syncLabel(label)
 
-                    if (syncedLabel.isDeleted) {
+                    if (syncedLabel.same(label) && syncedLabel.isDeleted) {
+                        Log.d("SyncRepositoryImpl", "Label with id: ${label.id} is deleted")
                         labelLocalDataSource.deleteLabel(label)
                     } else if (syncedLabel.same(label)) {
                         Log.d("SyncRepositoryImpl", "Label with id: ${label.id} is synced")
@@ -62,7 +63,7 @@ class SyncRepositoryImpl @Inject constructor(
                 try {
                     val syncedBubble = bubbleRemoteDataSource.syncBubble(bubble)
 
-                    if (syncedBubble.isDeleted) {
+                    if (syncedBubble.same(bubble) && syncedBubble.isDeleted) {
                         Log.d("SyncRepositoryImpl", "Bubble with id: ${bubble.id} is deleted")
                         bubbleLocalDataSource.deleteBubble(bubble)
                     } else if (syncedBubble.same(bubble)) {

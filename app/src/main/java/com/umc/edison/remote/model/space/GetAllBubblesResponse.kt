@@ -22,7 +22,7 @@ data class GetAllBubblesResponse(
 ) : RemoteMapper<BubbleEntity> {
 
     data class LabelResponse(
-        @SerializedName("labelId") val labelId: Int,
+        @SerializedName("localIdx") val labelId: Int,
         @SerializedName("name") val name: String,
         @SerializedName("color") val color: Int
     ) : RemoteMapper<LabelEntity> {
