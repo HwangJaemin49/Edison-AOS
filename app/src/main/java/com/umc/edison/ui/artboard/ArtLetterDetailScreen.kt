@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -218,18 +220,28 @@ fun ArtLetterDetailContent(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = uiState.artLetter.title,
-            color = Gray800,
-            style = MaterialTheme.typography.displayLarge,
-        )
-
         if (topPadding == 0.dp) {
+            Text(
+                text = uiState.artLetter.title,
+                color = Gray800,
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier.weight(1f)
+            )
+
             Icon(
                 painter = painterResource(id = R.drawable.ic_bookmark),
                 contentDescription = "BookMark",
                 tint = if (uiState.artLetter.scraped) Color(0xFFFFDE66) else Gray500,
-                modifier = Modifier.clickable { viewModel.scrapArtLetter() }
+                modifier = Modifier
+                    .clickable { viewModel.scrapArtLetter() }
+                    .weight(0.2f)
+            )
+        } else {
+            Text(
+                text = uiState.artLetter.title,
+                color = Gray800,
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -262,113 +274,126 @@ fun ArtLetterDetailContent(
         thickness = 1.dp,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp)
+            .padding(top = 24.dp)
     )
 
-    Text(
-        text = uiState.artLetter.content,
-        color = Gray800,
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.padding(vertical = 8.dp)
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        contentAlignment = Alignment.CenterEnd
+    Column(
+        modifier = if (topPadding == 0.dp) {
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(top = 24.dp)
+        } else {
+            Modifier.padding(top = 24.dp)
+        }
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_like),
-            contentDescription = "Like",
-            tint = if (uiState.artLetter.liked) Gray800 else Gray500,
-            modifier = Modifier
-                .size(26.dp)
-                .clickable { viewModel.likeArtLetter() }
+        Text(
+            text = uiState.artLetter.content,
+            color = Gray800,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(vertical = 8.dp)
         )
-    }
 
-    HorizontalDivider(
-        color = Gray300,
-        thickness = 1.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 24.dp)
-    )
+        Spacer(modifier = Modifier.height(24.dp))
 
-    Text(
-        text = "아트레터 더보기",
-        style = MaterialTheme.typography.displayMedium,
-        color = Gray800
-    )
-
-    Spacer(modifier = Modifier.height(12.dp))
-
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(48.dp)
-    ) {
-        items(uiState.relatedArtLetters.size) { relatedArtLetter ->
-            val artLetter = uiState.relatedArtLetters[relatedArtLetter]
-            Column(
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_like),
+                contentDescription = "Like",
+                tint = if (uiState.artLetter.liked) Gray800 else Gray500,
                 modifier = Modifier
-                    .width(220.dp)
-                    .wrapContentHeight()
-                    .clickable {
-                        navHostController.navigate(
-                            NavRoute.ArtLetterDetail.createRoute(
-                                artLetter.artLetterId
-                            )
-                        )
-                    },
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                val imageUrl = artLetter.thumbnail
+                    .size(26.dp)
+                    .clickable { viewModel.likeArtLetter() }
+            )
+        }
 
-                Box(
+        HorizontalDivider(
+            color = Gray300,
+            thickness = 1.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp)
+        )
+
+        Text(
+            text = "아트레터 더보기",
+            style = MaterialTheme.typography.displayMedium,
+            color = Gray800
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(48.dp)
+        ) {
+            items(uiState.relatedArtLetters.size) { relatedArtLetter ->
+                val artLetter = uiState.relatedArtLetters[relatedArtLetter]
+                Column(
                     modifier = Modifier
-                        .height(120.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Gray300)
+                        .width(220.dp)
+                        .wrapContentHeight()
+                        .clickable {
+                            navHostController.navigate(
+                                NavRoute.ArtLetterDetail.createRoute(
+                                    artLetter.artLetterId
+                                )
+                            )
+                        },
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = "ArtLetterPreview Category Image",
-                        contentScale = ContentScale.Crop,
-                    )
-                }
+                    val imageUrl = artLetter.thumbnail
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .height(120.dp)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Gray300)
+                    ) {
+                        AsyncImage(
+                            model = imageUrl,
+                            contentDescription = "ArtLetterPreview Category Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = artLetter.title,
+                            style = MaterialTheme.typography.displaySmall,
+                            color = Gray800,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_bookmark),
+                            contentDescription = "Bookmark",
+                            tint = if (artLetter.scraped) Color(0xFFFFDE66) else Gray500,
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable { viewModel.scrapArtLetter(artLetter.artLetterId) }
+                                .weight(0.2f)
+                        )
+                    }
+
                     Text(
-                        text = artLetter.title,
-                        style = MaterialTheme.typography.displaySmall,
+                        text = artLetter.tags.joinToString(" "),
+                        style = MaterialTheme.typography.titleMedium,
                         color = Gray800,
                     )
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_bookmark),
-                        contentDescription = "Bookmark",
-                        tint = if (artLetter.scraped) Color(0xFFFFDE66) else Gray500,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable { viewModel.scrapArtLetter(artLetter.artLetterId) }
-                    )
                 }
-
-                Text(
-                    text = artLetter.tags.joinToString(" "),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Gray800,
-                )
             }
         }
     }
