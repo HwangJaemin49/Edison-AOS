@@ -1,5 +1,6 @@
 package com.umc.edison.ui.bubblestorage
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -53,10 +55,11 @@ fun BubbleStorageScreen(
     viewModel: BubbleStorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
-        viewModel.updateEditMode(BubbleStorageMode.NONE)
         updateViewMode(false)
 
         viewModel.fetchStorageBubbles()
@@ -70,6 +73,7 @@ fun BubbleStorageScreen(
             updateViewMode(false)
             updateShowBottomNav(true)
         }
+        (context as? Activity)?.finish()
     }
 
     BaseContent(
@@ -147,7 +151,7 @@ fun BubbleStorageScreen(
             if (searchKeyword.isEmpty() || searchResults.isEmpty()) {
                 // Linear Gradient 효과가 적용된 배경
                 Canvas(modifier = Modifier.fillMaxSize()) {
-                    val gradientHeight = size.height * 0.3f
+                    val gradientHeight = size.height * 0.2f
 
                     drawRect(
                         brush = Brush.verticalGradient(

@@ -181,14 +181,14 @@ private fun AccountManagementContent(
                     color = Gray800,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { viewModel.updateMode(AccountManagementMode.DELETE_ACCOUNT) }
+                        .clickable { navHostController.navigate(NavRoute.DeleteAccount.route) }
                         .padding(vertical = 6.dp),
                 )
             }
         }
     }
 
-    if (uiState.mode != AccountManagementMode.NONE) {
+    if (uiState.mode == AccountManagementMode.LOGOUT) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -196,22 +196,18 @@ private fun AccountManagementContent(
                 .clickable { viewModel.updateMode(AccountManagementMode.NONE) },
             contentAlignment = Alignment.Center
         ) {
-            if (uiState.mode == AccountManagementMode.DELETE_ACCOUNT) {
-                navHostController.navigate(NavRoute.DeleteAccount.route)
-            } else if (uiState.mode == AccountManagementMode.LOGOUT) {
-                PopUpDecision(
-                    question = stringResource(R.string.logout_question),
-                    positiveButtonText = stringResource(R.string.logout),
-                    negativeButtonText = stringResource(R.string.cancel),
-                    onPositiveClick = {
-                        viewModel.logOut()
-                        navHostController.navigate(NavRoute.MyEdison.route) {
-                            popUpTo(NavRoute.MyEdison.route) { inclusive = true }
-                        }
-                    },
-                    onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
-                )
-            }
+            PopUpDecision(
+                question = stringResource(R.string.logout_question),
+                positiveButtonText = stringResource(R.string.logout),
+                negativeButtonText = stringResource(R.string.cancel),
+                onPositiveClick = {
+                    viewModel.logOut()
+                    navHostController.navigate(NavRoute.MyEdison.route) {
+                        popUpTo(NavRoute.MyEdison.route) { inclusive = true }
+                    }
+                },
+                onNegativeClick = { viewModel.updateMode(AccountManagementMode.NONE) }
+            )
         }
     }
 }

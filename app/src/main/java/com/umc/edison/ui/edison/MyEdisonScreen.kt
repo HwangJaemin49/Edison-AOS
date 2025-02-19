@@ -47,7 +47,6 @@ fun MyEdisonScreen(
     var isViewMode by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    var backPressedOnce by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     val pagerState = rememberPagerState(
@@ -57,15 +56,7 @@ fun MyEdisonScreen(
     )
 
     BackHandler {
-        if (backPressedOnce) {
-            (context as? Activity)?.finish()
-        } else {
-            backPressedOnce = true
-            coroutineScope.launch {
-                delay(2000)
-                backPressedOnce = false
-            }
-        }
+        (context as? Activity)?.finish()
     }
 
     LaunchedEffect(Unit) {
@@ -76,7 +67,7 @@ fun MyEdisonScreen(
 
     LaunchedEffect(uiState.bubbles) {
         if (uiState.bubbles.isNotEmpty()) {
-            pagerState.animateScrollToPage(1)
+            pagerState.scrollToPage(1)
         }
     }
 
@@ -129,19 +120,19 @@ fun MyEdisonScreen(
             MyEdisonNavBar(
                 onSearchClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(1)
+                        pagerState.scrollToPage(1)
                     }
                     viewModel.resetSearchResults()
                 },
                 onBubbleClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(0)
+                        pagerState.scrollToPage(0)
                     }
                     viewModel.resetSearchResults()
                 },
                 onStorageClick = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(1)
+                        pagerState.scrollToPage(1)
                     }
                     viewModel.resetSearchResults()
                 },

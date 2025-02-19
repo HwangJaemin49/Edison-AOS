@@ -264,12 +264,6 @@ class BubbleInputViewModel @Inject constructor(
 
     fun addContentBlocks(imagePaths: List<Uri>) {
 
-        val existingImageCount = _uiState.value.bubble.contentBlocks.count { it.type == ContentType.IMAGE }
-
-        if (existingImageCount+imagePaths.size  > 10) {
-            _uiState.update { it.copy(toastMessage = "최대 10장까지 첨부할 수 있습니다.") }
-            return
-        }
 
         val newImageBlocks = mutableListOf<ContentBlockModel>()
 
@@ -453,10 +447,7 @@ class BubbleInputViewModel @Inject constructor(
                 }
 
                 if (newContent.parseHtml().trim().isNotEmpty()) {
-                    val updatedContentBlock = contentBlock.copy(
-                        content = newContent,
-                    )
-                    updatedContentBlocks.add(updatedContentBlock)
+                    updatedContentBlocks.add(contentBlock)
                 }
             } else {
                 updatedContentBlocks.add(contentBlock)
@@ -481,11 +472,7 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun saveCameraImage(context: Context) {
-        val imageCnt = _uiState.value.bubble.contentBlocks.count { it.type == ContentType.IMAGE }
-        if (imageCnt >= 10) {
-            _uiState.update { it.copy(toastMessage = "최대 10장까지 첨부할 수 있습니다.") }
-            return
-        }
+
 
         val savedUri = saveImageToInternalStorage(context, _uiState.value.cameraImagePath!!)
         addContentBlocks(listOf(savedUri))

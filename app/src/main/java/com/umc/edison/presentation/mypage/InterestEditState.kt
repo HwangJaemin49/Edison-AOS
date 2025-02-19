@@ -6,9 +6,10 @@ import com.umc.edison.presentation.model.InterestModel
 
 data class InterestEditState(
     override val isLoading: Boolean,
-    val interest: InterestModel,
     override val error: Throwable?,
-    override val toastMessage: String?
+    override val toastMessage: String?,
+    val interest: InterestModel,
+    val isEdited: Boolean = false
 ) : BaseState {
     companion object {
         val DEFAULT = InterestEditState(

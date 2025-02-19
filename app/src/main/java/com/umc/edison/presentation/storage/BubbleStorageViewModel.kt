@@ -21,6 +21,7 @@ class BubbleStorageViewModel @Inject constructor(
     override val uiState = _uiState.asStateFlow()
 
     fun fetchStorageBubbles() {
+        _uiState.update { BubbleStorageState.DEFAULT }
         collectDataResource(
             flow = getStorageBubbleUseCase(),
             onSuccess = { bubbles ->

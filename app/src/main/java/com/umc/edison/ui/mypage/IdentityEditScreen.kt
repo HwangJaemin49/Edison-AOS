@@ -43,6 +43,12 @@ fun IdentityEditScreen(
         updateShowBottomNav(false)
     }
 
+    LaunchedEffect(uiState.isEdited) {
+        if (uiState.isEdited) {
+            navHostController.popBackStack()
+        }
+    }
+
     BaseContent(
         uiState = uiState,
         clearToastMessage = { viewModel.clearToastMessage() },
@@ -51,7 +57,6 @@ fun IdentityEditScreen(
                 title = "Identity 고르기",
                 onBack = {
                     viewModel.updateIdentity()
-                    navHostController.popBackStack()
                 }
             )
         }

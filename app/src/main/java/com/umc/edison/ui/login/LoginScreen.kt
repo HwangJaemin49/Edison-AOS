@@ -63,9 +63,7 @@ fun LoginScreen(
     val context = LocalContext.current
 
     val uiState by viewModel.uiState.collectAsState()
-    var backPressedOnce by remember { mutableStateOf(false) }
     var showPopup by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
 
 
     LaunchedEffect(Unit) {
@@ -73,15 +71,7 @@ fun LoginScreen(
     }
 
     BackHandler {
-        if (backPressedOnce) {
-            (context as? Activity)?.finish()
-        } else {
-            backPressedOnce = true
-            coroutineScope.launch {
-                delay(2000)
-                backPressedOnce = false
-            }
-        }
+        (context as? Activity)?.finish()
     }
 
     BaseContent(
