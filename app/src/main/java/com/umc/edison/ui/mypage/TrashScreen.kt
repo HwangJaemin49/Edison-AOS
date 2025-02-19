@@ -157,7 +157,8 @@ private fun TrashContent(
                     .fillMaxWidth()
                     .height(32.dp)
                     .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
                     selected = uiState.selectedBubbles.size == uiState.bubbles.size,

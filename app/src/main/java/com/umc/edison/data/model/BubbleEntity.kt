@@ -15,6 +15,7 @@ data class BubbleEntity(
     var backLinks: List<BubbleEntity> = emptyList(),
     var linkedBubble: BubbleEntity? = null,
     val isDeleted: Boolean = false,
+    val isTrashed: Boolean = false,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
     val deletedAt: Date? = null
@@ -52,7 +53,7 @@ fun BubbleEntity.same(other: BubbleEntity): Boolean {
     if (this.mainImage?.isEmpty() == true) this.mainImage = null
     if (other.mainImage?.isEmpty() == true) other.mainImage = null
 
-    Log.d("BubbleEntity", "this: $this,\n other: $other")
+    Log.d("BubbleEntity", "this: $this,\nother: $other")
 
     return id == other.id &&
             title == other.title &&
@@ -60,7 +61,8 @@ fun BubbleEntity.same(other: BubbleEntity): Boolean {
             mainImage == other.mainImage &&
             labels.map { it.id } == other.labels.map { it.id } &&
             backLinks.map { it.id } == other.backLinks.map { it.id } &&
-            isDeleted == other.isDeleted
+            isDeleted == other.isDeleted &&
+            isTrashed == other.isTrashed
 }
 
 fun Bubble.toData(): BubbleEntity = BubbleEntity(
