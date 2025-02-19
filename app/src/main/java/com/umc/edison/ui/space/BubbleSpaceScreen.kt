@@ -101,7 +101,9 @@ fun BubbleSpaceScreen(
         } else {
             navHostController.popBackStack()
         }
+        navHostController.navigate(NavRoute.MyEdison.route)
     }
+
 
     BaseContent(
         uiState = uiState,

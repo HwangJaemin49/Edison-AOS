@@ -2,6 +2,7 @@ package com.umc.edison.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -79,7 +80,11 @@ fun MainScreen() {
                     isBlur = true,
                     onBackScreenClick = { showInputBubble = false }
                 )
+                BackHandler {
+                    showInputBubble = false
+                }
             }
+
         }
     }
 }

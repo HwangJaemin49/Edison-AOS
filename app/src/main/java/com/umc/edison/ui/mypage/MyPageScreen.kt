@@ -1,5 +1,6 @@
 package com.umc.edison.ui.mypage
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -68,6 +69,10 @@ fun MyPageScreen(
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
         viewModel.fetchLoginState()
+    }
+
+    BackHandler {
+        navHostController.navigate(NavRoute.MyEdison.route)
     }
 
     BaseContent(
