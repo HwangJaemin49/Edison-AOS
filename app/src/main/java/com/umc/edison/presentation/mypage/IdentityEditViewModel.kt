@@ -81,8 +81,7 @@ class IdentityEditViewModel @Inject constructor(
             onSuccess = {
                 _uiState.update {
                     it.copy(
-                        identity = it.identity.copy(options = it.identity.selectedKeywords),
-                        isEdited = true
+                        identity = it.identity.copy(options = it.identity.selectedKeywords)
                     )
                 }
             },
@@ -93,7 +92,10 @@ class IdentityEditViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    isEdited = true,
+                ) }
             }
         )
     }
