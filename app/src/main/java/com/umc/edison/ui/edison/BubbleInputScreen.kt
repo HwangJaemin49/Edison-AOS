@@ -123,6 +123,7 @@ fun BubbleInputScreen(
                     },
                     onBackLinkClick = { bubble ->
                         viewModel.addBackLink(bubble)
+                        viewModel.updateIcon(IconType.NONE)
                     },
                     onLinkBubbleClick = {
                         viewModel.updateBubbleWithLink()

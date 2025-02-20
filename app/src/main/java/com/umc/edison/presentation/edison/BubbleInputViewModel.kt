@@ -487,8 +487,6 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun saveCameraImage(context: Context) {
-
-
         val savedUri = saveImageToInternalStorage(context, _uiState.value.cameraImagePath!!)
         addContentBlocks(listOf(savedUri))
     }
