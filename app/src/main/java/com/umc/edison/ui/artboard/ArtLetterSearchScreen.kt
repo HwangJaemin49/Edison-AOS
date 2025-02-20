@@ -29,10 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,7 +58,6 @@ import com.umc.edison.ui.components.ArtLetterCard
 import com.umc.edison.ui.components.GridLayout
 import com.umc.edison.ui.components.PopUpDecision
 import com.umc.edison.ui.components.SearchBar
-import com.umc.edison.ui.login.BubbleMessage
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
@@ -81,6 +78,8 @@ fun ArtLetterSearchScreen(
     BackHandler {
         if (uiState.query.isNotEmpty()) {
             viewModel.updateSearchQuery("")
+        } else {
+            navHostController.popBackStack()
         }
     }
 
@@ -191,9 +190,7 @@ fun ArtLetterSearchScreen(
                                             NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
                                         )
                                     },
-                                    onBookmarkClick = { artLetter ->
-                                        viewModel.postArtLetterScrap(artLetter.artLetterId)
-                                    }
+                                    onBookmarkClick = { viewModel.postArtLetterScrap(it.artLetterId) }
                                 )
                             }
                         }
@@ -566,7 +563,7 @@ fun Recommend(
                     .width(160.dp)
             ) {
                 ArtLetterCard(
-                    artLetter = artLetter as ArtLetterPreviewModel,
+                    artLetter = artLetter,
                     onArtLetterClick = { selectedArtLetter ->
                         navHostController.navigate(
                             NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
