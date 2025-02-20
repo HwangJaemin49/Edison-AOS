@@ -95,4 +95,8 @@ class LabelLocalDataSourceImpl @Inject constructor(
         markAsSynced(tableName, label.id)
     }
 
+    override suspend fun deleteAllLabels() {
+        labelDao.deleteAllLabels()
+    }
+
 }

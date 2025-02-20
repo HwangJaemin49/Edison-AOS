@@ -26,4 +26,7 @@ interface LabelDao : BaseDao<LabelLocal> {
 
     @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE id = :labelId")
     suspend fun getLabelById(labelId: Int): LabelLocal?
+
+    @Query("DELETE FROM ${RoomConstant.Table.LABEL}")
+    suspend fun deleteAllLabels()
 }

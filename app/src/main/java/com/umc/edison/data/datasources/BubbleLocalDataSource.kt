@@ -32,4 +32,6 @@ interface BubbleLocalDataSource {
 
     suspend fun deleteBubble(bubble: BubbleEntity)
     suspend fun addLinkedBubble(bubble: BubbleEntity)
+
+    suspend fun deleteAllBubbles()
 }
