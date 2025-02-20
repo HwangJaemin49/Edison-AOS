@@ -81,8 +81,7 @@ class InterestEditViewModel @Inject constructor(
             onSuccess = {
                 _uiState.update {
                     it.copy(
-                        interest = it.interest.copy(options = it.interest.selectedKeywords),
-                        isEdited = true
+                        interest = it.interest.copy(options = it.interest.selectedKeywords)
                     )
                 }
             },
@@ -93,7 +92,10 @@ class InterestEditViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(
+                    isLoading = false,
+                    isEdited = true,
+                ) }
             }
         )
     }

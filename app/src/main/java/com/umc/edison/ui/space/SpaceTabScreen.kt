@@ -136,7 +136,7 @@ fun BubbleGraphScreen(
                         ?: Offset.Zero
                     val end = uiState.bubbles.find { it.bubble.id == edge.endBubbleId }?.position
                         ?: Offset.Zero
-                    drawLine(color = Gray300, start = start, end = end, strokeWidth = 1.dp.toPx())
+                    drawLine(color = Gray500, start = start, end = end, strokeWidth = 1.dp.toPx())
                 }
 
                 // 버블 점 그리기
@@ -202,7 +202,7 @@ fun BubbleGraphScreen(
                     if (startBubble != null && endBubble != null) {
                         val start = startBubble.position * scale + offset
                         val end = endBubble.position * scale + offset
-                        drawLine(color = Gray300, start = start, end = end, strokeWidth = 1.dp.toPx())
+                        drawLine(color = Gray500, start = start, end = end, strokeWidth = 1.dp.toPx())
                     }
                 }
             }
