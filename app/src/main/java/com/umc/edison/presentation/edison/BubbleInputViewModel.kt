@@ -385,7 +385,7 @@ class BubbleInputViewModel @Inject constructor(
 
         checkCanSave()
 
-        if (!_uiState.value.canSave && isLinked) {
+        if (!_uiState.value.canSave) {
             _uiState.update { it.copy(toastMessage = "내용을 입력해주세요.") }
             addTextBlockToFront()
             return
