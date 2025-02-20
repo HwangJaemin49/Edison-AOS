@@ -317,7 +317,11 @@ fun ArtBoardSection(
                     )
                 },
                 onBookmarkClick = { artLetter ->
-                    viewModel.postArtLetterScrap(artLetter.artLetterId)
+                    if (uiState.isLoggedIn) {
+                        viewModel.postArtLetterScrap(artLetter.artLetterId)
+                    } else {
+                        // TODO: 팝업 창
+                    }
                 }
             )
         }

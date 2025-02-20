@@ -2,6 +2,7 @@ package com.umc.edison.remote.datasources
 
 import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.data.model.ArtLetterDetailEntity
+import com.umc.edison.data.model.ArtLetterKeyWordEntity
 import com.umc.edison.data.model.ArtLetterPreviewEntity
 import com.umc.edison.remote.api.ArtLetterApiService
 import com.umc.edison.remote.model.artletter.GetEditorPickRequest
@@ -66,5 +67,23 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
     override suspend fun postEditorPickArtLetter(): List<ArtLetterPreviewEntity> {
         val request = GetEditorPickRequest(listOf(1, 3, 4))
         return artLetterApiService.getEditorPick(request).data.map { it.toData() }
+    }
+
+    override suspend fun getSearchArtLetters(keyword: String,sortType: String): List<ArtLetterPreviewEntity> {
+        val response = artLetterApiService.getSearchArtLetters(keyword, sortType).data
+        return response.map { it.toData() }
+    }
+
+    override suspend fun getArtLetterKeyWord(artletterIds: List<Int>): List<ArtLetterKeyWordEntity> {
+        val response = artLetterApiService.getRecommendedKeywords(artletterIds).data
+        return response.map { it.toData() }
+    }
+
+    override suspend fun removeRecentSearch(keyword: String) {
+        artLetterApiService.removeRecentSearch(keyword)
+    }
+
+    override suspend fun getRecentSearches(): List<String> {
+        return artLetterApiService.getRecentSearches().data
     }
 }
