@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.text.Html
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
@@ -11,6 +12,7 @@ import com.umc.edison.domain.usecase.bubble.GetBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.UpdateBubbleUseCase
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
+import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.BubbleModel
@@ -24,6 +26,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
@@ -37,6 +40,7 @@ class BubbleInputViewModel @Inject constructor(
     private val addLabelUseCase: AddLabelUseCase,
     private val addBubbleUseCase: AddBubbleUseCase,
     private val updateBubbleUseCase: UpdateBubbleUseCase,
+    private val syncDataUseCase: SyncDataUseCase,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(BubbleInputState.DEFAULT)
@@ -47,6 +51,16 @@ class BubbleInputViewModel @Inject constructor(
         fetchBubble(id)
         fetchLabels()
         fetchBubbles()
+    }
+
+    private fun syncData() {
+        viewModelScope.launch {
+            try {
+                syncDataUseCase()
+            } catch (e: Throwable) {
+                _uiState.update { it.copy(error = e) }
+            }
+        }
     }
 
     private fun fetchBubble(bubbleId: Int) {
@@ -385,6 +399,7 @@ class BubbleInputViewModel @Inject constructor(
             },
             onSuccess = { savedBubble ->
                 _uiState.update { it.copy(toastMessage = "저장되었습니다.") }
+                syncData()
 
                 if (isLinked) {
                     _uiState.update {
