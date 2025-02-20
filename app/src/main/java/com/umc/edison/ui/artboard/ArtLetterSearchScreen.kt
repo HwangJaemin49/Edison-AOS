@@ -58,6 +58,7 @@ import com.umc.edison.presentation.model.ArtLetterPreviewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.ArtLetterCard
 import com.umc.edison.ui.components.GridLayout
+import com.umc.edison.ui.components.PopUpDecision
 import com.umc.edison.ui.components.SearchBar
 import com.umc.edison.ui.login.BubbleMessage
 import com.umc.edison.ui.navigation.NavRoute
@@ -88,6 +89,7 @@ fun ArtLetterSearchScreen(
         clearToastMessage = { viewModel.clearToastMessage() },
         containerColor = Color(0xFFF5F5F5)
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -137,7 +139,8 @@ fun ArtLetterSearchScreen(
                 )
 
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     contentAlignment = Alignment.Center,
                 ) {
                     if (showPopup) {
@@ -196,6 +199,33 @@ fun ArtLetterSearchScreen(
                         }
                     }
                 }
+            }
+        }
+
+        if (uiState.showLoginModal) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF3A3D40).copy(alpha = 0.5f))
+                    .clickable { viewModel.updateShowLoginModal(false) },
+                contentAlignment = Alignment.Center
+            ) {
+                PopUpDecision(
+                    question = "로그인이 필요한 기능입니다",
+                    positiveButtonText = "로그인",
+                    negativeButtonText = "취소",
+                    onPositiveClick = {
+                        navHostController.navigate(NavRoute.Login.route) {
+                            popUpTo(NavRoute.Login.route) {
+                                inclusive = true
+                            }
+                        }
+                        viewModel.updateShowLoginModal(false)
+                    },
+                    onNegativeClick = {
+                        viewModel.updateShowLoginModal(false)
+                    }
+                )
             }
         }
     }

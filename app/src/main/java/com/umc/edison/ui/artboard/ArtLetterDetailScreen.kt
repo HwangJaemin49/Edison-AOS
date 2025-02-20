@@ -208,7 +208,8 @@ fun ArtLetterDetailScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF3A3D40).copy(alpha = 0.5f)),
+                    .background(Color(0xFF3A3D40).copy(alpha = 0.5f))
+                    .clickable { viewModel.updateShowLoginModal(false) },
                 contentAlignment = Alignment.Center
             ) {
                 PopUpDecision(

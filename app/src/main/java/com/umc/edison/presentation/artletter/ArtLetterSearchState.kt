@@ -17,6 +17,7 @@ data class ArtLetterSearchState (
     val isSearchActivated: Boolean = false,
     val categories: List<String> = emptyList(),
     val keywords: List<ArtLetterKeyWordModel> = emptyList(),
+    val showLoginModal: Boolean = false,
 ) : BaseState {
     companion object {
         val DEFAULT = ArtLetterSearchState(

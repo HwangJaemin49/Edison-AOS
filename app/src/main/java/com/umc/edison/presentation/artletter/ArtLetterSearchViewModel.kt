@@ -143,6 +143,11 @@ class ArtLetterSearchViewModel @Inject constructor(
     }
 
     fun postArtLetterScrap(id: Int) {
+        if (!_uiState.value.isLoggedIn) {
+            _uiState.update { it.copy(showLoginModal = true) }
+            return
+        }
+
         collectDataResource(
             flow = scrapArtLetterUseCase(id),
             onSuccess = {
@@ -208,6 +213,10 @@ class ArtLetterSearchViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false) }
             }
         )
+    }
+
+    fun updateShowLoginModal(show: Boolean) {
+        _uiState.update { it.copy(showLoginModal = show) }
     }
 
     override fun clearToastMessage() {
