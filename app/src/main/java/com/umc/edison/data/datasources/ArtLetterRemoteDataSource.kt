@@ -22,7 +22,9 @@ interface ArtLetterRemoteDataSource {
 
     suspend fun getSearchArtLetters(keyword: String, sortType: String): List<ArtLetterPreviewEntity>
 
-    suspend fun getArtLetterKeyWord(artletterIds: List<Int>): List<ArtLetterKeyWordEntity>
+    suspend fun getArtLetterKeyWord(): List<ArtLetterKeyWordEntity>
+
+    suspend fun getArtLetterCategory(): List<String>
 
     suspend fun removeRecentSearch(keyword: String)
 

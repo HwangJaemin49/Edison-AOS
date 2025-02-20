@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.artletter
 
 import com.umc.edison.presentation.base.BaseState
+import com.umc.edison.presentation.model.ArtLetterKeyWordModel
 import com.umc.edison.presentation.model.ArtLetterPreviewModel
 
 data class ArtLetterSearchState (
@@ -11,8 +12,11 @@ data class ArtLetterSearchState (
     val artLetters: List<ArtLetterPreviewModel>,
     val recommendedArtLetters: List<ArtLetterPreviewModel> = emptyList(),
     val query: String = "",
+    val lastQuery: String = "",
     val recentSearches: List<String> = emptyList(),
     val isSearchActivated: Boolean = false,
+    val categories: List<String> = emptyList(),
+    val keywords: List<ArtLetterKeyWordModel> = emptyList(),
 ) : BaseState {
     companion object {
         val DEFAULT = ArtLetterSearchState(
