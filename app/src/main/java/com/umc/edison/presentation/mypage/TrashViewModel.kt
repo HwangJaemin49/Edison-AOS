@@ -42,6 +42,10 @@ class TrashViewModel @Inject constructor(
 
     fun updateBubbleRecoverMode(mode: BubbleRecoverMode) {
         _uiState.update { it.copy(mode = mode) }
+
+        if (mode == BubbleRecoverMode.NONE) {
+            clearSelection()
+        }
     }
 
     fun toggleBubbleSelection(bubble: BubbleModel) {
@@ -61,7 +65,7 @@ class TrashViewModel @Inject constructor(
         }
     }
 
-    fun clearSelection() {
+    private fun clearSelection() {
         _uiState.update { it.copy(selectedBubbles = emptyList()) }
     }
 

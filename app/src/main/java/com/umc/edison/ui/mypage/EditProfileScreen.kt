@@ -118,7 +118,7 @@ private fun EditProfileImage(
         ) {
             AsyncImage(
                 model = R.drawable.ic_camera,
-                contentDescription = "Profile Image",
+                contentDescription = "Camera Icon",
                 modifier = Modifier.size(18.dp)
             )
         }

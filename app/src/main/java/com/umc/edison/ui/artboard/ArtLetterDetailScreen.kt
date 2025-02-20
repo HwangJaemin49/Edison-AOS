@@ -2,6 +2,7 @@ package com.umc.edison.ui.artboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -209,7 +210,11 @@ fun ArtLetterDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color(0xFF3A3D40).copy(alpha = 0.5f))
-                    .clickable { viewModel.updateShowLoginModal(false) },
+                    .clickable(
+                        onClick = { viewModel.updateShowLoginModal(false) },
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 PopUpDecision(

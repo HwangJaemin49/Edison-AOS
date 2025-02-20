@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -223,13 +224,17 @@ fun EditorPickSection(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Gray300)
-                        .clickable {
-                            navHostController.navigate(
-                                NavRoute.ArtLetterDetail.createRoute(
-                                    artLetter.artLetterId
+                        .clickable(
+                            onClick = {
+                                navHostController.navigate(
+                                    NavRoute.ArtLetterDetail.createRoute(
+                                        artLetter.artLetterId
+                                    )
                                 )
-                            )
-                        },
+                            },
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     AsyncImage(
@@ -246,7 +251,7 @@ fun EditorPickSection(
                             .padding(horizontal = 16.dp)
                             .align(Alignment.BottomStart)
                             .padding(bottom = 32.dp),
-                    ){
+                    ) {
                         Text(
                             text = "${lines[0]},",
                             style = MaterialTheme.typography.headlineLarge,

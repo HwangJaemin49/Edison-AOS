@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -474,7 +475,11 @@ fun SearchChip(text: String, onDelete: () -> Unit, onSearch: () -> Unit) {
         modifier = Modifier
             .background(Gray300, shape = RoundedCornerShape(10.dp))
             .padding(horizontal = 14.dp, vertical = 8.dp)
-            .clickable { onSearch() },
+            .clickable(
+                onClick = { onSearch() },
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {

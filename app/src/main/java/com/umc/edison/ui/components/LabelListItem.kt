@@ -59,7 +59,11 @@ fun LabelListItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
-            .clickable(onClick = onClick),
+            .clickable(
+                onClick = onClick,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
