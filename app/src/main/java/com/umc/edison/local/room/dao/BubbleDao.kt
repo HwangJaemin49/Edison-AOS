@@ -1,12 +1,18 @@
 package com.umc.edison.local.room.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.umc.edison.local.model.BubbleLocal
 import com.umc.edison.local.room.RoomConstant
 
 @Dao
 interface BubbleDao : BaseDao<BubbleLocal> {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun sync(bubbleLocal: BubbleLocal)
+
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_deleted = 0 AND is_trashed = 0")
     suspend fun getAllBubbles(): List<BubbleLocal>
 
@@ -14,7 +20,7 @@ interface BubbleDao : BaseDao<BubbleLocal> {
     suspend fun getStorageBubbles(sevenDaysAgo: Long): List<BubbleLocal>
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id = :bubbleId")
-    suspend fun getBubbleById(bubbleId: Int): BubbleLocal
+    suspend fun getBubbleById(bubbleId: Int): BubbleLocal?
 
     @Query("""
         SELECT DISTINCT b.* FROM ${RoomConstant.Table.BUBBLE} b

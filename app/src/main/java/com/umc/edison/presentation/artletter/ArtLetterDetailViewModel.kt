@@ -5,6 +5,7 @@ import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
 import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.LikeArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
+import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ class ArtLetterDetailViewModel @Inject constructor(
     private val likeArtLetterUseCase: LikeArtLetterUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
     private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
+    private val getLogInStateUseCase: GetLogInStateUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -28,6 +30,19 @@ class ArtLetterDetailViewModel @Inject constructor(
         val id = savedStateHandle.get<Int>("id") ?: throw IllegalArgumentException("id is required")
         fetchArtLetterDetail(id)
         fetchRandomArtLetters()
+        getLoginState()
+    }
+
+    private fun getLoginState() {
+        collectDataResource(
+            flow = getLogInStateUseCase(),
+            onSuccess = { isLoggedIn ->
+                _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            }
+        )
     }
 
     private fun fetchArtLetterDetail(id: Int) {
@@ -58,6 +73,11 @@ class ArtLetterDetailViewModel @Inject constructor(
     }
 
     fun likeArtLetter() {
+        if (!_uiState.value.isLoggedIn) {
+            _uiState.update { it.copy(showLoginModal = true) }
+            return
+        }
+
         val artLetter = _uiState.value.artLetter
 
         collectDataResource(
@@ -77,6 +97,11 @@ class ArtLetterDetailViewModel @Inject constructor(
     }
 
     fun scrapArtLetter() {
+        if (!_uiState.value.isLoggedIn) {
+            _uiState.update { it.copy(showLoginModal = true) }
+            return
+        }
+
         val artLetter = _uiState.value.artLetter
 
         collectDataResource(
@@ -93,6 +118,11 @@ class ArtLetterDetailViewModel @Inject constructor(
     }
 
     fun scrapArtLetter(id: Int) {
+        if (!_uiState.value.isLoggedIn) {
+            _uiState.update { it.copy(showLoginModal = true) }
+            return
+        }
+
         if (id == _uiState.value.artLetter.artLetterId) {
             scrapArtLetter()
         } else {
@@ -118,6 +148,10 @@ class ArtLetterDetailViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun updateShowLoginModal(show: Boolean) {
+        _uiState.update { it.copy(showLoginModal = show) }
     }
 
     override fun clearToastMessage() {

@@ -61,7 +61,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getBubble(bubbleId: Int): BubbleEntity {
-        val bubble = bubbleDao.getBubbleById(bubbleId).toData()
+        val bubble = bubbleDao.getBubbleById(bubbleId)?.toData() ?: return BubbleEntity(0)
 
         bubble.labels = labelDao.getAllLabelsByBubbleId(bubbleId).map { it.toData() }
         bubble.linkedBubble = linkedBubbleDao.getLinkedBubbleByBubbleId(bubbleId)?.toData()
@@ -101,6 +101,18 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         return getBubble(bubble.id)
     }
 
+    override suspend fun syncBubbles(bubbles: List<BubbleEntity>) {
+        bubbles.map { bubble ->
+            bubbleDao.sync(bubble.toLocal())
+
+            addBubbleLabel(bubble)
+        }
+
+        bubbles.map { bubble ->
+            addLinkedBubble(bubble)
+        }
+    }
+
     override suspend fun addBubbles(bubbles: List<BubbleEntity>) {
         bubbles.map { bubble ->
             addBubble(bubble)
@@ -118,7 +130,9 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getUnSyncedBubbles(): List<BubbleEntity> {
-        return getUnSyncedDatas(tableName).map { it.toData() }
+        val localBubbles = getUnSyncedDatas(tableName)
+
+        return convertLocalBubblesToBubbles(localBubbles)
     }
 
     override suspend fun markAsSynced(bubble: BubbleEntity) {
@@ -171,13 +185,14 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    private suspend fun addLinkedBubble(bubble: BubbleEntity) {
+    override suspend fun addLinkedBubble(bubble: BubbleEntity) {
         bubble.linkedBubble?.let { linkedBubble ->
             val id = linkedBubbleDao.getLinkedBubbleId(bubble.id, linkedBubble.id, false)
             if (id == null) linkedBubbleDao.insert(bubble.id, linkedBubble.id, false)
         }
 
         bubble.backLinks.map { backLink ->
+            bubbleDao.getBubbleById(backLink.id) ?: return@map
             val id = linkedBubbleDao.getLinkedBubbleId(bubble.id, backLink.id, true)
             if (id == null) linkedBubbleDao.insert(bubble.id, backLink.id, true)
         }

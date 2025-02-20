@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -94,9 +96,10 @@ fun LabelTabScreen(
 
         Column(
             modifier = Modifier
-                .padding(start = 24.dp, top = 42.dp)
                 .fillMaxWidth()
                 .wrapContentHeight()
+                .verticalScroll(rememberScrollState())
+                .padding(start = 24.dp, top = 42.dp)
         ) {
             AddLabelButton(
                 onClick = {

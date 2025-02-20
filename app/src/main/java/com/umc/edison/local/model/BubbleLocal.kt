@@ -39,4 +39,10 @@ fun BubbleEntity.toLocal(): BubbleLocal = BubbleLocal(
     title = title,
     content = content,
     mainImage = mainImage,
+    isSynced = isSynced,
+    isTrashed = isTrashed,
+    isDeleted = isDeleted,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    deletedAt = deletedAt,
 )

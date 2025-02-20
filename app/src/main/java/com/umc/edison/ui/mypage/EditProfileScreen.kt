@@ -92,15 +92,19 @@ private fun EditProfileImage(
             .width(120.dp)
             .height(125.dp)
     ) {
-        AsyncImage(
-            model = user.profileImage ?: R.drawable.ic_profile_default_small,
-            contentDescription = "Profile Image",
+        Box(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .background(Gray300),
-            contentScale = ContentScale.Crop
-        )
+                .background(Gray200)
+        ) {
+            AsyncImage(
+                model = user.profileImage ?: R.drawable.ic_profile_default_small,
+                contentDescription = "Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
 
         Box(
             modifier = Modifier

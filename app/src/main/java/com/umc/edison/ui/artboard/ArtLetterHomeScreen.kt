@@ -57,6 +57,7 @@ import com.umc.edison.presentation.model.ArtLetterPreviewModel
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.components.ArtLetterCard
 import com.umc.edison.ui.components.GridLayout
+import com.umc.edison.ui.components.PopUpDecision
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
@@ -92,7 +93,37 @@ fun ArtLetterHomeScreen(
             verticalArrangement = Arrangement.spacedBy(48.dp)
         ) {
             EditorPickSection(uiState, navHostController)
-            ArtBoardSection(viewModel, uiState, navHostController)
+            ArtBoardSection(
+                viewModel = viewModel,
+                uiState = uiState,
+                navHostController = navHostController,
+            )
+        }
+
+        if (uiState.showLoginModal) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF3A3D40).copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                PopUpDecision(
+                    question = "로그인이 필요한 기능입니다",
+                    positiveButtonText = "로그인",
+                    negativeButtonText = "취소",
+                    onPositiveClick = {
+                        navHostController.navigate(NavRoute.Login.route) {
+                            popUpTo(NavRoute.Login.route) {
+                                inclusive = true
+                            }
+                        }
+                        viewModel.updateShowLoginModal(false)
+                    },
+                    onNegativeClick = {
+                        viewModel.updateShowLoginModal(false)
+                    }
+                )
+            }
         }
     }
 }

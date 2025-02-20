@@ -35,6 +35,7 @@ fun LabelEntity.toLocal(): LabelLocal = LabelLocal(
     id = id,
     name = name,
     color = color.toArgb(),
+    isSynced = isSynced,
     isDeleted = isDeleted,
     createdAt = createdAt,
     updatedAt = updatedAt,

@@ -67,13 +67,12 @@ fun BubbleStorageScreen(
 
     BackHandler(enabled = true) {
         if (uiState.mode == BubbleStorageMode.NONE) {
-            navHostController.popBackStack()
+            (context as? Activity)?.finish()
         } else {
             viewModel.updateEditMode(BubbleStorageMode.NONE)
             updateViewMode(false)
             updateShowBottomNav(true)
         }
-        (context as? Activity)?.finish()
     }
 
     BaseContent(

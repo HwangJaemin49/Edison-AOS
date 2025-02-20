@@ -8,18 +8,21 @@ import com.umc.edison.remote.model.RemoteMapper
 import com.umc.edison.remote.model.parseIso8601ToDate
 
 data class GetAllBubblesResponse(
-    @SerializedName("bubbleId") val bubbleId: Int,
+    @SerializedName("localIdx") val bubbleId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
     @SerializedName("mainImageUrl") val mainImageUrl: String,
     @SerializedName("labels") val labels: List<LabelResponse>,
-    @SerializedName("linkedBubbleId") val linkedBubbleId: Int?,
+    @SerializedName("backlinkIdxs") val backLinks: List<Int>,
+    @SerializedName("isDeleted") val isDeleted: Boolean?,
+    @SerializedName("isTrashed") val isTrashed: Boolean,
     @SerializedName("createdAt") val createdAt: String,
-    @SerializedName("updatedAt") val updatedAt: String
+    @SerializedName("updatedAt") val updatedAt: String,
+    @SerializedName("deletedAt") val deletedAt: String?
 ) : RemoteMapper<BubbleEntity> {
 
     data class LabelResponse(
-        @SerializedName("labelId") val labelId: Int,
+        @SerializedName("localIdx") val labelId: Int,
         @SerializedName("name") val name: String,
         @SerializedName("color") val color: Int
     ) : RemoteMapper<LabelEntity> {
@@ -37,7 +40,12 @@ data class GetAllBubblesResponse(
         content = content,
         mainImage = mainImageUrl,
         labels = labels.map { it.toData() },
+        backLinks = backLinks.map { BubbleEntity(it) },
+        isDeleted = isDeleted ?: false,
+        isTrashed = isTrashed,
         createdAt = parseIso8601ToDate(createdAt),
         updatedAt = parseIso8601ToDate(updatedAt),
+        deletedAt = deletedAt?.let { parseIso8601ToDate(it) },
+        isSynced = true
     )
 }

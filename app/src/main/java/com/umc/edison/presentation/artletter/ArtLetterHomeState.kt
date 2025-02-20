@@ -10,6 +10,7 @@ data class ArtLetterHomeState(
     val isLoggedIn: Boolean = false,
     val artLetters: List<ArtLetterPreviewModel>,
     val editorsPick: List<ArtLetterPreviewModel>,
+    val showLoginModal: Boolean = false,
 ) : BaseState {
     companion object {
         val DEFAULT = ArtLetterHomeState(

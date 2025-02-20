@@ -13,6 +13,7 @@ import com.umc.edison.R
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.usecase.login.GoogleLoginUseCase
 import com.umc.edison.domain.usecase.sync.GetServerDataUseCase
+import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.model.UserModel
 import com.umc.edison.presentation.model.toPresentation
 import kotlinx.coroutines.MainScope
@@ -23,6 +24,7 @@ import javax.inject.Singleton
 @Singleton
 class GoogleLoginHelper @Inject constructor(
     private val googleLoginUseCase: GoogleLoginUseCase,
+    private val syncDataUseCase: SyncDataUseCase,
     private val getServerDataUseCase: GetServerDataUseCase,
 ) {
     private val coroutineScope = MainScope()
@@ -118,7 +120,18 @@ class GoogleLoginHelper @Inject constructor(
                         Log.d("Google SignIn", "서버 로그인 성공: ${result.data}")
                         onLoading(false)
                         onSuccess(result.data.toPresentation())
-                        getServerDataUseCase()
+
+                        try {
+                            syncDataUseCase()
+                        } catch (e: Throwable) {
+                            Log.e("Init sync local to server data", "Failed to sync data", e)
+                        }
+
+                        try {
+                            getServerDataUseCase()
+                        } catch (e: Throwable) {
+                            Log.e("Init sync server to local data", "Failed to sync data", e)
+                        }
                     }
 
                     is DataResource.Error -> {
