@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.artletter
 
 
+import com.umc.edison.domain.usecase.artletter.GetArtLetterCategoryUseCase
 import com.umc.edison.domain.usecase.artletter.GetArtLetterKeyWordUseCase
 import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.GetRecentSearchesUseCase
@@ -23,17 +24,17 @@ class ArtLetterSearchViewModel @Inject constructor(
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
     private val getArtLetterKeyWordUseCase: GetArtLetterKeyWordUseCase,
     private val removeRecentSearchUseCase: RemoveRecentSearchUseCase,
-    private val getRecentSearchesUseCase: GetRecentSearchesUseCase
+    private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
+    private val getArtLetterCategoryUseCase: GetArtLetterCategoryUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ArtLetterSearchState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-    private val _keywords = MutableStateFlow(ArtLetterKeyWordState.DEFAULT)
-    val keywords = _keywords.asStateFlow()
-
     init {
         fetchRecommendedArtLetters()
         getRecentSearches()
+        getKeyWords()
+        getCetegories()
     }
 
     fun searchArtLetters() {
@@ -48,7 +49,13 @@ class ArtLetterSearchViewModel @Inject constructor(
         collectDataResource(
             flow = getSearchArtLettersUseCase(_uiState.value.query),
             onSuccess = { artletters ->
-                _uiState.update { it.copy(artLetters = artletters.toPresentation()) }
+                _uiState.update {
+                    it.copy(
+                        artLetters = artletters.toPresentation(),
+                        lastQuery = it.query,
+                        isSearchActivated = true
+                    )
+                }
             },
             onError = { error ->
                 _uiState.update { it.copy(error = error) }
@@ -136,6 +143,11 @@ class ArtLetterSearchViewModel @Inject constructor(
     }
 
     fun postArtLetterScrap(id: Int) {
+        if (!_uiState.value.isLoggedIn) {
+            _uiState.update { it.copy(showLoginModal = true) }
+            return
+        }
+
         collectDataResource(
             flow = scrapArtLetterUseCase(id),
             onSuccess = {
@@ -163,27 +175,48 @@ class ArtLetterSearchViewModel @Inject constructor(
         )
     }
 
-    fun updateIsSearchActivated(isSearchActivated: Boolean) {
-        _uiState.update {
-            it.copy(isSearchActivated = isSearchActivated)
-        }
-    }
-
-    fun getKeyWords(artletterIds: List<Int>) {
+    fun getKeyWords() {
         collectDataResource(
-            flow = getArtLetterKeyWordUseCase(artletterIds),
-            onSuccess = { keywords -> _keywords.update { it.copy(keywords = keywords.toPresentation()) }
+            flow = getArtLetterKeyWordUseCase(),
+            onSuccess = { keywords ->
+                _uiState.update { it.copy(keywords = keywords.toPresentation()) }
             },
             onError = { error ->
-                _keywords.update { it.copy(error = error) }
+                _uiState.update { it.copy(error = error) }
             },
             onLoading = {
-                _keywords.update { it.copy(isLoading = true) }
+                _uiState.update { it.copy(isLoading = true) }
             },
             onComplete = {
-                _keywords.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(isLoading = false) }
             }
         )
+    }
+
+    fun getCetegories() {
+        collectDataResource(
+            flow = getArtLetterCategoryUseCase(),
+            onSuccess = { categories ->
+                _uiState.update {
+                    it.copy(
+                        categories = categories
+                    )
+                }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun updateShowLoginModal(show: Boolean) {
+        _uiState.update { it.copy(showLoginModal = show) }
     }
 
     override fun clearToastMessage() {

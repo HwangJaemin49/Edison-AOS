@@ -1,11 +1,13 @@
 package com.umc.edison.remote.datasources
 
+import androidx.compose.runtime.key
 import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.data.model.ArtLetterKeyWordEntity
 import com.umc.edison.data.model.ArtLetterPreviewEntity
 import com.umc.edison.remote.api.ArtLetterApiService
 import com.umc.edison.remote.model.artletter.GetEditorPickRequest
+import com.umc.edison.remote.model.artletter.RemoveRecentSearchRequest
 import com.umc.edison.remote.model.artletter.toData
 import javax.inject.Inject
 
@@ -71,12 +73,18 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getSearchArtLetters(keyword: String,sortType: String): List<ArtLetterPreviewEntity> {
         val response = artLetterApiService.getSearchArtLetters(keyword, sortType).data
+
         return response.map { it.toData() }
     }
 
-    override suspend fun getArtLetterKeyWord(artletterIds: List<Int>): List<ArtLetterKeyWordEntity> {
+    override suspend fun getArtLetterKeyWord(): List<ArtLetterKeyWordEntity> {
+        val artletterIds = listOf(5, 6, 7)
         val response = artLetterApiService.getRecommendedKeywords(artletterIds).data
         return response.map { it.toData() }
+    }
+
+    override suspend fun getArtLetterCategory(): List<String> {
+        return artLetterApiService.getRecommendedCategories().data.categories
     }
 
     override suspend fun removeRecentSearch(keyword: String) {
@@ -84,6 +92,6 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getRecentSearches(): List<String> {
-        return artLetterApiService.getRecentSearches().data
+        return artLetterApiService.getRecentSearches().data.keywords
     }
 }
