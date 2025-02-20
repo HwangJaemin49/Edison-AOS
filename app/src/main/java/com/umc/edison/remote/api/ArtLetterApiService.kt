@@ -43,4 +43,6 @@ interface ArtLetterApiService {
     @GET("/artletters/search")
     suspend fun getSearchArtLetters(@Query("keyword") keyword: String, @Query("sortType") sortType: String): ResponseWithPagination<GetSearchArtLettersResponse>
 
+    suspend fun removeRecentSearch(id: Int)
+
 }

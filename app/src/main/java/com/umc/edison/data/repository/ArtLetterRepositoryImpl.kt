@@ -58,4 +58,9 @@ class ArtLetterRepositoryImpl @Inject constructor(
         flowDataResource (
             dataAction = { artLetterRemoteDataSource.getArtLetterKeyWord(artletterIds) }
         )
+
+    override fun removeRecentSearch(id: Int): Flow<DataResource<Unit>> =
+        flowDataResource(
+            dataAction = { artLetterRemoteDataSource.removeRecentSearch(id) }
+        )
 }

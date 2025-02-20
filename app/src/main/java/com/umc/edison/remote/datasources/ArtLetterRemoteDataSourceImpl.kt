@@ -78,4 +78,8 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         val response = artLetterApiService.getRecommendedKeywords(artletterIds).data
         return response.map { it.toData() }
     }
+
+    override suspend fun removeRecentSearch(id: Int) {
+        artLetterApiService.removeRecentSearch(id)
+    }
 }
