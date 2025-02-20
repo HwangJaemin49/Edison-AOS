@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Edison</string>
-    <string name="my_edison">마이 에디슨</string>
+    <string name="my_edison">나의 에디슨</string>
     <string name="space">스페이스</string>
     <string name="bubble">버블</string>
-    <string name="artletter">아트레터</string>
+    <string name="artboard">아트보드</string>
     <string name="my">마이</string>
     <string name="google_cloud_server_client_id">574560748765-f7gcudpd69caa8otl671d7apipjqg7er.apps.googleusercontent.com</string>
     <string name="login_require_title">로그인이 필요한 페이지입니다</string>

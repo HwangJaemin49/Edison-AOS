@@ -54,7 +54,7 @@ sealed class BottomNavItem(
     )
 
     data object ArtLetter : BottomNavItem(
-        title = R.string.artletter,
+        title = R.string.artboard,
         icon = R.drawable.ic_art_letter,
         selectedIcon = R.drawable.ic_art_letter_selected,
         route = NavRoute.ArtLetter.route
