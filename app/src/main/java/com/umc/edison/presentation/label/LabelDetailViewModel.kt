@@ -5,6 +5,7 @@ import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
+import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.LabelDetailMode
 import com.umc.edison.presentation.model.LabelModel
@@ -22,6 +23,7 @@ class LabelDetailViewModel @Inject constructor(
     private val moveBubblesUseCase: MoveBubblesUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
+    override val syncDataUseCase: SyncDataUseCase,
 ) : BaseBubbleViewModel<LabelDetailMode, LabelDetailState>() {
     override val _uiState = MutableStateFlow(LabelDetailState.DEFAULT)
     override val uiState = _uiState.asStateFlow()

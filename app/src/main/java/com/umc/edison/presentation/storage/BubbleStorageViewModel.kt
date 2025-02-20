@@ -2,6 +2,7 @@ package com.umc.edison.presentation.storage
 
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
+import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.BubbleStorageMode
 import com.umc.edison.presentation.model.toPresentation
@@ -15,6 +16,7 @@ import javax.inject.Inject
 class BubbleStorageViewModel @Inject constructor(
     private val getStorageBubbleUseCase: GetStorageBubbleUseCase,
     override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
+    override val syncDataUseCase: SyncDataUseCase,
 ) : BaseBubbleViewModel<BubbleStorageMode, BubbleStorageState>() {
 
     override val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)

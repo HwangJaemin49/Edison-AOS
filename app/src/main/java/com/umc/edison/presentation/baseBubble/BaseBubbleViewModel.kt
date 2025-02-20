@@ -1,11 +1,14 @@
 package com.umc.edison.presentation.baseBubble
 
+import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
+import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> : BaseViewModel() {
 
@@ -13,6 +16,7 @@ abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> :
     open val uiState get() = _uiState.asStateFlow()
 
     abstract val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase
+    abstract val syncDataUseCase: SyncDataUseCase
 
     fun updateEditMode(mode: BaseBubbleMode) {
         if (mode == BaseBubbleMode.NONE) {
@@ -63,8 +67,19 @@ abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> :
             },
             onComplete = {
                 _uiState.update { it.copyState(isLoading = false) as S }
+                syncData()
             }
         )
+    }
+
+    private fun syncData() {
+        viewModelScope.launch {
+            try {
+                syncDataUseCase()
+            } catch (e: Throwable) {
+                _uiState.update { it.copyState(error = e) as S }
+            }
+        }
     }
 
     protected abstract fun refreshDataAfterDeletion()
