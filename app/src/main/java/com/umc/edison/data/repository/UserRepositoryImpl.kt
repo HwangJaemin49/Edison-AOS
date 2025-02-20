@@ -1,6 +1,8 @@
 package com.umc.edison.data.repository
 
 import com.umc.edison.data.bound.flowDataResource
+import com.umc.edison.data.datasources.BubbleLocalDataSource
+import com.umc.edison.data.datasources.LabelLocalDataSource
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.IdentityCategoryMapper
 import com.umc.edison.data.model.InterestCategoryMapper
@@ -18,7 +20,9 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val userRemoteDataSource: UserRemoteDataSource,
+    private val bubbleLocalDataSource: BubbleLocalDataSource,
+    private val labelLocalDataSource: LabelLocalDataSource,
 ) : UserRepository {
 
     override fun getLogInState(): Flow<DataResource<Boolean>> = flowDataResource(
@@ -116,7 +120,11 @@ class UserRepositoryImpl @Inject constructor(
     )
 
     override fun deleteAccount(): Flow<DataResource<Unit>> = flowDataResource(
-        dataAction = { userRemoteDataSource.deleteAccount() }
+        dataAction = {
+            userRemoteDataSource.deleteAccount()
+            bubbleLocalDataSource.deleteAllBubbles()
+            labelLocalDataSource.deleteAllLabels()
+        }
     )
 
     override fun getMyIdentityResult(identityCategory: IdentityCategory): Flow<DataResource<Identity>> =

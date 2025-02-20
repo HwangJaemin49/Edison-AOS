@@ -197,4 +197,8 @@ class BubbleLocalDataSourceImpl @Inject constructor(
             if (id == null) linkedBubbleDao.insert(bubble.id, backLink.id, true)
         }
     }
+
+    override suspend fun deleteAllBubbles() {
+        bubbleDao.deleteAllBubbles()
+    }
 }

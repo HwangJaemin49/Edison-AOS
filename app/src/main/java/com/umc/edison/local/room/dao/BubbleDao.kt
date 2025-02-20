@@ -43,4 +43,7 @@ interface BubbleDao : BaseDao<BubbleLocal> {
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_trashed = 1 AND is_deleted = 0")
     suspend fun getTrashedBubbles(): List<BubbleLocal>
+
+    @Query("DELETE FROM ${RoomConstant.Table.BUBBLE}")
+    suspend fun deleteAllBubbles()
 }
