@@ -6,9 +6,9 @@ import com.umc.edison.remote.model.toIso8601String
 
 data class SyncBubbleRequest(
     @SerializedName("localIdx") val bubbleId: Int,
-    @SerializedName("title") val title: String,
-    @SerializedName("content") val content: String,
-    @SerializedName("mainImageUrl") val mainImageUrl: String,
+    @SerializedName("title") val title: String?,
+    @SerializedName("content") val content: String?,
+    @SerializedName("mainImageUrl") val mainImageUrl: String?,
     @SerializedName("backlinkIds") val backlinkIds: List<Int>,
     @SerializedName("labelIdxs") val labelIds: List<Int>,
     @SerializedName("isDeleted") val isDeleted: Boolean,
@@ -20,10 +20,10 @@ data class SyncBubbleRequest(
 
 fun BubbleEntity.toSyncBubbleRequest(): SyncBubbleRequest = SyncBubbleRequest(
     bubbleId = id,
-    title = title ?: "",
-    content = content ?: "",
-    mainImageUrl = mainImage ?: "",
-    backlinkIds = backLinks.map { it.id },
+    title = title,
+    content = content,
+    mainImageUrl = mainImage,
+    backlinkIds = if (linkedBubble != null) backLinks.map { it.id } + linkedBubble!!.id else backLinks.map { it.id },
     labelIds = labels.map { it.id },
     isDeleted = isDeleted,
     isTrashed = isTrashed,

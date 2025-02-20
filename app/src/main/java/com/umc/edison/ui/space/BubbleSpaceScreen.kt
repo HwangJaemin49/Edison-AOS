@@ -99,9 +99,8 @@ fun BubbleSpaceScreen(
                 pagerState.animateScrollToPage(0)
             }
         } else {
-            navHostController.popBackStack()
+            navHostController.navigate(NavRoute.MyEdison.route)
         }
-        navHostController.navigate(NavRoute.MyEdison.route)
     }
 
 

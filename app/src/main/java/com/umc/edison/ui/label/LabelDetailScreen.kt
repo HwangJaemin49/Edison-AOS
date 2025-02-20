@@ -43,7 +43,9 @@ fun LabelDetailScreen(
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
-        viewModel.fetchLabelDetail(uiState.label.id)
+        if (uiState.label.id != -1) {
+            viewModel.fetchLabelDetail(uiState.label.id)
+        }
     }
 
     BackHandler(enabled = true) {

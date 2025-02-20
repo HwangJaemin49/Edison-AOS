@@ -5,6 +5,7 @@ import com.umc.edison.presentation.baseBubble.BaseBubbleState
 import com.umc.edison.presentation.baseBubble.LabelDetailMode
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
+import com.umc.edison.ui.theme.Gray300
 
 data class LabelDetailState(
     val label: LabelModel,
@@ -17,7 +18,12 @@ data class LabelDetailState(
 ) : BaseBubbleState<LabelDetailMode>(selectedBubbles, mode, isLoading, error, toastMessage) {
     companion object {
         val DEFAULT = LabelDetailState(
-            label = LabelModel.DEFAULT,
+            label = LabelModel(
+                id = -1,
+                name = "",
+                color = Gray300,
+                bubbles = emptyList()
+            ),
             movableLabels = emptyList(),
             selectedBubbles = emptyList(),
             mode = LabelDetailMode.NONE,

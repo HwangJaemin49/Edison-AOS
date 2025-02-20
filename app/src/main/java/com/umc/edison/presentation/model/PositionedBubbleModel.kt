@@ -10,7 +10,7 @@ data class PositionedBubbleModel(
 )
 
 fun ClusteredBubblePosition.toPresentation(): PositionedBubbleModel {
-    val scale = 700f
+    val scale = 400f
 
     return PositionedBubbleModel(
         bubble = bubble.toPresentation(),

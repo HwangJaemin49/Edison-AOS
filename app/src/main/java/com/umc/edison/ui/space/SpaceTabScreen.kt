@@ -42,8 +42,8 @@ import com.umc.edison.presentation.space.BubbleGraphViewModel
 import com.umc.edison.ui.components.BubblePreview
 import com.umc.edison.ui.components.calculateBubblePreviewSize
 import com.umc.edison.ui.components.extractPlainText
-import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -145,7 +145,7 @@ fun BubbleGraphScreen(
                     val colors: List<Color> = positionedBubble.bubble.labels.map { it.color }
                     if (colors.size <= 1) {
                         drawCircle(
-                            color = colors.firstOrNull() ?: Gray100,
+                            color = colors.firstOrNull() ?: Gray500,
                             radius = radius,
                             center = positionedBubble.position
                         )

@@ -1,12 +1,17 @@
 package com.umc.edison.local.room.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.umc.edison.local.model.LabelLocal
 import com.umc.edison.local.room.RoomConstant
 
 @Dao
 interface LabelDao : BaseDao<LabelLocal> {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun sync(labelLocal: LabelLocal)
 
     @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE is_deleted = 0")
     suspend fun getAllLabels(): List<LabelLocal>

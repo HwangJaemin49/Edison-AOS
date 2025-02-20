@@ -1,7 +1,9 @@
 package com.umc.edison.presentation.storage
 
+import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
+import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.BubbleStorageMode
 import com.umc.edison.presentation.model.toPresentation
@@ -9,16 +11,32 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class BubbleStorageViewModel @Inject constructor(
     private val getStorageBubbleUseCase: GetStorageBubbleUseCase,
+    private val syncDataUseCase: SyncDataUseCase,
     override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
 ) : BaseBubbleViewModel<BubbleStorageMode, BubbleStorageState>() {
 
     override val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
     override val uiState = _uiState.asStateFlow()
+
+    init {
+        syncData()
+    }
+
+    private fun syncData() {
+        viewModelScope.launch {
+            try {
+                syncDataUseCase()
+            } catch (e: Throwable) {
+                _uiState.update { it.copy(error = e) }
+            }
+        }
+    }
 
     fun fetchStorageBubbles() {
         _uiState.update { BubbleStorageState.DEFAULT }
