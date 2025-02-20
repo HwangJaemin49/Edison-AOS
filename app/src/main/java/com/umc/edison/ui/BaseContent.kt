@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.ui.theme.White000
 
@@ -16,13 +17,14 @@ fun BaseContent(
     uiState: BaseState,
     clearToastMessage: () -> Unit,
     modifier: Modifier = Modifier,
+    containerColor: Color = White000,
     topBar: (@Composable () -> Unit)? = null,
     bottomBar: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Column(
         modifier = modifier
-            .background(White000)
+            .background(containerColor)
     ) {
         if (topBar != null) {
             Box(

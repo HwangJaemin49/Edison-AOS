@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.artletter
 
 
+import com.umc.edison.domain.usecase.artletter.GetArtLetterKeyWordUseCase
 import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.GetSearchArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
@@ -18,33 +19,42 @@ class ArtLetterSearchViewModel @Inject constructor(
     private val getSearchArtLettersUseCase: GetSearchArtLettersUseCase,
     private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
+    private val getArtLetterKeyWordUseCase: GetArtLetterKeyWordUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ArtLetterSearchState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-    private val _searchHistory = MutableStateFlow<List<String>>(emptyList())
-    val searchHistory = _searchHistory.asStateFlow()
-
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-
-    private val _lastSearchedQuery = MutableStateFlow("")
-    val lastSearchedQuery = _lastSearchedQuery.asStateFlow()
+    private val _keywords = MutableStateFlow(ArtLetterKeyWordState.DEFAULT)
+    val keywords = _keywords.asStateFlow()
 
     init {
         fetchRecommendedArtLetters()
     }
 
-    fun searchArtLetters(keyword: String, sortBy: String) {
-
-        if (keyword.isNotBlank()) {
-            _searchQuery.value = keyword
-            _lastSearchedQuery.value = keyword
-            addSearchHistory(keyword)
+    fun searchArtLetters() {
+        if (_uiState.value.query.isEmpty()) {
+            return
         }
-
         collectDataResource(
-            flow = getSearchArtLettersUseCase(keyword, sortBy),
+            flow = getSearchArtLettersUseCase(_uiState.value.query),
+            onSuccess = { artletters ->
+                _uiState.update { it.copy(artLetters = artletters.toPresentation()) }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _uiState.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun getSortedArtLetters(sortType: String) {
+        collectDataResource(
+            flow = getSearchArtLettersUseCase(_uiState.value.query, sortType),
             onSuccess = { artletters ->
                 _uiState.update { it.copy(artLetters = artletters.toPresentation()) }
             },
@@ -61,21 +71,14 @@ class ArtLetterSearchViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
-    }
-
-    private fun addSearchHistory(keyword: String) {
-        _searchHistory.update { currentList ->
-            val newList = listOf(keyword) + currentList
-            newList.take(5) // 최근 검색어 최대 5개 유지
+        _uiState.update {
+            it.copy(query = query)
         }
     }
 
-    fun removeSearchHistory(keyword: String) {
-        _searchHistory.update { currentList ->
-            currentList.filter { it != keyword }
-        }
-    }
+//    fun removeSearchHistory(id: Int) {
+//        _
+//    }
 
     private fun fetchRecommendedArtLetters() {
         collectDataResource(
@@ -113,6 +116,29 @@ class ArtLetterSearchViewModel @Inject constructor(
             },
             onComplete = {
                 _uiState.update { it.copy(isLoading = false) }
+            }
+        )
+    }
+
+    fun updateIsSearchActivated(isSearchActivated: Boolean) {
+        _uiState.update {
+            it.copy(isSearchActivated = isSearchActivated)
+        }
+    }
+
+    fun getKeyWords(artletterIds: List<Int>) {
+        collectDataResource(
+            flow = getArtLetterKeyWordUseCase(artletterIds),
+            onSuccess = { keywords -> _keywords.update { it.copy(keywords = keywords.toPresentation()) }
+            },
+            onError = { error ->
+                _keywords.update { it.copy(error = error) }
+            },
+            onLoading = {
+                _keywords.update { it.copy(isLoading = true) }
+            },
+            onComplete = {
+                _keywords.update { it.copy(isLoading = false) }
             }
         )
     }

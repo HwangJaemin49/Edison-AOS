@@ -38,7 +38,7 @@ interface ArtLetterApiService {
     suspend fun getArtLetterDetail(@Path("letterId") letterId: Int): ResponseWithData<GetArtLetterDetailResponse>
 
     @GET("/artletters/recommend-bar/keyword")
-    suspend fun getRecommendedKeywords(@Query("artletterIds") artletterIds: String): ResponseWithListData<GetArtLetterKeywordResponse>
+    suspend fun getRecommendedKeywords(@Query("artletterIds") artletterIds: List<Int>): ResponseWithListData<GetArtLetterKeywordResponse>
 
     @GET("/artletters/search")
     suspend fun getSearchArtLetters(@Query("keyword") keyword: String, @Query("sortType") sortType: String): ResponseWithPagination<GetSearchArtLettersResponse>

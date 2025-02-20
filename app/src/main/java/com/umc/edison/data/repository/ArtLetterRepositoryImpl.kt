@@ -5,6 +5,7 @@ import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.ArtLetterPreview
 import com.umc.edison.domain.model.ArtLetterDetail
+import com.umc.edison.domain.model.ArtLetterKeyWord
 import com.umc.edison.domain.repository.ArtLetterRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -51,5 +52,10 @@ class ArtLetterRepositoryImpl @Inject constructor(
     override fun getSearchArtLetters(keyword: String, sortType: String): Flow<DataResource<List<ArtLetterPreview>>> =
         flowDataResource(
             dataAction = { artLetterRemoteDataSource.getSearchArtLetters(keyword, sortType)}
+        )
+
+    override fun getArtLetterKeyWord(artletterIds: List<Int>): Flow<DataResource<List<ArtLetterKeyWord>>> =
+        flowDataResource (
+            dataAction = { artLetterRemoteDataSource.getArtLetterKeyWord(artletterIds) }
         )
 }

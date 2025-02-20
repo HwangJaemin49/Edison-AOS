@@ -9,5 +9,5 @@ import javax.inject.Inject
 class GetSearchArtLettersUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
-    operator fun invoke(keyword: String, sortType: String): Flow<DataResource<List<ArtLetterPreview>>> = artLetterRepository.getSearchArtLetters(keyword, sortType)
+    operator fun invoke(keyword: String, sortType: String = "default"): Flow<DataResource<List<ArtLetterPreview>>> = artLetterRepository.getSearchArtLetters(keyword, sortType)
 }

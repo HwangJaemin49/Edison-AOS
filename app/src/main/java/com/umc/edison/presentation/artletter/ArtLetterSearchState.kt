@@ -10,6 +10,9 @@ data class ArtLetterSearchState (
     override val toastMessage: String? = null,
     val artLetters: List<ArtLetterPreviewModel>,
     val recommendedArtLetters: List<ArtLetterPreviewModel> = emptyList(),
+    val query: String = "",
+    val recentSearches: List<String> = emptyList(),
+    val isSearchActivated: Boolean = false,
 ) : BaseState {
     companion object {
         val DEFAULT = ArtLetterSearchState(
