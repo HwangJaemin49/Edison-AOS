@@ -79,7 +79,11 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         return response.map { it.toData() }
     }
 
-    override suspend fun removeRecentSearch(id: Int) {
-        artLetterApiService.removeRecentSearch(id)
+    override suspend fun removeRecentSearch(keyword: String) {
+        artLetterApiService.removeRecentSearch(keyword)
+    }
+
+    override suspend fun getRecentSearches(): List<String> {
+        return artLetterApiService.getRecentSearches().data
     }
 }

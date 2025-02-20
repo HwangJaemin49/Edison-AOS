@@ -26,5 +26,7 @@ interface ArtLetterRepository {
 
     fun getArtLetterKeyWord(artletterIds: List<Int>): Flow<DataResource<List<ArtLetterKeyWord>>>
 
-    fun removeRecentSearch(id: Int): Flow<DataResource<Unit>>
+    fun removeRecentSearch(keyword: String): Flow<DataResource<Unit>>
+
+    fun getRecentSearches(): Flow<DataResource<List<String>>>
 }

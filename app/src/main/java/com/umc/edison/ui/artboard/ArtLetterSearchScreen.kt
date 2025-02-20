@@ -1,6 +1,6 @@
 package com.umc.edison.ui.artboard
 
-import android.util.Log
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +9,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -105,22 +104,20 @@ fun ArtLetterSearchScreen(
                 )
             }
 
-            if (uiState.query.isNotEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .horizontalScroll(rememberScrollState()) // 가로 스크롤 가능
-                ) {
-                    uiState.recentSearches.forEach { history ->
-                        SearchChip(
-                            text = history,
-                            onDelete = { viewModel.removeSearchHistory(history) }, // 검색어 삭제
-                            onSearch = {
-                                viewModel.searchArtLetters(history, "default")
-                            }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .horizontalScroll(rememberScrollState()) // 가로 스크롤 가능
+            ) {
+                uiState.recentSearches.forEach { history ->
+                    SearchChip(
+                        text = history,
+                        onDelete = { viewModel.removeSearchHistory(history) }, // 검색어 삭제
+                        onSearch = {
+                            viewModel.searchArtLetters(history)
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
 

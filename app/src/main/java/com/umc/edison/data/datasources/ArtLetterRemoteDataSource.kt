@@ -1,5 +1,6 @@
 package com.umc.edison.data.datasources
 
+import com.umc.edison.data.model.ArtLetterCategoryEntity
 import com.umc.edison.data.model.ArtLetterDetailEntity
 import com.umc.edison.data.model.ArtLetterKeyWordEntity
 import com.umc.edison.data.model.ArtLetterPreviewEntity
@@ -23,5 +24,7 @@ interface ArtLetterRemoteDataSource {
 
     suspend fun getArtLetterKeyWord(artletterIds: List<Int>): List<ArtLetterKeyWordEntity>
 
-    suspend fun removeRecentSearch(id: Int)
+    suspend fun removeRecentSearch(keyword: String)
+
+    suspend fun getRecentSearches(): List<String>
 }

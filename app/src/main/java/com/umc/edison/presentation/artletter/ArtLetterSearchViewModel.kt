@@ -3,7 +3,9 @@ package com.umc.edison.presentation.artletter
 
 import com.umc.edison.domain.usecase.artletter.GetArtLetterKeyWordUseCase
 import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
+import com.umc.edison.domain.usecase.artletter.GetRecentSearchesUseCase
 import com.umc.edison.domain.usecase.artletter.GetSearchArtLettersUseCase
+import com.umc.edison.domain.usecase.artletter.RemoveRecentSearchUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
@@ -20,6 +22,8 @@ class ArtLetterSearchViewModel @Inject constructor(
     private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
     private val getArtLetterKeyWordUseCase: GetArtLetterKeyWordUseCase,
+    private val removeRecentSearchUseCase: RemoveRecentSearchUseCase,
+    private val getRecentSearchesUseCase: GetRecentSearchesUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ArtLetterSearchState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -29,12 +33,18 @@ class ArtLetterSearchViewModel @Inject constructor(
 
     init {
         fetchRecommendedArtLetters()
+        getRecentSearches()
     }
 
     fun searchArtLetters() {
         if (_uiState.value.query.isEmpty()) {
             return
         }
+
+        if (uiState.value.query.trim().isEmpty()) {
+            return
+        }
+
         collectDataResource(
             flow = getSearchArtLettersUseCase(_uiState.value.query),
             onSuccess = { artletters ->
@@ -48,8 +58,17 @@ class ArtLetterSearchViewModel @Inject constructor(
             },
             onComplete = {
                 _uiState.update { it.copy(isLoading = false) }
+                getRecentSearches()
             }
         )
+    }
+
+    fun searchArtLetters(query: String) {
+        _uiState.update {
+            it.copy(query = query)
+        }
+
+        searchArtLetters()
     }
 
     fun getSortedArtLetters(sortType: String) {
@@ -70,15 +89,39 @@ class ArtLetterSearchViewModel @Inject constructor(
         )
     }
 
+    private fun getRecentSearches() {
+        collectDataResource(
+            flow = getRecentSearchesUseCase(),
+            onSuccess = { recentSearches ->
+                _uiState.update { it.copy(recentSearches = recentSearches) }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            }
+        )
+    }
+
     fun updateSearchQuery(query: String) {
         _uiState.update {
             it.copy(query = query)
         }
     }
 
-//    fun removeSearchHistory(id: Int) {
-//        _
-//    }
+    fun removeSearchHistory(keyword: String) {
+        collectDataResource(
+            flow = removeRecentSearchUseCase(keyword),
+            onSuccess = {
+                _uiState.update {
+                    it.copy(
+                        recentSearches = it.recentSearches.filter { search -> search != keyword }
+                    )
+                }
+            },
+            onError = { error ->
+                _uiState.update { it.copy(error = error) }
+            }
+        )
+    }
 
     private fun fetchRecommendedArtLetters() {
         collectDataResource(
