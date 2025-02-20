@@ -22,4 +22,6 @@ interface ArtLetterRepository {
     fun postArtLetterLike(id: Int): Flow<DataResource<Unit>>
 
     fun getSearchArtLetters(keyword: String, sortType: String): Flow<DataResource<List<ArtLetterPreview>>>
+
+    fun removeRecentSearch(id: Int): Flow<DataResource<Unit>>
 }
