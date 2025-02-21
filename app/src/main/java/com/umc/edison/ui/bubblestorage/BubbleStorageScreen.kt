@@ -63,6 +63,7 @@ fun BubbleStorageScreen(
         updateViewMode(false)
 
         viewModel.fetchStorageBubbles()
+        viewModel.syncData()
     }
 
     BackHandler(enabled = true) {

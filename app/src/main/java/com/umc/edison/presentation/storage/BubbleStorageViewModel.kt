@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.storage
 
+import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
 import com.umc.edison.domain.usecase.sync.SyncDataUseCase
@@ -10,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,6 +59,16 @@ class BubbleStorageViewModel @Inject constructor(
                 mode = BubbleStorageMode.EDIT,
                 toastMessage = "서비스 준비 중입니다."
             )
+        }
+    }
+
+    fun syncData() {
+        viewModelScope.launch {
+            try {
+                syncDataUseCase()
+            } catch (e: Throwable) {
+                _uiState.update { it.copy(error = e) }
+            }
         }
     }
 
