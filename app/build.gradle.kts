@@ -88,7 +88,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.compose.ui.viewbinding)
-    implementation(libs.constraintlayout.compose)
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.foundation.layout.android)
