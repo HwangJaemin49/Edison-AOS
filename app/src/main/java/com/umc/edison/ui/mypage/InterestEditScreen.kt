@@ -38,8 +38,8 @@ fun InterestEditScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: InterestEditViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
@@ -54,7 +54,7 @@ fun InterestEditScreen(
     BackHandler { viewModel.updateIdentity() }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(

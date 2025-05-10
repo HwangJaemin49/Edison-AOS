@@ -21,7 +21,6 @@ class ArtLetterHomeViewModel @Inject constructor(
     private val getSortedArtLettersUseCase: GetSortedArtLettersUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
 ) : BaseViewModel() {
-
     private val _uiState = MutableStateFlow(ArtLetterHomeState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -35,9 +34,6 @@ class ArtLetterHomeViewModel @Inject constructor(
             onSuccess = { isLoggedIn ->
                 _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -47,15 +43,6 @@ class ArtLetterHomeViewModel @Inject constructor(
             onSuccess = { artLetters ->
                 _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -80,15 +67,6 @@ class ArtLetterHomeViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -98,15 +76,6 @@ class ArtLetterHomeViewModel @Inject constructor(
             onSuccess = { artLetters ->
                 _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -116,23 +85,10 @@ class ArtLetterHomeViewModel @Inject constructor(
             onSuccess = { artLetters ->
                 _uiState.update { it.copy(editorsPick = artLetters.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
     fun updateShowLoginModal(show: Boolean) {
         _uiState.update { it.copy(showLoginModal = show) }
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

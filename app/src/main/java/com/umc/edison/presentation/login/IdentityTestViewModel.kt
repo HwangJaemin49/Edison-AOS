@@ -1,6 +1,5 @@
 package com.umc.edison.presentation.login
 
-import android.util.Log
 import androidx.compose.foundation.pager.PagerState
 import androidx.navigation.NavHostController
 import com.umc.edison.domain.model.IdentityCategory
@@ -23,14 +22,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class IdentityTestViewModel @Inject constructor (
+class IdentityTestViewModel @Inject constructor(
     private val setUserInterestUseCase: SetUserInterestUseCase,
     private val setUserIdentityUseCase: SetUserIdentityUseCase,
     private val getInterestKeywordsByCategoryUseCase: GetInterestKeywordsByCategoryUseCase,
     private val getIdentityKeywordsByCategoryUseCase: GetIdentityKeywordsByCategoryUseCase
-): BaseViewModel(
-
-) {
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(IdentityTestState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -45,7 +42,6 @@ class IdentityTestViewModel @Inject constructor (
     }
 
     private fun getIdentityCategoryForTab(index: Int) {
-
         val category = when (index) {
             0 -> IdentityCategory.EXPLAIN
             1 -> IdentityCategory.FIELD
@@ -64,51 +60,28 @@ class IdentityTestViewModel @Inject constructor (
     }
 
     private fun getInterestKeyWords(interestCategory: InterestCategory) {
-
         collectDataResource(
             flow = getInterestKeywordsByCategoryUseCase(
-                interestCategory =  interestCategory
-
+                interestCategory = interestCategory
             ),
-            onSuccess = {
-                interest ->
+            onSuccess = { interest ->
                 _uiState.update {
                     it.copy(interest = interest.toPresentation())
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
-    private fun getIdentityKeyWords(identityCategory : IdentityCategory) {
-
+    private fun getIdentityKeyWords(identityCategory: IdentityCategory) {
         collectDataResource(
             flow = getIdentityKeywordsByCategoryUseCase(
                 identityCategory = identityCategory,
             ),
-            onSuccess = {
-                    identity ->
+            onSuccess = { identity ->
                 _uiState.update {
                     it.copy(identity = identity.toPresentation())
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -123,7 +96,7 @@ class IdentityTestViewModel @Inject constructor (
             }
         } else {
             if (uiState.value.identity.selectedKeywords.size >= 5) {
-                _uiState.update {
+                _baseState.update {
                     it.copy(toastMessage = "최대 5개의 키워드를 선택할 수 있습니다.")
                 }
             } else {
@@ -149,7 +122,7 @@ class IdentityTestViewModel @Inject constructor (
             }
         } else {
             if (uiState.value.interest.selectedKeywords.size >= 5) {
-                _uiState.update {
+                _baseState.update {
                     it.copy(toastMessage = "최대 5개의 키워드를 선택할 수 있습니다.")
                 }
             } else {
@@ -164,9 +137,9 @@ class IdentityTestViewModel @Inject constructor (
         }
     }
 
-    fun setInterestTestResult(navController: NavHostController){
+    fun setInterestTestResult(navController: NavHostController) {
         collectDataResource(
-            flow =setUserInterestUseCase(_uiState.value.interest.toDomain()),
+            flow = setUserInterestUseCase(_uiState.value.interest.toDomain()),
             onSuccess = {
                 _uiState.update { it.copy(interest = it.interest.copy(options = it.interest.selectedKeywords)) }
                 CoroutineScope(Dispatchers.Main).launch {
@@ -174,19 +147,15 @@ class IdentityTestViewModel @Inject constructor (
                 }
             },
             onError = { error ->
-                _uiState.update { it.copy(toastMessage = "$error",error = error) }
+                _baseState.update { it.copy(toastMessage = "$error") }
             },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
-    fun setIdentityTestResult(pagerState: PagerState,
-                              coroutineScope: CoroutineScope ){
+    fun setIdentityTestResult(
+        pagerState: PagerState,
+        coroutineScope: CoroutineScope
+    ) {
         collectDataResource(
             flow = setUserIdentityUseCase(_uiState.value.identity.toDomain()),
             onSuccess = {
@@ -199,18 +168,8 @@ class IdentityTestViewModel @Inject constructor (
 
             },
             onError = { error ->
-                _uiState.update { it.copy(toastMessage = "$error", error = error) }
+                _baseState.update { it.copy(toastMessage = "$error") }
             },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

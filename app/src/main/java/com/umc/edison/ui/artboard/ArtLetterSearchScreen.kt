@@ -74,6 +74,7 @@ fun ArtLetterSearchScreen(
     viewModel: ArtLetterSearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
     var showPopup by remember { mutableStateOf(false) }
 
     BackHandler {
@@ -85,7 +86,7 @@ fun ArtLetterSearchScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         containerColor = Color(0xFFF5F5F5)
     ) {
@@ -188,7 +189,7 @@ fun ArtLetterSearchScreen(
                                     artLetter = artLetter as ArtLetterPreviewModel,
                                     onArtLetterClick = { selectedArtLetter ->
                                         navHostController.navigate(
-                                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId.toString())
+                                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
                                         )
                                     },
                                     onBookmarkClick = { viewModel.postArtLetterScrap(it.artLetterId) }
@@ -397,7 +398,7 @@ fun KeywordSection(
                     onKeywordClick = {
                         navHostController.navigate(
                             NavRoute.ArtLetterDetail.createRoute(
-                                keywordModel.artletterId.toString()
+                                keywordModel.artLetterId
                             )
                         )
                     },
@@ -571,7 +572,7 @@ fun Recommend(
                     artLetter = artLetter,
                     onArtLetterClick = { selectedArtLetter ->
                         navHostController.navigate(
-                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId.toString())
+                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
                         )
                     },
                     onBookmarkClick = { artLetter ->

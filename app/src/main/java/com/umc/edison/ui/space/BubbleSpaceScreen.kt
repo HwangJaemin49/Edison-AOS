@@ -66,8 +66,8 @@ fun BubbleSpaceScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: BubbleSpaceViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.checkLoginState()
@@ -105,7 +105,7 @@ fun BubbleSpaceScreen(
 
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         HorizontalPager(

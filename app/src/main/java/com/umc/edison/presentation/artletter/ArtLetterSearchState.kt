@@ -1,32 +1,32 @@
 package com.umc.edison.presentation.artletter
 
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.ArtLetterKeyWordModel
 import com.umc.edison.presentation.model.ArtLetterPreviewModel
 
-data class ArtLetterSearchState (
-    override val isLoading: Boolean = false,
-    val isLoggedIn: Boolean = false,
-    override val error: Throwable? = null,
-    override val toastMessage: String? = null,
+data class ArtLetterSearchState(
+    val isLoggedIn: Boolean,
     val artLetters: List<ArtLetterPreviewModel>,
-    val recommendedArtLetters: List<ArtLetterPreviewModel> = emptyList(),
-    val query: String = "",
-    val lastQuery: String = "",
-    val recentSearches: List<String> = emptyList(),
-    val isSearchActivated: Boolean = false,
-    val categories: List<String> = emptyList(),
-    val keywords: List<ArtLetterKeyWordModel> = emptyList(),
-    val showLoginModal: Boolean = false,
-) : BaseState {
+    val recommendedArtLetters: List<ArtLetterPreviewModel>,
+    val query: String,
+    val lastQuery: String,
+    val recentSearches: List<String>,
+    val isSearchActivated: Boolean,
+    val categories: List<String>,
+    val keywords: List<ArtLetterKeyWordModel>,
+    val showLoginModal: Boolean,
+) {
     companion object {
         val DEFAULT = ArtLetterSearchState(
-            isLoading = false,
             isLoggedIn = false,
-            error = null,
-            toastMessage = null,
             artLetters = emptyList(),
             recommendedArtLetters = emptyList(),
+            query = "",
+            lastQuery = "",
+            recentSearches = emptyList(),
+            isSearchActivated = false,
+            categories = emptyList(),
+            keywords = emptyList(),
+            showLoginModal = false,
         )
     }
 }

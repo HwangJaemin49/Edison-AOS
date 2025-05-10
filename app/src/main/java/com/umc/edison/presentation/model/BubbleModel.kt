@@ -4,14 +4,14 @@ import com.umc.edison.domain.model.Bubble
 import java.util.Date
 
 data class BubbleModel(
-    val id: Int = 0,
-    val title: String? = null,
-    val contentBlocks: List<ContentBlockModel> = listOf(),
-    val mainImage: String? = null,
-    val labels: List<LabelModel> = listOf(),
-    val backLinks: List<BubbleModel> = listOf(),
-    val linkedBubble: BubbleModel? = null,
-    val date: Date = Date()
+    val id: Int,
+    val title: String?,
+    val contentBlocks: List<ContentBlockModel>,
+    val mainImage: String?,
+    val labels: List<LabelModel>,
+    val backLinks: List<BubbleModel>,
+    val linkedBubble: BubbleModel?,
+    val date: Date
 ) {
     fun toDomain(): Bubble = Bubble(
         id,
@@ -23,6 +23,19 @@ data class BubbleModel(
         linkedBubble?.toDomain(),
         date
     )
+
+    companion object {
+        val DEFAULT = BubbleModel(
+            id = 0,
+            title = null,
+            contentBlocks = emptyList(),
+            mainImage = null,
+            labels = emptyList(),
+            backLinks = emptyList(),
+            linkedBubble = null,
+            date = Date()
+        )
+    }
 }
 
 fun Bubble.toPresentation(): BubbleModel =

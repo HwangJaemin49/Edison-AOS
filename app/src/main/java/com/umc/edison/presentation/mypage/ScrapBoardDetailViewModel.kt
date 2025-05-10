@@ -31,15 +31,9 @@ class ScrapBoardDetailViewModel @Inject constructor(
             onSuccess = { artLetters ->
                 _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
             onLoading = {
-                _uiState.update { it.copy(isLoading = true, categoryName = name) }
+                _uiState.update { it.copy(categoryName = name) }
             },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -59,19 +53,6 @@ class ScrapBoardDetailViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

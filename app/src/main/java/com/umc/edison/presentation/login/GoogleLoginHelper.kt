@@ -50,7 +50,8 @@ class GoogleLoginHelper @Inject constructor(
         coroutineScope.launch {
             try {
                 onLoading(true)
-                val response: GetCredentialResponse = credentialManager.getCredential(context, request)
+                val response: GetCredentialResponse =
+                    credentialManager.getCredential(context, request)
                 handleSignIn(response, onSuccess, onFailure, onLoading)
             } catch (e: GetCredentialException) {
                 onLoading(false)
@@ -60,6 +61,7 @@ class GoogleLoginHelper @Inject constructor(
                     is androidx.credentials.exceptions.GetCredentialCancellationException -> {
                         onFailure("사용자가 로그인 창을 닫았습니다.")
                     }
+
                     else -> {
                         onFailure("알 수 없는 로그인 오류 발생")
                     }
@@ -87,7 +89,8 @@ class GoogleLoginHelper @Inject constructor(
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     try {
-                        val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                        val googleIdTokenCredential =
+                            GoogleIdTokenCredential.createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
                         Log.d("Google SignIn", "ID Token (CustomCredential): $idToken")
 

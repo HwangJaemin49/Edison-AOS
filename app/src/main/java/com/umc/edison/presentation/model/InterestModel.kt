@@ -8,7 +8,7 @@ data class InterestModel(
     val question: String,
     val questionTip: String,
     val descriptionFirst: String,
-    val descriptionSecond: String? = null,
+    val descriptionSecond: String?,
     val options: List<KeywordModel>,
     val selectedKeywords: List<KeywordModel>
 ) {
@@ -17,6 +17,18 @@ data class InterestModel(
             category = InterestCategory.entries[id],
             keywords = selectedKeywords.map { it.toDomain() },
             options = options.map { it.toDomain() }
+        )
+    }
+
+    companion object {
+        val DEFAULT = InterestModel(
+            id = 0,
+            question = InterestCategory.NONE.question,
+            questionTip = InterestCategory.NONE.questionTip,
+            descriptionFirst = InterestCategory.NONE.descriptionFirst,
+            descriptionSecond = null,
+            options = emptyList(),
+            selectedKeywords = emptyList()
         )
     }
 }

@@ -24,7 +24,6 @@ class ArtLetterDetailViewModel @Inject constructor(
     private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
     private val getLogInStateUseCase: GetLogInStateUseCase
 ) : BaseViewModel() {
-
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -46,9 +45,6 @@ class ArtLetterDetailViewModel @Inject constructor(
             onSuccess = { isLoggedIn ->
                 _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -58,11 +54,6 @@ class ArtLetterDetailViewModel @Inject constructor(
             onSuccess = { artLetterDetail ->
                 _uiState.update { it.copy(artLetter = artLetterDetail.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = { _uiState.update { it.copy(isLoading = true) } },
-            onComplete = { _uiState.update { it.copy(isLoading = false) } }
         )
     }
 
@@ -70,12 +61,10 @@ class ArtLetterDetailViewModel @Inject constructor(
         collectDataResource(
             flow = getRandomArtLettersUseCase(),
             onSuccess = { artLetters ->
-                val unique = artLetters.filter { it.artLetterId != _uiState.value.artLetter.artLetterId }
+                val unique =
+                    artLetters.filter { it.artLetterId != _uiState.value.artLetter.artLetterId }
                 _uiState.update { it.copy(relatedArtLetters = unique.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -99,7 +88,6 @@ class ArtLetterDetailViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error -> _uiState.update { it.copy(error = error) } }
         )
     }
 
@@ -120,7 +108,6 @@ class ArtLetterDetailViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error -> _uiState.update { it.copy(error = error) } }
         )
     }
 
@@ -151,7 +138,6 @@ class ArtLetterDetailViewModel @Inject constructor(
                             )
                         }
                     },
-                    onError = { error -> _uiState.update { it.copy(error = error) } }
                 )
             }
         }
@@ -159,9 +145,5 @@ class ArtLetterDetailViewModel @Inject constructor(
 
     fun updateShowLoginModal(show: Boolean) {
         _uiState.update { it.copy(showLoginModal = show) }
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

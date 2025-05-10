@@ -35,15 +35,6 @@ class MyPageViewModel @Inject constructor(
                     initMyPage()
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -60,15 +51,6 @@ class MyPageViewModel @Inject constructor(
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -80,15 +62,6 @@ class MyPageViewModel @Inject constructor(
                     state.copy(identities = identityKeywords.map { it.toPresentation() })
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -98,15 +71,6 @@ class MyPageViewModel @Inject constructor(
             onSuccess = { interestKeyword ->
                 _uiState.update { it.copy(interest = interestKeyword.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -122,19 +86,6 @@ class MyPageViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

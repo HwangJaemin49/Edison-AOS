@@ -40,6 +40,7 @@ fun LabelDetailScreen(
     viewModel: LabelDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
@@ -58,7 +59,7 @@ fun LabelDetailScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.mode == LabelDetailMode.EDIT) {
@@ -161,7 +162,7 @@ fun LabelDetailScreen(
             }
         } else if (uiState.mode == LabelDetailMode.MOVE) {
             BottomSheet(
-                uiState = uiState,
+                baseState = baseState,
                 clearToastMessage = { viewModel.clearToastMessage() },
                 onDismiss = {
                     viewModel.updateEditMode(LabelDetailMode.EDIT)
@@ -173,7 +174,10 @@ fun LabelDetailScreen(
                         viewModel.updateEditMode(LabelDetailMode.EDIT)
                     },
                     onConfirm = { labelList ->
-                        if (labelList.isNotEmpty()) viewModel.moveSelectedBubbles(labelList.first(), showBottomNav = updateShowBottomNav)
+                        if (labelList.isNotEmpty()) viewModel.moveSelectedBubbles(
+                            labelList.first(),
+                            showBottomNav = updateShowBottomNav
+                        )
                         else viewModel.updateEditMode(LabelDetailMode.EDIT)
                     },
                 )
@@ -189,7 +193,7 @@ fun LabelDetailScreen(
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
                 },
-                uiState = uiState,
+                baseState = baseState,
                 clearToastMessage = { viewModel.clearToastMessage() }
             )
         }

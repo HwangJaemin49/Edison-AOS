@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-
 @HiltViewModel
 class MyEdisonViewModel @Inject constructor(
     private val getAllBubblesUseCase: GetAllBubblesUseCase,
@@ -29,15 +28,6 @@ class MyEdisonViewModel @Inject constructor(
                     })
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -48,28 +38,18 @@ class MyEdisonViewModel @Inject constructor(
                 _uiState.update { it.copy(searchResults = bubbles.toPresentation()) }
 
                 if (bubbles.isEmpty()) {
-                    _uiState.update {
+                    _baseState.update {
                         it.copy(toastMessage = "검색 결과를 찾을 수 없습니다.")
                     }
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
             onLoading = {
-                _uiState.update { it.copy(isLoading = true, query = query) }
+                _uiState.update { it.copy(query = query) }
             },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
     fun resetSearchResults() {
         _uiState.update { it.copy(searchResults = emptyList(), query = "") }
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

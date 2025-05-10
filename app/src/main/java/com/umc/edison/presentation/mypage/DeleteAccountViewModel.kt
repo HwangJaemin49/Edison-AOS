@@ -16,42 +16,20 @@ class DeleteAccountViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun toggleAgree() {
-        _uiState.update {
-            it.copy(isAgree = !it.isAgree)
-        }
+        _uiState.update { it.copy(isAgree = !it.isAgree) }
     }
 
     fun deleteAccount() {
         collectDataResource(
             flow = deleteAccountUseCase(),
             onSuccess = {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        toastMessage = "회원 탈퇴 되었습니다.",
-                        isDeleted = true
-                    )
-                }
+                _uiState.update { it.copy(isDeleted = true) }
+                _baseState.update { it.copy(toastMessage = "회원 탈퇴 되었습니다.") }
             },
             onError = { error ->
-                _uiState.update {
-                    it.copy(
-                        error = error,
-                        toastMessage = "회원 탈퇴에 실패했습니다.",
-                        isDeleted = false
-                    )
-                }
+                _uiState.update { it.copy(isDeleted = false) }
+                _baseState.update { it.copy(toastMessage = "회원 탈퇴에 실패했습니다.") }
             },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

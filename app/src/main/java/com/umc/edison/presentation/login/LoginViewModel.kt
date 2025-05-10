@@ -16,37 +16,31 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val googleLoginHelper: GoogleLoginHelper
-): BaseViewModel() {
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(LoginState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     fun signInWithGoogle(context: Context, navController: NavHostController) {
         googleLoginHelper.signInWithGoogle(
             context = context,
-            onSuccess = { user->
+            onSuccess = { user ->
                 CoroutineScope(Dispatchers.Main).launch {
-                    _uiState.update { it.copy(toastMessage = "로그인 성공!", user = user) }
+                    _baseState.update { it.copy(toastMessage = "로그인 성공!") }
+                    _uiState.update { it.copy(user = user) }
 
-                    if(user.isNewMember){
+                    if (user.isNewMember) {
                         navController.navigate(NavRoute.TermsOfUse.route)
-                    }else{
+                    } else {
                         navController.navigate(NavRoute.MyEdison.route)
                     }
-
                 }
             },
             onFailure = { message ->
-                _uiState.update { it.copy(toastMessage = message) }
-
+                _baseState.update { it.copy(toastMessage = message) }
             },
             onLoading = { isLoading ->
-                _uiState.update { it.copy(isLoading = isLoading) }
+                _baseState.update { it.copy(isLoading = isLoading) }
             }
         )
-    }
-
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

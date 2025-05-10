@@ -23,11 +23,11 @@ fun ScrapBoardScreen(
     navHostController: NavHostController,
     viewModel: ScrapBoardViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(

@@ -34,8 +34,8 @@ fun DeleteAccountScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: DeleteAccountViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
@@ -52,7 +52,7 @@ fun DeleteAccountScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(

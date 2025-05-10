@@ -20,7 +20,6 @@ class LabelListViewModel @Inject constructor(
     private val updateLabelUseCase: UpdateLabelUseCase,
     private val deleteLabelUseCase: DeleteLabelUseCase,
 ) : BaseViewModel() {
-
     private val _uiState = MutableStateFlow(LabelListState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -33,19 +32,11 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                val sortedLabels = labels.sortedWith(compareBy({ it.id == 0 }, { it.bubbles.size })).reversed()
+                val sortedLabels =
+                    labels.sortedWith(compareBy({ it.id == 0 }, { it.bubbles.size })).reversed()
 
                 _uiState.update { it.copy(labels = sortedLabels.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -65,12 +56,6 @@ class LabelListViewModel @Inject constructor(
                     updateEditMode(LabelEditMode.NONE)
                     _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
-                onError = { error ->
-                    _uiState.update { it.copy(error = error) }
-                },
-                onLoading = {
-                    _uiState.update { it.copy(isLoading = true) }
-                },
                 onComplete = {
                     fetchLabels()
                 }
@@ -81,12 +66,6 @@ class LabelListViewModel @Inject constructor(
                 onSuccess = {
                     updateEditMode(LabelEditMode.NONE)
                     _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
-                },
-                onError = { error ->
-                    _uiState.update { it.copy(error = error) }
-                },
-                onLoading = {
-                    _uiState.update { it.copy(isLoading = true) }
                 },
                 onComplete = {
                     fetchLabels()
@@ -100,24 +79,16 @@ class LabelListViewModel @Inject constructor(
             flow = deleteLabelUseCase(_uiState.value.selectedLabel.toDomain()),
             onSuccess = {
                 updateEditMode(LabelEditMode.NONE)
-                _uiState.update { it.copy(
-                    labels = it.labels.filter { label -> label.id != it.selectedLabel.id },
-                    selectedLabel = LabelListState.DEFAULT.selectedLabel
-                ) }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update {
+                    it.copy(
+                        labels = it.labels.filter { label -> label.id != it.selectedLabel.id },
+                        selectedLabel = LabelListState.DEFAULT.selectedLabel
+                    )
+                }
             },
             onComplete = {
                 fetchLabels()
             }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

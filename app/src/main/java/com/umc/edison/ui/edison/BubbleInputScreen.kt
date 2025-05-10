@@ -54,7 +54,7 @@ fun BubbleInputScreen(
     viewModel: BubbleInputViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
@@ -63,14 +63,15 @@ fun BubbleInputScreen(
     BackHandler {
         if (uiState.labelEditMode != LabelEditMode.NONE) {
             viewModel.updateLabelEditMode(LabelEditMode.NONE)
-        } else if(uiState.isGalleryOpen) {
+        } else if (uiState.isGalleryOpen) {
             viewModel.closeGallery()
             viewModel.updateIcon(IconType.NONE)
         } else if (uiState.isCameraOpen) {
             viewModel.updateCameraOpen(false)
             viewModel.updateIcon(IconType.NONE)
         } else if (uiState.selectedIcon == IconType.CAMERA || uiState.selectedIcon == IconType.LINK
-            || uiState.selectedIcon == IconType.BACK_LINK) {
+            || uiState.selectedIcon == IconType.BACK_LINK
+        ) {
             viewModel.updateIcon(IconType.NONE)
         } else {
             if (uiState.canSave) {
@@ -81,7 +82,7 @@ fun BubbleInputScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BubbleInputTopBar(
@@ -197,8 +198,8 @@ fun BubbleInputContent(
     viewModel: BubbleInputViewModel,
     onLinkClick: (Int) -> Unit
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
     val context = LocalContext.current
 
     val takePictureLauncher = rememberLauncherForActivityResult(
@@ -224,7 +225,7 @@ fun BubbleInputContent(
             },
             onClose = { viewModel.closeGallery() },
             multiSelectMode = true,
-            uiState = uiState,
+            baseState = baseState,
             clearToastMessage = { viewModel.clearToastMessage() }
         )
     }
@@ -246,7 +247,7 @@ fun BubbleInputContent(
             onDismiss = {
                 viewModel.updateLabelEditMode(LabelEditMode.NONE)
             },
-            uiState = uiState,
+            baseState = baseState,
             clearToastMessage = { viewModel.clearToastMessage() }
         ) {
             LabelModalContent(
@@ -266,7 +267,7 @@ fun BubbleInputContent(
     if (uiState.labelEditMode == LabelEditMode.EDIT) {
         BottomSheet(
             onDismiss = { viewModel.updateLabelEditMode(LabelEditMode.NONE) },
-            uiState = uiState,
+            baseState = baseState,
             clearToastMessage = { viewModel.clearToastMessage() }
         ) {
             LabelSelectModalContent(
@@ -302,7 +303,8 @@ fun BubbleInputContent(
             viewModel.deleteContentBlock(contentBlock)
         },
         onMainSelected = { uri ->
-            viewModel.selectMainImage(uri) },
+            viewModel.selectMainImage(uri)
+        },
         bubbleInputState = uiState,
         onLinkClick = onLinkClick
     )

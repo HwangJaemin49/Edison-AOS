@@ -22,7 +22,8 @@ class BubbleGraphViewModel @Inject constructor(
         collectDataResource(
             flow = getClusteredBubblesUseCase(),
             onSuccess = { clusteredBubbles ->
-                val bubbles = clusteredBubbles.toPresentation().sortedByDescending { it.bubble.date }
+                val bubbles =
+                    clusteredBubbles.toPresentation().sortedByDescending { it.bubble.date }
                 val edges = bubbles.toEdgeDataModel()
                 val clusters = bubbles.toClusterModel()
 
@@ -34,19 +35,6 @@ class BubbleGraphViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

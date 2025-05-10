@@ -1,22 +1,17 @@
 package com.umc.edison.presentation.mypage
 
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.UserModel
 
 data class AccountManagementState(
-    override val isLoading: Boolean,
     val isLoggedIn: Boolean,
-    val user: UserModel? = null,
-    val mode: AccountManagementMode = AccountManagementMode.NONE,
-    override val error: Throwable?,
-    override val toastMessage: String?
-) : BaseState {
+    val user: UserModel?,
+    val mode: AccountManagementMode,
+) {
     companion object {
         val DEFAULT = AccountManagementState(
-            isLoading = false,
             isLoggedIn = false,
-            error = null,
-            toastMessage = null
+            user = null,
+            mode = AccountManagementMode.NONE,
         )
     }
 }

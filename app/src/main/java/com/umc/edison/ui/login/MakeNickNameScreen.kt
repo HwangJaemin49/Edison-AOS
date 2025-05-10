@@ -31,15 +31,13 @@ import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 
-
 @Composable
 fun MakeNickNameScreen(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: MakeNickNameViewModel = hiltViewModel(),
 ) {
-
-    val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
     var textState by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
@@ -47,7 +45,7 @@ fun MakeNickNameScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Column(
@@ -56,7 +54,6 @@ fun MakeNickNameScreen(
                 .padding(24.dp),
             verticalArrangement = Arrangement.Top,
         ) {
-
             Text(
                 text = "에디슨에서 사용할\n닉네임을 설정해주세요.",
                 color = Gray800,
@@ -103,5 +100,3 @@ fun MakeNickNameScreen(
         }
     }
 }
-
-

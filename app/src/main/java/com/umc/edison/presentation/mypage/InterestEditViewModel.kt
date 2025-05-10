@@ -37,15 +37,6 @@ class InterestEditViewModel @Inject constructor(
                     it.copy(interest = interest.toPresentation())
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -60,7 +51,7 @@ class InterestEditViewModel @Inject constructor(
             }
         } else {
             if (uiState.value.interest.selectedKeywords.size >= 5) {
-                _uiState.update {
+                _baseState.update {
                     it.copy(toastMessage = "최대 5개의 키워드를 선택할 수 있습니다.")
                 }
             } else {
@@ -85,22 +76,9 @@ class InterestEditViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
             onComplete = {
-                _uiState.update { it.copy(
-                    isLoading = false,
-                    isEdited = true,
-                ) }
+                _uiState.update { it.copy(isEdited = true) }
             }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

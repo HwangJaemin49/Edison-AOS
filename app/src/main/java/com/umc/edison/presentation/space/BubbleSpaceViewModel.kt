@@ -25,9 +25,6 @@ class BubbleSpaceViewModel @Inject constructor(
             onSuccess = { isLoggedIn ->
                 _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error, isLoading = false) }
-            }
         )
     }
 
@@ -54,17 +51,10 @@ class BubbleSpaceViewModel @Inject constructor(
             onSuccess = { bubbles ->
                 _uiState.update { it.copy(searchResults = bubbles.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
             onComplete = {
                 if (uiState.value.searchResults.isEmpty()) {
-                    _uiState.update { it.copy(toastMessage = "검색 결과를 찾을 수 없습니다.") }
+                    _baseState.update { it.copy(toastMessage = "검색 결과를 찾을 수 없습니다.") }
                 }
-                _uiState.update { it.copy(isLoading = false) }
             }
         )
     }
@@ -76,9 +66,4 @@ class BubbleSpaceViewModel @Inject constructor(
             _uiState.update { it.copy(searchResults = emptyList()) }
         }
     }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

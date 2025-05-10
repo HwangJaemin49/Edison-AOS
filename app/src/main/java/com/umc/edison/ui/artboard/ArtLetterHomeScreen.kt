@@ -70,6 +70,7 @@ fun ArtLetterHomeScreen(
     viewModel: ArtLetterHomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchAllArtLetters()
@@ -81,7 +82,7 @@ fun ArtLetterHomeScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = { TopBar(navHostController, viewModel) },
         modifier = Modifier.fillMaxSize(),

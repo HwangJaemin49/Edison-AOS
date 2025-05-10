@@ -11,12 +11,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-
 @HiltViewModel
-class TermsOfUseViewModel @Inject constructor (
+class TermsOfUseViewModel @Inject constructor(
     private val getProfileInfoUseCase: GetProfileInfoUseCase
-): BaseViewModel() {
-
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(TermsOfUseState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -30,15 +28,6 @@ class TermsOfUseViewModel @Inject constructor (
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -55,9 +44,4 @@ class TermsOfUseViewModel @Inject constructor (
             }
         }
     }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

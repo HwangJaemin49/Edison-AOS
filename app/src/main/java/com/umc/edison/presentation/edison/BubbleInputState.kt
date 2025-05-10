@@ -1,7 +1,6 @@
 package com.umc.edison.presentation.edison
 
 import android.net.Uri
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.LabelModel
@@ -10,29 +9,33 @@ import com.umc.edison.ui.components.ListStyle
 import com.umc.edison.ui.components.TextStyle
 
 data class BubbleInputState(
-    override val isLoading: Boolean = false,
     val bubble: BubbleModel,
     val bubbles: List<BubbleModel>,
-    val labelEditMode: LabelEditMode = LabelEditMode.NONE,
+    val labelEditMode: LabelEditMode,
     val labels: List<LabelModel>,
-    val selectedLabels: List<LabelModel> = emptyList(),
-    val selectedIcon: IconType = IconType.NONE,
-    val selectedTextStyles: List<TextStyle> = emptyList(),
-    val selectedListStyle: ListStyle = ListStyle.NONE,
-    val isGalleryOpen: Boolean = false,
-    val isCameraOpen: Boolean = false,
-    val cameraImagePath: Uri? = null,
-    val canSave: Boolean = false,
-    override val error: Throwable? = null,
-    override val toastMessage: String? = null,
-) : BaseState {
+    val selectedLabels: List<LabelModel>,
+    val selectedIcon: IconType,
+    val selectedTextStyles: List<TextStyle>,
+    val selectedListStyle: ListStyle,
+    val isGalleryOpen: Boolean,
+    val isCameraOpen: Boolean,
+    val cameraImagePath: Uri?,
+    val canSave: Boolean,
+) {
     companion object {
         val DEFAULT = BubbleInputState(
-            isLoading = false,
-            bubble = BubbleModel(),
+            bubble = BubbleModel.DEFAULT,
             bubbles = emptyList(),
-            labels = emptyList(),
             labelEditMode = LabelEditMode.NONE,
+            labels = emptyList(),
+            selectedLabels = emptyList(),
+            selectedIcon = IconType.NONE,
+            selectedTextStyles = emptyList(),
+            selectedListStyle = ListStyle.NONE,
+            isGalleryOpen = false,
+            isCameraOpen = false,
+            cameraImagePath = null,
+            canSave = false,
         )
     }
 }

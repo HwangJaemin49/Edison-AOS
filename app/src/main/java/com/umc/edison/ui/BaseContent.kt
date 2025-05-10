@@ -14,7 +14,7 @@ import com.umc.edison.ui.theme.White000
 
 @Composable
 fun BaseContent(
-    uiState: BaseState,
+    baseState: BaseState,
     clearToastMessage: () -> Unit,
     modifier: Modifier = Modifier,
     containerColor: Color = White000,
@@ -40,14 +40,13 @@ fun BaseContent(
         Box(
             modifier = Modifier.weight(1f)
         ) {
-            if (uiState.isLoading) {
+            if (baseState.isLoading) {
                 LoadingScreen()
             } else {
                 content()
-
-                if (uiState.toastMessage != null) {
+                baseState.toastMessage?.let {
                     ToastScreen(
-                        message = uiState.toastMessage!!,
+                        message = it,
                         onDismiss = { clearToastMessage() }
                     )
                 }

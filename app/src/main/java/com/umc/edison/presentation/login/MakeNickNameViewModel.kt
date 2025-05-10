@@ -16,12 +16,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MakeNickNameViewModel @Inject constructor (
+class MakeNickNameViewModel @Inject constructor(
     private val getProfileInfoUseCase: GetProfileInfoUseCase,
     private val makeNickNameUseCase: MakeNickNameUseCase,
-): BaseViewModel() {
-
-    private val _uiState = MutableStateFlow( MakeNickNameState .DEFAULT)
+) : BaseViewModel() {
+    private val _uiState = MutableStateFlow(MakeNickNameState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -34,42 +33,18 @@ class MakeNickNameViewModel @Inject constructor (
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
-    fun makeNickName(nickname: String,navController: NavHostController) {
+    fun makeNickName(nickname: String, navController: NavHostController) {
         collectDataResource(
-            flow=makeNickNameUseCase(nickname),
+            flow = makeNickNameUseCase(nickname),
             onSuccess = {
                 _uiState.update { it.copy(user = it.user.copy(nickname = nickname)) }
                 CoroutineScope(Dispatchers.Main).launch {
                     navController.navigate(NavRoute.IdentityTest.route)
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
-
-    }
-
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

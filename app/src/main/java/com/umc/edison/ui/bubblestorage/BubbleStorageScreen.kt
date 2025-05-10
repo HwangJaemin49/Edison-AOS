@@ -55,6 +55,7 @@ fun BubbleStorageScreen(
     viewModel: BubbleStorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
     val context = LocalContext.current
 
 
@@ -63,7 +64,6 @@ fun BubbleStorageScreen(
         updateViewMode(false)
 
         viewModel.fetchStorageBubbles()
-        viewModel.syncData()
     }
 
     BackHandler(enabled = true) {
@@ -77,7 +77,7 @@ fun BubbleStorageScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.mode == BubbleStorageMode.EDIT) {
@@ -216,7 +216,7 @@ fun BubbleStorageScreen(
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
                 },
-                uiState = uiState,
+                baseState = baseState,
                 clearToastMessage = { viewModel.clearToastMessage() }
             )
         } else if (uiState.mode == BubbleStorageMode.SHARE) {
@@ -225,7 +225,7 @@ fun BubbleStorageScreen(
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
                     updateViewMode(false)
                 },
-                uiState = uiState,
+                baseState = baseState,
                 clearToastMessage = { viewModel.clearToastMessage() },
                 showToastMessage = false
             ) {

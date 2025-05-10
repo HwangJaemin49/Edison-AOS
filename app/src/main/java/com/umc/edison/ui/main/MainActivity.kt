@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
@@ -117,14 +116,5 @@ fun MainScreen(navController: NavHostController) {
                 }
             }
         }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.Q)
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    EdisonTheme {
-        MainScreen(navController = rememberNavController())
     }
 }

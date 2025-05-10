@@ -8,7 +8,8 @@ import android.net.NetworkCapabilities
 
 class NetworkStateMonitor(context: Context) {
 
-    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     fun registerCallback(onConnected: () -> Unit) {
         val networkCallback = object : ConnectivityManager.NetworkCallback() {

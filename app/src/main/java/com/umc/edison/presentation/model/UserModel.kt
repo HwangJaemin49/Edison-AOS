@@ -6,7 +6,7 @@ data class UserModel(
     val nickname: String?,
     val profileImage: String?,
     val email: String,
-    val isNewMember:Boolean
+    val isNewMember: Boolean
 ) {
     companion object {
         val DEFAULT = UserModel(

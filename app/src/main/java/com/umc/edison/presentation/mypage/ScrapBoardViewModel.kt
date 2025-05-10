@@ -32,20 +32,6 @@ class ScrapBoardViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

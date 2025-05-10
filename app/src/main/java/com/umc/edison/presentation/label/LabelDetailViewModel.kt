@@ -1,11 +1,11 @@
 package com.umc.edison.presentation.label
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.LabelDetailMode
 import com.umc.edison.presentation.model.LabelModel
@@ -23,13 +23,13 @@ class LabelDetailViewModel @Inject constructor(
     private val moveBubblesUseCase: MoveBubblesUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
-    override val syncDataUseCase: SyncDataUseCase,
 ) : BaseBubbleViewModel<LabelDetailMode, LabelDetailState>() {
     override val _uiState = MutableStateFlow(LabelDetailState.DEFAULT)
     override val uiState = _uiState.asStateFlow()
 
     init {
         val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
+        Log.i("LabelDetailViewModel", "labelId: $id")
         fetchLabelDetail(id)
     }
 
@@ -46,15 +46,6 @@ class LabelDetailViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -68,15 +59,6 @@ class LabelDetailViewModel @Inject constructor(
 
                 _uiState.update { it.copy(movableLabels = movableLabels) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -92,15 +74,6 @@ class LabelDetailViewModel @Inject constructor(
                 showBottomNav(true)
                 fetchLabelDetail(label.id)
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 

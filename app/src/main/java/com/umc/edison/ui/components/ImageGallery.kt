@@ -43,7 +43,7 @@ fun ImageGallery(
     onImageSelected: (List<Uri>) -> Unit,
     multiSelectMode: Boolean,
     onClose: () -> Unit,
-    uiState: BaseState,
+    baseState: BaseState,
     clearToastMessage: () -> Unit
 ) {
     val context = LocalContext.current
@@ -72,7 +72,7 @@ fun ImageGallery(
 
     BottomSheet(
         onDismiss = { onClose() },
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = clearToastMessage
     ) {
         Column(

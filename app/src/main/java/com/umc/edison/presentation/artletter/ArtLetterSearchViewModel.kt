@@ -1,6 +1,5 @@
 package com.umc.edison.presentation.artletter
 
-
 import com.umc.edison.domain.usecase.artletter.GetArtLetterCategoryUseCase
 import com.umc.edison.domain.usecase.artletter.GetArtLetterKeyWordUseCase
 import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
-
 
 @HiltViewModel
 class ArtLetterSearchViewModel @Inject constructor(
@@ -34,7 +32,7 @@ class ArtLetterSearchViewModel @Inject constructor(
         fetchRecommendedArtLetters()
         getRecentSearches()
         getKeyWords()
-        getCetegories()
+        getCategories()
     }
 
     fun searchArtLetters() {
@@ -48,23 +46,16 @@ class ArtLetterSearchViewModel @Inject constructor(
 
         collectDataResource(
             flow = getSearchArtLettersUseCase(_uiState.value.query),
-            onSuccess = { artletters ->
+            onSuccess = { artLetters ->
                 _uiState.update {
                     it.copy(
-                        artLetters = artletters.toPresentation(),
+                        artLetters = artLetters.toPresentation(),
                         lastQuery = it.query,
                         isSearchActivated = true
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
                 getRecentSearches()
             }
         )
@@ -81,18 +72,9 @@ class ArtLetterSearchViewModel @Inject constructor(
     fun getSortedArtLetters(sortType: String) {
         collectDataResource(
             flow = getSearchArtLettersUseCase(_uiState.value.query, sortType),
-            onSuccess = { artletters ->
-                _uiState.update { it.copy(artLetters = artletters.toPresentation()) }
+            onSuccess = { artLetters ->
+                _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -102,9 +84,6 @@ class ArtLetterSearchViewModel @Inject constructor(
             onSuccess = { recentSearches ->
                 _uiState.update { it.copy(recentSearches = recentSearches) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -124,9 +103,6 @@ class ArtLetterSearchViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -136,9 +112,6 @@ class ArtLetterSearchViewModel @Inject constructor(
             onSuccess = { artLetters ->
                 _uiState.update { it.copy(recommendedArtLetters = artLetters.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -163,15 +136,6 @@ class ArtLetterSearchViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -181,19 +145,10 @@ class ArtLetterSearchViewModel @Inject constructor(
             onSuccess = { keywords ->
                 _uiState.update { it.copy(keywords = keywords.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
-    fun getCetegories() {
+    fun getCategories() {
         collectDataResource(
             flow = getArtLetterCategoryUseCase(),
             onSuccess = { categories ->
@@ -203,23 +158,10 @@ class ArtLetterSearchViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
     fun updateShowLoginModal(show: Boolean) {
         _uiState.update { it.copy(showLoginModal = show) }
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

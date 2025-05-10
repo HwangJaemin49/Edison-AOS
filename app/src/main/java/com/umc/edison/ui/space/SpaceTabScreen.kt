@@ -1,5 +1,6 @@
 package com.umc.edison.ui.space
 
+import android.annotation.SuppressLint
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Paint
@@ -61,6 +62,7 @@ fun SpaceTabScreen(
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun BubbleGraphScreen(
     showBubble: (BubbleModel) -> Unit,
@@ -167,7 +169,7 @@ fun BubbleGraphScreen(
                         Paint().apply {
                             color = Gray800.toArgb()
                             textSize = 35f
-                            textAlign = android.graphics.Paint.Align.CENTER
+                            textAlign = Paint.Align.CENTER
                         }
                     )
                 }

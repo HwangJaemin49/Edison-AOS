@@ -34,7 +34,6 @@ import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.login.PrefsHelper
 import com.umc.edison.ui.navigation.NavRoute
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,6 +43,7 @@ fun MyEdisonScreen(
     viewModel: MyEdisonViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
     var isViewMode by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -72,7 +72,7 @@ fun MyEdisonScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         HorizontalPager(

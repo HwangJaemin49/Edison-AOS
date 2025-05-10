@@ -34,15 +34,6 @@ class AccountManagementViewModel @Inject constructor(
                     fetchProfileInfo()
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -52,15 +43,6 @@ class AccountManagementViewModel @Inject constructor(
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -72,31 +54,17 @@ class AccountManagementViewModel @Inject constructor(
         collectDataResource(
             flow = logOutUseCase(),
             onSuccess = {
-                _uiState.update { it.copy(
-                    isLoggedIn = false,
-                    user = null,
-                    toastMessage = "로그아웃 되었습니다."
-                ) }
+                _baseState.update { it.copy(toastMessage = "로그아웃 되었습니다.") }
+                _uiState.update { it.copy(isLoggedIn = false, user = null) }
             },
             onError = { error ->
-                _uiState.update { it.copy(
-                    error = error,
-                    toastMessage = "로그아웃에 실패했습니다."
-                ) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
+                _baseState.update { it.copy(toastMessage = "로그아웃에 실패했습니다.") }
             },
             onComplete = {
-                _uiState.update { it.copy(
-                    isLoading = false,
-                    mode = AccountManagementMode.NONE
-                ) }
+                _uiState.update {
+                    it.copy(mode = AccountManagementMode.NONE)
+                }
             }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

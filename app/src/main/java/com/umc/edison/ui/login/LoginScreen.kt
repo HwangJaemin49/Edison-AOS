@@ -40,7 +40,6 @@ import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -50,8 +49,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.umc.edison.ui.theme.Gray700
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -59,12 +56,10 @@ fun LoginScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
-
     val context = LocalContext.current
 
-    val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
     var showPopup by remember { mutableStateOf(false) }
-
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
@@ -75,7 +70,7 @@ fun LoginScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Box(
@@ -171,15 +166,11 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(bottom = 24.dp),
                     onClick = { navHostController.navigate(NavRoute.TermsOfUse.route) },
-
-                    )
+                )
             }
         }
     }
-
-
 }
-
 
 @Composable
 fun BubbleMessage(modifier: Modifier, onDismiss: () -> Unit) {
@@ -218,8 +209,5 @@ fun BubbleMessage(modifier: Modifier, onDismiss: () -> Unit) {
                 )
             }
         }
-
     }
-
 }
-

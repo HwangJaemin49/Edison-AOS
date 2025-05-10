@@ -14,7 +14,6 @@ import javax.inject.Inject
 class EditProfileViewModel @Inject constructor(
     private val getProfileInfoUseCase: GetProfileInfoUseCase,
     private val updateUserProfileUseCase: UpdateUserProfileUseCase
-
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(EditProfileState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -29,15 +28,6 @@ class EditProfileViewModel @Inject constructor(
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -45,17 +35,8 @@ class EditProfileViewModel @Inject constructor(
         collectDataResource(
             flow = updateUserProfileUseCase(_uiState.value.user.toDomain()),
             onSuccess = {
-                _uiState.update { it.copy(toastMessage = "프로필이 수정되었습니다.") }
+                _baseState.update { it.copy(toastMessage = "프로필이 수정되었습니다.") }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -66,9 +47,4 @@ class EditProfileViewModel @Inject constructor(
     fun updateUserProfileImage(profileImage: String) {
         _uiState.update { it.copy(user = it.user.copy(profileImage = profileImage)) }
     }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

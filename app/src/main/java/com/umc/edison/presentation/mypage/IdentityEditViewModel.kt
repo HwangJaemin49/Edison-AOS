@@ -33,19 +33,8 @@ class IdentityEditViewModel @Inject constructor(
         collectDataResource(
             flow = getMyIdentityResultUseCase(category),
             onSuccess = { identity ->
-                _uiState.update {
-                    it.copy(identity = identity.toPresentation())
-                }
+                _uiState.update { it.copy(identity = identity.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -60,7 +49,7 @@ class IdentityEditViewModel @Inject constructor(
             }
         } else {
             if (uiState.value.identity.selectedKeywords.size >= 5) {
-                _uiState.update {
+                _baseState.update {
                     it.copy(toastMessage = "최대 5개의 키워드를 선택할 수 있습니다.")
                 }
             } else {
@@ -85,22 +74,9 @@ class IdentityEditViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
             onComplete = {
-                _uiState.update { it.copy(
-                    isLoading = false,
-                    isEdited = true,
-                ) }
+                _uiState.update { it.copy(isEdited = true) }
             }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 
 object PrefsHelper {
-
     private const val PREFS_NAME = "app_prefs"
     private const val KEY_MAIN_SCREEN_VISITED = "main_screen_visited"
 

@@ -66,8 +66,8 @@ fun MyPageScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
@@ -79,7 +79,7 @@ fun MyPageScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             HamburgerMenu(
@@ -128,7 +128,7 @@ private fun MyPageContent(
     ) {
         ProfileInfo(
             imageUrl = uiState.user.profileImage,
-            name = uiState.user.nickname?:"",
+            name = uiState.user.nickname ?: "",
             navHostController = navHostController,
         )
 

@@ -24,6 +24,12 @@ data class LabelModel(
             color = Gray300,
             bubbles = emptyList()
         )
+        val EMPTY = LabelModel(
+            id = -1,
+            name = "",
+            color = Gray300,
+            bubbles = emptyList()
+        )
     }
 }
 

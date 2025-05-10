@@ -6,9 +6,9 @@ import com.umc.edison.domain.model.IdentityCategory
 data class IdentityModel(
     val id: Int,
     val question: String,
-    val questionTip: String? = null,
+    val questionTip: String?,
     val descriptionFirst: String,
-    val descriptionSecond: String? = null,
+    val descriptionSecond: String?,
     val options: List<KeywordModel>,
     val selectedKeywords: List<KeywordModel>,
 ) {
@@ -17,6 +17,18 @@ data class IdentityModel(
             category = IdentityCategory.entries[id],
             selectedKeywords = selectedKeywords.map { it.toDomain() },
             options = options.map { it.toDomain() }
+        )
+    }
+
+    companion object {
+        val DEFAULT = IdentityModel(
+            id = IdentityCategory.NONE.ordinal,
+            question = IdentityCategory.NONE.question,
+            questionTip = null,
+            descriptionFirst = IdentityCategory.NONE.descriptionFirst,
+            descriptionSecond = null,
+            options = emptyList(),
+            selectedKeywords = emptyList()
         )
     }
 }

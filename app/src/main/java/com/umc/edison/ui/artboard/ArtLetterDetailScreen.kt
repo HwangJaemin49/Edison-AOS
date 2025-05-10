@@ -82,6 +82,7 @@ fun ArtLetterDetailScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenHeightPx = with(LocalDensity.current) { screenHeight.toPx() }
@@ -90,7 +91,7 @@ fun ArtLetterDetailScreen(
     var sheetOffsetPx by remember { mutableFloatStateOf(collapsedOffset) }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
