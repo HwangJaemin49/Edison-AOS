@@ -228,7 +228,7 @@ fun EditorPickSection(
                             onClick = {
                                 navHostController.navigate(
                                     NavRoute.ArtLetterDetail.createRoute(
-                                        artLetter.artLetterId
+                                        artLetter.artLetterId.toString()
                                     )
                                 )
                             },
@@ -318,7 +318,7 @@ fun ArtBoardSection(
                 onArtLetterClick = { artLetter ->
                     navHostController.navigate(
                         NavRoute.ArtLetterDetail.createRoute(
-                            artLetter.artLetterId
+                            artLetter.artLetterId.toString()
                         )
                     )
                 },

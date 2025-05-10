@@ -188,7 +188,7 @@ fun ArtLetterSearchScreen(
                                     artLetter = artLetter as ArtLetterPreviewModel,
                                     onArtLetterClick = { selectedArtLetter ->
                                         navHostController.navigate(
-                                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
+                                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId.toString())
                                         )
                                     },
                                     onBookmarkClick = { viewModel.postArtLetterScrap(it.artLetterId) }
@@ -397,7 +397,7 @@ fun KeywordSection(
                     onKeywordClick = {
                         navHostController.navigate(
                             NavRoute.ArtLetterDetail.createRoute(
-                                keywordModel.artletterId
+                                keywordModel.artletterId.toString()
                             )
                         )
                     },
@@ -571,7 +571,7 @@ fun Recommend(
                     artLetter = artLetter,
                     onArtLetterClick = { selectedArtLetter ->
                         navHostController.navigate(
-                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
+                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId.toString())
                         )
                     },
                     onBookmarkClick = { artLetter ->

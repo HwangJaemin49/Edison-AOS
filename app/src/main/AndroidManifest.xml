@@ -21,6 +21,10 @@
         android:theme="@style/Theme.Edison"
         tools:targetApi="31">
 
+        <meta-data
+            android:name="io.branch.sdk.BranchKey"
+            android:value="key_live_ntBapmcpd47GsqWgQbezuledzxbE5RQr" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -28,7 +32,8 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/file_paths"
+                />
         </provider>
 
         <provider

@@ -8,13 +8,19 @@ import com.umc.edison.presentation.sync.SyncTrigger
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 
+import androidx.hilt.work.HiltWorkerFactory
+import io.branch.referral.Branch
+
 @HiltAndroidApp
 class EdisonApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
 
-        // NetworkStateMonitor 초기화 및 데이터 동기화 설정
+        // Branch SDK 초기화
+        Branch.getAutoInstance(this)
+
+        // 기존 네트워크 상태 모니터링 초기화
         val syncTrigger = SyncTrigger(this)
         syncTrigger.setupSync()
     }
