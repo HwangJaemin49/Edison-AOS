@@ -35,6 +35,9 @@ android {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
             }
         }
+        
+        manifestPlaceholders["branch_key"] = localProperties["branch_key"] ?: ""
+
     }
 
     buildTypes {

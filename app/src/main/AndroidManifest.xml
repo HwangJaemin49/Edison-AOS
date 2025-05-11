@@ -23,7 +23,7 @@
 
         <meta-data
             android:name="io.branch.sdk.BranchKey"
-            android:value="key_live_ntBapmcpd47GsqWgQbezuledzxbE5RQr" />
+            android:value="${branch_key}" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
