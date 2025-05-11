@@ -10,5 +10,5 @@ class GetLabelUseCase @Inject constructor(
     private val labelRepository: LabelRepository
 ) {
     operator fun invoke(id: String): Flow<DataResource<Label>> =
-        labelRepository.getLabelDetail(id)
+        labelRepository.getLabel(id)
 }
