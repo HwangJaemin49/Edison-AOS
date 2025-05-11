@@ -10,5 +10,5 @@ class SearchBubblesUseCase @Inject constructor(
     private val bubbleRepository: BubbleRepository
 ) {
     operator fun invoke(query: String): Flow<DataResource<List<Bubble>>> =
-        bubbleRepository.getSearchBubbles(query)
+        bubbleRepository.searchBubbles(query)
 }

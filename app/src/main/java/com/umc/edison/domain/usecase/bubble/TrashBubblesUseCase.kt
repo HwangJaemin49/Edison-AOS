@@ -10,5 +10,5 @@ class TrashBubblesUseCase @Inject constructor(
     private val bubbleRepository: BubbleRepository
 ) {
     operator fun invoke(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
-        bubbleRepository.softDeleteBubbles(bubbles)
+        bubbleRepository.trashBubbles(bubbles)
 }

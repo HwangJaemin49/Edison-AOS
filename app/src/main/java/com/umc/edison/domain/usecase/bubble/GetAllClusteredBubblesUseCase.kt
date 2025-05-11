@@ -10,5 +10,5 @@ class GetAllClusteredBubblesUseCase @Inject constructor(
     private val bubbleRepository: BubbleRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<ClusteredBubble>>> =
-        bubbleRepository.getClusteredBubblesPosition()
+        bubbleRepository.getAllClusteredBubbles()
 }
