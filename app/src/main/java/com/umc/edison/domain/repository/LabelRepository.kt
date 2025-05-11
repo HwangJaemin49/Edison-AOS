@@ -1,6 +1,6 @@
 package com.umc.edison.domain.repository
 
-import com.umc.edison.data.DataResource
+import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.label.Label
 import kotlinx.coroutines.flow.Flow
 

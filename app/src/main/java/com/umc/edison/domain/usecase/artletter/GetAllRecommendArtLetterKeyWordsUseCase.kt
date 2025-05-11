@@ -1,6 +1,6 @@
 package com.umc.edison.domain.usecase.artletter
 
-import com.umc.edison.data.DataResource
+import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.artLetter.ArtLetterKeyWord
 import com.umc.edison.domain.repository.ArtLetterRepository
 import kotlinx.coroutines.flow.Flow

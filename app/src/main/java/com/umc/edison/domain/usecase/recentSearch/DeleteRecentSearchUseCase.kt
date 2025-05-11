@@ -1,6 +1,6 @@
 package com.umc.edison.domain.usecase.recentSearch
 
-import com.umc.edison.data.DataResource
+import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.repository.RecentSearchRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
