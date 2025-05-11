@@ -6,9 +6,9 @@ import com.umc.edison.domain.repository.ArtLetterRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAllArtLettersUseCase @Inject constructor(
+class GetAllSortedArtLettersUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
-    operator fun invoke(): Flow<DataResource<List<ArtLetter>>> =
-        artLetterRepository.getAllArtLetters()
+    operator fun invoke(sortBy: String): Flow<DataResource<List<ArtLetter>>> =
+        artLetterRepository.getSortedArtLetters(sortBy)
 }

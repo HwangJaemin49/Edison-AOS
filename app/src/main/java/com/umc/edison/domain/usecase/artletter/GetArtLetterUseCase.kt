@@ -6,9 +6,9 @@ import com.umc.edison.domain.repository.ArtLetterRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAllArtLettersUseCase @Inject constructor(
+class GetArtLetterUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
-    operator fun invoke(): Flow<DataResource<List<ArtLetter>>> =
-        artLetterRepository.getAllArtLetters()
+    operator fun invoke(id: Int): Flow<DataResource<ArtLetter>> =
+        artLetterRepository.getArtLetterDetail(id)
 }
