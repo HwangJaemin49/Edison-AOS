@@ -1,7 +1,7 @@
 package com.umc.edison.data.model
 
-import com.umc.edison.domain.model.IdentityCategory
-import com.umc.edison.domain.model.Identity
+import com.umc.edison.data.model.artLetter.toData
+import com.umc.edison.domain.model.identity.IdentityCategory
 
 data class IdentityEntity(
     val categoryNumber: String,

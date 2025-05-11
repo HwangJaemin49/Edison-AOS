@@ -1,13 +1,13 @@
 package com.umc.edison.data.model
 
 import android.util.Log
-import com.umc.edison.domain.model.Bubble
-import com.umc.edison.domain.model.ContentBlock
-import com.umc.edison.domain.model.ContentType
+import com.umc.edison.data.model.artLetter.toData
+import com.umc.edison.domain.model.bubble.Bubble
+import com.umc.edison.domain.model.bubble.ContentType
 import java.util.Date
 
 data class BubbleEntity(
-    var id: Int,
+    var id: String,
     val title: String? = null,
     val content: String? = null,
     var mainImage: String? = null,

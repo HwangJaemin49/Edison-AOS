@@ -7,11 +7,8 @@ import kotlinx.coroutines.withContext
 
 class FlowBoundResource<DomainType, DataType>(
     dataAction: suspend () -> DataType,
-) : FLowBaseBoundResource<DomainType, DataType>(dataAction) {
-
+) : FLowBaseBoundResource<DomainType, DataType, DataType>(dataAction) {
     override suspend fun collect(collector: FlowCollector<DataResource<DomainType>>) {
-        withContext(Dispatchers.IO) {
-            actionFromSource(collector)
-        }
+        actionFromSource(collector)
     }
 }

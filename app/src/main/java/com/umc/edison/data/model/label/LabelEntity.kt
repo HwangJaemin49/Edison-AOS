@@ -2,11 +2,12 @@ package com.umc.edison.data.model
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import com.umc.edison.domain.model.Label
+import com.umc.edison.data.model.artLetter.toData
+import com.umc.edison.domain.model.label.Label
 import java.util.Date
 
 data class LabelEntity(
-    val id: Int,
+    val id: String,
     val name: String,
     val color: Color,
     var bubbles: List<BubbleEntity> = emptyList(),
