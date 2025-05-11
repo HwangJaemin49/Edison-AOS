@@ -3,7 +3,7 @@ package com.umc.edison.data.model.bubble
 import com.umc.edison.data.model.DataMapper
 import com.umc.edison.domain.model.bubble.ClusteredBubble
 
-data class PositionedBubbleEntity(
+data class ClusteredBubbleEntity(
     val bubble : BubbleEntity,
     val x: Float,
     val y: Float,

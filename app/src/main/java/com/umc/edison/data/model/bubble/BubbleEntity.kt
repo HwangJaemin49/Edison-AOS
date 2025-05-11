@@ -1,19 +1,21 @@
-package com.umc.edison.data.model
+package com.umc.edison.data.model.bubble
 
 import android.util.Log
-import com.umc.edison.data.model.artLetter.toData
+import com.umc.edison.data.model.DataMapper
+import com.umc.edison.data.model.label.LabelEntity
+import com.umc.edison.data.model.label.toData
+import com.umc.edison.data.model.toDomain
 import com.umc.edison.domain.model.bubble.Bubble
-import com.umc.edison.domain.model.bubble.ContentType
 import java.util.Date
 
 data class BubbleEntity(
     var id: String,
-    val title: String? = null,
-    val content: String? = null,
-    var mainImage: String? = null,
-    var labels: List<LabelEntity> = emptyList(),
-    var backLinks: List<BubbleEntity> = emptyList(),
-    var linkedBubble: BubbleEntity? = null,
+    val title: String?,
+    val content: String?,
+    var mainImage: String?,
+    var labels: List<LabelEntity>,
+    var backLinks: List<BubbleEntity>,
+    var linkedBubble: BubbleEntity?,
     val isDeleted: Boolean = false,
     val isTrashed: Boolean = false,
     val createdAt: Date = Date(),
@@ -21,33 +23,16 @@ data class BubbleEntity(
     val deletedAt: Date? = null,
     val isSynced: Boolean = false
 ) : DataMapper<Bubble> {
-    override fun toDomain(): Bubble {
-        // Text 타입의 경우 앞에 %<TEXT>와 뒤에 </TEXT>%가 붙어있고
-        // Image 타입의 경우 앞에 %<IMAGE>와 뒤에 </IMAGE>%가 붙어있음
-        val contentBlocks = content?.split("%<")?.mapIndexed { idx, s ->
-            val type = when {
-                s.startsWith("${ContentType.TEXT}>") -> ContentType.TEXT
-                s.startsWith("${ContentType.IMAGE}>") -> ContentType.IMAGE
-                else -> return@mapIndexed null
-            }
-            val content = when (type) {
-                ContentType.TEXT -> s.substringAfter("${ContentType.TEXT}>").substringBefore("</${ContentType.TEXT}")
-                ContentType.IMAGE -> s.substringAfter("${ContentType.IMAGE}>").substringBefore("</${ContentType.IMAGE}")
-            }
-            ContentBlock(type, content, idx)
-        }?.filterNotNull() ?: emptyList()
-
-        return Bubble(
-            id,
-            title,
-            contentBlocks,
-            mainImage?.ifEmpty { null },
-            labels.toDomain(),
-            backLinks.toDomain(),
-            linkedBubble?.toDomain(),
-            updatedAt
-        )
-    }
+    override fun toDomain(): Bubble = Bubble(
+        id,
+        title,
+        content,
+        mainImage,
+        labels.toDomain(),
+        backLinks.toDomain(),
+        linkedBubble?.toDomain(),
+        updatedAt
+    )
 }
 
 fun BubbleEntity.same(other: BubbleEntity): Boolean {
@@ -69,9 +54,7 @@ fun BubbleEntity.same(other: BubbleEntity): Boolean {
 fun Bubble.toData(): BubbleEntity = BubbleEntity(
     id = id,
     title = title,
-    content = contentBlocks.joinToString(separator = "") {
-        "%<${it.type}>${it.content}</${it.type}>%"
-    },
+    content = content,
     mainImage = mainImage,
     labels = labels.toData(),
     backLinks = backLinks.toData(),
