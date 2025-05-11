@@ -4,12 +4,14 @@ import com.umc.edison.data.repository.ArtLetterRepositoryImpl
 import com.umc.edison.data.repository.BubbleRepositoryImpl
 import com.umc.edison.data.repository.IdentityRepositoryImpl
 import com.umc.edison.data.repository.LabelRepositoryImpl
+import com.umc.edison.data.repository.RecentSearchRepositoryImpl
 import com.umc.edison.data.repository.SyncRepositoryImpl
 import com.umc.edison.data.repository.UserRepositoryImpl
 import com.umc.edison.domain.repository.ArtLetterRepository
 import com.umc.edison.domain.repository.BubbleRepository
 import com.umc.edison.domain.repository.IdentityRepository
 import com.umc.edison.domain.repository.LabelRepository
+import com.umc.edison.domain.repository.RecentSearchRepository
 import com.umc.edison.domain.repository.SyncRepository
 import com.umc.edison.domain.repository.UserRepository
 import dagger.Binds
@@ -56,4 +58,10 @@ internal abstract class RepositoryModule {
     abstract fun bindIdentityRepository(
         identityRepositoryImpl: IdentityRepositoryImpl
     ): IdentityRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRecentSearchRepository(
+        recentSearchRepositoryImpl: RecentSearchRepositoryImpl
+    ): RecentSearchRepository
 }

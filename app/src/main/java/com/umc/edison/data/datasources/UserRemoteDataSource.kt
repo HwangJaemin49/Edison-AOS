@@ -10,6 +10,7 @@ interface UserRemoteDataSource {
 
     // READ
     suspend fun getAllMyIdentityResults(): List<IdentityEntity>
+    suspend fun getAllRecentSearches() : List<String>
     suspend fun getIdentityByCategory(categoryNumber: String): IdentityEntity
     suspend fun getLogInState(): Boolean
     suspend fun getMyIdentityResult(categoryNumber: String): IdentityEntity
@@ -21,5 +22,6 @@ interface UserRemoteDataSource {
     suspend fun updateProfileInfo(user: UserEntity)
 
     // DELETE
+    suspend fun deleteRecentSearch(search: String)
     suspend fun deleteUser()
 }
