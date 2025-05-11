@@ -13,8 +13,8 @@ interface BubbleLabelDao {
                 "VALUES (:bubbleId, :labelId, :createdAt, :updatedAt)"
     )
     suspend fun insert(
-        bubbleId: Int,
-        labelId: Int,
+        bubbleId: String,
+        labelId: String,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
     )
@@ -22,8 +22,8 @@ interface BubbleLabelDao {
     @Query(
         "DELETE FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId"
     )
-    suspend fun deleteByBubbleId(bubbleId: Int)
+    suspend fun deleteByBubbleId(bubbleId: String)
 
     @Query("SELECT id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId AND label_id = :labelId")
-    suspend fun getBubbleLabelId(bubbleId: Int, labelId: Int): Int?
+    suspend fun getBubbleLabelId(bubbleId: String, labelId: String): Int?
 }

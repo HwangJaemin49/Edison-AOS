@@ -6,9 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 
-interface BaseDao<T> {
+interface BaseSyncDao<T> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entity: T): Long
+    suspend fun insert(entity: T): String
 
     @Update
     suspend fun update(entity: T)
@@ -17,14 +17,11 @@ interface BaseDao<T> {
     suspend fun delete(entity: T)
 
     @androidx.room.RawQuery
-    suspend fun getUnSyncedDatas(query: SupportSQLiteQuery): List<T>
-
-    @androidx.room.RawQuery
-    suspend fun markAsSynced(query: SupportSQLiteQuery): Int
-
-    @androidx.room.RawQuery
     suspend fun getById(query: SupportSQLiteQuery): T?
 
     @androidx.room.RawQuery
-    suspend fun recover(query: SupportSQLiteQuery): Int
+    suspend fun getAllUnSyncedRows(query: SupportSQLiteQuery): List<T>
+
+    @androidx.room.RawQuery
+    suspend fun markAsSynced(query: SupportSQLiteQuery): Int
 }

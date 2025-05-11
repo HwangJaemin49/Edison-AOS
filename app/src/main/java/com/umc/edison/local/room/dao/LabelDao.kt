@@ -8,7 +8,7 @@ import com.umc.edison.local.model.LabelLocal
 import com.umc.edison.local.room.RoomConstant
 
 @Dao
-interface LabelDao : BaseDao<LabelLocal> {
+interface LabelDao : BaseSyncDao<LabelLocal> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun sync(labelLocal: LabelLocal)
@@ -22,10 +22,10 @@ interface LabelDao : BaseDao<LabelLocal> {
                     "SELECT label_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId" +
                 ") AND is_deleted = 0"
     )
-    suspend fun getAllLabelsByBubbleId(bubbleId: Int): List<LabelLocal>
+    suspend fun getAllLabelsByBubbleId(bubbleId: String): List<LabelLocal>
 
     @Query("SELECT * FROM ${RoomConstant.Table.LABEL} WHERE id = :labelId")
-    suspend fun getLabelById(labelId: Int): LabelLocal?
+    suspend fun getLabelById(labelId: String): LabelLocal?
 
     @Query("DELETE FROM ${RoomConstant.Table.LABEL}")
     suspend fun deleteAllLabels()

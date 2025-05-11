@@ -14,8 +14,8 @@ interface LinkedBubbleDao {
                 "VALUES (:currId, :linkedId, :isBack, :createdAt, :updatedAt)"
     )
     suspend fun insert(
-        currId: Int,
-        linkedId: Int,
+        currId: String,
+        linkedId: String,
         isBack: Boolean,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
@@ -25,17 +25,17 @@ interface LinkedBubbleDao {
         "SELECT * FROM ${RoomConstant.Table.BUBBLE} " +
                 "WHERE id IN (SELECT link_bubble_id FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND is_back = 0)"
     )
-    suspend fun getLinkedBubbleByBubbleId(currId: Int): BubbleLocal?
+    suspend fun getLinkedBubbleByBubbleId(currId: String): BubbleLocal?
 
     @Query(
         "SELECT * FROM ${RoomConstant.Table.BUBBLE} " +
                 "WHERE id IN (SELECT link_bubble_id FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND is_back = 1)"
     )
-    suspend fun getBackLinksByBubbleId(currId: Int): List<BubbleLocal>
+    suspend fun getBackLinksByBubbleId(currId: String): List<BubbleLocal>
 
     @Query("SELECT id FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND link_bubble_id = :linkedId AND is_back = :isBack")
-    suspend fun getLinkedBubbleId(currId: Int, linkedId: Int, isBack: Boolean): Int?
+    suspend fun getLinkedBubbleId(currId: String, linkedId: String, isBack: Boolean): Int?
 
     @Query("DELETE FROM ${RoomConstant.Table.LINKED_BUBBLE} WHERE curr_bubble_id = :currId AND is_back = :isBack")
-    suspend fun deleteLinkedBubble(currId: Int, isBack: Boolean)
+    suspend fun deleteLinkedBubble(currId: String, isBack: Boolean)
 }
