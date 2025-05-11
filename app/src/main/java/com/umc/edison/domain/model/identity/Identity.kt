@@ -1,9 +1,9 @@
-package com.umc.edison.domain.model
+package com.umc.edison.domain.model.identity
 
 data class Identity(
     val category: IdentityCategory,
-    val selectedKeywords: List<Keyword> = emptyList(),
-    val options: List<Keyword>
+    val selectedKeywords: List<IdentityKeyword>,
+    val keywords: List<IdentityKeyword>
 )
 
 enum class IdentityCategory(
@@ -32,5 +32,12 @@ enum class IdentityCategory(
         question = "나에게 가장\n영감을 주는 환경은?",
         descriptionFirst = "닉네임 님은",
         descriptionSecond = "에서 가장 영감을 받아요!",
-    )
+    ),
+
+    INSPIRATION(
+        question = "나의 상상력을\n자극하는 분야는?",
+        questionTip = "잘 알지 못해도 관심있는 분야일수록 좋아요.",
+        descriptionFirst = "닉네임 님은",
+        descriptionSecond = "에서 가장 영감을 받아요!",
+    ),
 }

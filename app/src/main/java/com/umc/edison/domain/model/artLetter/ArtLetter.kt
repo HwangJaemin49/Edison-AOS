@@ -1,6 +1,6 @@
-package com.umc.edison.domain.model
+package com.umc.edison.domain.model.artLetter
 
-class ArtLetterDetail (
+data class ArtLetter (
     val artLetterId: Int,
     val title: String,
     val content: String,
