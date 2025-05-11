@@ -9,5 +9,5 @@ import javax.inject.Inject
 class GetMyProfileInfoUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    operator fun invoke(): Flow<DataResource<User>> = userRepository.getProfileInfo()
+    operator fun invoke(): Flow<DataResource<User>> = userRepository.getMyProfileInfo()
 }

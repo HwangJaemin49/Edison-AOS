@@ -8,5 +8,5 @@ import javax.inject.Inject
 class DeleteUserUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    operator fun invoke(): Flow<DataResource<Unit>> = userRepository.deleteAccount()
+    operator fun invoke(): Flow<DataResource<Unit>> = userRepository.deleteUser()
 }
