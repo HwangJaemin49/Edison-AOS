@@ -1,8 +1,8 @@
-package com.umc.edison.data.model
+package com.umc.edison.data.model.label
 
 import android.util.Log
 import androidx.compose.ui.graphics.Color
-import com.umc.edison.data.model.artLetter.toData
+import com.umc.edison.data.model.DataMapper
 import com.umc.edison.domain.model.label.Label
 import java.util.Date
 
@@ -10,7 +10,6 @@ data class LabelEntity(
     val id: String,
     val name: String,
     val color: Color,
-    var bubbles: List<BubbleEntity> = emptyList(),
     val isDeleted: Boolean = false,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
@@ -21,7 +20,6 @@ data class LabelEntity(
         id = id,
         name = name,
         color = color,
-        bubbles = bubbles.map { it.toDomain() }
     )
 }
 
@@ -37,7 +35,6 @@ fun Label.toData(): LabelEntity = LabelEntity(
     id = id,
     name = name,
     color = color,
-    bubbles = bubbles.toData()
 )
 
 fun List<Label>.toData(): List<LabelEntity> = map { it.toData() }

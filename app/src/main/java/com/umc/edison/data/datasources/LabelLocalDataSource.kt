@@ -1,20 +1,21 @@
 package com.umc.edison.data.datasources
 
-import com.umc.edison.data.model.LabelEntity
+import com.umc.edison.data.model.label.LabelEntity
 
 interface LabelLocalDataSource {
-    suspend fun getAllLabels(): List<LabelEntity>
-    suspend fun addLabels(labels: List<LabelEntity>)
+    // CREATE
     suspend fun addLabel(label: LabelEntity)
-    suspend fun updateLabel(label: LabelEntity)
-    suspend fun softDeleteLabel(label: LabelEntity)
-    suspend fun deleteLabel(label: LabelEntity)
 
-    suspend fun getLabelDetail(labelId: Int): LabelEntity
-
-    suspend fun syncLabels(labels: List<LabelEntity>)
+    // READ
+    suspend fun getAllLabels(): List<LabelEntity>
+    suspend fun getLabel(id: String): LabelEntity
     suspend fun getUnSyncedLabels(): List<LabelEntity>
-    suspend fun markAsSynced(label: LabelEntity)
 
-    suspend fun deleteAllLabels()
+    // UPDATE
+    suspend fun markAsSynced(label: LabelEntity)
+    suspend fun updateLabel(label: LabelEntity)
+
+    // DELETE
+    suspend fun deleteLabel(label: LabelEntity)
+    suspend fun softDeleteLabel(label: LabelEntity)
 }
