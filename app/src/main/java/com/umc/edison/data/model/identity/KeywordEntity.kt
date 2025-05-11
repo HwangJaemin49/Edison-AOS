@@ -1,5 +1,6 @@
-package com.umc.edison.data.model
+package com.umc.edison.data.model.identity
 
+import com.umc.edison.data.model.DataMapper
 import com.umc.edison.domain.model.identity.IdentityKeyword
 
 data class KeywordEntity(

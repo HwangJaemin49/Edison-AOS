@@ -2,11 +2,13 @@ package com.umc.edison.data.di
 
 import com.umc.edison.data.repository.ArtLetterRepositoryImpl
 import com.umc.edison.data.repository.BubbleRepositoryImpl
+import com.umc.edison.data.repository.IdentityRepositoryImpl
 import com.umc.edison.data.repository.LabelRepositoryImpl
 import com.umc.edison.data.repository.SyncRepositoryImpl
 import com.umc.edison.data.repository.UserRepositoryImpl
 import com.umc.edison.domain.repository.ArtLetterRepository
 import com.umc.edison.domain.repository.BubbleRepository
+import com.umc.edison.domain.repository.IdentityRepository
 import com.umc.edison.domain.repository.LabelRepository
 import com.umc.edison.domain.repository.SyncRepository
 import com.umc.edison.domain.repository.UserRepository
@@ -48,4 +50,10 @@ internal abstract class RepositoryModule {
     abstract fun bindArtLetterRepository(
         artLetterRepositoryImpl: ArtLetterRepositoryImpl
     ) : ArtLetterRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindIdentityRepository(
+        identityRepositoryImpl: IdentityRepositoryImpl
+    ): IdentityRepository
 }

@@ -6,9 +6,9 @@ import com.umc.edison.domain.repository.IdentityRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAllMyIdentitiesUseCase @Inject constructor(
+class GetAllMyIdentityResultsUseCase @Inject constructor(
     private val identityRepository: IdentityRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<Identity>>> =
-        identityRepository.getAllMyIdentities()
+        identityRepository.getAllMyIdentityResults()
 }

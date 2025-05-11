@@ -10,9 +10,9 @@ interface IdentityRepository {
     fun addIdentity(identity: Identity): Flow<DataResource<Unit>>
 
     // READ
-    fun getAllMyIdentities(): Flow<DataResource<List<Identity>>>
+    fun getAllMyIdentityResults(): Flow<DataResource<List<Identity>>>
     fun getIdentityByCategory(category: IdentityCategory): Flow<DataResource<Identity>>
-    fun getMyIdentityResult(category: IdentityCategory): Flow<DataResource<Identity>>
+    fun getMyIdentityResultByCategory(category: IdentityCategory): Flow<DataResource<Identity>>
 
     // UPDATE
     fun updateMyIdentity(identity: Identity): Flow<DataResource<Unit>>

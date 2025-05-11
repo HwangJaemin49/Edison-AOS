@@ -11,5 +11,5 @@ class GetMyIdentityResultUseCase @Inject constructor(
     private val identityRepository: IdentityRepository,
 ) {
     operator fun invoke(category: IdentityCategory): Flow<DataResource<Identity>> =
-        identityRepository.getMyIdentityResult(category)
+        identityRepository.getMyIdentityResultByCategory(category)
 }
