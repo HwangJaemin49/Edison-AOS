@@ -7,6 +7,7 @@ import java.util.Date
 
 @Dao
 interface BubbleLabelDao {
+    // CREATE
     @Query(
         "INSERT INTO ${RoomConstant.Table.BUBBLE_LABEL} " +
                 "(bubble_id, label_id, created_at, updated_at) " +
@@ -19,11 +20,12 @@ interface BubbleLabelDao {
         updatedAt: Date = Date()
     )
 
-    @Query(
-        "DELETE FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId"
-    )
-    suspend fun deleteByBubbleId(bubbleId: String)
-
+    // READ
     @Query("SELECT id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId AND label_id = :labelId")
     suspend fun getBubbleLabelId(bubbleId: String, labelId: String): Int?
+
+    // DELETE
+    @Query("DELETE FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE bubble_id = :bubbleId")
+    suspend fun deleteByBubbleId(bubbleId: String)
+
 }

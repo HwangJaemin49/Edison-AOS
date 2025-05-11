@@ -1,26 +1,27 @@
 package com.umc.edison.local.room.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.umc.edison.local.model.BubbleLocal
 import com.umc.edison.local.room.RoomConstant
 
 @Dao
 interface BubbleDao : BaseSyncDao<BubbleLocal> {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun sync(bubbleLocal: BubbleLocal)
-
+    // READ
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_deleted = 0 AND is_trashed = 0")
     suspend fun getAllBubbles(): List<BubbleLocal>
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_deleted = 0 AND is_trashed = 0 AND created_at >= :sevenDaysAgo")
-    suspend fun getStorageBubbles(sevenDaysAgo: Long): List<BubbleLocal>
+    suspend fun getAllRecentBubbles(sevenDaysAgo: Long): List<BubbleLocal>
+
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_trashed = 1 AND is_deleted = 0")
+    suspend fun getAllTrashedBubbles(): List<BubbleLocal>
 
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id = :bubbleId")
     suspend fun getBubbleById(bubbleId: String): BubbleLocal?
+
+    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE label_id = :labelId) AND is_deleted = 0 AND is_trashed = 0")
+    suspend fun getBubblesByLabelId(labelId: String): List<BubbleLocal>
 
     @Query(
         """
@@ -37,15 +38,10 @@ interface BubbleDao : BaseSyncDao<BubbleLocal> {
     )
     suspend fun getSearchBubbles(query: String): List<BubbleLocal>
 
-    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL} WHERE label_id = :labelId) AND is_deleted = 0 AND is_trashed = 0")
-    suspend fun getBubblesByLabel(labelId: String): List<BubbleLocal>
-
     @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE id NOT IN (SELECT bubble_id FROM ${RoomConstant.Table.BUBBLE_LABEL}) AND is_deleted = 0 AND is_trashed = 0")
     suspend fun getBubblesWithoutLabel(): List<BubbleLocal>
 
-    @Query("SELECT * FROM ${RoomConstant.Table.BUBBLE} WHERE is_trashed = 1 AND is_deleted = 0")
-    suspend fun getTrashedBubbles(): List<BubbleLocal>
-
+    // DELETE
     @Query("DELETE FROM ${RoomConstant.Table.BUBBLE} WHERE id IN (:ids)")
     suspend fun deleteBubbles(ids: List<String>)
 

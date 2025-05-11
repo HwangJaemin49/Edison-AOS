@@ -51,13 +51,13 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         val sevenDaysAgo = Calendar.getInstance().apply {
             add(Calendar.DAY_OF_YEAR, -dayBefore)
         }.time.time
-        val localBubbles: List<BubbleLocal> = bubbleDao.getStorageBubbles(sevenDaysAgo)
+        val localBubbles: List<BubbleLocal> = bubbleDao.getAllRecentBubbles(sevenDaysAgo)
 
         return convertLocalBubblesToBubbleEntities(localBubbles)
     }
 
     override suspend fun getAllTrashedBubbles(): List<BubbleEntity> {
-        val deletedBubbles: List<BubbleLocal> = bubbleDao.getTrashedBubbles()
+        val deletedBubbles: List<BubbleLocal> = bubbleDao.getAllTrashedBubbles()
 
         return convertLocalBubblesToBubbleEntities(deletedBubbles)
     }
@@ -76,7 +76,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getBubblesByLabelId(labelId: String): List<BubbleEntity> {
-        val localBubbles: List<BubbleLocal> = bubbleDao.getBubblesByLabel(labelId)
+        val localBubbles: List<BubbleLocal> = bubbleDao.getBubblesByLabelId(labelId)
         return convertLocalBubblesToBubbleEntities(localBubbles)
     }
 
