@@ -1,12 +1,12 @@
-package com.umc.edison.domain.usecase.mypage
+package com.umc.edison.domain.usecase.user
 
-import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.model.User
+import com.umc.edison.data.DataResource
+import com.umc.edison.domain.model.user.User
 import com.umc.edison.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetProfileInfoUseCase @Inject constructor(
+class GetMyProfileInfoUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     operator fun invoke(): Flow<DataResource<User>> = userRepository.getProfileInfo()
