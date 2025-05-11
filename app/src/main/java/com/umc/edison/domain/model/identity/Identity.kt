@@ -16,6 +16,7 @@ enum class IdentityCategory(
         question = "",
         descriptionFirst = "",
     ),
+
     EXPLAIN(
         question = "나를 설명하는\n단어를 골라주세요!",
         descriptionFirst = "닉네임 님은 자신을 이렇게 바라보고 있어요.",
