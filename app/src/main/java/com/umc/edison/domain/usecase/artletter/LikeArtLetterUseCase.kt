@@ -9,5 +9,5 @@ class LikeArtLetterUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(id: Int): Flow<DataResource<Unit>> =
-        artLetterRepository.postArtLetterLike(id)
+        artLetterRepository.likeArtLetter(id)
 }

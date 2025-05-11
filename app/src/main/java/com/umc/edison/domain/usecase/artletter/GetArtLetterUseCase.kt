@@ -10,5 +10,5 @@ class GetArtLetterUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(id: Int): Flow<DataResource<ArtLetter>> =
-        artLetterRepository.getArtLetterDetail(id)
+        artLetterRepository.getArtLetter(id)
 }

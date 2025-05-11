@@ -13,5 +13,5 @@ class SearchArtLettersUseCase @Inject constructor(
         keyword: String,
         sortType: String = "default"
     ): Flow<DataResource<List<ArtLetter>>> =
-        artLetterRepository.getSearchArtLetters(keyword, sortType)
+        artLetterRepository.searchArtLetters(keyword, sortType)
 }

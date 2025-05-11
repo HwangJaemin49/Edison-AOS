@@ -9,5 +9,5 @@ class ScrapArtLetterUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(id: Int): Flow<DataResource<Unit>> =
-        artLetterRepository.postArtLetterScrap(id)
+        artLetterRepository.scrapArtLetter(id)
 }

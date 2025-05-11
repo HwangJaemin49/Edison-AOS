@@ -1,4 +1,4 @@
-package com.umc.edison.domain
+package com.umc.edison.data
 
 sealed class DataResource<out T> {
     class Success<out T>(val data: T) : DataResource<T>()

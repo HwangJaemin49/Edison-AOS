@@ -2,13 +2,13 @@ package com.umc.edison.domain.usecase.artletter
 
 import com.umc.edison.data.DataResource
 import com.umc.edison.domain.model.artLetter.ArtLetter
-import com.umc.edison.domain.repository.UserRepository
+import com.umc.edison.domain.repository.ArtLetterRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetAllScrappedArtLettersUseCase @Inject constructor(
-    private val userRepository: UserRepository
+    private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<ArtLetter>>> =
-        userRepository.getMyScrapArtLetters()
+        artLetterRepository.getAllScrappedArtLetters()
 }

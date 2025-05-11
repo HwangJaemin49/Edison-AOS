@@ -10,6 +10,6 @@ class GetAllEditorPickArtLettersUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<ArtLetter>>> {
-        return artLetterRepository.getEditorPickArtLetters()
+        return artLetterRepository.getAllEditorPickArtLetters()
     }
 }

@@ -1,34 +1,24 @@
 package com.umc.edison.domain.repository
 
-
-import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.model.ArtLetterPreview
-import com.umc.edison.domain.model.ArtLetterDetail
-import com.umc.edison.domain.model.ArtLetterKeyWord
+import com.umc.edison.data.DataResource
+import com.umc.edison.domain.model.artLetter.ArtLetter
+import com.umc.edison.domain.model.artLetter.ArtLetterKeyWord
 import kotlinx.coroutines.flow.Flow
 
 interface ArtLetterRepository {
-    fun getEditorPickArtLetters(): Flow<DataResource<List<ArtLetterPreview>>>
+    // READ
+    fun getAllArtLetterCategories(): Flow<DataResource<List<String>>>
+    fun getAllArtLetters(): Flow<DataResource<List<ArtLetter>>>
+    fun getAllEditorPickArtLetters(): Flow<DataResource<List<ArtLetter>>>
+    fun getAllRandomArtLetters(): Flow<DataResource<List<ArtLetter>>>
+    fun getAllRecommendArtLetterKeyWords(): Flow<DataResource<List<ArtLetterKeyWord>>>
+    fun getAllScrappedArtLetters(): Flow<DataResource<List<ArtLetter>>>
+    fun getArtLetter(id: Int): Flow<DataResource<ArtLetter>>
+    fun getScrappedArtLettersByCategory(category: String): Flow<DataResource<List<ArtLetter>>>
+    fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>>
+    fun searchArtLetters(keyword: String, sortType: String): Flow<DataResource<List<ArtLetter>>>
 
-    fun getAllArtLetters(): Flow<DataResource<List<ArtLetterPreview>>>
-
-    fun getArtLetterDetail(letterId: Int): Flow<DataResource<ArtLetterDetail>>
-
-    fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetterPreview>>>
-
-    fun getRandomArtLetters(): Flow<DataResource<List<ArtLetterPreview>>>
-
-    fun postArtLetterScrap(id: Int): Flow<DataResource<Unit>>
-
-    fun postArtLetterLike(id: Int): Flow<DataResource<Unit>>
-
-    fun getSearchArtLetters(keyword: String, sortType: String): Flow<DataResource<List<ArtLetterPreview>>>
-
-    fun getArtLetterKeyWord(): Flow<DataResource<List<ArtLetterKeyWord>>>
-
-    fun getArtLetterCategory(): Flow<DataResource<List<String>>>
-
-    fun removeRecentSearch(keyword: String): Flow<DataResource<Unit>>
-
-    fun getRecentSearches(): Flow<DataResource<List<String>>>
+    // UPDATE
+    fun likeArtLetter(id: Int): Flow<DataResource<Unit>>
+    fun scrapArtLetter(id: Int): Flow<DataResource<Unit>>
 }

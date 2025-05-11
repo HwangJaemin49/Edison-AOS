@@ -10,6 +10,6 @@ class GetAllRecommendArtLetterKeyWordsUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<ArtLetterKeyWord>>> {
-        return artLetterRepository.getArtLetterKeyWord()
+        return artLetterRepository.getAllRecommendArtLetterKeyWords()
     }
 }

@@ -10,5 +10,5 @@ class GetAllRandomArtLettersUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<ArtLetter>>> =
-        artLetterRepository.getRandomArtLetters()
+        artLetterRepository.getAllRandomArtLetters()
 }

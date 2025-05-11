@@ -9,5 +9,5 @@ class GetAllArtLetterCategoriesUseCase @Inject constructor(
     private val artLetterRepository: ArtLetterRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<String>>> =
-        artLetterRepository.getArtLetterCategory()
+        artLetterRepository.getAllArtLetterCategories()
 }
