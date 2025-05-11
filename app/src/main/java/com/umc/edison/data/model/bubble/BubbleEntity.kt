@@ -9,13 +9,13 @@ import com.umc.edison.domain.model.bubble.Bubble
 import java.util.Date
 
 data class BubbleEntity(
-    var id: String,
+    val id: String,
     val title: String?,
     val content: String?,
-    var mainImage: String?,
-    var labels: List<LabelEntity>,
-    var backLinks: List<BubbleEntity>,
-    var linkedBubble: BubbleEntity?,
+    val mainImage: String?,
+    val labels: List<LabelEntity>,
+    val backLinks: List<BubbleEntity>,
+    val linkedBubble: BubbleEntity?,
     val isDeleted: Boolean = false,
     val isTrashed: Boolean = false,
     val createdAt: Date = Date(),
@@ -36,9 +36,6 @@ data class BubbleEntity(
 }
 
 fun BubbleEntity.same(other: BubbleEntity): Boolean {
-    if (this.mainImage?.isEmpty() == true) this.mainImage = null
-    if (other.mainImage?.isEmpty() == true) other.mainImage = null
-
     Log.d("BubbleEntity", "this: $this,\nother: $other")
 
     return id == other.id &&
