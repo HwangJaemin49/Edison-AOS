@@ -5,12 +5,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.umc.edison.data.model.LabelEntity
+import com.umc.edison.data.model.label.LabelEntity
 import java.util.Date
+import java.util.UUID
 
 @Entity
 data class LabelLocal(
-    @PrimaryKey(autoGenerate = true) override val id: Int = 0,
+    @PrimaryKey
+    @ColumnInfo(name = "id") override val uuid: String = UUID.randomUUID().toString(),
     val name: String,
     val color: Int,
     @ColumnInfo(name = "is_synced") override var isSynced: Boolean = false,
@@ -20,10 +22,9 @@ data class LabelLocal(
     @ColumnInfo(name = "deleted_at") override var deletedAt: Date? = null,
 ) : LocalMapper<LabelEntity>, BaseSyncLocal {
     override fun toData(): LabelEntity = LabelEntity(
-        id = id,
+        id = uuid,
         name = name,
         color = Color(color),
-        bubbles = emptyList(),
         isDeleted = isDeleted,
         createdAt = createdAt,
         updatedAt = updatedAt,
@@ -32,7 +33,7 @@ data class LabelLocal(
 }
 
 fun LabelEntity.toLocal(): LabelLocal = LabelLocal(
-    id = id,
+    uuid = id,
     name = name,
     color = color.toArgb(),
     isSynced = isSynced,
