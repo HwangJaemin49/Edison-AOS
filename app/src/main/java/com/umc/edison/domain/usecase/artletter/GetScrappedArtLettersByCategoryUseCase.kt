@@ -6,7 +6,7 @@ import com.umc.edison.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAllScrappedArtLettersByCategoryUseCase @Inject constructor(
+class GetScrappedArtLettersByCategoryUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     operator fun invoke(category: String): Flow<DataResource<List<ArtLetter>>> =
