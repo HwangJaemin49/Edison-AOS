@@ -1,8 +1,9 @@
-package com.umc.edison.data.model
+package com.umc.edison.data.model.artLetter
 
-import com.umc.edison.domain.model.ArtLetterDetail
+import com.umc.edison.data.model.DataMapper
+import com.umc.edison.domain.model.artLetter.ArtLetter
 
-data class ArtLetterDetailEntity(
+data class ArtLetterEntity(
     val artLetterId: Int,
     val title: String,
     val content: String,
@@ -14,8 +15,8 @@ data class ArtLetterDetailEntity(
     val likesCnt: Int,
     val liked: Boolean,
     val scraped: Boolean
-) : DataMapper<ArtLetterDetail> {
-    override fun toDomain(): ArtLetterDetail = ArtLetterDetail(
+) : DataMapper<ArtLetter> {
+    override fun toDomain(): ArtLetter = ArtLetter(
         artLetterId = artLetterId,
         title = title,
         content = content,
@@ -29,17 +30,3 @@ data class ArtLetterDetailEntity(
         scraped = scraped
     )
 }
-
-fun ArtLetterDetail.toData(): ArtLetterDetailEntity = ArtLetterDetailEntity(
-    artLetterId = artLetterId,
-    title = title,
-    content = content,
-    category = category,
-    readTime = readTime,
-    writer = writer,
-    tags = tags,
-    thumbnail = thumbnail,
-    likesCnt = likesCnt,
-    liked = liked,
-    scraped = scraped
-)

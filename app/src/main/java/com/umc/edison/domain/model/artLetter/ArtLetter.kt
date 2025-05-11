@@ -12,4 +12,20 @@ data class ArtLetter (
     val likesCnt: Int,
     val liked: Boolean,
     val scraped: Boolean,
-)
+) {
+    companion object {
+        val DEFAULT = ArtLetter(
+            artLetterId = 0,
+            title = "",
+            content = "",
+            category = "",
+            readTime = 0,
+            writer = "",
+            tags = emptyList(),
+            thumbnail = "",
+            likesCnt = 0,
+            liked = false,
+            scraped = false
+        )
+    }
+}

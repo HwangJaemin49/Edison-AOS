@@ -1,32 +1,23 @@
 package com.umc.edison.data.datasources
 
-import com.umc.edison.data.model.ArtLetterCategoryEntity
-import com.umc.edison.data.model.ArtLetterDetailEntity
-import com.umc.edison.data.model.ArtLetterKeyWordEntity
-import com.umc.edison.data.model.ArtLetterPreviewEntity
+import com.umc.edison.data.model.artLetter.ArtLetterEntity
+import com.umc.edison.data.model.artLetter.ArtLetterKeyWordEntity
+import com.umc.edison.data.model.artLetter.ArtLetterPreviewEntity
 
 interface ArtLetterRemoteDataSource {
+    // READ
+    suspend fun getAllArtLetterCategories(): List<String>
     suspend fun getAllArtLetters(): List<ArtLetterPreviewEntity>
-
-    suspend fun getArtLetterDetail(id: Int): ArtLetterDetailEntity
-
+    suspend fun getAllEditorPickArtLetters(): List<ArtLetterPreviewEntity>
+    suspend fun getAllRandomArtLetters(): List<ArtLetterPreviewEntity>
+    suspend fun getAllRecommendArtLetterKeyWords(): List<ArtLetterKeyWordEntity>
+    suspend fun getAllScrappedArtLetters(): List<ArtLetterPreviewEntity>
+    suspend fun getArtLetter(id: Int): ArtLetterEntity
+    suspend fun getScrappedArtLettersByCategory(category: String): List<ArtLetterPreviewEntity>
     suspend fun getSortedArtLetters(sortBy: String): List<ArtLetterPreviewEntity>
+    suspend fun getSearchArtLetterResults(keyword: String, sortType: String): List<ArtLetterPreviewEntity>
 
-    suspend fun getRandomArtLetters(): List<ArtLetterPreviewEntity>
-
-    suspend fun postArtLetterScrap(id: Int)
-
+    // UPDATE
     suspend fun postArtLetterLike(id: Int)
-
-    suspend fun postEditorPickArtLetter(): List<ArtLetterPreviewEntity>
-
-    suspend fun getSearchArtLetters(keyword: String, sortType: String): List<ArtLetterPreviewEntity>
-
-    suspend fun getArtLetterKeyWord(): List<ArtLetterKeyWordEntity>
-
-    suspend fun getArtLetterCategory(): List<String>
-
-    suspend fun removeRecentSearch(keyword: String)
-
-    suspend fun getRecentSearches(): List<String>
+    suspend fun postArtLetterScrap(id: Int)
 }
