@@ -3,10 +3,8 @@ package com.umc.edison.domain.usecase.sync
 import com.umc.edison.domain.repository.SyncRepository
 import javax.inject.Inject
 
-class GetServerDataUseCase @Inject constructor(
+class SyncLocalDataToServerUseCase @Inject constructor(
     private val syncRepository: SyncRepository
 ) {
-    suspend operator fun invoke() {
-        syncRepository.syncServerDataToLocal()
-    }
+    suspend operator fun invoke() = syncRepository.syncLocalDataToServer()
 }
