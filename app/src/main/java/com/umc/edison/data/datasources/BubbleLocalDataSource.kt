@@ -24,5 +24,6 @@ interface BubbleLocalDataSource {
 
     // DELETE
     suspend fun deleteBubbles(bubbles: List<BubbleEntity>)
+    suspend fun softDeleteBubbles(bubbles: List<BubbleEntity>)
     suspend fun trashBubbles(bubbles: List<BubbleEntity>)
 }

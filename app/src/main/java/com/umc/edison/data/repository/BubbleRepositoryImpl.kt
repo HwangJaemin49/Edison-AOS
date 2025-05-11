@@ -99,13 +99,9 @@ class BubbleRepositoryImpl @Inject constructor(
     // DELETE
     override fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
         flowSyncDataResource(
-            localAction = { bubbleLocalDataSource.deleteBubbles(bubbles.toData()) },
+            localAction = { bubbleLocalDataSource.softDeleteBubbles(bubbles.toData()) },
             remoteSync = { bubbleRemoteDataSource.deleteBubbles(bubbles.toData()) },
-            onRemoteSuccess = { remoteData ->
-                for (bubble in remoteData) {
-                    bubbleLocalDataSource.markAsSynced(bubble)
-                }
-            }
+            onRemoteSuccess = { remoteData -> bubbleLocalDataSource.deleteBubbles(remoteData)}
         )
 
     override fun trashBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
