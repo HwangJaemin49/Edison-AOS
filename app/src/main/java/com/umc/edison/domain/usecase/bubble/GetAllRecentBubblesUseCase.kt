@@ -6,9 +6,10 @@ import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class DeleteBubblesUseCase @Inject constructor(
+class GetAllRecentBubblesUseCase @Inject constructor(
     private val bubbleRepository: BubbleRepository
 ) {
-    operator fun invoke(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
-        bubbleRepository.deleteBubbles(bubbles)
+    private val dayBefore = 7
+    operator fun invoke(): Flow<DataResource<List<Bubble>>> =
+        bubbleRepository.getAllRecentBubbles(dayBefore)
 }

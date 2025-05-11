@@ -6,9 +6,9 @@ import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class DeleteBubblesUseCase @Inject constructor(
+class SearchBubblesUseCase @Inject constructor(
     private val bubbleRepository: BubbleRepository
 ) {
-    operator fun invoke(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
-        bubbleRepository.deleteBubbles(bubbles)
+    operator fun invoke(query: String): Flow<DataResource<List<Bubble>>> =
+        bubbleRepository.getSearchBubbles(query)
 }
