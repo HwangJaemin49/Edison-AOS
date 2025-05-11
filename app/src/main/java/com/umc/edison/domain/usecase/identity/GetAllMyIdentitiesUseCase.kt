@@ -2,13 +2,13 @@ package com.umc.edison.domain.usecase.identity
 
 import com.umc.edison.data.DataResource
 import com.umc.edison.domain.model.identity.Identity
-import com.umc.edison.domain.repository.UserRepository
+import com.umc.edison.domain.repository.IdentityRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAllMyIdentityResultsUseCase @Inject constructor(
-    private val userRepository: UserRepository
+class GetAllMyIdentitiesUseCase @Inject constructor(
+    private val identityRepository: IdentityRepository
 ) {
     operator fun invoke(): Flow<DataResource<List<Identity>>> =
-        userRepository.getAllMyIdentityResults()
+        identityRepository.getAllMyIdentities()
 }
