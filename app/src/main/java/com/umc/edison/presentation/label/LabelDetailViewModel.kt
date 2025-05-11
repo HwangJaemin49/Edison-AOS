@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
-import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
+import com.umc.edison.domain.usecase.label.GetLabelUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.LabelDetailMode
 import com.umc.edison.presentation.model.LabelModel
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LabelDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getLabelDetailUseCase: GetLabelDetailUseCase,
+    private val getLabelUseCase: GetLabelUseCase,
     private val moveBubblesUseCase: MoveBubblesUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
@@ -37,7 +37,7 @@ class LabelDetailViewModel @Inject constructor(
         _uiState.update { LabelDetailState.DEFAULT }
 
         collectDataResource(
-            flow = getLabelDetailUseCase(id),
+            flow = getLabelUseCase(id),
             onSuccess = { label ->
                 val shuffledBubbles = label.bubbles.shuffled().toPresentation()
                 _uiState.update {
