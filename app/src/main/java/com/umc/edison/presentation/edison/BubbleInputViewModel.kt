@@ -322,6 +322,34 @@ class BubbleInputViewModel @Inject constructor(
         checkCanSave()
     }
 
+    fun deleteBackLink(targetBackLink: BubbleModel) {
+        val currentBubble = _uiState.value.bubble
+        val updatedBackLinks = currentBubble.backLinks
+            .filterNot { it.id == targetBackLink.id }
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                bubble = currentBubble.copy(
+                    backLinks = updatedBackLinks
+                )
+            )
+        }
+    }
+
+    fun deleteLinkBubble(targetLinkBubble: BubbleModel) {
+        val currentBubble = _uiState.value.bubble
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                bubble = currentBubble.copy(
+                    linkedBubble = if (currentBubble.linkedBubble?.id == targetLinkBubble.id) null else currentBubble.linkedBubble
+                )
+            )
+        }
+    }
+
+
+
     fun deleteContentBlock(contentBlock: ContentBlockModel) {
         if (contentBlock.type != ContentType.IMAGE) return
 
