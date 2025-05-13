@@ -1,5 +1,8 @@
 package com.umc.edison.presentation.storage
 
+import android.app.Application
+import android.content.Intent
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
@@ -16,6 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BubbleStorageViewModel @Inject constructor(
+    private val context: Application,
     private val getStorageBubbleUseCase: GetStorageBubbleUseCase,
     override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
     override val syncDataUseCase: SyncDataUseCase,
@@ -23,6 +27,8 @@ class BubbleStorageViewModel @Inject constructor(
 
     override val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
     override val uiState = _uiState.asStateFlow()
+
+
 
     fun fetchStorageBubbles() {
         _uiState.update { BubbleStorageState.DEFAULT }
@@ -54,12 +60,33 @@ class BubbleStorageViewModel @Inject constructor(
     }
 
     fun shareTexts() {
-        _uiState.update {
-            it.copy(
-                mode = BubbleStorageMode.EDIT,
-                toastMessage = "서비스 준비 중입니다."
-            )
+        val context = this.context
+        val selectedBubbles = _uiState.value.selectedBubbles
+
+        if (selectedBubbles.isEmpty()) return
+
+        val textsToShare = selectedBubbles.map { bubble ->
+            val title = bubble.title ?: ""
+            val content = bubble.contentBlocks
+                .filter { it.type.name == "TEXT" }
+                .sortedBy { it.position }
+                .joinToString {
+                    HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+                }
+
+            "$title\n\n$content"
+        }.joinToString("---\n\n")
+
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, textsToShare)
+            type = "text/plain"
         }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // context가 Application이기 때문에 필요함
+        context.startActivity(shareIntent)
     }
 
     fun syncData() {
@@ -71,6 +98,8 @@ class BubbleStorageViewModel @Inject constructor(
             }
         }
     }
+
+
 
     override fun refreshDataAfterDeletion() {
         fetchStorageBubbles()
