@@ -13,6 +13,6 @@ class FlowSyncBoundResource<DomainType, DataType, BackUpDataType>(
 ) {
     override suspend fun collect(collector: FlowCollector<DataResource<DomainType>>) {
         actionFromSource(collector)
-        actionBackUpFromSource(collector, onRemoteSuccess)
+        actionBackUpFromSource(onRemoteSuccess)
     }
 }
