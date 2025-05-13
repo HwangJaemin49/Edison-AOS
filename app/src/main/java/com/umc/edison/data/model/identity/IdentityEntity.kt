@@ -5,13 +5,13 @@ import com.umc.edison.domain.model.identity.Identity
 import com.umc.edison.domain.model.identity.IdentityCategory
 
 data class IdentityEntity(
-    val categoryNumber: String,
-    val selectedKeywords: List<KeywordEntity>,
-    val keywords: List<KeywordEntity>,
+    val category: IdentityCategory,
+    val selectedKeywords: List<IdentityKeywordEntity>,
+    val keywords: List<IdentityKeywordEntity>,
 ) : DataMapper<Identity> {
     override fun toDomain(): Identity {
         return Identity(
-            category = IdentityCategoryMapper.entries.first { it.categoryNumber == categoryNumber }.category,
+            category = category,
             selectedKeywords = selectedKeywords.map { it.toDomain() },
             keywords = keywords.map { it.toDomain() }
         )
@@ -20,33 +20,8 @@ data class IdentityEntity(
 
 fun Identity.toData(): IdentityEntity {
     return IdentityEntity(
-        categoryNumber = IdentityCategoryMapper.entries.first { it.category == category }.categoryNumber,
+        category = category,
         selectedKeywords = selectedKeywords.map { it.toData() },
         keywords = keywords.map { it.toData() }
     )
-}
-
-enum class IdentityCategoryMapper(
-    val categoryNumber: String,
-    val category: IdentityCategory
-) {
-    EXPLAIN(
-        categoryNumber = "CATEGORY1",
-        category = IdentityCategory.EXPLAIN
-    ),
-
-    FIELD(
-        categoryNumber = "CATEGORY2",
-        category = IdentityCategory.FIELD
-    ),
-
-    ENVIRONMENT(
-        categoryNumber = "CATEGORY3",
-        category = IdentityCategory.ENVIRONMENT
-    ),
-
-    INSPIRATION(
-        categoryNumber = "CATEGORY4",
-        category = IdentityCategory.INSPIRATION
-    ),
 }
