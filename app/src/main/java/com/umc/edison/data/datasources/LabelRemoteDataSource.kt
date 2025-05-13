@@ -10,5 +10,5 @@ interface LabelRemoteDataSource {
     suspend fun updateLabel(label: LabelEntity): LabelEntity
 
     // DELETE
-    suspend fun deleteLabel(label: LabelEntity): LabelEntity
+    suspend fun deleteLabel(id: String): LabelEntity
 }

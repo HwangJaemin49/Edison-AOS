@@ -17,5 +17,4 @@ interface LabelLocalDataSource {
 
     // DELETE
     suspend fun deleteLabel(label: LabelEntity)
-    suspend fun softDeleteLabel(label: LabelEntity)
 }

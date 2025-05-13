@@ -21,14 +21,14 @@ data class LabelEntity(
         name = name,
         color = color,
     )
-}
 
-fun LabelEntity.same(other: LabelEntity): Boolean {
-    Log.d("LabelEntity", "this: $this,\nother: $other")
-    return id == other.id &&
-        name == other.name &&
-        color == other.color &&
-        isDeleted == other.isDeleted
+    fun same(other: LabelEntity): Boolean {
+        Log.d("LabelEntity", "this: $this, \nother: $other")
+        return id == other.id &&
+            name == other.name &&
+            color == other.color &&
+            isDeleted == other.isDeleted
+    }
 }
 
 fun Label.toData(): LabelEntity = LabelEntity(

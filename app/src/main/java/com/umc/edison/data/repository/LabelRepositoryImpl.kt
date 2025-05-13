@@ -9,6 +9,7 @@ import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.label.Label
 import com.umc.edison.domain.repository.LabelRepository
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 import javax.inject.Inject
 
 class LabelRepositoryImpl @Inject constructor(
@@ -45,8 +46,18 @@ class LabelRepositoryImpl @Inject constructor(
     // DELETE
     override fun deleteLabel(id: String): Flow<DataResource<Unit>> =
         flowSyncDataResource(
-            localAction = { labelLocalDataSource.softDeleteLabel(labelLocalDataSource.getLabel(id)) },
-            remoteSync = { labelRemoteDataSource.deleteLabel(labelLocalDataSource.getLabel(id)) },
+            localAction = {
+                val label = labelLocalDataSource.getLabel(id)
+
+                if (!label.isDeleted) {
+                    label.copy(
+                        isDeleted = true,
+                        deletedAt = Date()
+                    )
+                    labelLocalDataSource.updateLabel(label)
+                }
+            },
+            remoteSync = { labelRemoteDataSource.deleteLabel(id) },
             onRemoteSuccess = { remoteData -> labelLocalDataSource.deleteLabel(remoteData) }
         )
 }
