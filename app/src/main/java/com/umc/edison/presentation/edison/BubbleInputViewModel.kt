@@ -3,6 +3,7 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.model.ContentType
@@ -327,6 +328,7 @@ class BubbleInputViewModel @Inject constructor(
         val updatedBackLinks = currentBubble.backLinks
             .filterNot { it.id == targetBackLink.id }
 
+
         _uiState.update { currentState ->
             currentState.copy(
                 bubble = currentBubble.copy(
@@ -334,6 +336,8 @@ class BubbleInputViewModel @Inject constructor(
                 )
             )
         }
+
+
     }
 
     fun deleteLinkBubble(targetLinkBubble: BubbleModel) {
@@ -424,9 +428,13 @@ class BubbleInputViewModel @Inject constructor(
                 addBubbleUseCase(_uiState.value.bubble.toDomain())
             } else {
                 updateBubbleUseCase(_uiState.value.bubble.toDomain())
+
             },
             onSuccess = { savedBubble ->
                 _uiState.update { it.copy(toastMessage = "저장되었습니다.") }
+
+                Log.d("debug", "{$savedBubble}")
+
                 syncData()
 
                 if (isLinked) {
