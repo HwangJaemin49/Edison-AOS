@@ -8,9 +8,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.withContext
 
-abstract class FLowBaseBoundResource<DomainType, DataType, BackUpDataType>(
+abstract class FLowBaseBoundResource<DomainType, DataType>(
     val dataAction: suspend () -> DataType,
-    val backUpAction: suspend () -> BackUpDataType? = { null },
 ) : Flow<DataResource<DomainType>> {
     protected open suspend fun actionFromSource(
         collector: FlowCollector<DataResource<DomainType>>,
@@ -22,23 +21,6 @@ abstract class FLowBaseBoundResource<DomainType, DataType, BackUpDataType>(
             collector.emit(DataResource.success(data.toDomain()))
         } catch (e: Throwable) {
             collector.emit(DataResource.error(e))
-        }
-    }
-
-    protected open suspend fun actionBackUpFromSource(
-        successAction: (suspend (BackUpDataType) -> Unit)? = null,
-    ) {
-        try {
-            val data = withContext(Dispatchers.IO) { backUpAction() }
-            Log.d("actionBackUpFromSource", "result: $data")
-
-            withContext(Dispatchers.IO) {
-                data?.let {
-                    successAction?.invoke(it)
-                }
-            }
-        } catch (e: Throwable) {
-            Log.e("actionBackUpFromSource", "error: ${e.message}")
         }
     }
 }
