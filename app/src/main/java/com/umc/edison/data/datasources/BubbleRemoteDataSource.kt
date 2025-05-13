@@ -1,7 +1,7 @@
 package com.umc.edison.data.datasources
 
 import com.umc.edison.data.model.bubble.BubbleEntity
-import com.umc.edison.data.model.bubble.ClusteredBubbleEntity
+import com.umc.edison.data.model.bubble.PositionBubbleEntity
 
 interface BubbleRemoteDataSource {
     // CREATE
@@ -9,7 +9,7 @@ interface BubbleRemoteDataSource {
     suspend fun addBubble(bubble: BubbleEntity): BubbleEntity
 
     // READ
-    suspend fun getAllClusteredBubbles(): List<ClusteredBubbleEntity>
+    suspend fun getAllClusteredBubbles(): List<PositionBubbleEntity>
 
     // UPDATE
     suspend fun recoverBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>

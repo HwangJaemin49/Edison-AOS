@@ -4,12 +4,14 @@ import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.bound.flowSyncDataResource
 import com.umc.edison.data.datasources.BubbleLocalDataSource
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
+import com.umc.edison.data.model.bubble.ClusteredBubbleEntity
 import com.umc.edison.data.model.bubble.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.bubble.Bubble
 import com.umc.edison.domain.model.bubble.ClusteredBubble
 import com.umc.edison.domain.repository.BubbleRepository
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 import javax.inject.Inject
 
 class BubbleRepositoryImpl @Inject constructor(
@@ -43,7 +45,24 @@ class BubbleRepositoryImpl @Inject constructor(
 
     override fun getAllClusteredBubbles(): Flow<DataResource<List<ClusteredBubble>>> =
         flowDataResource(
-            dataAction = { bubbleRemoteDataSource.getAllClusteredBubbles() }
+            dataAction = {
+                val remoteResponse = bubbleRemoteDataSource.getAllClusteredBubbles()
+
+                val clusteredBubbles = mutableListOf<ClusteredBubbleEntity>()
+                remoteResponse.map {
+                    val bubble = bubbleLocalDataSource.getBubble(it.id)
+                    clusteredBubbles.add(
+                        ClusteredBubbleEntity(
+                            bubble = bubble,
+                            x = it.x,
+                            y = it.y,
+                            group = it.group
+                        )
+                    )
+                }
+
+                clusteredBubbles
+            }
         )
 
     override fun getAllRecentBubbles(dayBefore: Int): Flow<DataResource<List<Bubble>>> =
@@ -69,7 +88,16 @@ class BubbleRepositoryImpl @Inject constructor(
     // UPDATE
     override fun recoverBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
         flowSyncDataResource(
-            localAction = { bubbleLocalDataSource.recoverBubbles(bubbles.toData()) },
+            localAction = {
+                val updatedBubbles = bubbles.toData().map { bubble ->
+                    bubble.copy(
+                        isTrashed = false,
+                        isDeleted = false,
+                        deletedAt = null,
+                    )
+                }
+                bubbleLocalDataSource.updateBubbles(updatedBubbles)
+            },
             remoteSync = { bubbleRemoteDataSource.recoverBubbles(bubbles.toData()) },
             onRemoteSuccess = { remoteData ->
                 for (bubble in remoteData) {
@@ -99,14 +127,31 @@ class BubbleRepositoryImpl @Inject constructor(
     // DELETE
     override fun deleteBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
         flowSyncDataResource(
-            localAction = { bubbleLocalDataSource.softDeleteBubbles(bubbles.toData()) },
+            localAction = {
+                val updatedBubbles = bubbles.toData().map { bubble ->
+                    bubble.copy(
+                        isDeleted = true,
+                        deletedAt = Date(),
+                    )
+                }
+                bubbleLocalDataSource.updateBubbles(updatedBubbles)
+            },
             remoteSync = { bubbleRemoteDataSource.deleteBubbles(bubbles.toData()) },
             onRemoteSuccess = { remoteData -> bubbleLocalDataSource.deleteBubbles(remoteData)}
         )
 
     override fun trashBubbles(bubbles: List<Bubble>): Flow<DataResource<Unit>> =
         flowSyncDataResource(
-            localAction = { bubbleLocalDataSource.trashBubbles(bubbles.toData()) },
+            localAction = {
+                val updatedBubbles = bubbles.toData().map { bubble ->
+                    bubble.copy(
+                        isTrashed = true,
+                        isDeleted = false,
+                        deletedAt = Date(),
+                    )
+                }
+                bubbleLocalDataSource.updateBubbles(updatedBubbles)
+            },
             remoteSync = { bubbleRemoteDataSource.trashBubbles(bubbles.toData()) },
             onRemoteSuccess = { remoteData ->
                 for (bubble in remoteData) {

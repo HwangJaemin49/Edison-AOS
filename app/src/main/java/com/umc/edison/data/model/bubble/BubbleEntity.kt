@@ -33,19 +33,19 @@ data class BubbleEntity(
         linkedBubble?.toDomain(),
         updatedAt
     )
-}
 
-fun BubbleEntity.same(other: BubbleEntity): Boolean {
-    Log.d("BubbleEntity", "this: $this,\nother: $other")
+    fun same(other: BubbleEntity): Boolean {
+        Log.d("BubbleEntity", "this: $this,\nother: $other")
 
-    return id == other.id &&
-            title == other.title &&
-            content == other.content &&
-            mainImage == other.mainImage &&
-            labels.map { it.id } == other.labels.map { it.id } &&
-            backLinks.map { it.id } == other.backLinks.map { it.id } &&
-            isDeleted == other.isDeleted &&
-            isTrashed == other.isTrashed
+        return id == other.id &&
+                title == other.title &&
+                content == other.content &&
+                mainImage == other.mainImage &&
+                labels.map { it.id } == other.labels.map { it.id } &&
+                backLinks.map { it.id } == other.backLinks.map { it.id } &&
+                isDeleted == other.isDeleted &&
+                isTrashed == other.isTrashed
+    }
 }
 
 fun Bubble.toData(): BubbleEntity = BubbleEntity(
