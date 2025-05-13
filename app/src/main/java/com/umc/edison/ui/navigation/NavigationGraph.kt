@@ -1,5 +1,8 @@
 package com.umc.edison.ui.navigation
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -29,13 +32,13 @@ import com.umc.edison.ui.mypage.ScrapBoardDetailScreen
 import com.umc.edison.ui.mypage.ScrapBoardScreen
 import com.umc.edison.ui.mypage.TrashScreen
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NavigationGraph(
     navHostController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit
 ) {
     NavHost(navHostController, startDestination = NavRoute.Splash.route) {
-        // bottom navigation
         composable(NavRoute.MyEdison.route) {
             MyEdisonScreen(navHostController, updateShowBottomNav)
         }
@@ -52,11 +55,20 @@ fun NavigationGraph(
             ArtLetterSearchScreen(navHostController)
         }
 
+        // ✅ 수정된 아트레터 상세 경로
         composable(
             route = "${NavRoute.ArtLetter.route}/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
-        ) {
-            ArtLetterDetailScreen(navHostController)
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val idStr = backStackEntry.arguments?.getString("id")
+            if (idStr != null) {
+                ArtLetterDetailScreen(
+                    artLetterId = idStr,
+                    navHostController = navHostController
+                )
+            } else {
+                Log.e("NavGraph", "Invalid artLetterId in deeplink: $idStr")
+            }
         }
 
         composable(NavRoute.MyPage.route) {
@@ -94,25 +106,24 @@ fun NavigationGraph(
             ScrapBoardDetailScreen(navHostController)
         }
 
-        composable(NavRoute.Login.route){
-            LoginScreen(  navHostController, updateShowBottomNav )
+        composable(NavRoute.Login.route) {
+            LoginScreen(navHostController, updateShowBottomNav)
         }
 
-        composable(NavRoute.Splash.route){
-            SplashScreen(navHostController ,updateShowBottomNav)
+        composable(NavRoute.Splash.route) {
+            SplashScreen(navHostController, updateShowBottomNav)
         }
 
-
-        composable(NavRoute.MakeNickName.route){
-            MakeNickNameScreen( navHostController,updateShowBottomNav )
+        composable(NavRoute.MakeNickName.route) {
+            MakeNickNameScreen(navHostController, updateShowBottomNav)
         }
 
-        composable(NavRoute.IdentityTest.route){
-            IdentityTestScreen(navHostController, updateShowBottomNav )
+        composable(NavRoute.IdentityTest.route) {
+            IdentityTestScreen(navHostController, updateShowBottomNav)
         }
 
-        composable(NavRoute.TermsOfUse.route){
-            TermsOfUseScreen(navHostController,updateShowBottomNav )
+        composable(NavRoute.TermsOfUse.route) {
+            TermsOfUseScreen(navHostController, updateShowBottomNav)
         }
 
         composable(
@@ -140,7 +151,7 @@ fun NavigationGraph(
             route = "${NavRoute.MyEdison.route}/bubbles/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
-            BubbleInputScreen(navHostController,updateShowBottomNav)
+            BubbleInputScreen(navHostController, updateShowBottomNav)
         }
     }
 }

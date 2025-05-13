@@ -1,5 +1,10 @@
 package com.umc.edison.ui.artboard
 
+import android.content.Intent
+import io.branch.referral.util.LinkProperties
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -27,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -38,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
@@ -46,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import io.branch.referral.util.ContentMetadata
 import com.umc.edison.R
 import com.umc.edison.presentation.artletter.ArtLetterDetailState
 import com.umc.edison.presentation.artletter.ArtLetterDetailViewModel
@@ -58,20 +66,27 @@ import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
+import io.branch.indexing.BranchUniversalObject
 import kotlin.math.roundToInt
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun ArtLetterDetailScreen(
+    artLetterId: String,
     navHostController: NavHostController,
     viewModel: ArtLetterDetailViewModel = hiltViewModel()
 ) {
+    // ✅ artLetterId로 데이터 로딩 (최초 1회)
+    LaunchedEffect(artLetterId) {
+        viewModel.loadArtLetter(artLetterId)
+    }
+
     val uiState by viewModel.uiState.collectAsState()
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenHeightPx = with(LocalDensity.current) { screenHeight.toPx() }
     val collapsedOffset = screenHeightPx * 0.4f
     val expandedOffset = 0f
-
     var sheetOffsetPx by remember { mutableFloatStateOf(collapsedOffset) }
 
     BaseContent(
@@ -121,6 +136,8 @@ fun ArtLetterDetailScreen(
             }
 
             if (sheetOffsetPx > 10f) {
+                val context = LocalContext.current
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -135,7 +152,6 @@ fun ArtLetterDetailScreen(
                         },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // 작성 시간
                     Row(
                         modifier = Modifier
                             .wrapContentSize()
@@ -151,7 +167,6 @@ fun ArtLetterDetailScreen(
                             modifier = Modifier.size(24.dp),
                             tint = Gray600
                         )
-
                         Text(
                             text = "${uiState.artLetter.readTime}분",
                             color = Gray600,
@@ -175,7 +190,6 @@ fun ArtLetterDetailScreen(
                             color = Gray600,
                             style = MaterialTheme.typography.labelLarge
                         )
-
                         Icon(
                             painter = painterResource(id = R.drawable.ic_like),
                             contentDescription = "Likes",
@@ -197,7 +211,40 @@ fun ArtLetterDetailScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_share),
                             contentDescription = "Share",
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clickable {
+                                    val artLetterIdToShare = uiState.artLetter.artLetterId.toString()
+                                    val branchUniversalObject = BranchUniversalObject()
+                                        .setCanonicalIdentifier("artLetter/$artLetterIdToShare")
+                                        .setTitle(uiState.artLetter.title)
+                                        .setContentDescription(uiState.artLetter.content.take(100))
+                                        .setContentMetadata(
+                                            ContentMetadata().addCustomMetadata("artLetterId", artLetterIdToShare)
+                                        )
+
+                                    val linkProperties = LinkProperties()
+                                        .setFeature("sharing")
+                                        .setChannel("app")
+                                        .setStage("detail")
+
+                                    branchUniversalObject.generateShortUrl(
+                                        context,
+                                        linkProperties
+                                    ) { url, error ->
+                                        if (error == null) {
+                                            val sendIntent = Intent().apply {
+                                                action = Intent.ACTION_SEND
+                                                putExtra(Intent.EXTRA_TEXT, url)
+                                                type = "text/plain"
+                                            }
+                                            val shareIntent = Intent.createChooser(sendIntent, null)
+                                            context.startActivity(shareIntent)
+                                        } else {
+                                            Log.e("BranchShare", "Branch error: ${error.message}")
+                                        }
+                                    }
+                                },
                             tint = Gray600,
                         )
                     }
@@ -237,6 +284,7 @@ fun ArtLetterDetailScreen(
         }
     }
 }
+
 
 @Composable
 fun ArtLetterDetailContent(
@@ -373,7 +421,7 @@ fun ArtLetterDetailContent(
                         .clickable {
                             navHostController.navigate(
                                 NavRoute.ArtLetterDetail.createRoute(
-                                    artLetter.artLetterId
+                                    artLetter.artLetterId.toString()
                                 )
                             )
                         },

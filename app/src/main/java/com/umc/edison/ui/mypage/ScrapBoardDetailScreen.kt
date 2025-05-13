@@ -49,7 +49,7 @@ fun ScrapBoardDetailScreen(
                 onArtLetterClick = { artLetter ->
                     navHostController.navigate(
                         NavRoute.ArtLetterDetail.createRoute(
-                            artLetter.artLetterId
+                            artLetter.artLetterId.toString()
                         )
                     )
                 },

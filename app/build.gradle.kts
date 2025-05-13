@@ -35,6 +35,9 @@ android {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
             }
         }
+        
+        manifestPlaceholders["branch_key"] = localProperties["branch_key"] ?: ""
+
     }
 
     buildTypes {
@@ -74,7 +77,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -93,6 +95,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
@@ -125,4 +128,6 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    implementation("io.branch.sdk.android:library:5.+")
 }
