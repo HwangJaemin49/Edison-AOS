@@ -6,7 +6,7 @@ import com.umc.edison.domain.repository.IdentityRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class UpdateMyIdentityUseCase @Inject constructor(
+class UpdateMyIdentityResultUseCase @Inject constructor(
     private val identityRepository: IdentityRepository
 ) {
     operator fun invoke(identity: Identity): Flow<DataResource<Unit>> =
