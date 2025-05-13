@@ -3,7 +3,7 @@ package com.umc.edison.data.model.identity
 import com.umc.edison.data.model.DataMapper
 import com.umc.edison.domain.model.identity.IdentityKeyword
 
-data class KeywordEntity(
+data class IdentityKeywordEntity(
     val id: Int,
     val name: String
 ) : DataMapper<IdentityKeyword> {
@@ -15,8 +15,8 @@ data class KeywordEntity(
     }
 }
 
-fun IdentityKeyword.toData(): KeywordEntity {
-    return KeywordEntity(
+fun IdentityKeyword.toData(): IdentityKeywordEntity {
+    return IdentityKeywordEntity(
         id = id,
         name = name
     )

@@ -2,7 +2,6 @@ package com.umc.edison.data.repository
 
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.UserRemoteDataSource
-import com.umc.edison.data.model.identity.IdentityCategoryMapper
 import com.umc.edison.data.model.identity.toData
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.identity.Identity
@@ -15,7 +14,7 @@ class IdentityRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserRemoteDataSource
 ) : IdentityRepository {
     // CREATE
-    override fun addIdentity(identity: Identity): Flow<DataResource<Unit>> =
+    override fun addUserIdentity(identity: Identity): Flow<DataResource<Unit>> =
         flowDataResource(
             dataAction = { userRemoteDataSource.addIdentity(identity.toData()) }
         )
@@ -29,27 +28,19 @@ class IdentityRepositoryImpl @Inject constructor(
     override fun getIdentityByCategory(category: IdentityCategory): Flow<DataResource<Identity>> =
         flowDataResource(
             dataAction = {
-                val categoryNumber = IdentityCategoryMapper.entries.first {
-                    it.category == category
-                }.categoryNumber
-
-                userRemoteDataSource.getIdentityByCategory(categoryNumber)
+                userRemoteDataSource.getIdentityByCategory(category)
             }
         )
 
     override fun getMyIdentityResultByCategory(category: IdentityCategory): Flow<DataResource<Identity>> =
         flowDataResource(
             dataAction = {
-                val categoryNumber = IdentityCategoryMapper.entries.first {
-                    it.category == category
-                }.categoryNumber
-
-                userRemoteDataSource.getMyIdentityResult(categoryNumber)
+                userRemoteDataSource.getMyIdentityResult(category)
             }
         )
 
     // UPDATE
-    override fun updateMyIdentity(identity: Identity): Flow<DataResource<Unit>> =
+    override fun updateMyIdentityResult(identity: Identity): Flow<DataResource<Unit>> =
         flowDataResource(
             dataAction = { userRemoteDataSource.updateIdentity(identity.toData()) }
         )
