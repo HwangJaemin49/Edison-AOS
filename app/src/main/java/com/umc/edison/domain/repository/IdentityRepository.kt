@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface IdentityRepository {
     // CREATE
-    fun addIdentity(identity: Identity): Flow<DataResource<Unit>>
+    fun addUserIdentity(identity: Identity): Flow<DataResource<Unit>>
 
     // READ
     fun getAllMyIdentityResults(): Flow<DataResource<List<Identity>>>
@@ -15,5 +15,5 @@ interface IdentityRepository {
     fun getMyIdentityResultByCategory(category: IdentityCategory): Flow<DataResource<Identity>>
 
     // UPDATE
-    fun updateMyIdentity(identity: Identity): Flow<DataResource<Unit>>
+    fun updateMyIdentityResult(identity: Identity): Flow<DataResource<Unit>>
 }

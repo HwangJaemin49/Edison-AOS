@@ -10,5 +10,5 @@ class UpdateMyIdentityResultUseCase @Inject constructor(
     private val identityRepository: IdentityRepository
 ) {
     operator fun invoke(identity: Identity): Flow<DataResource<Unit>> =
-        identityRepository.updateMyIdentity(identity)
+        identityRepository.updateMyIdentityResult(identity)
 }
