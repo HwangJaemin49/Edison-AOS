@@ -3,6 +3,7 @@ package com.umc.edison.data.repository
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.identity.toData
+import com.umc.edison.data.model.toDomain
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.identity.Identity
 import com.umc.edison.domain.model.identity.IdentityCategory
@@ -28,14 +29,17 @@ class IdentityRepositoryImpl @Inject constructor(
     override fun getIdentityByCategory(category: IdentityCategory): Flow<DataResource<Identity>> =
         flowDataResource(
             dataAction = {
-                userRemoteDataSource.getIdentityByCategory(category)
+                userRemoteDataSource.getIdentityByCategory(category.toData())
             }
         )
 
     override fun getMyIdentityResultByCategory(category: IdentityCategory): Flow<DataResource<Identity>> =
         flowDataResource(
             dataAction = {
-                userRemoteDataSource.getMyIdentityResult(category)
+                val allResults = userRemoteDataSource.getAllMyIdentityResults()
+                allResults.firstOrNull { it.category == category }
+                    ?: throw IllegalArgumentException("Identity not found for category: $category")
+
             }
         )
 
