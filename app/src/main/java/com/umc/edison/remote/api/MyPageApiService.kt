@@ -36,12 +36,6 @@ interface MyPageApiService {
     @GET("members/identity")
     suspend fun getAllMyTestResults(): ResponseWithData<GetAllMyTestResultsResponse>
 
-    @GET("artletters/scrap")
-    suspend fun getMyScrapArtLetters(): ResponseWithPagination<GetMyScrapArtLettersResponse>
-
-    @GET("artletters/scrap/{category}")
-    suspend fun getScrapArtLettersByCategory(@Path("category") category: String): ResponseWithPagination<GetScrapArtLettersByCategoryResponse>
-
     @PATCH("members/identity")
     suspend fun updateTest(@Body identity: UpdateTestRequest): ResponseWithData<UpdateTestResponse>
 

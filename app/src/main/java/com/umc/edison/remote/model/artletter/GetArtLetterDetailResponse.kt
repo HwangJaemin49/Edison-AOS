@@ -1,7 +1,7 @@
 package com.umc.edison.remote.model.artletter
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.ArtLetterDetailEntity
+import com.umc.edison.data.model.artLetter.ArtLetterEntity
 import com.umc.edison.remote.model.RemoteMapper
 
 class GetArtLetterDetailResponse (
@@ -19,9 +19,9 @@ class GetArtLetterDetailResponse (
     @SerializedName("updatedAt") val updatedAt: String,
     @SerializedName("liked") val liked: Boolean,
     @SerializedName("scraped") val scraped: Boolean
-) : RemoteMapper<ArtLetterDetailEntity> {
+) : RemoteMapper<ArtLetterEntity> {
 
-    override fun toData(): ArtLetterDetailEntity = ArtLetterDetailEntity(
+    override fun toData(): ArtLetterEntity = ArtLetterEntity(
         artLetterId = artLetterId,
         title = title,
         content = content,

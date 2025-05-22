@@ -1,8 +1,7 @@
 package com.umc.edison.remote.model.login
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.IdentityEntity
-import com.umc.edison.data.model.InterestEntity
+import com.umc.edison.data.model.identity.IdentityEntity
 
 data class SetIdentityKeywordRequest(
     @SerializedName("category")
@@ -12,10 +11,5 @@ data class SetIdentityKeywordRequest(
 )
 fun IdentityEntity.toSetIdentityKeywordRequest(): SetIdentityKeywordRequest =SetIdentityKeywordRequest(
     category = categoryNumber,
-    keywords = keywords.map { it.id }
-)
-
-fun InterestEntity.toSetIdentityKeywordRequest(): SetIdentityKeywordRequest =SetIdentityKeywordRequest(
-    category = categoryNumber,
-    keywords = keywords.map { it.id }
+    keywords = selectedKeywords.map { it.id }
 )

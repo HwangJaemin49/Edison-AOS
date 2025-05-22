@@ -1,8 +1,7 @@
 package com.umc.edison.remote.model.mypage
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.IdentityEntity
-import com.umc.edison.data.model.InterestEntity
+import com.umc.edison.data.model.identity.IdentityEntity
 
 data class UpdateTestRequest(
     @SerializedName("category") val category: String,
@@ -11,10 +10,5 @@ data class UpdateTestRequest(
 
 fun IdentityEntity.toUpdateTestRequest(): UpdateTestRequest = UpdateTestRequest(
     category = categoryNumber,
-    keywords = keywords.map { it.id }
-)
-
-fun InterestEntity.toUpdateTestRequest(): UpdateTestRequest = UpdateTestRequest(
-    category = categoryNumber,
-    keywords = keywords.map { it.id }
+    keywords = selectedKeywords.map { it.id }
 )

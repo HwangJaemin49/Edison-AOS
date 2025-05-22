@@ -1,7 +1,7 @@
 package com.umc.edison.remote.model.sync
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.BubbleEntity
+import com.umc.edison.data.model.bubble.BubbleEntity
 import com.umc.edison.remote.model.toIso8601String
 
 data class SyncBubbleRequest(

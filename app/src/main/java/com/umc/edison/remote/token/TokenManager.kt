@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 @Singleton
 class TokenManager @Inject constructor(
@@ -34,10 +35,10 @@ class TokenManager @Inject constructor(
         REFRESH_TOKEN = refreshToken
 
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString("access_token", ACCESS_TOKEN)
-        if (REFRESH_TOKEN != null) editor.putString("refresh_token", REFRESH_TOKEN)
-        editor.apply()
+        sharedPreferences.edit {
+            putString("access_token", ACCESS_TOKEN)
+            if (REFRESH_TOKEN != null) putString("refresh_token", REFRESH_TOKEN)
+        }
     }
 
     fun deleteToken() {
@@ -45,9 +46,9 @@ class TokenManager @Inject constructor(
         REFRESH_TOKEN = null
 
         val sharedPreferences: SharedPreferences = context.getSharedPreferences("token", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.remove("access_token")
-        editor.remove("refresh_token")
-        editor.apply()
+        sharedPreferences.edit {
+            remove("access_token")
+            remove("refresh_token")
+        }
     }
 }

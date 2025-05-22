@@ -2,7 +2,7 @@ package com.umc.edison.remote.model.sync
 
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.LabelEntity
+import com.umc.edison.data.model.label.LabelEntity
 import com.umc.edison.remote.model.toIso8601String
 
 data class SyncLabelRequest(

@@ -7,5 +7,4 @@ import retrofit2.http.GET
 interface BubbleSpaceApiService {
     @GET("/spaces/convert")
     suspend fun getBubblePosition(): ResponseWithData<List<GetBubblePositionResponse>>
-
 }

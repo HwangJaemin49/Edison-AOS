@@ -1,7 +1,7 @@
 package com.umc.edison.remote.model.mypage
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.ArtLetterCategoryEntity
+import com.umc.edison.data.model.artLetter.ArtLetterCategoryEntity
 import com.umc.edison.remote.model.RemoteMapper
 
 data class GetMyScrapArtLettersResponse(

@@ -15,7 +15,8 @@ import com.umc.edison.remote.model.artletter.PostArtLetterScrapResponse
 import com.umc.edison.remote.model.artletter.GetEditorPickResponse
 import com.umc.edison.remote.model.artletter.GetRecentSearchesResponse
 import com.umc.edison.remote.model.artletter.GetSearchArtLettersResponse
-import com.umc.edison.remote.model.artletter.RemoveRecentSearchRequest
+import com.umc.edison.remote.model.mypage.GetMyScrapArtLettersResponse
+import com.umc.edison.remote.model.mypage.GetScrapArtLettersByCategoryResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -29,12 +30,6 @@ interface ArtLetterApiService {
 
     @GET("/artletters")
     suspend fun getSortedArtLetters(@Query("sortType") sortBy: String): ResponseWithListData<GetSortedArtLettersResponse>
-
-    @POST("/artletters/{artletterId}/scrap")
-    suspend fun postArtLetterScrap(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterScrapResponse>
-
-    @POST("/artletters/{artletterId}/like")
-    suspend fun postArtLetterLike(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterLikeResponse>
 
     @POST("/artletters/editor-pick")
     suspend fun getEditorPick(@Body ids: GetEditorPickRequest): ResponseWithListData<GetEditorPickResponse>
@@ -51,10 +46,21 @@ interface ArtLetterApiService {
     @GET("/artletters/search")
     suspend fun getSearchArtLetters(@Query("keyword") keyword: String, @Query("sortType") sortType: String): ResponseWithPagination<GetSearchArtLettersResponse>
 
-    @DELETE("/artletters/search-memory")
-    suspend fun removeRecentSearch(@Query("keyword") keyword: String): BaseResponse
+    @GET("artletters/scrap")
+    suspend fun getMyScrapArtLetters(): ResponseWithPagination<GetMyScrapArtLettersResponse>
+
+    @GET("artletters/scrap/{category}")
+    suspend fun getScrappedArtLettersByCategory(@Path("category") category: String): ResponseWithPagination<GetScrapArtLettersByCategoryResponse>
 
     @GET("/artletters/search-memory")
     suspend fun getRecentSearches(): ResponseWithData<GetRecentSearchesResponse>
 
+    @POST("/artletters/{artletterId}/scrap")
+    suspend fun postArtLetterScrap(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterScrapResponse>
+
+    @POST("/artletters/{artletterId}/like")
+    suspend fun postArtLetterLike(@Path("artletterId") id: Int): ResponseWithData<PostArtLetterLikeResponse>
+
+    @DELETE("/artletters/search-memory")
+    suspend fun removeRecentSearch(@Query("keyword") keyword: String): BaseResponse
 }
