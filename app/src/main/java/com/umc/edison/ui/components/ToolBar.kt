@@ -22,10 +22,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
 import com.umc.edison.R
-import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.edison.BubbleInputState
 import com.umc.edison.presentation.edison.parseHtml
 import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.presentation.model.ContentType
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray600

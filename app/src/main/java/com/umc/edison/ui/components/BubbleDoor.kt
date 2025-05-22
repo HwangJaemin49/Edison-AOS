@@ -46,7 +46,6 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size
-import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.ui.theme.Gray100
@@ -61,6 +60,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toArgb
@@ -78,6 +78,7 @@ import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
 import com.mohamedrejeb.richeditor.ui.material3.RichText
 import com.umc.edison.presentation.edison.BubbleInputState
 import com.umc.edison.presentation.edison.parseHtml
+import com.umc.edison.presentation.model.ContentType
 import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.Red500
 import com.umc.edison.ui.theme.White000
@@ -92,7 +93,7 @@ fun BubbleDoor(
     onImageDeleted: (ContentBlockModel) -> Unit = {},
     onMainSelected: (String?) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
-    onLinkClick: (Int) -> Unit = {},
+    onLinkClick: (String) -> Unit = {},
 ) {
     val colors = bubble.labels.map { it.color }
     val outerColors = when (colors.size) {
@@ -166,7 +167,7 @@ private fun BubbleContent(
     uiState: BubbleInputState,
     deleteClicked: (ContentBlockModel) -> Unit,
     mainClicked: (String?) -> Unit,
-    onLinkClick: (Int) -> Unit,
+    onLinkClick: (String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -212,7 +213,7 @@ private fun BubbleContent(
             )
         }
 
-        var deletedImageBlockId by remember { mutableStateOf<Int>(-1) }
+        var deletedImageBlockId by remember { mutableIntStateOf(-1) }
 
         bubble.contentBlocks.forEachIndexed { index, contentBlock ->
             when (contentBlock.type) {
@@ -229,7 +230,7 @@ private fun BubbleContent(
                     val isInitialized = remember(index) { mutableStateOf(false) }
 
                     LaunchedEffect(deletedImageBlockId) {
-                        deletedImageBlockId?.let {
+                        deletedImageBlockId.let {
                             richTextState.setHtml(contentBlock.content)
                             deletedImageBlockId = -1
                         }
@@ -420,10 +421,7 @@ private fun BubbleContent(
                 val myUriHandler by remember {
                     mutableStateOf(object : UriHandler {
                         override fun openUri(uri: String) {
-                            val bubbleId = uri.toIntOrNull()
-                            if (bubbleId != null) {
-                                onLinkClick(bubbleId)
-                            }
+                            onLinkClick(uri)
                         }
                     })
                 }
@@ -474,10 +472,7 @@ private fun BubbleContent(
             val myUriHandler by remember {
                 mutableStateOf(object : UriHandler {
                     override fun openUri(uri: String) {
-                        val bubbleId = uri.toIntOrNull()
-                        if (bubbleId != null) {
-                            onLinkClick(bubbleId)
-                        }
+                        onLinkClick(uri)
                     }
                 })
             }

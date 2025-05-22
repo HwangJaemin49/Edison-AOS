@@ -126,7 +126,7 @@ fun LabelTopAppBar(
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = "${label.name}  ${label.bubbles.size}",
+            text = "${label.name}  ${label.bubbleCnt}",
             style = MaterialTheme.typography.titleLarge,
             color = Gray800
         )

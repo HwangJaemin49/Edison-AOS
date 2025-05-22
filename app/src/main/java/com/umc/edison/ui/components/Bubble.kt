@@ -48,9 +48,9 @@ import coil3.compose.AsyncImage
 import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.material3.RichText
-import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.edison.parseHtml
 import com.umc.edison.presentation.model.BubbleModel
+import com.umc.edison.presentation.model.ContentType
 import com.umc.edison.ui.theme.EdisonTypography
 import com.umc.edison.ui.theme.Gray100
 import com.umc.edison.ui.theme.Gray200
@@ -125,7 +125,7 @@ fun BubbleInput(
 fun Bubble(
     bubble: BubbleModel,
     onBubbleClick: () -> Unit,
-    onLinkedBubbleClick: (Int) -> Unit,
+    onLinkedBubbleClick: (String) -> Unit,
 ) {
     val bubbleSize = calculateBubbleSize(bubble)
 

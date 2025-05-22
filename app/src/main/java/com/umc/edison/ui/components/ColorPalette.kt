@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.umc.edison.R
 import com.umc.edison.ui.theme.White000
+import androidx.core.graphics.get
 
 @Composable
 fun ColorPalette(
@@ -93,7 +94,7 @@ fun ColorPalette(
                             val pixelY = (dragPosition.y / displayedHeight * originalHeight).toInt()
 
                             if (pixelX in 0 until originalWidth && pixelY in 0 until originalHeight) {
-                                val pixelColor = bitmap.getPixel(pixelX, pixelY)
+                                val pixelColor = bitmap[pixelX, pixelY]
                                 onColorSelected(Color(pixelColor))
                             }
                             change.consume()

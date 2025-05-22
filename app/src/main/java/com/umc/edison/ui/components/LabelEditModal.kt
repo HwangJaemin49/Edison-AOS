@@ -151,16 +151,3 @@ fun LabelModalContent(
 private fun validateLabelInfo(text: String, selectedColor: Color): Boolean {
     return text.isNotBlank() && selectedColor != Gray300
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewModalContent() {
-    EdisonTheme {
-        LabelModalContent(
-            editMode = LabelEditMode.ADD,
-            onDismiss = { },
-            onConfirm = { },
-            label = LabelModel(id = 0, name = "라벨 이름", color = Yellow100, bubbles = listOf()),
-        )
-    }
-}
