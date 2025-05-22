@@ -3,7 +3,6 @@ package com.umc.edison.data.repository
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.identity.toData
-import com.umc.edison.data.model.toDomain
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.identity.Identity
 import com.umc.edison.domain.model.identity.IdentityCategory
