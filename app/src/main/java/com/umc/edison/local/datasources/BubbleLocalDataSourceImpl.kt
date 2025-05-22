@@ -79,6 +79,11 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         return convertLocalBubblesToBubbleEntities(localBubbles)
     }
 
+    override suspend fun getBubblesWithoutLabel(): List<BubbleEntity> {
+        val localBubbles: List<BubbleLocal> = bubbleDao.getBubblesWithoutLabel()
+        return convertLocalBubblesToBubbleEntities(localBubbles)
+    }
+
     override suspend fun getSearchBubbleResults(query: String): List<BubbleEntity> {
         val localBubbles: List<BubbleLocal> = bubbleDao.getSearchBubbles(query)
         return convertLocalBubblesToBubbleEntities(localBubbles)

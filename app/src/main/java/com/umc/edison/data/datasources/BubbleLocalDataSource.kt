@@ -13,6 +13,7 @@ interface BubbleLocalDataSource {
     suspend fun getAllTrashedBubbles(): List<BubbleEntity>
     suspend fun getBubble(id: String): BubbleEntity
     suspend fun getBubblesByLabelId(labelId: String): List<BubbleEntity>
+    suspend fun getBubblesWithoutLabel(): List<BubbleEntity>
     suspend fun getSearchBubbleResults(query: String): List<BubbleEntity>
     suspend fun getUnSyncedBubbles(): List<BubbleEntity>
 

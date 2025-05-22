@@ -16,6 +16,8 @@ interface BubbleRepository {
     fun getAllRecentBubbles(dayBefore: Int): Flow<DataResource<List<Bubble>>>
     fun getAllTrashedBubbles(): Flow<DataResource<List<Bubble>>>
     fun getBubble(id: String): Flow<DataResource<Bubble>>
+    fun getBubblesByLabel(labelId: String): Flow<DataResource<List<Bubble>>>
+    fun getBubblesWithoutLabel(): Flow<DataResource<List<Bubble>>>
     fun searchBubbles(query: String): Flow<DataResource<List<Bubble>>>
 
     // UPDATE

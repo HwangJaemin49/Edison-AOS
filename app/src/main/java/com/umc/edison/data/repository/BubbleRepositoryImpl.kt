@@ -80,6 +80,16 @@ class BubbleRepositoryImpl @Inject constructor(
             dataAction = { bubbleLocalDataSource.getBubble(id) }
         )
 
+    override fun getBubblesByLabel(labelId: String): Flow<DataResource<List<Bubble>>> =
+        flowDataResource(
+            dataAction = { bubbleLocalDataSource.getBubblesByLabelId(labelId) }
+        )
+
+    override fun getBubblesWithoutLabel(): Flow<DataResource<List<Bubble>>> =
+        flowDataResource(
+            dataAction = { bubbleLocalDataSource.getBubblesWithoutLabel() }
+        )
+
     override fun searchBubbles(query: String): Flow<DataResource<List<Bubble>>> =
         flowDataResource(
             dataAction = { bubbleLocalDataSource.getSearchBubbleResults(query) }
