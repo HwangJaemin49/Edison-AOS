@@ -1,5 +1,7 @@
 package com.umc.edison.presentation.storage
 
+import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.GetAllRecentBubblesUseCase
 import android.app.Application
 import android.content.Intent
 import androidx.core.text.HtmlCompat
@@ -18,8 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class BubbleStorageViewModel @Inject constructor(
     private val context: Application,
-    private val getStorageBubbleUseCase: GetStorageBubbleUseCase,
-    override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
+    private val getAllRecentBubblesUseCase: GetAllRecentBubblesUseCase,
+    override val trashBubblesUseCase: TrashBubblesUseCase,
 ) : BaseBubbleViewModel<BubbleStorageMode, BubbleStorageState>() {
 
     override val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
@@ -28,7 +30,7 @@ class BubbleStorageViewModel @Inject constructor(
     fun fetchStorageBubbles() {
         _uiState.update { BubbleStorageState.DEFAULT }
         collectDataResource(
-            flow = getStorageBubbleUseCase(),
+            flow = getAllRecentBubblesUseCase(),
             onSuccess = { bubbles ->
                 val sortedBubbles = bubbles.sortedBy { it.date }
                 _uiState.update { it.copy(bubbles = sortedBubbles.toPresentation()) }

@@ -8,13 +8,15 @@ import com.umc.edison.presentation.model.LabelModel
 
 data class LabelDetailState(
     val label: LabelModel,
+    val bubbles: List<BubbleModel>,
     val movableLabels: List<LabelModel>,
     override val selectedBubbles: List<BubbleModel>,
     override val mode: BaseBubbleMode,
 ) : BaseBubbleState<LabelDetailMode>(selectedBubbles, mode) {
     companion object {
         val DEFAULT = LabelDetailState(
-            label = LabelModel.EMPTY,
+            label = LabelModel.DEFAULT,
+            bubbles = emptyList(),
             movableLabels = emptyList(),
             selectedBubbles = emptyList(),
             mode = LabelDetailMode.NONE,

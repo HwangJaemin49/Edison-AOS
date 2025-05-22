@@ -42,14 +42,14 @@ class BubbleInputViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id: String = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
+        val id: String? = savedStateHandle["id"]
         fetchBubble(id)
         fetchLabels()
         fetchBubbles()
     }
 
-    private fun fetchBubble(bubbleId: String) {
-        if (bubbleId.isEmpty()) {
+    private fun fetchBubble(bubbleId: String?) {
+        if (bubbleId.isNullOrEmpty()) {
             addTextBlockToFront()
             return
         }
@@ -351,7 +351,7 @@ class BubbleInputViewModel @Inject constructor(
         }
 
         collectDataResource(
-            flow = if (_uiState.value.bubble.id.isEmpty()) {
+            flow = if (_uiState.value.bubble.id.isNullOrEmpty()) {
                 addBubbleUseCase(_uiState.value.bubble.toDomain())
             } else {
                 updateBubbleUseCase(_uiState.value.bubble.toDomain())

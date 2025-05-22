@@ -1,8 +1,8 @@
 package com.umc.edison.presentation.mypage
 
 import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
-import com.umc.edison.domain.usecase.mypage.GetTrashedBubblesUseCase
-import com.umc.edison.domain.usecase.mypage.RecoverBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.GetAllTrashedBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.RecoverBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.toPresentation
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TrashViewModel @Inject constructor(
-    private val getTrashedBubblesUseCase: GetTrashedBubblesUseCase,
+    private val getAllTrashedBubblesUseCase: GetAllTrashedBubblesUseCase,
     private val recoverBubblesUseCase: RecoverBubblesUseCase,
     private val deleteBubblesUseCase: DeleteBubblesUseCase,
 ) : BaseViewModel() {
@@ -23,7 +23,7 @@ class TrashViewModel @Inject constructor(
 
     fun fetchDeletedBubbles() {
         collectDataResource(
-            flow = getTrashedBubblesUseCase(),
+            flow = getAllTrashedBubblesUseCase(),
             onSuccess = { bubbles ->
                 bubbles.sortedByDescending { it.date }
                 _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }

@@ -1,5 +1,7 @@
 package com.umc.edison.presentation.label
 
+import com.umc.edison.domain.usecase.bubble.GetBubblesByLabelUseCase
+import com.umc.edison.domain.usecase.bubble.GetBubblesWithoutLabelUseCase
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
@@ -16,6 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LabelListViewModel @Inject constructor(
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
+    private val getBubblesByLabelUseCase: GetBubblesByLabelUseCase,
+    private val getBubblesWithoutLabelUseCase: GetBubblesWithoutLabelUseCase,
     private val addLabelUseCase: AddLabelUseCase,
     private val updateLabelUseCase: UpdateLabelUseCase,
     private val deleteLabelUseCase: DeleteLabelUseCase,
@@ -32,11 +36,58 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                val sortedLabels =
-                    labels.sortedWith(compareBy({ it.id == 0 }, { it.bubbles.size })).reversed()
-
-                _uiState.update { it.copy(labels = sortedLabels.toPresentation()) }
+                _uiState.update { it.copy(labels = labels.toPresentation()) }
             },
+            onComplete = {
+                fetchBubblesByLabel()
+            }
+        )
+    }
+
+    private fun fetchBubblesByLabel() {
+        _uiState.value.labels.forEach {
+            if (it.id.isNullOrEmpty()) return@forEach
+
+            collectDataResource(
+                flow = getBubblesByLabelUseCase(it.id),
+                onSuccess = { bubbles ->
+                    _uiState.update { uiState ->
+                        uiState.copy(
+                            labels = uiState.labels.map { label ->
+                                if (label.id == it.id) {
+                                    label.copy(bubbleCnt = bubbles.size)
+                                } else {
+                                    label
+                                }
+                            }
+                        )
+                    }
+                },
+                onComplete = {
+                    // 버블 개수 많은 순으로 정렬
+                    _uiState.update {
+                        it.copy(
+                            labels = it.labels.sortedByDescending { it.bubbleCnt }
+                        )
+                    }
+                    fetchBubblesWithoutLabel()
+                }
+            )
+        }
+    }
+
+    private fun fetchBubblesWithoutLabel() {
+        collectDataResource(
+            flow = getBubblesWithoutLabelUseCase(),
+            onSuccess = { bubbles ->
+                _uiState.update {
+                    it.copy(
+                        labels = listOf(
+                            LabelModel.DEFAULT.copy(bubbleCnt = bubbles.size)
+                        ) + it.labels
+                    )
+                }
+            }
         )
     }
 
@@ -76,7 +127,7 @@ class LabelListViewModel @Inject constructor(
 
     fun deleteSelectedLabel() {
         collectDataResource(
-            flow = deleteLabelUseCase(_uiState.value.selectedLabel.toDomain()),
+            flow = deleteLabelUseCase(_uiState.value.selectedLabel.toDomain().id),
             onSuccess = {
                 updateEditMode(LabelEditMode.NONE)
                 _uiState.update {

@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.baseBubble
 
-import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +11,7 @@ abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> :
     protected abstract val _uiState: MutableStateFlow<S>
     open val uiState = _uiState.asStateFlow()
 
-    abstract val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase
+    abstract val trashBubblesUseCase: TrashBubblesUseCase
 
     fun updateEditMode(mode: BaseBubbleMode) {
         if (mode == BaseBubbleMode.NONE) {
@@ -46,7 +46,7 @@ abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> :
 
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
-            flow = softDeleteBubblesUseCase(
+            flow = trashBubblesUseCase(
                 _uiState.value.selectedBubbles.toSet().map { it.toDomain() }
             ),
             onSuccess = {

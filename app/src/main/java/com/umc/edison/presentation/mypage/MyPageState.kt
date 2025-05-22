@@ -1,17 +1,16 @@
 package com.umc.edison.presentation.mypage
 
-import com.umc.edison.domain.model.IdentityCategory
-import com.umc.edison.domain.model.InterestCategory
+import com.umc.edison.domain.model.identity.IdentityCategory
 import com.umc.edison.presentation.model.IdentityModel
-import com.umc.edison.presentation.model.InterestModel
 import com.umc.edison.presentation.model.ArtLetterCategoryModel
 import com.umc.edison.presentation.model.UserModel
+import com.umc.edison.presentation.model.toType
 
 data class MyPageState(
     val isLoggedIn: Boolean,
     val user: UserModel,
     val identities: List<IdentityModel>,
-    val interest: InterestModel,
+    val interest: IdentityModel,
     val myArtLetterCategories: List<ArtLetterCategoryModel>,
 ) {
     companion object {
@@ -20,7 +19,7 @@ data class MyPageState(
             user = UserModel.DEFAULT,
             identities = listOf(
                 IdentityModel(
-                    id = IdentityCategory.EXPLAIN.ordinal,
+                    category = IdentityCategory.EXPLAIN.toType(),
                     question = IdentityCategory.EXPLAIN.question,
                     questionTip = null,
                     descriptionFirst = IdentityCategory.EXPLAIN.descriptionFirst,
@@ -29,7 +28,7 @@ data class MyPageState(
                     selectedKeywords = emptyList(),
                 ),
                 IdentityModel(
-                    id = IdentityCategory.FIELD.ordinal,
+                    category = IdentityCategory.FIELD.toType(),
                     question = IdentityCategory.FIELD.question,
                     questionTip = null,
                     descriptionFirst = IdentityCategory.FIELD.descriptionFirst,
@@ -38,7 +37,7 @@ data class MyPageState(
                     selectedKeywords = listOf()
                 ),
                 IdentityModel(
-                    id = IdentityCategory.ENVIRONMENT.ordinal,
+                    category = IdentityCategory.ENVIRONMENT.toType(),
                     question = IdentityCategory.ENVIRONMENT.question,
                     questionTip = null,
                     descriptionFirst = IdentityCategory.ENVIRONMENT.descriptionFirst,
@@ -47,12 +46,12 @@ data class MyPageState(
                     selectedKeywords = listOf()
                 )
             ),
-            interest = InterestModel(
-                id = InterestCategory.INSPIRATION.ordinal,
-                question = InterestCategory.INSPIRATION.question,
-                questionTip = InterestCategory.INSPIRATION.questionTip,
-                descriptionFirst = InterestCategory.INSPIRATION.descriptionFirst,
-                descriptionSecond = InterestCategory.INSPIRATION.descriptionSecond,
+            interest = IdentityModel(
+                category = IdentityCategory.INSPIRATION.toType(),
+                question = IdentityCategory.INSPIRATION.question,
+                questionTip = IdentityCategory.INSPIRATION.questionTip,
+                descriptionFirst = IdentityCategory.INSPIRATION.descriptionFirst,
+                descriptionSecond = IdentityCategory.INSPIRATION.descriptionSecond,
                 options = listOf(),
                 selectedKeywords = listOf()
             ),

@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.mypage
 
-import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
-import com.umc.edison.domain.usecase.mypage.UpdateUserProfileUseCase
+import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
+import com.umc.edison.domain.usecase.user.UpdateProfileInfoUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,8 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val getProfileInfoUseCase: GetProfileInfoUseCase,
-    private val updateUserProfileUseCase: UpdateUserProfileUseCase
+    private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
+    private val updateUserProfileUseCase: UpdateProfileInfoUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(EditProfileState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -24,7 +24,7 @@ class EditProfileViewModel @Inject constructor(
 
     private fun fetchProfileInfo() {
         collectDataResource(
-            flow = getProfileInfoUseCase(),
+            flow = getMyProfileInfoUseCase(),
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },

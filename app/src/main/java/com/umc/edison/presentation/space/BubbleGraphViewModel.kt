@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.space
 
-import com.umc.edison.domain.usecase.space.GetClusteredBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.GetAllClusteredBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toClusterModel
 import com.umc.edison.presentation.model.toEdgeDataModel
@@ -13,14 +13,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BubbleGraphViewModel @Inject constructor(
-    private val getClusteredBubblesUseCase: GetClusteredBubblesUseCase,
+    private val getAllClusteredBubblesUseCase: GetAllClusteredBubblesUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(BubbleGraphState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     fun fetchClusteredBubbles() {
         collectDataResource(
-            flow = getClusteredBubblesUseCase(),
+            flow = getAllClusteredBubblesUseCase(),
             onSuccess = { clusteredBubbles ->
                 val bubbles =
                     clusteredBubbles.toPresentation().sortedByDescending { it.bubble.date }

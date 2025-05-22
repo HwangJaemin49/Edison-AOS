@@ -5,7 +5,7 @@ import java.util.Date
 import java.util.UUID
 
 data class BubbleModel(
-    val id: String,
+    val id: String?,
     val title: String?,
     val contentBlocks: List<ContentBlockModel>,
     val mainImage: String?,
@@ -16,7 +16,7 @@ data class BubbleModel(
 ) {
     fun toDomain(): Bubble {
         return Bubble(
-            id = if (id.isEmpty()) UUID.randomUUID().toString() else id,
+            id = id ?: UUID.randomUUID().toString(),
             title = title,
             content = contentBlocks.joinToString { it.toDomain() },
             mainImage = mainImage,
@@ -29,7 +29,7 @@ data class BubbleModel(
 
     companion object {
         val DEFAULT = BubbleModel(
-            id = "",
+            id = null,
             title = null,
             contentBlocks = emptyList(),
             mainImage = null,

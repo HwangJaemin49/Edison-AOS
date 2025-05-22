@@ -8,7 +8,8 @@ import java.util.UUID
 data class LabelModel(
     val id: String?,
     val name: String,
-    val color: Color
+    val color: Color,
+    val bubbleCnt: Int,
 ) {
     fun toDomain(): Label = Label(
         id = id ?: UUID.randomUUID().toString(),
@@ -19,12 +20,13 @@ data class LabelModel(
     companion object {
         val DEFAULT = LabelModel(
             id = null,
-            name = "",
-            color = Gray300
+            name = "-",
+            color = Gray300,
+            bubbleCnt = 0
         )
     }
 }
 
-fun Label.toPresentation(): LabelModel = LabelModel(id, name, color)
+fun Label.toPresentation(): LabelModel = LabelModel(id, name, color, 0)
 
 fun List<Label>.toPresentation(): List<LabelModel> = map { it.toPresentation() }

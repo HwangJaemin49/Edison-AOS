@@ -1,24 +1,20 @@
 package com.umc.edison.presentation.login
 
 import androidx.navigation.NavHostController
-import com.umc.edison.domain.usecase.login.MakeNickNameUseCase
-import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
+import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
+import com.umc.edison.domain.usecase.user.UpdateProfileInfoUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
-import com.umc.edison.ui.navigation.NavRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MakeNickNameViewModel @Inject constructor(
-    private val getProfileInfoUseCase: GetProfileInfoUseCase,
-    private val makeNickNameUseCase: MakeNickNameUseCase,
+    private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
+    private val updateProfileInfoUseCase: UpdateProfileInfoUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MakeNickNameState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -29,7 +25,7 @@ class MakeNickNameViewModel @Inject constructor(
 
     private fun fetchProfileInfo() {
         collectDataResource(
-            flow = getProfileInfoUseCase(),
+            flow = getMyProfileInfoUseCase(),
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
@@ -37,14 +33,16 @@ class MakeNickNameViewModel @Inject constructor(
     }
 
     fun makeNickName(nickname: String, navController: NavHostController) {
-        collectDataResource(
-            flow = makeNickNameUseCase(nickname),
-            onSuccess = {
-                _uiState.update { it.copy(user = it.user.copy(nickname = nickname)) }
-                CoroutineScope(Dispatchers.Main).launch {
-                    navController.navigate(NavRoute.IdentityTest.route)
-                }
-            },
-        )
+//        collectDataResource(
+//            flow = updateProfileInfoUseCase(
+//
+//            ),
+//            onSuccess = {
+//                _uiState.update { it.copy(user = it.user.copy(nickname = nickname)) }
+//                CoroutineScope(Dispatchers.Main).launch {
+//                    navController.navigate(NavRoute.IdentityTest.route)
+//                }
+//            },
+//        )
     }
 }

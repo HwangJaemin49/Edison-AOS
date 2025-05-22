@@ -1,8 +1,8 @@
 package com.umc.edison.presentation.mypage
 
-import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
-import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
-import com.umc.edison.domain.usecase.mypage.LogOutUseCase
+import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
+import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
+import com.umc.edison.domain.usecase.user.LogOutUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountManagementViewModel @Inject constructor(
     private val getLogInStateUseCase: GetLogInStateUseCase,
-    private val getProfileInfoUseCase: GetProfileInfoUseCase,
+    private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
     private val logOutUseCase: LogOutUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(AccountManagementState.DEFAULT)
@@ -39,7 +39,7 @@ class AccountManagementViewModel @Inject constructor(
 
     private fun fetchProfileInfo() {
         collectDataResource(
-            flow = getProfileInfoUseCase(),
+            flow = getMyProfileInfoUseCase(),
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },

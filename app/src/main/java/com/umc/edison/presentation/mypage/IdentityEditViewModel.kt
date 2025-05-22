@@ -1,9 +1,9 @@
 package com.umc.edison.presentation.mypage
 
 import androidx.lifecycle.SavedStateHandle
-import com.umc.edison.domain.model.IdentityCategory
-import com.umc.edison.domain.usecase.mypage.GetMyIdentityResultUseCase
-import com.umc.edison.domain.usecase.mypage.UpdateIdentityUseCase
+import com.umc.edison.domain.model.identity.IdentityCategory
+import com.umc.edison.domain.usecase.identity.GetMyIdentityResultByCategoryUseCase
+import com.umc.edison.domain.usecase.identity.UpdateMyIdentityResultUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.model.toPresentation
@@ -16,8 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class IdentityEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getMyIdentityResultUseCase: GetMyIdentityResultUseCase,
-    private val updateIdentityUseCase: UpdateIdentityUseCase,
+    private val getMyIdentityResultByCategoryUseCase: GetMyIdentityResultByCategoryUseCase,
+    private val updateMyIdentityResultUseCase: UpdateMyIdentityResultUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(IdentityEditState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -28,10 +28,16 @@ class IdentityEditViewModel @Inject constructor(
     }
 
     private fun fetchIdentityTestResult(id: Int) {
-        val category = IdentityCategory.entries[id]
+        val category = when(id) {
+            1 -> IdentityCategory.EXPLAIN
+            2 -> IdentityCategory.FIELD
+            3 -> IdentityCategory.ENVIRONMENT
+            4 -> IdentityCategory.INSPIRATION
+            else -> throw IllegalArgumentException("Invalid category id")
+        }
 
         collectDataResource(
-            flow = getMyIdentityResultUseCase(category),
+            flow = getMyIdentityResultByCategoryUseCase(category),
             onSuccess = { identity ->
                 _uiState.update { it.copy(identity = identity.toPresentation()) }
             },
@@ -66,7 +72,7 @@ class IdentityEditViewModel @Inject constructor(
 
     fun updateIdentity() {
         collectDataResource(
-            flow = updateIdentityUseCase(_uiState.value.identity.toDomain()),
+            flow = updateMyIdentityResultUseCase(_uiState.value.identity.toDomain()),
             onSuccess = {
                 _uiState.update {
                     it.copy(

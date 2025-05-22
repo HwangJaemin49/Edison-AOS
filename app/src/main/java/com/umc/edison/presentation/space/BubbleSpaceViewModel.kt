@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.space
 
-import com.umc.edison.domain.usecase.bubble.GetSearchBubblesUseCase
-import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
+import com.umc.edison.domain.usecase.bubble.SearchBubblesUseCase
+import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.toPresentation
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BubbleSpaceViewModel @Inject constructor(
     private val getLogInStateUseCase: GetLogInStateUseCase,
-    private val getSearchBubblesUseCase: GetSearchBubblesUseCase,
+    private val searchBubblesUseCase: SearchBubblesUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(BubbleSpaceState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -47,7 +47,7 @@ class BubbleSpaceViewModel @Inject constructor(
         }
 
         collectDataResource(
-            flow = getSearchBubblesUseCase(_uiState.value.query),
+            flow = searchBubblesUseCase(_uiState.value.query),
             onSuccess = { bubbles ->
                 _uiState.update { it.copy(searchResults = bubbles.toPresentation()) }
             },
