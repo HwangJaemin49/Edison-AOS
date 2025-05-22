@@ -1,14 +1,15 @@
 package com.umc.edison.presentation.artletter
 
-import com.umc.edison.domain.usecase.artletter.GetArtLetterCategoryUseCase
-import com.umc.edison.domain.usecase.artletter.GetArtLetterKeyWordUseCase
-import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
-import com.umc.edison.domain.usecase.artletter.GetRecentSearchesUseCase
-import com.umc.edison.domain.usecase.artletter.GetSearchArtLettersUseCase
-import com.umc.edison.domain.usecase.artletter.RemoveRecentSearchUseCase
+import com.umc.edison.domain.usecase.artletter.GetAllArtLetterCategoriesUseCase
+import com.umc.edison.domain.usecase.artletter.GetAllRecommendArtLetterKeyWordsUseCase
+import com.umc.edison.domain.usecase.artletter.GetAllRandomArtLettersUseCase
+import com.umc.edison.domain.usecase.recentSearch.GetAllRecentSearchesUseCase
+import com.umc.edison.domain.usecase.artletter.SearchArtLettersUseCase
+import com.umc.edison.domain.usecase.recentSearch.DeleteRecentSearchUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.presentation.model.toPreviewPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,13 +18,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ArtLetterSearchViewModel @Inject constructor(
-    private val getSearchArtLettersUseCase: GetSearchArtLettersUseCase,
-    private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
+    private val searchArtLettersUseCase: SearchArtLettersUseCase,
+    private val getAllRandomArtLettersUseCase: GetAllRandomArtLettersUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
-    private val getArtLetterKeyWordUseCase: GetArtLetterKeyWordUseCase,
-    private val removeRecentSearchUseCase: RemoveRecentSearchUseCase,
-    private val getRecentSearchesUseCase: GetRecentSearchesUseCase,
-    private val getArtLetterCategoryUseCase: GetArtLetterCategoryUseCase
+    private val getAllRecommendArtLetterKeyWordsUseCase: GetAllRecommendArtLetterKeyWordsUseCase,
+    private val deleteRecentSearchUseCase: DeleteRecentSearchUseCase,
+    private val getAllRecentSearchesUseCase: GetAllRecentSearchesUseCase,
+    private val getAllArtLetterCategoriesUseCase: GetAllArtLetterCategoriesUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ArtLetterSearchState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -45,11 +46,11 @@ class ArtLetterSearchViewModel @Inject constructor(
         }
 
         collectDataResource(
-            flow = getSearchArtLettersUseCase(_uiState.value.query),
+            flow = searchArtLettersUseCase(_uiState.value.query),
             onSuccess = { artLetters ->
                 _uiState.update {
                     it.copy(
-                        artLetters = artLetters.toPresentation(),
+                        artLetters = artLetters.toPreviewPresentation(),
                         lastQuery = it.query,
                         isSearchActivated = true
                     )
@@ -71,16 +72,16 @@ class ArtLetterSearchViewModel @Inject constructor(
 
     fun getSortedArtLetters(sortType: String) {
         collectDataResource(
-            flow = getSearchArtLettersUseCase(_uiState.value.query, sortType),
+            flow = searchArtLettersUseCase(_uiState.value.query, sortType),
             onSuccess = { artLetters ->
-                _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
+                _uiState.update { it.copy(artLetters = artLetters.toPreviewPresentation()) }
             },
         )
     }
 
     private fun getRecentSearches() {
         collectDataResource(
-            flow = getRecentSearchesUseCase(),
+            flow = getAllRecentSearchesUseCase(),
             onSuccess = { recentSearches ->
                 _uiState.update { it.copy(recentSearches = recentSearches) }
             },
@@ -95,7 +96,7 @@ class ArtLetterSearchViewModel @Inject constructor(
 
     fun removeSearchHistory(keyword: String) {
         collectDataResource(
-            flow = removeRecentSearchUseCase(keyword),
+            flow = deleteRecentSearchUseCase(keyword),
             onSuccess = {
                 _uiState.update {
                     it.copy(
@@ -108,9 +109,9 @@ class ArtLetterSearchViewModel @Inject constructor(
 
     private fun fetchRecommendedArtLetters() {
         collectDataResource(
-            flow = getRandomArtLettersUseCase(),
+            flow = getAllRandomArtLettersUseCase(),
             onSuccess = { artLetters ->
-                _uiState.update { it.copy(recommendedArtLetters = artLetters.toPresentation()) }
+                _uiState.update { it.copy(recommendedArtLetters = artLetters.toPreviewPresentation()) }
             },
         )
     }
@@ -141,7 +142,7 @@ class ArtLetterSearchViewModel @Inject constructor(
 
     fun getKeyWords() {
         collectDataResource(
-            flow = getArtLetterKeyWordUseCase(),
+            flow = getAllRecommendArtLetterKeyWordsUseCase(),
             onSuccess = { keywords ->
                 _uiState.update { it.copy(keywords = keywords.toPresentation()) }
             },
@@ -150,7 +151,7 @@ class ArtLetterSearchViewModel @Inject constructor(
 
     fun getCategories() {
         collectDataResource(
-            flow = getArtLetterCategoryUseCase(),
+            flow = getAllArtLetterCategoriesUseCase(),
             onSuccess = { categories ->
                 _uiState.update {
                     it.copy(

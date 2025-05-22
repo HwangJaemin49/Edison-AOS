@@ -1,14 +1,18 @@
 package com.umc.edison.presentation.artletter
 
+import androidx.lifecycle.SavedStateHandle
+import com.umc.edison.domain.usecase.artletter.GetArtLetterUseCase
+import com.umc.edison.domain.usecase.artletter.GetAllRandomArtLettersUseCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
 import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.LikeArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
-import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
+import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
 import com.umc.edison.presentation.base.BaseViewModel
-import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.presentation.model.toDetailPresentation
+import com.umc.edison.presentation.model.toPreviewPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,10 +22,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ArtLetterDetailViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val getArtLetterUseCase: GetArtLetterUseCase,
     private val getArtLetterDetailUseCase: GetArtLetterDetailUseCase,
     private val likeArtLetterUseCase: LikeArtLetterUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
-    private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
+    private val getAllRandomArtLettersUseCase: GetAllRandomArtLettersUseCase,
     private val getLogInStateUseCase: GetLogInStateUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
@@ -50,20 +56,20 @@ class ArtLetterDetailViewModel @Inject constructor(
 
     private fun fetchArtLetterDetail(id: Int) {
         collectDataResource(
-            flow = getArtLetterDetailUseCase(id),
+            flow = getArtLetterUseCase(id),
             onSuccess = { artLetterDetail ->
-                _uiState.update { it.copy(artLetter = artLetterDetail.toPresentation()) }
+                _uiState.update { it.copy(artLetter = artLetterDetail.toDetailPresentation()) }
             },
         )
     }
 
     private fun fetchRandomArtLetters() {
         collectDataResource(
-            flow = getRandomArtLettersUseCase(),
+            flow = getAllRandomArtLettersUseCase(),
             onSuccess = { artLetters ->
                 val unique =
                     artLetters.filter { it.artLetterId != _uiState.value.artLetter.artLetterId }
-                _uiState.update { it.copy(relatedArtLetters = unique.toPresentation()) }
+                _uiState.update { it.copy(relatedArtLetters = unique.toPreviewPresentation()) }
             },
         )
     }
