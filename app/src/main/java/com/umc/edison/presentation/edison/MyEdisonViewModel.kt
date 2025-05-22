@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.edison
 
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.GetSearchBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.SearchBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyEdisonViewModel @Inject constructor(
     private val getAllBubblesUseCase: GetAllBubblesUseCase,
-    private val getSearchBubblesUseCase: GetSearchBubblesUseCase,
+    private val searchBubblesUseCase: SearchBubblesUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MyEdisonState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -33,7 +33,7 @@ class MyEdisonViewModel @Inject constructor(
 
     fun fetchSearchBubbles(query: String) {
         collectDataResource(
-            flow = getSearchBubblesUseCase(query),
+            flow = searchBubblesUseCase(query),
             onSuccess = { bubbles ->
                 _uiState.update { it.copy(searchResults = bubbles.toPresentation()) }
 

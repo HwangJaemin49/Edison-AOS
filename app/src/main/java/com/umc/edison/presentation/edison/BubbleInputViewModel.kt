@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.text.Html
 import androidx.lifecycle.SavedStateHandle
-import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetBubbleUseCase
@@ -15,6 +14,7 @@ import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.ContentBlockModel
+import com.umc.edison.presentation.model.ContentType
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
 import com.umc.edison.ui.components.IconType
@@ -42,14 +42,14 @@ class BubbleInputViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
+        val id: String = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
         fetchBubble(id)
         fetchLabels()
         fetchBubbles()
     }
 
-    private fun fetchBubble(bubbleId: Int) {
-        if (bubbleId == 0) {
+    private fun fetchBubble(bubbleId: String) {
+        if (bubbleId.isEmpty()) {
             addTextBlockToFront()
             return
         }
@@ -58,7 +58,7 @@ class BubbleInputViewModel @Inject constructor(
             flow = getBubbleUseCase(bubbleId),
             onSuccess = { bubble ->
                 val sortedContentBlocks =
-                    bubble.contentBlocks.toPresentation().sortedBy { it.position }
+                    bubble.toPresentation().contentBlocks.sortedBy { it.position }
                 _uiState.update {
                     it.copy(
                         bubble = bubble.toPresentation().copy(contentBlocks = sortedContentBlocks),
@@ -91,8 +91,7 @@ class BubbleInputViewModel @Inject constructor(
             onSuccess = { labels ->
                 _uiState.update {
                     it.copy(
-                        labels = labels.filter { label -> label.id != 0 }.toMutableList()
-                            .toPresentation()
+                        labels = labels.toPresentation(),
                     )
                 }
             },
@@ -352,7 +351,7 @@ class BubbleInputViewModel @Inject constructor(
         }
 
         collectDataResource(
-            flow = if (_uiState.value.bubble.id == 0) {
+            flow = if (_uiState.value.bubble.id.isEmpty()) {
                 addBubbleUseCase(_uiState.value.bubble.toDomain())
             } else {
                 updateBubbleUseCase(_uiState.value.bubble.toDomain())
