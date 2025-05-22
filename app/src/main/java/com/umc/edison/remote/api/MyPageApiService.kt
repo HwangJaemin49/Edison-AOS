@@ -2,12 +2,9 @@ package com.umc.edison.remote.api
 
 import com.umc.edison.remote.model.BaseResponse
 import com.umc.edison.remote.model.ResponseWithData
-import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.mypage.GetIdentityKeywordResponse
 import com.umc.edison.remote.model.mypage.GetAllMyTestResultsResponse
-import com.umc.edison.remote.model.mypage.GetMyScrapArtLettersResponse
 import com.umc.edison.remote.model.mypage.GetProfileInfoResponse
-import com.umc.edison.remote.model.mypage.GetScrapArtLettersByCategoryResponse
 import com.umc.edison.remote.model.mypage.UpdateTestRequest
 import com.umc.edison.remote.model.mypage.UpdateTestResponse
 import com.umc.edison.remote.model.mypage.UpdateProfileRequest
@@ -20,9 +17,6 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface MyPageApiService {
-    @GET("bubbles/deleted")
-    suspend fun getDeletedBubbles(): ResponseWithPagination<GetDeletedBubbleListResponse>
-
     @GET("members")
     suspend fun getProfileInfo(): ResponseWithData<GetProfileInfoResponse>
 
