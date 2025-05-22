@@ -11,7 +11,6 @@ import com.umc.edison.local.room.dao.BubbleDao
 import com.umc.edison.local.room.dao.BubbleLabelDao
 import com.umc.edison.local.room.dao.LabelDao
 import com.umc.edison.local.room.dao.LinkedBubbleDao
-import java.util.Date
 import javax.inject.Inject
 
 class BubbleLocalDataSourceImpl @Inject constructor(
@@ -92,19 +91,6 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     }
 
     // UPDATE
-    override suspend fun recoverBubbles(bubbles: List<BubbleEntity>) {
-        bubbles.map { bubble ->
-            recoverBubble(bubble)
-        }
-    }
-
-    private suspend fun recoverBubble(bubble: BubbleEntity) {
-        val localBubble = bubble.toLocal()
-        localBubble.isTrashed = false
-
-        recover(localBubble, tableName)
-    }
-
     override suspend fun updateBubbles(bubbles: List<BubbleEntity>) {
         bubbles.map { bubble ->
             updateBubble(bubble)
@@ -130,23 +116,6 @@ class BubbleLocalDataSourceImpl @Inject constructor(
     // DELETE
     override suspend fun deleteBubbles(bubbles: List<BubbleEntity>) {
         bubbleDao.deleteBubbles(bubbles.map { it.id })
-    }
-
-    override suspend fun softDeleteBubbles(bubbles: List<BubbleEntity>) {
-        bubbles.map {
-            softDelete(it.toLocal(), tableName)
-        }
-    }
-
-    override suspend fun trashBubbles(bubbles: List<BubbleEntity>) {
-        bubbles.map { bubble ->
-            val localBubble = bubble.toLocal()
-            localBubble.deletedAt = Date()
-            localBubble.isTrashed = true
-            localBubble.isDeleted = false
-
-            update(localBubble, tableName)
-        }
     }
 
     // Helper function
