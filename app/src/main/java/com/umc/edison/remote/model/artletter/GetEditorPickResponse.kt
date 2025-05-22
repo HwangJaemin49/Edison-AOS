@@ -12,7 +12,7 @@ data class GetEditorPickResponse(
     @SerializedName("readTime") val readTime: Int,
     @SerializedName("writer") val writer: String,
     @SerializedName("tags") val tags: String,
-    @SerializedName("thumbnail") val thumbnail: String?,
+    @SerializedName("thumbnail") val thumbnail: String,
     @SerializedName("likesCnt") val likesCnt: Int,
     @SerializedName("scrapsCnt") val scrapsCnt: Int,
     @SerializedName("createdAt") val createdAt: String,
@@ -22,8 +22,9 @@ data class GetEditorPickResponse(
 ) : RemoteMapper<ArtLetterPreviewEntity> {
     override fun toData(): ArtLetterPreviewEntity = ArtLetterPreviewEntity(
         artLetterId = artLetterId,
+        category = category,
         title = title,
-        thumbnail = thumbnail ?: "",
+        thumbnail = thumbnail,
         scraped = scraped,
         tags = tags.split(" ")
     )

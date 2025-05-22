@@ -7,7 +7,7 @@ import com.umc.edison.remote.model.RemoteMapper
 data class GetSortedArtLettersResponse(
     @SerializedName("artletterId") val artLetterId: Int,
     @SerializedName("title") val title: String,
-    @SerializedName("thumbnail") val thumbnail: String?,
+    @SerializedName("thumbnail") val thumbnail: String,
     @SerializedName("likesCnt") val likesCnt: Int,
     @SerializedName("scrapsCnt") val scrapsCnt: Int,
     @SerializedName("updatedAt") val updatedAt: String,
@@ -16,8 +16,9 @@ data class GetSortedArtLettersResponse(
 ) : RemoteMapper<ArtLetterPreviewEntity> {
     override fun toData(): ArtLetterPreviewEntity = ArtLetterPreviewEntity(
         artLetterId = artLetterId,
+        category = "",
         title = title,
-        thumbnail = thumbnail ?: "",
+        thumbnail = thumbnail,
         scraped = scraped,
         tags = emptyList()
     )

@@ -9,7 +9,9 @@ data class SetIdentityKeywordRequest(
     @SerializedName("keywords")
     val keywords: List<Int>
 )
-fun IdentityEntity.toSetIdentityKeywordRequest(): SetIdentityKeywordRequest =SetIdentityKeywordRequest(
-    category = categoryNumber,
-    keywords = selectedKeywords.map { it.id }
-)
+
+fun IdentityEntity.toSetIdentityKeywordRequest(): SetIdentityKeywordRequest =
+    SetIdentityKeywordRequest(
+        category = category.categoryNumber,
+        keywords = selectedKeywords.map { it.id }
+    )

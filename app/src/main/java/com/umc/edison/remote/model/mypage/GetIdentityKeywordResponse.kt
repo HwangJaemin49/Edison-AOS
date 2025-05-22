@@ -1,7 +1,6 @@
 package com.umc.edison.remote.model.mypage
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.identity.IdentityEntity
 import com.umc.edison.data.model.identity.IdentityKeywordEntity
 
 data class GetIdentityKeywordResponse(

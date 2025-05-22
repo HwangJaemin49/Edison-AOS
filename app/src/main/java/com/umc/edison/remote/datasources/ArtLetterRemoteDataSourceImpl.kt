@@ -48,6 +48,7 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
             result.add(
                 ArtLetterPreviewEntity(
                     artLetterId = picked[i].artLetterId,
+                    category = picked[i].category,
                     title = picked[i].title,
                     thumbnail = picked[i].thumbnail,
                     scraped = picked[i].scraped,

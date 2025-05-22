@@ -9,6 +9,6 @@ data class UpdateTestRequest(
 )
 
 fun IdentityEntity.toUpdateTestRequest(): UpdateTestRequest = UpdateTestRequest(
-    category = categoryNumber,
+    category = category.categoryNumber,
     keywords = selectedKeywords.map { it.id }
 )

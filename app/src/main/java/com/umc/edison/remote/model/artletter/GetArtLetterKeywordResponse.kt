@@ -5,11 +5,11 @@ import com.umc.edison.data.model.artLetter.ArtLetterKeyWordEntity
 import com.umc.edison.remote.model.RemoteMapper
 
 class GetArtLetterKeywordResponse (
-    @SerializedName("artletterId") val artletterId: Int,
+    @SerializedName("artletterId") val artLetterId: Int,
     @SerializedName("keyword") val keyword: String
 ) : RemoteMapper<ArtLetterKeyWordEntity> {
     override fun toData(): ArtLetterKeyWordEntity = ArtLetterKeyWordEntity (
-        artLetterId = artletterId,
+        artLetterId = artLetterId,
         keyword = keyword
     )
 }

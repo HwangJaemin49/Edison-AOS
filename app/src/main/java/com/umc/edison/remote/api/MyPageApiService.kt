@@ -3,7 +3,6 @@ package com.umc.edison.remote.api
 import com.umc.edison.remote.model.BaseResponse
 import com.umc.edison.remote.model.ResponseWithData
 import com.umc.edison.remote.model.ResponseWithPagination
-import com.umc.edison.remote.model.mypage.GetDeletedBubbleListResponse
 import com.umc.edison.remote.model.mypage.GetIdentityKeywordResponse
 import com.umc.edison.remote.model.mypage.GetAllMyTestResultsResponse
 import com.umc.edison.remote.model.mypage.GetMyScrapArtLettersResponse

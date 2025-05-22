@@ -3,8 +3,6 @@ package com.umc.edison.remote.api
 import com.umc.edison.remote.model.sync.SyncLabelRequest
 import com.umc.edison.remote.model.ResponseWithData
 import com.umc.edison.remote.model.ResponseWithPagination
-import com.umc.edison.remote.model.space.GetAllBubblesResponse
-import com.umc.edison.remote.model.space.GetLabelResponse
 import com.umc.edison.remote.model.sync.SyncBubbleRequest
 import com.umc.edison.remote.model.sync.SyncBubbleResponse
 import com.umc.edison.remote.model.sync.SyncLabelResponse

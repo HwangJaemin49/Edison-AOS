@@ -5,7 +5,7 @@ import com.umc.edison.remote.model.ResponseWithData
 import com.umc.edison.remote.model.ResponseWithListData
 import com.umc.edison.remote.model.ResponseWithPagination
 import com.umc.edison.remote.model.artletter.GetAllArtLettersResponse
-import com.umc.edison.remote.model.artletter.GetArtLetterCetegoryResponse
+import com.umc.edison.remote.model.artletter.GetArtLetterCategoryResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterDetailResponse
 import com.umc.edison.remote.model.artletter.GetArtLetterKeywordResponse
 import com.umc.edison.remote.model.artletter.GetEditorPickRequest
@@ -41,7 +41,7 @@ interface ArtLetterApiService {
     suspend fun getRecommendedKeywords(@Query("artletterIds") artletterIds: List<Int>): ResponseWithListData<GetArtLetterKeywordResponse>
 
     @GET("/artletters/recommend-bar/category")
-    suspend fun getRecommendedCategories(): ResponseWithData<GetArtLetterCetegoryResponse>
+    suspend fun getRecommendedCategories(): ResponseWithData<GetArtLetterCategoryResponse>
 
     @GET("/artletters/search")
     suspend fun getSearchArtLetters(@Query("keyword") keyword: String, @Query("sortType") sortType: String): ResponseWithPagination<GetSearchArtLettersResponse>
