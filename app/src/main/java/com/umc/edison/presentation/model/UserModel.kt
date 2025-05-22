@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.User
+import com.umc.edison.domain.model.user.User
 
 data class UserModel(
     val nickname: String?,

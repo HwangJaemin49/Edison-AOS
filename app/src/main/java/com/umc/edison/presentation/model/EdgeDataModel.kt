@@ -1,8 +1,8 @@
 package com.umc.edison.presentation.model
 
 data class EdgeDataModel(
-    val startBubbleId: Int,
-    val endBubbleId: Int
+    val startBubbleId: String,
+    val endBubbleId: String
 )
 
 fun List<PositionedBubbleModel>.toEdgeDataModel(): List<EdgeDataModel> {

@@ -1,10 +1,10 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.Identity
-import com.umc.edison.domain.model.IdentityCategory
+import com.umc.edison.domain.model.identity.Identity
+import com.umc.edison.domain.model.identity.IdentityCategory
 
 data class IdentityModel(
-    val id: Int,
+    val category: IdentityCategoryType,
     val question: String,
     val questionTip: String?,
     val descriptionFirst: String,
@@ -14,15 +14,15 @@ data class IdentityModel(
 ) {
     fun toDomain(): Identity {
         return Identity(
-            category = IdentityCategory.entries[id],
+            category = category.toDomain(),
             selectedKeywords = selectedKeywords.map { it.toDomain() },
-            options = options.map { it.toDomain() }
+            keywords = options.map { it.toDomain() }
         )
     }
 
     companion object {
         val DEFAULT = IdentityModel(
-            id = IdentityCategory.NONE.ordinal,
+            category = IdentityCategory.NONE.toType(),
             question = IdentityCategory.NONE.question,
             questionTip = null,
             descriptionFirst = IdentityCategory.NONE.descriptionFirst,
@@ -35,12 +35,32 @@ data class IdentityModel(
 
 fun Identity.toPresentation(): IdentityModel {
     return IdentityModel(
-        id = category.ordinal,
+        category = category.toType(),
         question = category.question,
         questionTip = category.questionTip,
         descriptionFirst = category.descriptionFirst,
         descriptionSecond = category.descriptionSecond,
-        options = options.map { it.toPresentation() },
+        options = keywords.map { it.toPresentation() },
         selectedKeywords = selectedKeywords.map { it.toPresentation() }
     )
+}
+
+enum class IdentityCategoryType {
+    NONE, EXPLAIN, FIELD, ENVIRONMENT, INSPIRATION
+}
+
+fun IdentityCategory.toType(): IdentityCategoryType = when (this) {
+    IdentityCategory.NONE -> IdentityCategoryType.NONE
+    IdentityCategory.EXPLAIN -> IdentityCategoryType.EXPLAIN
+    IdentityCategory.FIELD -> IdentityCategoryType.FIELD
+    IdentityCategory.ENVIRONMENT -> IdentityCategoryType.ENVIRONMENT
+    IdentityCategory.INSPIRATION -> IdentityCategoryType.INSPIRATION
+}
+
+fun IdentityCategoryType.toDomain(): IdentityCategory = when (this) {
+    IdentityCategoryType.NONE -> IdentityCategory.NONE
+    IdentityCategoryType.EXPLAIN -> IdentityCategory.EXPLAIN
+    IdentityCategoryType.FIELD -> IdentityCategory.FIELD
+    IdentityCategoryType.ENVIRONMENT -> IdentityCategory.ENVIRONMENT
+    IdentityCategoryType.INSPIRATION -> IdentityCategory.INSPIRATION
 }

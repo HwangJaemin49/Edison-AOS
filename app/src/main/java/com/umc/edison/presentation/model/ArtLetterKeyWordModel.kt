@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.ArtLetterKeyWord
+import com.umc.edison.domain.model.artLetter.ArtLetterKeyWord
 
 data class ArtLetterKeyWordModel(
     val artLetterId: Int,
@@ -8,7 +8,7 @@ data class ArtLetterKeyWordModel(
 )
 
 fun ArtLetterKeyWord.toPresentation(): ArtLetterKeyWordModel = ArtLetterKeyWordModel(
-    artLetterId = artletterId,
+    artLetterId = artLetterId,
     keyword = keyword
 )
 

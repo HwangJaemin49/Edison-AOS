@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.ArtLetterPreview
+import com.umc.edison.domain.model.artLetter.ArtLetter
 
 data class ArtLetterPreviewModel(
     val artLetterId: Int,
@@ -10,7 +10,7 @@ data class ArtLetterPreviewModel(
     val tags: List<String>,
 )
 
-fun ArtLetterPreview.toPresentation(): ArtLetterPreviewModel = ArtLetterPreviewModel(
+fun ArtLetter.toPreviewPresentation(): ArtLetterPreviewModel = ArtLetterPreviewModel(
     artLetterId = artLetterId,
     title = title,
     thumbnail = thumbnail,
@@ -18,6 +18,6 @@ fun ArtLetterPreview.toPresentation(): ArtLetterPreviewModel = ArtLetterPreviewM
     tags = tags,
 )
 
-fun List<ArtLetterPreview>.toPresentation(): List<ArtLetterPreviewModel> {
-    return map { it.toPresentation() }
+fun List<ArtLetter>.toPreviewPresentation(): List<ArtLetterPreviewModel> {
+    return map { it.toPreviewPresentation() }
 }
