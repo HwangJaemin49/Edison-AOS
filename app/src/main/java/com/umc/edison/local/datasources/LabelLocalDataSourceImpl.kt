@@ -1,5 +1,6 @@
 package com.umc.edison.local.datasources
 
+import android.util.Log
 import com.umc.edison.data.datasources.LabelLocalDataSource
 import com.umc.edison.data.model.label.LabelEntity
 import com.umc.edison.local.model.LabelLocal
@@ -21,6 +22,9 @@ class LabelLocalDataSourceImpl @Inject constructor(
 
     // READ
     override suspend fun getAllLabels(): List<LabelEntity> {
+        labelDao.getAllLabels().forEach {
+            Log.i("LabelLocalDataSourceImpl", "Label: ${it.uuid}, ${it.name}, ${it.color}")
+        }
         return labelDao.getAllLabels().map { it.toData() }
     }
 
@@ -46,9 +50,5 @@ class LabelLocalDataSourceImpl @Inject constructor(
     // DELETE
     override suspend fun deleteLabel(label: LabelEntity) {
         labelDao.delete(label.toLocal())
-    }
-
-    override suspend fun softDeleteLabel(label: LabelEntity) {
-        softDelete(label.toLocal(), tableName)
     }
 }

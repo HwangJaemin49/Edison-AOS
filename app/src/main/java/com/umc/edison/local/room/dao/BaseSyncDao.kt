@@ -8,7 +8,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 
 interface BaseSyncDao<T> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(entity: T): String
+    suspend fun insert(entity: T)
 
     @Update
     suspend fun update(entity: T)

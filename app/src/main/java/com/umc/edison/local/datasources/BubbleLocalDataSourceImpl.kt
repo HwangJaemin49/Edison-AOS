@@ -128,8 +128,8 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         bubble.labels.map { label ->
             val localLabel: LabelLocal? = labelDao.getLabelById(label.id)
             if (localLabel == null) {
-                val labelId: String = labelDao.insert(label.toLocal())
-                bubbleLabelDao.insert(bubble.id, labelId)
+                labelDao.insert(label.toLocal())
+                bubbleLabelDao.insert(bubble.id, label.id)
             } else {
                 val id = bubbleLabelDao.getBubbleLabelId(bubble.id, localLabel.uuid)
                 if (id == null) bubbleLabelDao.insert(bubble.id, localLabel.uuid)
