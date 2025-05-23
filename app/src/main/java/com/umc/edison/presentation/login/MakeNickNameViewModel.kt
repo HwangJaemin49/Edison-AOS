@@ -32,6 +32,7 @@ class MakeNickNameViewModel @Inject constructor(
         )
     }
 
+    // TODO: Implement nickname validation logic
     fun makeNickName(nickname: String, navController: NavHostController) {
 //        collectDataResource(
 //            flow = updateProfileInfoUseCase(

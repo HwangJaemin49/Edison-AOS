@@ -1,13 +1,10 @@
 package com.umc.edison.presentation.storage
 
-import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.GetAllRecentBubblesUseCase
 import android.app.Application
 import android.content.Intent
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.viewModelScope
-import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
+import com.umc.edison.domain.usecase.bubble.GetAllRecentBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.BubbleStorageMode
 import com.umc.edison.presentation.model.toPresentation
@@ -52,7 +49,7 @@ class BubbleStorageViewModel @Inject constructor(
 
         if (selectedBubbles.isEmpty()) return
 
-        val textsToShare = selectedBubbles.map { bubble ->
+        val textsToShare = selectedBubbles.joinToString("---\n\n") { bubble ->
             val title = bubble.title ?: ""
             val content = bubble.contentBlocks
                 .filter { it.type.name == "TEXT" }
@@ -62,7 +59,7 @@ class BubbleStorageViewModel @Inject constructor(
                 }
 
             "$title\n\n$content"
-        }.joinToString("---\n\n")
+        }
 
 
         val sendIntent = Intent().apply {

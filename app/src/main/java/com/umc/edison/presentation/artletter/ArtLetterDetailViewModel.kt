@@ -28,7 +28,8 @@ class ArtLetterDetailViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id = savedStateHandle["artLetterId"] ?: throw IllegalArgumentException("artLetterId is required")
+        val id: Int = savedStateHandle["artLetterId"]
+            ?: throw IllegalArgumentException("artLetterId is required")
 
         fetchArtLetterDetail(id)
         fetchRandomArtLetters()

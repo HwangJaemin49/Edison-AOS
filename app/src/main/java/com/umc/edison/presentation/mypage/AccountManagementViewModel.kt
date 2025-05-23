@@ -57,7 +57,7 @@ class AccountManagementViewModel @Inject constructor(
                 _baseState.update { it.copy(toastMessage = "로그아웃 되었습니다.") }
                 _uiState.update { it.copy(isLoggedIn = false, user = null) }
             },
-            onError = { error ->
+            onError = { _ ->
                 _baseState.update { it.copy(toastMessage = "로그아웃에 실패했습니다.") }
             },
             onComplete = {

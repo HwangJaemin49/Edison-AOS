@@ -23,12 +23,13 @@ class IdentityEditViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id = savedStateHandle["identityId"] ?: throw IllegalArgumentException("id is required")
+        val id: Int =
+            savedStateHandle["identityId"] ?: throw IllegalArgumentException("id is required")
         fetchIdentityTestResult(id)
     }
 
     private fun fetchIdentityTestResult(id: Int) {
-        val category = when(id) {
+        val category = when (id) {
             1 -> IdentityCategory.EXPLAIN
             2 -> IdentityCategory.FIELD
             3 -> IdentityCategory.ENVIRONMENT

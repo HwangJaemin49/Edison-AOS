@@ -104,6 +104,7 @@ class IdentityTestViewModel @Inject constructor(
         }
     }
 
+    // TODO: Implement this function
     fun toggleInterestKeyword(keyword: KeywordModel) {
 //        if (uiState.value.identity.selectedKeywords.contains(keyword)) {
 //            _uiState.update {
@@ -130,6 +131,7 @@ class IdentityTestViewModel @Inject constructor(
 //        }
     }
 
+    // TODO: Implement this function
     fun setInterestTestResult(navController: NavHostController) {
 //        collectDataResource(
 //            flow = setUserInterestUseCase(_uiState.value.interest.toDomain()),

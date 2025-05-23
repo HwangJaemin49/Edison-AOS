@@ -26,7 +26,7 @@ class DeleteAccountViewModel @Inject constructor(
                 _uiState.update { it.copy(isDeleted = true) }
                 _baseState.update { it.copy(toastMessage = "회원 탈퇴 되었습니다.") }
             },
-            onError = { error ->
+            onError = { _ ->
                 _uiState.update { it.copy(isDeleted = false) }
                 _baseState.update { it.copy(toastMessage = "회원 탈퇴에 실패했습니다.") }
             },
