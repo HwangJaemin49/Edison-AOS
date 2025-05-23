@@ -137,7 +137,7 @@ fun LabelTabScreen(
 fun LabelList(
     labels: List<LabelModel>,
     draggedIndex: Int,
-    onLabelClick: (Int) -> Unit,
+    onLabelClick: (String?) -> Unit,
     onEditClick: (Int) -> Unit,
     onDeleteClick: (Int) -> Unit,
     onDrag: (Int) -> Unit,
@@ -148,7 +148,7 @@ fun LabelList(
             LabelListItem(
                 labelColor = label.color,
                 labelText = label.name,
-                count = label.bubbles.size,
+                count = label.bubbleCnt,
                 isDragged = index == draggedIndex,
                 onClick = { onLabelClick(label.id) },
                 onEditClick = { onEditClick(index) },

@@ -3,10 +3,6 @@ package com.umc.edison.presentation.artletter
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.artletter.GetArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.GetAllRandomArtLettersUseCase
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
-import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.LikeArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
@@ -17,14 +13,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ArtLetterDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getArtLetterUseCase: GetArtLetterUseCase,
-    private val getArtLetterDetailUseCase: GetArtLetterDetailUseCase,
     private val likeArtLetterUseCase: LikeArtLetterUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
     private val getAllRandomArtLettersUseCase: GetAllRandomArtLettersUseCase,
@@ -33,14 +27,10 @@ class ArtLetterDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-    fun loadArtLetter(id: String) {
-        val intId = id.toIntOrNull()
-        if (intId == null) {
-            _uiState.update { it.copy(error = Exception("Invalid artLetterId: $id")) }
-            return
-        }
+    init {
+        val id = savedStateHandle["artLetterId"] ?: throw IllegalArgumentException("artLetterId is required")
 
-        fetchArtLetterDetail(intId)
+        fetchArtLetterDetail(id)
         fetchRandomArtLetters()
         getLoginState()
     }

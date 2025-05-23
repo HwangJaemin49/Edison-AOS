@@ -1,6 +1,5 @@
 package com.umc.edison.ui.artboard
 
-
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -245,7 +244,7 @@ fun SearchResultBar(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ResultChip(text = "# " + text)
+        ResultChip(text = "# $text")
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "에 관련된 아트레터",
@@ -517,7 +516,7 @@ fun NoResultSection(text: String) {
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "# " + text,
+                    text = "# $text",
                     style = MaterialTheme.typography.displayMedium.copy(color = Gray800)
                 )
             }

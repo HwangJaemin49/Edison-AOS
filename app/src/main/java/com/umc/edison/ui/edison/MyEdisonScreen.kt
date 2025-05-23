@@ -91,7 +91,7 @@ fun MyEdisonScreen(
                         Spacer(modifier = Modifier.weight(0.6f))
 
                         BubbleInput(
-                            onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute(0)) },
+                            onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute("")) },
                         )
 
                         Spacer(modifier = Modifier.weight(1f))

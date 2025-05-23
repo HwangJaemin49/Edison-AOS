@@ -228,9 +228,7 @@ fun EditorPickSection(
                         .clickable(
                             onClick = {
                                 navHostController.navigate(
-                                    NavRoute.ArtLetterDetail.createRoute(
-                                        artLetter.artLetterId.toString()
-                                    )
+                                    NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)
                                 )
                             },
                             indication = null,
@@ -318,9 +316,7 @@ fun ArtBoardSection(
                 artLetter = it as ArtLetterPreviewModel,
                 onArtLetterClick = { artLetter ->
                     navHostController.navigate(
-                        NavRoute.ArtLetterDetail.createRoute(
-                            artLetter.artLetterId.toString()
-                        )
+                        NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)
                     )
                 },
                 onBookmarkClick = { artLetter ->

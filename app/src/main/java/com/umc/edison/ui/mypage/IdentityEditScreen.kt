@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.presentation.base.BaseState
+import com.umc.edison.presentation.model.IdentityCategoryType
 import com.umc.edison.presentation.mypage.IdentityEditState
 import com.umc.edison.presentation.mypage.IdentityEditViewModel
 import com.umc.edison.ui.BaseContent
@@ -58,7 +59,7 @@ fun IdentityEditScreen(
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
-                title = "Identity 고르기",
+                title = if (uiState.identity.category == IdentityCategoryType.INSPIRATION) "관심사 고르기" else "Identity 고르기",
                 onBack = {
                     viewModel.updateIdentity()
                 }

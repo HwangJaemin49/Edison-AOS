@@ -48,9 +48,7 @@ fun ScrapBoardDetailScreen(
                 artLetter = it as ArtLetterPreviewModel,
                 onArtLetterClick = { artLetter ->
                     navHostController.navigate(
-                        NavRoute.ArtLetterDetail.createRoute(
-                            artLetter.artLetterId.toString()
-                        )
+                        NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)
                     )
                 },
                 onBookmarkClick = { artLetter ->

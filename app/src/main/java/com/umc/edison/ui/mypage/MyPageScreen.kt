@@ -42,7 +42,7 @@ import coil3.compose.AsyncImage
 import com.umc.edison.R
 import com.umc.edison.presentation.model.ArtLetterCategoryModel
 import com.umc.edison.presentation.model.IdentityModel
-import com.umc.edison.presentation.model.InterestModel
+import com.umc.edison.presentation.model.toIndex
 import com.umc.edison.presentation.mypage.MyPageState
 import com.umc.edison.presentation.mypage.MyPageViewModel
 import com.umc.edison.ui.BaseContent
@@ -145,7 +145,7 @@ private fun MyPageContent(
             interest = uiState.interest,
             onItemClick = { id ->
                 navHostController.navigate(
-                    NavRoute.InterestEdit.createRoute(id)
+                    NavRoute.IdentityEdit.createRoute(id)
                 )
             }
         )
@@ -216,7 +216,7 @@ private fun IdentityTestResultContainer(
             WhiteContainerItem(
                 title = it.question,
                 description = it.selectedKeywords.joinToString { keyword -> keyword.name },
-                onClick = { onItemClick(it.id) }
+                onClick = { onItemClick(it.category.toIndex()) }
             )
         }
     }
@@ -224,7 +224,7 @@ private fun IdentityTestResultContainer(
 
 @Composable
 private fun InterestResultContainer(
-    interest: InterestModel,
+    interest: IdentityModel,
     onItemClick: (Int) -> Unit,
 ) {
     GrayColumnContainer(
@@ -234,7 +234,7 @@ private fun InterestResultContainer(
         WhiteContainerItem(
             title = interest.question,
             description = interest.selectedKeywords.joinToString { keyword -> keyword.name },
-            onClick = { onItemClick(interest.id) }
+            onClick = { onItemClick(interest.category.toIndex()) }
         )
     }
 }

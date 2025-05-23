@@ -196,7 +196,7 @@ fun BubbleInputTopBar(
 @Composable
 fun BubbleInputContent(
     viewModel: BubbleInputViewModel,
-    onLinkClick: (Int) -> Unit
+    onLinkClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val baseState by viewModel.baseState.collectAsState()
@@ -259,7 +259,7 @@ fun BubbleInputContent(
                     viewModel.saveLabel(label)
                     viewModel.updateLabelEditMode(LabelEditMode.EDIT)
                 },
-                label = LabelModel.DEFAULT
+                label = LabelModel.INIT
             )
         }
     }

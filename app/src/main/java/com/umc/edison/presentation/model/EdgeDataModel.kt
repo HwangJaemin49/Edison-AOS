@@ -13,8 +13,8 @@ fun List<PositionedBubbleModel>.toEdgeDataModel(): List<EdgeDataModel> {
         bubblePosition.bubble.linkedBubble?.let {
             edges.add(
                 EdgeDataModel(
-                    startBubbleId = bubblePosition.bubble.id,
-                    endBubbleId = it.id
+                    startBubbleId = bubblePosition.bubble.id!!,
+                    endBubbleId = it.id!!
                 )
             )
         }
@@ -22,8 +22,8 @@ fun List<PositionedBubbleModel>.toEdgeDataModel(): List<EdgeDataModel> {
         bubblePosition.bubble.backLinks.forEach { backLink ->
             edges.add(
                 EdgeDataModel(
-                    startBubbleId = bubblePosition.bubble.id,
-                    endBubbleId = backLink.id
+                    startBubbleId = bubblePosition.bubble.id!!,
+                    endBubbleId = backLink.id!!
                 )
             )
         }

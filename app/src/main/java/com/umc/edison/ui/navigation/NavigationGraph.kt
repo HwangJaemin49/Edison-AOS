@@ -1,8 +1,5 @@
 package com.umc.edison.ui.navigation
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -31,7 +28,6 @@ import com.umc.edison.ui.mypage.ScrapBoardDetailScreen
 import com.umc.edison.ui.mypage.ScrapBoardScreen
 import com.umc.edison.ui.mypage.TrashScreen
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NavigationGraph(
     navHostController: NavHostController,

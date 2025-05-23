@@ -29,15 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.LabelModel
-import com.umc.edison.ui.theme.EdisonTheme
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
-import com.umc.edison.ui.theme.Yellow100
 import com.umc.edison.ui.theme.ColorPickerList
 import com.umc.edison.ui.theme.Gray300
 

@@ -64,3 +64,11 @@ fun IdentityCategoryType.toDomain(): IdentityCategory = when (this) {
     IdentityCategoryType.ENVIRONMENT -> IdentityCategory.ENVIRONMENT
     IdentityCategoryType.INSPIRATION -> IdentityCategory.INSPIRATION
 }
+
+fun IdentityCategoryType.toIndex(): Int = when (this) {
+    IdentityCategoryType.NONE -> 0
+    IdentityCategoryType.EXPLAIN -> 1
+    IdentityCategoryType.FIELD -> 2
+    IdentityCategoryType.ENVIRONMENT -> 3
+    IdentityCategoryType.INSPIRATION -> 4
+}

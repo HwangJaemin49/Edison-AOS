@@ -304,14 +304,14 @@ fun IdentityTest4(
         verticalArrangement = Arrangement.Top,
     ) {
         Text(
-            text = uiState.interest.question,
+            text = uiState.identity.question,
             color = Gray800,
             style = MaterialTheme.typography.displayLarge,
             modifier = Modifier.padding(top = 30.dp, bottom = 12.dp)
         )
 
         Text(
-            text = uiState.interest.questionTip,
+            text = uiState.identity.questionTip!!,
             color = Gray500,
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 48.dp)
@@ -322,10 +322,10 @@ fun IdentityTest4(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(bottom = 48.dp)
         ) {
-            uiState.interest.options.forEach { keyword ->
+            uiState.identity.options.forEach { keyword ->
                 KeywordChip(
                     keyword = keyword.name,
-                    isSelected = uiState.interest.selectedKeywords.contains(keyword),
+                    isSelected = uiState.identity.selectedKeywords.contains(keyword),
                     onClick = { viewModel.toggleInterestKeyword(keyword) }
                 )
             }

@@ -1,20 +1,16 @@
 package com.umc.edison.ui.main
 
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +34,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var syncTrigger: SyncTrigger
     private lateinit var navController: NavHostController
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         syncTrigger = SyncTrigger(this)
@@ -62,7 +57,7 @@ class MainActivity : ComponentActivity() {
                     if (!artLetterId.isNullOrBlank()) {
                         Log.d("BranchDeeplink", "Received artLetterId: $artLetterId")
                         // 딥링크로 이동
-                        navController.navigate(NavRoute.ArtLetterDetail.createRoute(artLetterId))
+                        navController.navigate(NavRoute.ArtLetterDetail.createRoute(artLetterId.toInt()))
                     }
                 } else {
                     Log.e("BranchDeeplink", "Branch error: ${error.message}")
@@ -78,7 +73,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun MainScreen(navController: NavHostController) {
     var showInputBubble by remember { mutableStateOf(false) }

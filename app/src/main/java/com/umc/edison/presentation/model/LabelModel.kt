@@ -24,6 +24,13 @@ data class LabelModel(
             color = Gray300,
             bubbleCnt = 0
         )
+
+        val INIT = LabelModel(
+            id = null,
+            name = "",
+            color = Gray300,
+            bubbleCnt = 0
+        )
     }
 }
 
