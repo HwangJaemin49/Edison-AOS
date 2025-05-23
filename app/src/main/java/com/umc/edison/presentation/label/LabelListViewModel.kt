@@ -27,10 +27,6 @@ class LabelListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LabelListState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-    init {
-        fetchLabels()
-    }
-
     fun fetchLabels() {
         _uiState.update { LabelListState.DEFAULT }
         collectDataResource(

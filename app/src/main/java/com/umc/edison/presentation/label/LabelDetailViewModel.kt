@@ -32,7 +32,7 @@ class LabelDetailViewModel @Inject constructor(
     override val uiState = _uiState.asStateFlow()
 
     init {
-        val id: String? = savedStateHandle["id"]
+        val id: String? = savedStateHandle["labelId"]
         Log.i("LabelDetailViewModel", "labelId: $id")
         fetchLabelDetail(id)
     }

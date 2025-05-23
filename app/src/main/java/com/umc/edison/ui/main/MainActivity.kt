@@ -106,7 +106,7 @@ fun MainScreen(navController: NavHostController) {
                 BubbleInput(
                     onClick = {
                         showInputBubble = false
-                        navController.navigate(NavRoute.BubbleEdit.createRoute(0))
+                        navController.navigate(NavRoute.BubbleEdit.createRoute(null))
                     },
                     isBlur = true,
                     onBackScreenClick = { showInputBubble = false }

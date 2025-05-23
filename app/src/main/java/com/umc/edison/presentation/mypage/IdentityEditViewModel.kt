@@ -23,7 +23,7 @@ class IdentityEditViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id = savedStateHandle.get<Int>("id") ?: throw IllegalArgumentException("id is required")
+        val id = savedStateHandle["identityId"] ?: throw IllegalArgumentException("id is required")
         fetchIdentityTestResult(id)
     }
 

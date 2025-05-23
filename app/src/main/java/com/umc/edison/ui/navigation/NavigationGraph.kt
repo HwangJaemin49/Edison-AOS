@@ -26,7 +26,6 @@ import com.umc.edison.ui.mypage.AccountManagementScreen
 import com.umc.edison.ui.mypage.DeleteAccountScreen
 import com.umc.edison.ui.mypage.EditProfileScreen
 import com.umc.edison.ui.mypage.IdentityEditScreen
-import com.umc.edison.ui.mypage.InterestEditScreen
 import com.umc.edison.ui.mypage.MenuScreen
 import com.umc.edison.ui.mypage.ScrapBoardDetailScreen
 import com.umc.edison.ui.mypage.ScrapBoardScreen
@@ -55,20 +54,11 @@ fun NavigationGraph(
             ArtLetterSearchScreen(navHostController)
         }
 
-        // ✅ 수정된 아트레터 상세 경로
         composable(
-            route = "${NavRoute.ArtLetter.route}/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val idStr = backStackEntry.arguments?.getString("id")
-            if (idStr != null) {
-                ArtLetterDetailScreen(
-                    artLetterId = idStr,
-                    navHostController = navHostController
-                )
-            } else {
-                Log.e("NavGraph", "Invalid artLetterId in deeplink: $idStr")
-            }
+            route = "${NavRoute.ArtLetter.route}?artLetterId={artLetterId}",
+            arguments = listOf(navArgument("artLetterId") { type = NavType.IntType })
+        ) {
+            ArtLetterDetailScreen(navHostController)
         }
 
         composable(NavRoute.MyPage.route) {
@@ -100,7 +90,7 @@ fun NavigationGraph(
         }
 
         composable(
-            route = "${NavRoute.ScrapBoard.route}/categories/{name}",
+            route = "${NavRoute.ScrapBoard.route}/categories?name={name}",
             arguments = listOf(navArgument("name") { type = NavType.StringType })
         ) {
             ScrapBoardDetailScreen(navHostController)
@@ -127,29 +117,30 @@ fun NavigationGraph(
         }
 
         composable(
-            route = "${NavRoute.MyPage.route}/identity/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            route = "${NavRoute.IdentityEdit.route}?identityId={identityId}",
+            arguments = listOf(navArgument("identityId") { type = NavType.IntType })
         ) {
             IdentityEditScreen(navHostController, updateShowBottomNav)
         }
 
         composable(
-            route = "${NavRoute.MyPage.route}/interest/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
-        ) {
-            InterestEditScreen(navHostController, updateShowBottomNav)
-        }
-
-        composable(
-            route = "${NavRoute.SpaceLabel.route}/labels/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            route = "${NavRoute.LabelDetail.route}?labelId={labelId}",
+            arguments = listOf(navArgument("labelId") {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            })
         ) {
             LabelDetailScreen(navHostController, updateShowBottomNav)
         }
 
         composable(
-            route = "${NavRoute.MyEdison.route}/bubbles/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            route = "${NavRoute.BubbleEdit.route}?bubbleId={bubbleId}",
+            arguments = listOf(navArgument("bubbleId") {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            })
         ) {
             BubbleInputScreen(navHostController, updateShowBottomNav)
         }

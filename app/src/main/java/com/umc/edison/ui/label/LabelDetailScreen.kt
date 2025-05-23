@@ -44,9 +44,6 @@ fun LabelDetailScreen(
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(true)
-        if (uiState.label.id != -1) {
-            viewModel.fetchLabelDetail(uiState.label.id)
-        }
     }
 
     BackHandler(enabled = true) {
@@ -124,7 +121,7 @@ fun LabelDetailScreen(
             )
 
             BubblesLayout(
-                bubbles = uiState.label.bubbles,
+                bubbles = uiState.bubbles,
                 onBubbleClick = onBubbleClick,
                 onBubbleLongClick = onBubbleLongClick,
                 isBlur = uiState.mode != LabelDetailMode.NONE,

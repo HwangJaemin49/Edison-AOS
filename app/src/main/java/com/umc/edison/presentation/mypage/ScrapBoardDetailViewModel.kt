@@ -21,7 +21,7 @@ class ScrapBoardDetailViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val category = savedStateHandle.get<String>("name") ?: ""
+        val category = savedStateHandle["name"] ?: throw IllegalArgumentException("category name is required")
         fetchScrapArtLetters(category)
     }
 

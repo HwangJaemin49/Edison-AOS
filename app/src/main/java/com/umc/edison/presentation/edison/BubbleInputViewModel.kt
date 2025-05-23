@@ -42,7 +42,7 @@ class BubbleInputViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id: String? = savedStateHandle["id"]
+        val id: String? = savedStateHandle["bubbleId"]
         fetchBubble(id)
         fetchLabels()
         fetchBubbles()
