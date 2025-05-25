@@ -32,7 +32,7 @@ class LabelListViewModel @Inject constructor(
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                _uiState.update { it.copy(labels = labels.toPresentation()) }
+                _uiState.update { it.copy(labels = labels.distinctBy { it.id }.toPresentation()) }
             },
             onComplete = {
                 fetchBubblesByLabel()
@@ -77,10 +77,12 @@ class LabelListViewModel @Inject constructor(
             flow = getBubblesWithoutLabelUseCase(),
             onSuccess = { bubbles ->
                 _uiState.update {
+                    val labels = listOf(
+                        LabelModel.DEFAULT.copy(bubbleCnt = bubbles.size)
+                    ) + it.labels
+
                     it.copy(
-                        labels = listOf(
-                            LabelModel.DEFAULT.copy(bubbleCnt = bubbles.size)
-                        ) + it.labels
+                        labels = labels.distinctBy { it.id }
                     )
                 }
             }

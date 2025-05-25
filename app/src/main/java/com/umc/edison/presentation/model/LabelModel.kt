@@ -3,6 +3,7 @@ package com.umc.edison.presentation.model
 import androidx.compose.ui.graphics.Color
 import com.umc.edison.domain.model.label.Label
 import com.umc.edison.ui.theme.Gray300
+import com.umc.edison.ui.theme.White000
 import java.util.UUID
 
 data class LabelModel(
@@ -21,7 +22,7 @@ data class LabelModel(
         val DEFAULT = LabelModel(
             id = null,
             name = "-",
-            color = Gray300,
+            color = White000,
             bubbleCnt = 0
         )
 
