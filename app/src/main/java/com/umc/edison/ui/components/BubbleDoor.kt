@@ -3,8 +3,10 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -54,7 +56,10 @@ import com.umc.edison.ui.theme.Gray700
 import com.umc.edison.ui.theme.Gray800
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -66,10 +71,16 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
 import com.mohamedrejeb.richeditor.model.RichTextState
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
@@ -94,6 +105,8 @@ fun BubbleDoor(
     onMainSelected: (String?) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
     onLinkClick: (String) -> Unit = {},
+    onBackLinkDeleted: (BubbleModel) -> Unit = {},
+    onLinkBubbleDeleted: (BubbleModel) -> Unit = {},
 ) {
     val colors = bubble.labels.map { it.color }
     val outerColors = when (colors.size) {
@@ -153,6 +166,8 @@ fun BubbleDoor(
                 deleteClicked = onImageDeleted,
                 mainClicked = onMainSelected,
                 onLinkClick = onLinkClick,
+                onBackLinkDeleted = onBackLinkDeleted,
+                onLinkBubbleDeleted = onLinkBubbleDeleted
             )
         }
     }
@@ -168,6 +183,8 @@ private fun BubbleContent(
     deleteClicked: (ContentBlockModel) -> Unit,
     mainClicked: (String?) -> Unit,
     onLinkClick: (String) -> Unit,
+    onBackLinkDeleted: (BubbleModel) -> Unit,
+    onLinkBubbleDeleted: (BubbleModel) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -415,18 +432,10 @@ private fun BubbleContent(
         ) {
             bubble.backLinks.forEach { backLink ->
 
-                val richTextState = rememberRichTextState()
-                val isInitialized = remember(backLink.id) { mutableStateOf(false) }
+                var isLongPressed by remember(backLink.id) { mutableStateOf(false) }
+                var layoutResult by remember(backLink.id) { mutableStateOf<TextLayoutResult?>(null) }
 
-                val myUriHandler by remember {
-                    mutableStateOf(object : UriHandler {
-                        override fun openUri(uri: String) {
-                            onLinkClick(uri)
-                        }
-                    })
-                }
-
-                if (!isInitialized.value) {
+                val annotatedString = remember(backLink.id) {
                     val selectedTitle = backLink.title?.takeIf { it.isNotBlank() }
                         ?: backLink.contentBlocks
                             .filter { it.type == ContentType.TEXT }
@@ -434,50 +443,107 @@ private fun BubbleContent(
                             ?.content?.parseHtml()?.take(10)
                         ?: "내용 없음"
 
-                    val splitTitle = selectedTitle.split("\n")
+                    val displayText = selectedTitle.split("\n").first()
 
-                    richTextState.addLink(
-                        text = "[[${splitTitle[0]}]]",
-                        url = "${backLink.id}"
-                    )
-
-                    isInitialized.value = true
+                    buildAnnotatedString {
+                        pushStringAnnotation(
+                            tag = "URL",
+                            annotation = backLink.id.toString()
+                        )
+                        withStyle(SpanStyle(color = Color.Blue)) {
+                            append("[[ ")
+                            append(displayText)
+                            append(" ]]")
+                        }
+                        pop()
+                    }
                 }
 
-                if (isEditable) {
-                    CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
-                        BasicRichText(
-                            state = richTextState,
-                            modifier = Modifier.fillMaxWidth(),
-                            style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                        )
-                    }
-                } else {
-                    CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
-                        RichText(
-                            state = richTextState,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Gray800,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                Box(
+                    modifier = Modifier
+                        .wrapContentWidth() // ✅ FlowRow 대응
+                        .pointerInput(backLink.id) {
+                            detectTapGestures(
+                                onLongPress = {
+                                    isLongPressed = true
+                                },
+                                onTap = { offsetPos ->
+                                    layoutResult?.let { layout ->
+                                        val offset = layout.getOffsetForPosition(offsetPos)
+                                        annotatedString.getStringAnnotations("URL", offset, offset)
+                                            .firstOrNull()?.let { annotation ->
+                                                annotation.item.toIntOrNull()?.let { bubbleId ->
+                                                    onLinkClick(bubbleId)
+                                                }
+                                            }
+                                    }
+                                }
+                            )
+                        }
+                ) {
+
+                    BasicText(
+                        text = annotatedString,
+                        onTextLayout = { layoutResult = it },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    if (isLongPressed) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .clickable { isLongPressed = false }, // 바깥 클릭 시 닫기
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Button(
+                                shape = RoundedCornerShape(100.dp),
+                                onClick = {
+                                    isLongPressed = false
+                                    onBackLinkDeleted(backLink)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor =  Gray100
+                                )
+                            ) {
+                                Text(
+                                    text = "백링크 삭제하기",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontSize = 14.sp,
+                                    color = Red500
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(1.dp))
+
+                            Button(
+                                shape = RoundedCornerShape(100.dp),
+                                onClick = {
+                                   isLongPressed = false
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Gray700,
+                                )
+                            ) {
+                                Text(
+                                    text = "취소",
+                                    style = MaterialTheme.typography.bodyMedium.copy(color = Red100),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
 
         bubble.linkedBubble?.let { linkedBubble ->
-            val richTextState = rememberRichTextState()
-            val isInitialized = remember(linkedBubble.id) { mutableStateOf(false) }
 
-            val myUriHandler by remember {
-                mutableStateOf(object : UriHandler {
-                    override fun openUri(uri: String) {
-                        onLinkClick(uri)
-                    }
-                })
-            }
+            var isLongPressed by remember(linkedBubble.id) { mutableStateOf(false) }
+            var layoutResult by remember(linkedBubble.id) { mutableStateOf<TextLayoutResult?>(null) }
 
-            if (!isInitialized.value) {
+            val annotatedString = remember(linkedBubble.id) {
                 val selectedTitle = linkedBubble.title?.takeIf { it.isNotBlank() }
                     ?: linkedBubble.contentBlocks
                         .filter { it.type == ContentType.TEXT }
@@ -485,39 +551,97 @@ private fun BubbleContent(
                         ?.content?.parseHtml()?.take(10)
                     ?: "내용 없음"
 
-                val splitTitle = selectedTitle.split("\n")
+                val displayText = selectedTitle.split("\n").first()
 
-                richTextState.addLink(
-                    text = "[[${splitTitle[0]}]]",
-                    url = "${linkedBubble.id}"
+                buildAnnotatedString {
+                    pushStringAnnotation(
+                        tag = "URL",
+                        annotation = linkedBubble.id.toString()
+                    )
+                    withStyle(SpanStyle(color = Color.Blue)) {
+                        append("[[ ")
+                        append(displayText)
+                        append(" ]]")
+                    }
+                    pop()
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .pointerInput(linkedBubble.id) {
+                        detectTapGestures(
+                            onLongPress = { isLongPressed = true },
+                            onTap = { offsetPos ->
+                                layoutResult?.let { layout ->
+                                    val offset = layout.getOffsetForPosition(offsetPos)
+                                    annotatedString.getStringAnnotations("URL", offset, offset)
+                                        .firstOrNull()?.let { annotation ->
+                                            annotation.item.toIntOrNull()?.let { bubbleId ->
+                                                onLinkClick(bubbleId)
+                                            }
+                                        }
+                                }
+                            }
+                        )
+                    }
+            ) {
+                BasicText(
+                    text = annotatedString,
+                    onTextLayout = { layoutResult = it },
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
-                isInitialized.value = true
-            }
+                if (isLongPressed) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable { isLongPressed = false },
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Button(
+                            shape = RoundedCornerShape(100.dp),
+                            onClick = {
+                                isLongPressed = false
+                                onLinkBubbleDeleted(linkedBubble)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor =  Gray100
+                            )
+                        ) {
+                            Text(
+                                text = "링크버블 삭제하기",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontSize = 14.sp,
+                                color = Red500
+                            )
+                        }
 
-            if (isEditable) {
-                CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
-                    BasicRichText(
-                        state = richTextState,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium.copy(color = Gray800),
-                    )
-                }
-            } else {
-                CompositionLocalProvider(LocalUriHandler provides myUriHandler) {
-                    RichText(
-                        state = richTextState,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Gray800,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        Spacer(modifier = Modifier.height(1.dp))
+
+                        Button(
+                            shape = RoundedCornerShape(100.dp),
+                            onClick = {
+                                isLongPressed = false
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Gray700,
+                            )
+                        ) {
+                            Text(
+                                text = "취소",
+                                style = MaterialTheme.typography.bodyMedium.copy(color = Red100),
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
                 }
             }
         }
 
-        if (uiState.bubble.labels.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(29.dp))
-        }
     }
 }
 

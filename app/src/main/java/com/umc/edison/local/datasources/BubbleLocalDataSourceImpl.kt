@@ -107,6 +107,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
 
         bubbleLabelDao.deleteByBubbleId(bubble.id)
         linkedBubbleDao.deleteLinkedBubble(bubble.id, false)
+        linkedBubbleDao.deleteLinkedBubble(bubble.id, true)
 
         addBubbleLabel(bubble)
         addLinkedBubble(bubble)

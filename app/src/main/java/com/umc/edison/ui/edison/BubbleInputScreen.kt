@@ -306,6 +306,12 @@ fun BubbleInputContent(
             viewModel.selectMainImage(uri)
         },
         bubbleInputState = uiState,
-        onLinkClick = onLinkClick
+        onLinkClick = onLinkClick,
+        onBackLinkDeleted = { backLink ->
+            viewModel.deleteBackLink(backLink)
+        },
+        onLinkBubbleDeleted = { linkBubble ->
+            viewModel.deleteLinkBubble(linkBubble)
+        }
     )
 }
