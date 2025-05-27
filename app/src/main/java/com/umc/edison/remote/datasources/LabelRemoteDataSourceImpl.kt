@@ -10,7 +10,15 @@ class LabelRemoteDataSourceImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
+    override suspend fun getAllLabels(): List<LabelEntity> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun updateLabel(label: LabelEntity): LabelEntity {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun syncLabel(label: LabelEntity): LabelEntity {
         TODO("Not yet implemented")
     }
 

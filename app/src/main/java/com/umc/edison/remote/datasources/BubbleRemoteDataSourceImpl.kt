@@ -28,6 +28,10 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
         return bubbleSpaceApiService.getBubblePosition().data.map { it.toData() }
     }
 
+    override suspend fun getAllBubbles(): List<BubbleEntity> {
+        TODO("Not yet implemented")
+    }
+
     // UPDATE
     override suspend fun recoverBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity> {
         TODO("Not yet implemented")
@@ -38,6 +42,10 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun syncBubble(bubble: BubbleEntity): BubbleEntity {
         TODO("Not yet implemented")
     }
 

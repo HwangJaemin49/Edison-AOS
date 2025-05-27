@@ -21,6 +21,7 @@ interface BubbleLocalDataSource {
     suspend fun updateBubbles(bubbles: List<BubbleEntity>)
     suspend fun updateBubble(bubble: BubbleEntity) : BubbleEntity
     suspend fun markAsSynced(bubble: BubbleEntity)
+    suspend fun syncBubbles(bubbles: List<BubbleEntity>)
 
     // DELETE
     suspend fun deleteBubbles(bubbles: List<BubbleEntity>)

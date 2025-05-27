@@ -10,11 +10,13 @@ interface BubbleRemoteDataSource {
 
     // READ
     suspend fun getAllClusteredBubbles(): List<PositionBubbleEntity>
+    suspend fun getAllBubbles(): List<BubbleEntity>
 
     // UPDATE
     suspend fun recoverBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
     suspend fun updateBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
     suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity
+    suspend fun syncBubble(bubble: BubbleEntity): BubbleEntity
 
     // DELETE
     suspend fun deleteBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
