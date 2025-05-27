@@ -1,5 +1,6 @@
 package com.umc.edison.data.repository
 
+import android.util.Log
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.identity.toData
@@ -36,7 +37,7 @@ class IdentityRepositoryImpl @Inject constructor(
         flowDataResource(
             dataAction = {
                 val allResults = userRemoteDataSource.getAllMyIdentityResults()
-                allResults.firstOrNull { it.category == category }
+                allResults.firstOrNull { it.category.toDomain() == category }
                     ?: throw IllegalArgumentException("Identity not found for category: $category")
 
             }
