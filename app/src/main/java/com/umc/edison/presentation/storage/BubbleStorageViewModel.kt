@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.core.text.HtmlCompat
 import com.umc.edison.domain.usecase.bubble.GetAllRecentBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.BubbleStorageMode
 import com.umc.edison.presentation.model.toPresentation
@@ -16,10 +17,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BubbleStorageViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val context: Application,
     private val getAllRecentBubblesUseCase: GetAllRecentBubblesUseCase,
     override val trashBubblesUseCase: TrashBubblesUseCase,
-) : BaseBubbleViewModel<BubbleStorageMode, BubbleStorageState>() {
+) : BaseBubbleViewModel<BubbleStorageMode, BubbleStorageState>(toastManager) {
 
     override val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
     override val uiState = _uiState.asStateFlow()

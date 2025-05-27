@@ -80,7 +80,6 @@ fun MyPageScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             HamburgerMenu(
                 onClick = { navHostController.navigate(NavRoute.Menu.route) },

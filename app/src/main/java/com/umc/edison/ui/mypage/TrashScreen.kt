@@ -32,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.mypage.BubbleRecoverMode
 import com.umc.edison.presentation.mypage.TrashState
@@ -73,7 +72,6 @@ fun TrashScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.mode == BubbleRecoverMode.SELECT) {
                 BottomSheetForDelete(
@@ -92,7 +90,6 @@ fun TrashScreen(
         TrashContent(
             viewModel = viewModel,
             uiState = uiState,
-            baseState = baseState,
             navHostController = navHostController
         )
     }
@@ -103,7 +100,6 @@ fun TrashScreen(
 private fun TrashContent(
     viewModel: TrashViewModel,
     uiState: TrashState,
-    baseState: BaseState,
     navHostController: NavHostController
 ) {
     var onBubbleClick: (BubbleModel) -> Unit = {}
@@ -209,8 +205,6 @@ private fun TrashContent(
             confirmText = "삭제",
             onDismiss = { viewModel.updateBubbleRecoverMode(BubbleRecoverMode.SELECT) },
             onConfirm = { viewModel.deleteBubbles() },
-            baseState = baseState,
-            clearToastMessage = { viewModel.clearToastMessage() }
         )
     }
 

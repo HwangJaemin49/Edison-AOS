@@ -83,7 +83,6 @@ fun ArtLetterHomeScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = { TopBar(navHostController, viewModel) },
         modifier = Modifier.fillMaxSize(),
         bottomBar = {}

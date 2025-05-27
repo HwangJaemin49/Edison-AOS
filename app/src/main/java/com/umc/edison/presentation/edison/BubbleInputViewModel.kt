@@ -3,7 +3,6 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
@@ -11,6 +10,7 @@ import com.umc.edison.domain.usecase.bubble.GetBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.UpdateBubbleUseCase
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.BubbleModel
@@ -32,13 +32,14 @@ import javax.inject.Inject
 @HiltViewModel
 class BubbleInputViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    toastManager: ToastManager,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     private val getBubbleUseCase: GetBubbleUseCase,
     private val getAllBubblesUseCase: GetAllBubblesUseCase,
     private val addLabelUseCase: AddLabelUseCase,
     private val addBubbleUseCase: AddBubbleUseCase,
     private val updateBubbleUseCase: UpdateBubbleUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(BubbleInputState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -377,7 +378,7 @@ class BubbleInputViewModel @Inject constructor(
         checkCanSave()
 
         if (!_uiState.value.canSave) {
-            _baseState.update { it.copy(toastMessage = "내용을 입력해주세요.") }
+            showToast("내용을 입력해주세요.")
             addTextBlockToFront()
             return
         }
@@ -390,7 +391,7 @@ class BubbleInputViewModel @Inject constructor(
 
             },
             onSuccess = { savedBubble ->
-                _baseState.update { it.copy(toastMessage = "저장되었습니다.") }
+                showToast("저장되었습니다.")
 
                 if (isLinked) {
                     _uiState.update {
@@ -522,7 +523,9 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun updateToastMessage(message: String) {
-        _baseState.update { it.copy(toastMessage = message) }
+        if (!message.isEmpty()) {
+            showToast(message)
+        }
     }
 }
 

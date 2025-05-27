@@ -6,6 +6,7 @@ import com.umc.edison.domain.usecase.artletter.GetAllRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.LikeArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toDetailPresentation
 import com.umc.edison.presentation.model.toPreviewPresentation
@@ -18,12 +19,13 @@ import javax.inject.Inject
 @HiltViewModel
 class ArtLetterDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    toastManager: ToastManager,
     private val getArtLetterUseCase: GetArtLetterUseCase,
     private val likeArtLetterUseCase: LikeArtLetterUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
     private val getAllRandomArtLettersUseCase: GetAllRandomArtLettersUseCase,
     private val getLogInStateUseCase: GetLogInStateUseCase
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

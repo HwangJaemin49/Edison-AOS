@@ -82,7 +82,6 @@ fun ArtLetterDetailScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(

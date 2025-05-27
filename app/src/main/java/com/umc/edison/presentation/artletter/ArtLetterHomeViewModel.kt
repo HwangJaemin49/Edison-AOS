@@ -5,6 +5,7 @@ import com.umc.edison.domain.usecase.artletter.GetSortedArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.GetAllEditorPickArtLettersUseCase
 import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPreviewPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,12 +16,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ArtLetterHomeViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getLogInStateUseCase: GetLogInStateUseCase,
     private val getAllEditorPickArtLettersUseCase: GetAllEditorPickArtLettersUseCase,
     private val getAllArtLettersUseCase: GetAllArtLettersUseCase,
     private val getSortedArtLettersUseCase: GetSortedArtLettersUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(ArtLetterHomeState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

@@ -4,14 +4,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.DataResource
+import com.umc.edison.presentation.ToastManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-open class BaseViewModel : ViewModel() {
+open class BaseViewModel @Inject constructor(
+    private val toastManager: ToastManager,
+) : ViewModel() {
     internal val _baseState = MutableStateFlow(BaseState.DEFAULT)
     val baseState = _baseState.asStateFlow()
 
@@ -59,7 +63,9 @@ open class BaseViewModel : ViewModel() {
         }
     }
 
-    fun clearToastMessage() {
-        _baseState.update { it.copy(toastMessage = null) }
+    protected fun showToast(message: String) {
+        viewModelScope.launch {
+            toastManager.showToast(message)
+        }
     }
 }

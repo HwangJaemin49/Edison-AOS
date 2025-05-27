@@ -71,7 +71,6 @@ fun LoginScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Box(
             modifier = Modifier

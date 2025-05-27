@@ -33,7 +33,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 
@@ -43,15 +42,13 @@ fun ImageGallery(
     onImageSelected: (List<Uri>) -> Unit,
     multiSelectMode: Boolean,
     onClose: () -> Unit,
-    baseState: BaseState,
-    clearToastMessage: () -> Unit
 ) {
     val context = LocalContext.current
     val selectedImages = remember { mutableStateListOf<Uri>() }
     var imageList by remember { mutableStateOf(loadGalleryImages(context, "Recent")) }
-    var folderList by remember { mutableStateOf(loadGalleryFolders(context)) } // ✅ 폴더 리스트
-    var selectedFolder by remember { mutableStateOf("Recent") } // ✅ 선택된 폴더
-    var isExpand by remember { mutableStateOf(false) } // ✅ 폴더 리스트 다이얼로그 상태
+    var folderList by remember { mutableStateOf(loadGalleryFolders(context)) } // 폴더 리스트
+    var selectedFolder by remember { mutableStateOf("Recent") } // 선택된 폴더
+    var isExpand by remember { mutableStateOf(false) } // 폴더 리스트 다이얼로그 상태
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -72,8 +69,6 @@ fun ImageGallery(
 
     BottomSheet(
         onDismiss = { onClose() },
-        baseState = baseState,
-        clearToastMessage = clearToastMessage
     ) {
         Column(
             modifier = Modifier

@@ -2,6 +2,7 @@ package com.umc.edison.presentation.edison
 
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.SearchBubblesUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,9 +13,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyEdisonViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getAllBubblesUseCase: GetAllBubblesUseCase,
     private val searchBubblesUseCase: SearchBubblesUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(MyEdisonState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -38,9 +40,7 @@ class MyEdisonViewModel @Inject constructor(
                 _uiState.update { it.copy(searchResults = bubbles.toPresentation()) }
 
                 if (bubbles.isEmpty()) {
-                    _baseState.update {
-                        it.copy(toastMessage = "검색 결과를 찾을 수 없습니다.")
-                    }
+                    showToast("검색 결과를 찾을 수 없습니다.")
                 }
             },
             onLoading = {

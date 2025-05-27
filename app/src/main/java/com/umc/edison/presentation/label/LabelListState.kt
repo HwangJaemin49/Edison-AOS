@@ -10,7 +10,7 @@ data class LabelListState(
     companion object {
         val DEFAULT = LabelListState(
             labels = emptyList(),
-            selectedLabel = LabelModel.DEFAULT,
+            selectedLabel = LabelModel.INIT,
             labelEditMode = LabelEditMode.NONE,
         )
     }

@@ -2,6 +2,7 @@ package com.umc.edison.presentation.space
 
 import com.umc.edison.domain.usecase.bubble.SearchBubblesUseCase
 import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.toPresentation
@@ -13,9 +14,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BubbleSpaceViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getLogInStateUseCase: GetLogInStateUseCase,
     private val searchBubblesUseCase: SearchBubblesUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(BubbleSpaceState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -53,7 +55,7 @@ class BubbleSpaceViewModel @Inject constructor(
             },
             onComplete = {
                 if (uiState.value.searchResults.isEmpty()) {
-                    _baseState.update { it.copy(toastMessage = "검색 결과를 찾을 수 없습니다.") }
+                    showToast("검색 결과를 찾을 수 없습니다.")
                 }
             }
         )

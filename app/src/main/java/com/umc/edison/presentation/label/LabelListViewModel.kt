@@ -6,6 +6,7 @@ import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.UpdateLabelUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
@@ -17,13 +18,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LabelListViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     private val getBubblesByLabelUseCase: GetBubblesByLabelUseCase,
     private val getBubblesWithoutLabelUseCase: GetBubblesWithoutLabelUseCase,
     private val addLabelUseCase: AddLabelUseCase,
     private val updateLabelUseCase: UpdateLabelUseCase,
     private val deleteLabelUseCase: DeleteLabelUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(LabelListState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -90,6 +92,9 @@ class LabelListViewModel @Inject constructor(
     }
 
     fun updateEditMode(labelEditMode: LabelEditMode) {
+        if (labelEditMode == LabelEditMode.ADD) {
+            _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
+        }
         _uiState.update { it.copy(labelEditMode = labelEditMode) }
     }
 

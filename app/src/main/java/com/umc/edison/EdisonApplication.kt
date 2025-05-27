@@ -1,14 +1,13 @@
 package com.umc.edison
 
 import android.app.Application
+import android.util.Log
 import androidx.work.Configuration
 import com.umc.edison.data.di.EntryPointModule
 import com.umc.edison.data.sync.SyncDataWorkerFactory
 import com.umc.edison.presentation.sync.SyncTrigger
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
-
-import androidx.hilt.work.HiltWorkerFactory
 import io.branch.referral.Branch
 
 @HiltAndroidApp
@@ -33,7 +32,7 @@ class EdisonApplication : Application(), Configuration.Provider {
             ).getSyncDataWorkerFactory()
 
             return Configuration.Builder()
-                .setMinimumLoggingLevel(android.util.Log.DEBUG)
+                .setMinimumLoggingLevel(Log.DEBUG)
                 .setWorkerFactory(syncDataWorkerFactory)
                 .build()
         }

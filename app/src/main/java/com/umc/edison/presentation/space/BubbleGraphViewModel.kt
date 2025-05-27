@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.space
 
 import com.umc.edison.domain.usecase.bubble.GetAllClusteredBubblesUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toClusterModel
 import com.umc.edison.presentation.model.toEdgeDataModel
@@ -13,8 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BubbleGraphViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getAllClusteredBubblesUseCase: GetAllClusteredBubblesUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(BubbleGraphState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

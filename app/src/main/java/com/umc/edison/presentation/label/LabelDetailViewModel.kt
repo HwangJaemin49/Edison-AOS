@@ -8,6 +8,7 @@ import com.umc.edison.domain.usecase.bubble.MoveBubblesToOtherLabelUseCase
 import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.GetLabelUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.LabelDetailMode
 import com.umc.edison.presentation.model.LabelModel
@@ -21,13 +22,14 @@ import javax.inject.Inject
 @HiltViewModel
 class LabelDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    toastManager: ToastManager,
     private val getBubblesByLabelUseCase: GetBubblesByLabelUseCase,
     private val getBubblesWithoutLabelUseCase: GetBubblesWithoutLabelUseCase,
     private val getLabelUseCase: GetLabelUseCase,
     private val moveBubblesToOtherLabelUseCase: MoveBubblesToOtherLabelUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
     override val trashBubblesUseCase: TrashBubblesUseCase,
-) : BaseBubbleViewModel<LabelDetailMode, LabelDetailState>() {
+) : BaseBubbleViewModel<LabelDetailMode, LabelDetailState>(toastManager) {
     override val _uiState = MutableStateFlow(LabelDetailState.DEFAULT)
     override val uiState = _uiState.asStateFlow()
 

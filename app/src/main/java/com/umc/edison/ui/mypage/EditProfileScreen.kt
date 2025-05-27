@@ -30,7 +30,6 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val baseState by viewModel.baseState.collectAsState()
     var showGallery by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { updateShowBottomNav(false) }
@@ -75,8 +74,6 @@ fun EditProfileScreen(
                 },
                 onClose = { showGallery = false },
                 multiSelectMode = false,
-                baseState = baseState,
-                clearToastMessage = { viewModel.clearToastMessage() }
             )
         }
     }
