@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,7 +38,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import io.branch.referral.Branch
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -86,16 +90,25 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(navController: NavHostController) {
     val toastManager = rememberToastManager()
-    var toastMessage by remember { mutableStateOf<String?>(null) }
+    val toastMessage by toastManager.toastMessage.collectAsState()
+    var visibleMessage by remember { mutableStateOf<String?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
+    var clearJob by remember { mutableStateOf<Job?>(null) }
 
     var showInputBubble by remember { mutableStateOf(false) }
     var showBottomNav by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        toastManager.toastMessage.collect { message ->
-            toastMessage = message
-            delay(2000)
-            toastMessage = null
+    LaunchedEffect(toastMessage) {
+        if (toastMessage != null) {
+            visibleMessage = toastMessage
+            clearJob?.cancel()
+
+            clearJob = coroutineScope.launch {
+                delay(2000)
+                visibleMessage = null
+                toastManager.clearToast()
+            }
         }
     }
 
@@ -131,10 +144,13 @@ fun MainScreen(navController: NavHostController) {
                 }
             }
 
-            toastMessage?.let {
+            visibleMessage?.let {
                 ToastScreen(
                     message = it,
-                    onDismiss = { toastMessage = null }
+                    onDismiss = {
+                        visibleMessage = null
+                        toastManager.clearToast()
+                    }
                 )
             }
         }
