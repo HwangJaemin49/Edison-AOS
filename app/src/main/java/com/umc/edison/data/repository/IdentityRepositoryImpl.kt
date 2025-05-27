@@ -1,6 +1,5 @@
 package com.umc.edison.data.repository
 
-import android.util.Log
 import com.umc.edison.data.bound.flowDataResource
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.identity.toData
