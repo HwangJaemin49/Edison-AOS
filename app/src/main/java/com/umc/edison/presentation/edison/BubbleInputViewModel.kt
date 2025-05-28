@@ -3,7 +3,6 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
@@ -545,13 +544,16 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun toggleImageSelection(imageUri: Uri) {
+        val currImageSize = _uiState.value.bubble.contentBlocks.filter {
+            it.type == ContentType.IMAGE
+        }.size
+
         if (_uiState.value.selectedImages.contains(imageUri)) {
             _uiState.update { it.copy(selectedImages = it.selectedImages - imageUri) }
-        } else if (_uiState.value.selectedImages.size < 10) {
+        } else if (_uiState.value.selectedImages.size < 10 - currImageSize) {
             _uiState.update { it.copy(selectedImages = it.selectedImages + imageUri) }
         } else {
-            Log.d("toggleImageSelection", "이미지 선택 최대 개수 초과")
-            showToast("이미지는 최대 10개까지 선택할 수 있습니다.")
+            showToast("이미지는 최대 10개까지 첨부할 수 있습니다.")
         }
     }
 
