@@ -3,6 +3,7 @@ package com.umc.edison.presentation.edison
 import android.content.Context
 import android.net.Uri
 import android.text.Html
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.update
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @HiltViewModel
 class BubbleInputViewModel @Inject constructor(
@@ -237,8 +239,11 @@ class BubbleInputViewModel @Inject constructor(
         }
     }
 
-    fun addContentBlocks(imagePaths: List<Uri>) {
-
+    fun addContentBlocks() {
+        // uiState의 selectedImages 중 현재 ContentBlocks에 없는 이미지들만 필터링
+        val imagePaths = _uiState.value.selectedImages.filter { imageUri ->
+            _uiState.value.bubble.contentBlocks.none { it.content == imageUri.toString() }
+        }
 
         val newImageBlocks = mutableListOf<ContentBlockModel>()
 
@@ -296,8 +301,6 @@ class BubbleInputViewModel @Inject constructor(
                 )
             )
         }
-
-
     }
 
     fun deleteLinkBubble(targetLinkBubble: BubbleModel) {
@@ -312,17 +315,23 @@ class BubbleInputViewModel @Inject constructor(
         }
     }
 
-
-
     fun deleteContentBlock(contentBlock: ContentBlockModel) {
         if (contentBlock.type != ContentType.IMAGE) return
 
         val currentBubble = _uiState.value.bubble
         val contentBlocks = currentBubble.contentBlocks.sortedBy { it.position }.toMutableList()
 
-        val targetIndex = contentBlocks.indexOfFirst { it.position == contentBlock.position }
+        val targetIndex = contentBlocks.indexOfFirst {
+            it.position == contentBlock.position
+            it.content == contentBlock.content
+        }
 
         if (targetIndex == -1) return
+
+        // selectedImages에서 해당 이미지 제거
+        if (_uiState.value.selectedImages.contains(contentBlock.content.toUri())) {
+            _uiState.update { it.copy(selectedImages = it.selectedImages - contentBlock.content.toUri()) }
+        }
 
         // 이미지가 첫 번째 블록일 때
         if (targetIndex == 0) {
@@ -471,7 +480,14 @@ class BubbleInputViewModel @Inject constructor(
 
     fun saveCameraImage(context: Context) {
         val savedUri = saveImageToInternalStorage(context, _uiState.value.cameraImagePath!!)
-        addContentBlocks(listOf(savedUri))
+        _uiState.update {
+            it.copy(
+                cameraImagePath = null,
+                isCameraOpen = false,
+                selectedImages = it.selectedImages + savedUri
+            )
+        }
+        addContentBlocks()
     }
 
     fun updateCameraOpen(isOpen: Boolean) {
@@ -527,6 +543,18 @@ class BubbleInputViewModel @Inject constructor(
             showToast(message)
         }
     }
+
+    fun toggleImageSelection(imageUri: Uri) {
+        if (_uiState.value.selectedImages.contains(imageUri)) {
+            _uiState.update { it.copy(selectedImages = it.selectedImages - imageUri) }
+        } else if (_uiState.value.selectedImages.size < 10) {
+            _uiState.update { it.copy(selectedImages = it.selectedImages + imageUri) }
+        } else {
+            Log.d("toggleImageSelection", "이미지 선택 최대 개수 초과")
+            showToast("이미지는 최대 10개까지 선택할 수 있습니다.")
+        }
+    }
+
 }
 
 fun String.parseHtml(): String {

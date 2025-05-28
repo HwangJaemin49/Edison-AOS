@@ -1,5 +1,6 @@
 package com.umc.edison.presentation.mypage
 
+import android.net.Uri
 import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
 import com.umc.edison.domain.usecase.user.UpdateProfileInfoUseCase
 import com.umc.edison.presentation.ToastManager
@@ -46,7 +47,12 @@ class EditProfileViewModel @Inject constructor(
         _uiState.update { it.copy(user = it.user.copy(nickname = nickname)) }
     }
 
-    fun updateUserProfileImage(profileImage: String) {
-        _uiState.update { it.copy(user = it.user.copy(profileImage = profileImage)) }
+    fun updateUserProfileImage(profileImage: Uri) {
+        _uiState.update {
+            it.copy(
+                user = it.user.copy(profileImage = profileImage.toString()),
+                selectedImages = listOf(profileImage)
+            )
+        }
     }
 }

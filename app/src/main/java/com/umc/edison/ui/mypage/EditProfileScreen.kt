@@ -69,8 +69,9 @@ fun EditProfileScreen(
 
         if (showGallery) {
             ImageGallery(
-                onImageSelected = { uriList ->
-                    viewModel.updateUserProfileImage(uriList[0].toString())
+                selectedImages = uiState.selectedImages,
+                onImageSelected = { uri ->
+                    viewModel.updateUserProfileImage(uri)
                 },
                 onClose = { showGallery = false },
                 multiSelectMode = false,

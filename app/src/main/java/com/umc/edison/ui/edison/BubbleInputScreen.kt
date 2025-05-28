@@ -218,8 +218,12 @@ fun BubbleInputContent(
 
     if (uiState.isGalleryOpen) {
         ImageGallery(
-            onImageSelected = { uriList ->
-                viewModel.addContentBlocks(uriList)
+            selectedImages = uiState.selectedImages,
+            onImageSelected = { uri ->
+                viewModel.toggleImageSelection(uri)
+            },
+            onConfirmed = {
+                viewModel.addContentBlocks()
             },
             onClose = { viewModel.closeGallery() },
             multiSelectMode = true,
