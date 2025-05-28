@@ -11,20 +11,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.sync.SyncTrigger
 import com.umc.edison.ui.ToastScreen
 import com.umc.edison.ui.components.BubbleInput
@@ -32,15 +27,8 @@ import com.umc.edison.ui.navigation.BottomNavigation
 import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.navigation.NavigationGraph
 import com.umc.edison.ui.theme.EdisonTheme
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import io.branch.referral.Branch
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -57,6 +45,7 @@ class MainActivity : ComponentActivity() {
             navController = rememberNavController()
             EdisonTheme {
                 MainScreen(navController = navController)
+                ToastScreen()
             }
         }
     }
@@ -89,28 +78,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen(navController: NavHostController) {
-    val toastManager = rememberToastManager()
-    val toastMessage by toastManager.toastMessage.collectAsState()
-    var visibleMessage by remember { mutableStateOf<String?>(null) }
-
-    val coroutineScope = rememberCoroutineScope()
-    var clearJob by remember { mutableStateOf<Job?>(null) }
-
     var showInputBubble by remember { mutableStateOf(false) }
     var showBottomNav by remember { mutableStateOf(true) }
-
-    LaunchedEffect(toastMessage) {
-        if (toastMessage != null) {
-            visibleMessage = toastMessage
-            clearJob?.cancel()
-
-            clearJob = coroutineScope.launch {
-                delay(2000)
-                visibleMessage = null
-                toastManager.clearToast()
-            }
-        }
-    }
 
     Scaffold(
         bottomBar = {
@@ -143,31 +112,6 @@ fun MainScreen(navController: NavHostController) {
                     showInputBubble = false
                 }
             }
-
-            visibleMessage?.let {
-                ToastScreen(
-                    message = it,
-                    onDismiss = {
-                        visibleMessage = null
-                        toastManager.clearToast()
-                    }
-                )
-            }
         }
     }
-}
-
-@Composable
-fun rememberToastManager(): ToastManager {
-    val context = LocalContext.current
-    val entry = remember(context) {
-        EntryPointAccessors.fromApplication(context, ToastManagerEntryPoint::class.java)
-    }
-    return entry.toastManager()
-}
-
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-interface ToastManagerEntryPoint {
-    fun toastManager(): ToastManager
 }
