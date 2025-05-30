@@ -31,7 +31,7 @@ class SyncRepositoryImpl @Inject constructor(
         unSyncedBubbles.forEach { bubble ->
             val syncedBubble = bubbleRemoteDataSource.syncBubble(bubble)
             if (syncedBubble.same(bubble)) {
-                bubbleLocalDataSource.markAsSynced(syncedBubble)
+                bubbleLocalDataSource.markAsSynced(bubble)
             } else {
                 Log.e("syncLocalDataToServer", "Failed to sync bubble: ${bubble.id}")
             }

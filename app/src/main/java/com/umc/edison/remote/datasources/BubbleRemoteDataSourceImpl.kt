@@ -3,11 +3,15 @@ package com.umc.edison.remote.datasources
 import com.umc.edison.data.datasources.BubbleRemoteDataSource
 import com.umc.edison.data.model.bubble.BubbleEntity
 import com.umc.edison.data.model.bubble.PositionBubbleEntity
+import com.umc.edison.data.model.bubble.SyncBubbleEntity
 import com.umc.edison.remote.api.BubbleSpaceApiService
+import com.umc.edison.remote.api.SyncApiService
+import com.umc.edison.remote.model.sync.toSyncBubbleRequest
 import javax.inject.Inject
 
 class BubbleRemoteDataSourceImpl @Inject constructor(
     private val bubbleSpaceApiService: BubbleSpaceApiService,
+    private val syncApiService: SyncApiService,
 ) : BubbleRemoteDataSource {
     // CREATE
     override suspend fun addBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity> {
@@ -45,8 +49,8 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override suspend fun syncBubble(bubble: BubbleEntity): BubbleEntity {
-        TODO("Not yet implemented")
+    override suspend fun syncBubble(bubble: BubbleEntity): SyncBubbleEntity {
+        return syncApiService.syncBubble(bubble.toSyncBubbleRequest()).data.toData()
     }
 
     // DELETE
