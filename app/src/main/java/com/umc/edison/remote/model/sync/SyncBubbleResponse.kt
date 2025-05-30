@@ -10,7 +10,7 @@ data class SyncBubbleResponse(
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
     @SerializedName("mainImageUrl") val mainImageUrl: String,
-    @SerializedName("labels") val labels: List<String> = emptyList(),
+    @SerializedName("labels") val labels: List<SyncBubbleLabelResponse> = emptyList(),
     @SerializedName("backlinkIdxs") val backlinkIds: List<String> = emptyList(),
     @SerializedName("linkedBubbleIdx") val linkedBubbleId: String?,
     @SerializedName("isDeleted") val isDeleted: Boolean,
@@ -24,7 +24,7 @@ data class SyncBubbleResponse(
         title = title,
         content = content,
         mainImage = mainImageUrl,
-        labelIds = labels,
+        labelIds = labels.map { it.id },
         backLinkIds = backlinkIds,
         linkedBubbleId = linkedBubbleId,
         isDeleted = isDeleted,
@@ -32,5 +32,11 @@ data class SyncBubbleResponse(
         createdAt = parseIso8601ToDate(createdAt),
         updatedAt = parseIso8601ToDate(updatedAt),
         deletedAt = deletedAt?.let { parseIso8601ToDate(it) },
+    )
+
+    data class SyncBubbleLabelResponse(
+        @SerializedName("localIdx") val id: String,
+        @SerializedName("name") val name: String,
+        @SerializedName("color") val color: Int
     )
 }

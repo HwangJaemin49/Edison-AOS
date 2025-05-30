@@ -36,7 +36,7 @@ open class BaseLocalDataSourceImpl<T : BaseSyncLocal>(
 
     suspend fun markAsSynced(tableName: String, id: String) {
         val date = Date()
-        val query = SimpleSQLiteQuery("UPDATE $tableName SET is_synced = 1, updated_at = $date WHERE id = '$id'")
+        val query = SimpleSQLiteQuery("UPDATE $tableName SET is_synced = 1, updated_at = '$date' WHERE id = '$id'")
         baseDao.markAsSynced(query)
     }
 }
