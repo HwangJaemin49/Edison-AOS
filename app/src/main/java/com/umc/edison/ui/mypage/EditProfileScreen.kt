@@ -30,7 +30,6 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val baseState by viewModel.baseState.collectAsState()
     var showGallery by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { updateShowBottomNav(false) }
@@ -70,13 +69,12 @@ fun EditProfileScreen(
 
         if (showGallery) {
             ImageGallery(
-                onImageSelected = { uriList ->
-                    viewModel.updateUserProfileImage(uriList[0].toString())
+                selectedImages = uiState.selectedImages,
+                onImageSelected = { uri ->
+                    viewModel.updateUserProfileImage(uri)
                 },
                 onClose = { showGallery = false },
                 multiSelectMode = false,
-                baseState = baseState,
-                clearToastMessage = { viewModel.clearToastMessage() }
             )
         }
     }

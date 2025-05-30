@@ -73,7 +73,6 @@ fun MyEdisonScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         HorizontalPager(
             state = pagerState,

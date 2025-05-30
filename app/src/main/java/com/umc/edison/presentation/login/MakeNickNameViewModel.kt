@@ -3,6 +3,7 @@ package com.umc.edison.presentation.login
 import androidx.navigation.NavHostController
 import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
 import com.umc.edison.domain.usecase.user.UpdateProfileInfoUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,9 +14,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MakeNickNameViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
     private val updateProfileInfoUseCase: UpdateProfileInfoUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(MakeNickNameState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

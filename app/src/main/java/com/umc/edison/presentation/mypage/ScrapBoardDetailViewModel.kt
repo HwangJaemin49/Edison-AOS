@@ -3,6 +3,7 @@ package com.umc.edison.presentation.mypage
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.GetScrappedArtLettersByCategoryUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPreviewPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,9 +15,10 @@ import javax.inject.Inject
 @HiltViewModel
 class ScrapBoardDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    toastManager: ToastManager,
     private val getScrappedArtLettersByCategoryUseCase: GetScrappedArtLettersByCategoryUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(ScrapBoardDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

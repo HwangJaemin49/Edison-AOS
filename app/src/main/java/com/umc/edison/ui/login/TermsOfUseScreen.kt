@@ -49,7 +49,6 @@ fun TermsOfUseScreen(
     }
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() }
     ) {
         Column(
             modifier = Modifier

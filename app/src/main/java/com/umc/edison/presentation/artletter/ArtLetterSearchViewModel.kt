@@ -7,6 +7,7 @@ import com.umc.edison.domain.usecase.recentSearch.GetAllRecentSearchesUseCase
 import com.umc.edison.domain.usecase.artletter.SearchArtLettersUseCase
 import com.umc.edison.domain.usecase.recentSearch.DeleteRecentSearchUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import com.umc.edison.presentation.model.toPreviewPresentation
@@ -18,6 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ArtLetterSearchViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val searchArtLettersUseCase: SearchArtLettersUseCase,
     private val getAllRandomArtLettersUseCase: GetAllRandomArtLettersUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
@@ -25,7 +27,7 @@ class ArtLetterSearchViewModel @Inject constructor(
     private val deleteRecentSearchUseCase: DeleteRecentSearchUseCase,
     private val getAllRecentSearchesUseCase: GetAllRecentSearchesUseCase,
     private val getAllArtLetterCategoriesUseCase: GetAllArtLetterCategoriesUseCase
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(ArtLetterSearchState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.presentation.model.IdentityCategoryType
 import com.umc.edison.presentation.mypage.IdentityEditState
 import com.umc.edison.presentation.mypage.IdentityEditViewModel
@@ -56,7 +55,6 @@ fun IdentityEditScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = if (uiState.identity.category == IdentityCategoryType.INSPIRATION) "관심사 고르기" else "Identity 고르기",
@@ -66,7 +64,7 @@ fun IdentityEditScreen(
             )
         }
     ) {
-        IdentityContent(viewModel, uiState, baseState)
+        IdentityContent(viewModel, uiState)
     }
 }
 
@@ -75,85 +73,79 @@ fun IdentityEditScreen(
 private fun IdentityContent(
     viewModel: IdentityEditViewModel,
     uiState: IdentityEditState,
-    baseState: BaseState
 ) {
-    BaseContent(
-        baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .verticalScroll(
+                state = rememberScrollState()
+            )
+            .padding(start = 24.dp, top = 36.dp, end = 24.dp, bottom = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .verticalScroll(
-                    state = rememberScrollState()
-                )
-                .padding(start = 24.dp, top = 36.dp, end = 24.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+        Text(
+            text = uiState.identity.question,
+            style = MaterialTheme.typography.displayLarge,
+            color = Gray800,
+            softWrap = true,
+        )
+
+        GrayColumnContainer(
+            paddingHorizontal = 24.dp,
+            paddingVertical = 18.dp,
+            space = 20.dp
         ) {
             Text(
-                text = uiState.identity.question,
-                style = MaterialTheme.typography.displayLarge,
-                color = Gray800,
-                softWrap = true,
+                text = uiState.identity.descriptionFirst,
+                style = MaterialTheme.typography.titleMedium,
+                color = Gray800
             )
 
-            GrayColumnContainer(
-                paddingHorizontal = 24.dp,
-                paddingVertical = 18.dp,
-                space = 20.dp
+            FlowRow(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = uiState.identity.descriptionFirst,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Gray800
-                )
-
-                FlowRow(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    uiState.identity.selectedKeywords.forEach { keyword ->
-                        KeywordChip(
-                            keyword = keyword.name,
-                            isSelected = true,
-                            onClick = {}
-                        )
-                    }
-                }
-
-                uiState.identity.descriptionSecond?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Gray800,
-                        modifier = Modifier.align(Alignment.End)
+                uiState.identity.selectedKeywords.forEach { keyword ->
+                    KeywordChip(
+                        keyword = keyword.name,
+                        isSelected = true,
+                        onClick = {}
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
+            uiState.identity.descriptionSecond?.let {
                 Text(
-                    text = "선택하기",
+                    text = it,
                     style = MaterialTheme.typography.titleMedium,
                     color = Gray800,
+                    modifier = Modifier.align(Alignment.End)
                 )
+            }
+        }
 
-                FlowRow(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    uiState.identity.options.forEach { keyword ->
-                        KeywordChip(
-                            keyword = keyword.name,
-                            isSelected = uiState.identity.selectedKeywords.contains(keyword),
-                            onClick = { viewModel.toggleKeyword(keyword) }
-                        )
-                    }
+        Spacer(modifier = Modifier.height(28.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Text(
+                text = "선택하기",
+                style = MaterialTheme.typography.titleMedium,
+                color = Gray800,
+            )
+
+            FlowRow(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                uiState.identity.options.forEach { keyword ->
+                    KeywordChip(
+                        keyword = keyword.name,
+                        isSelected = uiState.identity.selectedKeywords.contains(keyword),
+                        onClick = { viewModel.toggleKeyword(keyword) }
+                    )
                 }
             }
         }

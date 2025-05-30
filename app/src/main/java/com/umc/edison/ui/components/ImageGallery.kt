@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,25 +32,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray800
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageGallery(
-    onImageSelected: (List<Uri>) -> Unit,
+    selectedImages: List<Uri>,
+    onImageSelected: (Uri) -> Unit,
+    onConfirmed: () -> Unit = {},
     multiSelectMode: Boolean,
     onClose: () -> Unit,
-    baseState: BaseState,
-    clearToastMessage: () -> Unit
 ) {
     val context = LocalContext.current
-    val selectedImages = remember { mutableStateListOf<Uri>() }
     var imageList by remember { mutableStateOf(loadGalleryImages(context, "Recent")) }
-    var folderList by remember { mutableStateOf(loadGalleryFolders(context)) } // ✅ 폴더 리스트
-    var selectedFolder by remember { mutableStateOf("Recent") } // ✅ 선택된 폴더
-    var isExpand by remember { mutableStateOf(false) } // ✅ 폴더 리스트 다이얼로그 상태
+    var folderList by remember { mutableStateOf(loadGalleryFolders(context)) } // 폴더 리스트
+    var selectedFolder by remember { mutableStateOf("Recent") } // 선택된 폴더
+    var isExpand by remember { mutableStateOf(false) } // 폴더 리스트 다이얼로그 상태
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -72,8 +69,6 @@ fun ImageGallery(
 
     BottomSheet(
         onDismiss = { onClose() },
-        baseState = baseState,
-        clearToastMessage = clearToastMessage
     ) {
         Column(
             modifier = Modifier
@@ -138,8 +133,7 @@ fun ImageGallery(
                         text = "선택",
                         modifier = Modifier.clickable(
                             onClick = {
-                                onImageSelected(selectedImages)
-                                selectedImages.clear()
+                                onConfirmed()
                                 onClose()
                             },
                             enabled = selectedImages.isNotEmpty()
@@ -155,7 +149,8 @@ fun ImageGallery(
             LazyVerticalGrid(columns = GridCells.Fixed(3)) {
                 items(
                     count = imageList.size,
-                    key = { index -> imageList[index].hashCode() }) { index ->
+                    key = { index -> imageList[index].hashCode() }
+                ) { index ->
                     val uri = imageList[index]
                     val isSelected = selectedImages.contains(uri)
                     val selectedIndex = selectedImages.indexOf(uri) + 1
@@ -164,18 +159,7 @@ fun ImageGallery(
                         modifier = Modifier
                             .aspectRatio(1f)
                             .clickable {
-                                if (multiSelectMode) {
-                                    if (isSelected) {
-                                        selectedImages.remove(uri)
-                                    } else {
-                                        selectedImages.add(uri)
-                                    }
-                                } else {
-                                    selectedImages.add(uri)
-                                    onImageSelected(selectedImages)
-                                    selectedImages.clear()
-                                    onClose()
-                                }
+                                onImageSelected(uri)
                             }, contentAlignment = Alignment.Center
                     ) {
                         AsyncImage(
@@ -195,18 +179,7 @@ fun ImageGallery(
                             RadioButton(
                                 selected = isSelected,
                                 onClick = {
-                                    if (multiSelectMode) {
-                                        if (isSelected) {
-                                            selectedImages.remove(uri)
-                                        } else {
-                                            selectedImages.add(uri)
-                                        }
-                                    } else {
-                                        selectedImages.add(uri)
-                                        onImageSelected(selectedImages)
-                                        selectedImages.clear()
-                                        onClose()
-                                    }
+                                    onImageSelected(uri)
                                 },
                             )
 
@@ -218,7 +191,6 @@ fun ImageGallery(
                                         style = MaterialTheme.typography.bodyLarge,
                                         modifier = Modifier.align(Alignment.Center)
                                     )
-
                                 }
                             }
                         }

@@ -86,7 +86,6 @@ fun ArtLetterSearchScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         containerColor = Color(0xFFF5F5F5)
     ) {
 

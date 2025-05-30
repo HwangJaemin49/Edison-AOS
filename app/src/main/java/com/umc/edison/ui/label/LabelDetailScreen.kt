@@ -57,7 +57,6 @@ fun LabelDetailScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.mode == LabelDetailMode.EDIT) {
                 BottomSheetForDelete(
@@ -159,8 +158,6 @@ fun LabelDetailScreen(
             }
         } else if (uiState.mode == LabelDetailMode.MOVE) {
             BottomSheet(
-                baseState = baseState,
-                clearToastMessage = { viewModel.clearToastMessage() },
                 onDismiss = {
                     viewModel.updateEditMode(LabelDetailMode.EDIT)
                 },
@@ -190,8 +187,6 @@ fun LabelDetailScreen(
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
                 },
-                baseState = baseState,
-                clearToastMessage = { viewModel.clearToastMessage() }
             )
         }
     }

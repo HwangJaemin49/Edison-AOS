@@ -21,6 +21,7 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.umc.edison.presentation.sync.SyncTrigger
+import com.umc.edison.ui.ToastScreen
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.navigation.BottomNavigation
 import com.umc.edison.ui.navigation.NavRoute
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("AppStart", "EdisonApplication started")
         syncTrigger = SyncTrigger(this)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -43,6 +45,7 @@ class MainActivity : ComponentActivity() {
             navController = rememberNavController()
             EdisonTheme {
                 MainScreen(navController = navController)
+                ToastScreen()
             }
         }
     }

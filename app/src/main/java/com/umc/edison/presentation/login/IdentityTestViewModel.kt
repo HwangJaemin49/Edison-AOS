@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import com.umc.edison.domain.model.identity.IdentityCategory
 import com.umc.edison.domain.usecase.identity.GetIdentityByCategoryUseCase
 import com.umc.edison.domain.usecase.identity.AddUserIdentityUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.model.toPresentation
@@ -18,9 +19,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IdentityTestViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val addUserIdentityUseCase: AddUserIdentityUseCase,
     private val getIdentityByCategoryUseCase: GetIdentityByCategoryUseCase
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(IdentityTestState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -89,9 +91,7 @@ class IdentityTestViewModel @Inject constructor(
             }
         } else {
             if (uiState.value.identity.selectedKeywords.size >= 5) {
-                _baseState.update {
-                    it.copy(toastMessage = "최대 5개의 키워드를 선택할 수 있습니다.")
-                }
+                showToast("최대 5개의 키워드를 선택할 수 있습니다.")
             } else {
                 _uiState.update {
                     it.copy(
@@ -161,9 +161,6 @@ class IdentityTestViewModel @Inject constructor(
                     }
                 }
 
-            },
-            onError = { error ->
-                _baseState.update { it.copy(toastMessage = "$error") }
             },
         )
     }

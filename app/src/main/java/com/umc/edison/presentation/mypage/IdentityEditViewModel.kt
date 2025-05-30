@@ -2,8 +2,10 @@ package com.umc.edison.presentation.mypage
 
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.model.identity.IdentityCategory
+import com.umc.edison.domain.usecase.identity.GetIdentityByCategoryUseCase
 import com.umc.edison.domain.usecase.identity.GetMyIdentityResultByCategoryUseCase
 import com.umc.edison.domain.usecase.identity.UpdateMyIdentityResultUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.model.toPresentation
@@ -16,9 +18,11 @@ import javax.inject.Inject
 @HiltViewModel
 class IdentityEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    toastManager: ToastManager,
+    private val getIdentityByCategoryUseCase: GetIdentityByCategoryUseCase,
     private val getMyIdentityResultByCategoryUseCase: GetMyIdentityResultByCategoryUseCase,
     private val updateMyIdentityResultUseCase: UpdateMyIdentityResultUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(IdentityEditState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -42,6 +46,20 @@ class IdentityEditViewModel @Inject constructor(
             onSuccess = { identity ->
                 _uiState.update { it.copy(identity = identity.toPresentation()) }
             },
+            onComplete = {
+                fetchIdentityKeywords(category)
+            }
+        )
+    }
+
+    private fun fetchIdentityKeywords(category: IdentityCategory) {
+        collectDataResource(
+            flow = getIdentityByCategoryUseCase(category),
+            onSuccess = { identity ->
+                _uiState.update { it.copy(identity = it.identity.copy(
+                    options = identity.toPresentation().options,
+                )) }
+            }
         )
     }
 
@@ -56,9 +74,7 @@ class IdentityEditViewModel @Inject constructor(
             }
         } else {
             if (uiState.value.identity.selectedKeywords.size >= 5) {
-                _baseState.update {
-                    it.copy(toastMessage = "최대 5개의 키워드를 선택할 수 있습니다.")
-                }
+                showToast("최대 5개의 키워드를 선택할 수 있습니다.")
             } else {
                 _uiState.update {
                     it.copy(

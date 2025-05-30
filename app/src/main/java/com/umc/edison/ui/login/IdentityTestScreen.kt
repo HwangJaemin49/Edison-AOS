@@ -79,7 +79,6 @@ fun IdentityTestScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Column(
             modifier = Modifier
@@ -141,7 +140,6 @@ fun IdentityTest1(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Column(
             modifier = Modifier

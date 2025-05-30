@@ -3,6 +3,7 @@ package com.umc.edison.presentation.mypage
 import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
 import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
 import com.umc.edison.domain.usecase.user.LogOutUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,10 +14,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AccountManagementViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getLogInStateUseCase: GetLogInStateUseCase,
     private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
     private val logOutUseCase: LogOutUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(AccountManagementState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -54,11 +56,11 @@ class AccountManagementViewModel @Inject constructor(
         collectDataResource(
             flow = logOutUseCase(),
             onSuccess = {
-                _baseState.update { it.copy(toastMessage = "로그아웃 되었습니다.") }
+                showToast("로그아웃 되었습니다.")
                 _uiState.update { it.copy(isLoggedIn = false, user = null) }
             },
             onError = { _ ->
-                _baseState.update { it.copy(toastMessage = "로그아웃에 실패했습니다.") }
+                showToast("로그아웃에 실패했습니다.")
             },
             onComplete = {
                 _uiState.update {

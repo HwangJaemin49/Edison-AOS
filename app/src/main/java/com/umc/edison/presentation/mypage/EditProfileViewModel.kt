@@ -1,7 +1,9 @@
 package com.umc.edison.presentation.mypage
 
+import android.net.Uri
 import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
 import com.umc.edison.domain.usecase.user.UpdateProfileInfoUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,9 +14,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
     private val updateUserProfileUseCase: UpdateProfileInfoUseCase
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(EditProfileState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -35,7 +38,7 @@ class EditProfileViewModel @Inject constructor(
         collectDataResource(
             flow = updateUserProfileUseCase(_uiState.value.user.toDomain()),
             onSuccess = {
-                _baseState.update { it.copy(toastMessage = "프로필이 수정되었습니다.") }
+                showToast("프로필이 수정되었습니다.")
             },
         )
     }
@@ -44,7 +47,12 @@ class EditProfileViewModel @Inject constructor(
         _uiState.update { it.copy(user = it.user.copy(nickname = nickname)) }
     }
 
-    fun updateUserProfileImage(profileImage: String) {
-        _uiState.update { it.copy(user = it.user.copy(profileImage = profileImage)) }
+    fun updateUserProfileImage(profileImage: Uri) {
+        _uiState.update {
+            it.copy(
+                user = it.user.copy(profileImage = profileImage.toString()),
+                selectedImages = listOf(profileImage)
+            )
+        }
     }
 }

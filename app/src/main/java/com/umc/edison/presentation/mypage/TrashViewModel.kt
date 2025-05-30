@@ -3,6 +3,7 @@ package com.umc.edison.presentation.mypage
 import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllTrashedBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.RecoverBubblesUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.toPresentation
@@ -14,10 +15,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TrashViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getAllTrashedBubblesUseCase: GetAllTrashedBubblesUseCase,
     private val recoverBubblesUseCase: RecoverBubblesUseCase,
     private val deleteBubblesUseCase: DeleteBubblesUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(TrashState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -74,9 +76,7 @@ class TrashViewModel @Inject constructor(
                         bubbles = it.bubbles - it.selectedBubbles.toSet(),
                     )
                 }
-                _baseState.update {
-                    it.copy(toastMessage = "버블이 삭제되었습니다.")
-                }
+                showToast("버블이 삭제되었습니다.")
                 fetchDeletedBubbles()
             },
         )
@@ -92,9 +92,7 @@ class TrashViewModel @Inject constructor(
                         bubbles = it.bubbles - it.selectedBubbles.toSet(),
                     )
                 }
-                _baseState.update {
-                    it.copy(toastMessage = "버블이 복원되었습니다.")
-                }
+                showToast("버블이 복원되었습니다.")
             },
         )
     }

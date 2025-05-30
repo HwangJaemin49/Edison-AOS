@@ -28,7 +28,6 @@ fun ScrapBoardDetailScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = uiState.categoryName,

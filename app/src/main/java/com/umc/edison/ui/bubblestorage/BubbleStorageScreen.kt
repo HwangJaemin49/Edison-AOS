@@ -78,7 +78,6 @@ fun BubbleStorageScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         bottomBar = {
             if (uiState.mode == BubbleStorageMode.EDIT) {
                 BottomSheetForDelete(
@@ -216,8 +215,6 @@ fun BubbleStorageScreen(
                 onConfirm = {
                     viewModel.deleteSelectedBubbles(showBottomNav = updateShowBottomNav)
                 },
-                baseState = baseState,
-                clearToastMessage = { viewModel.clearToastMessage() }
             )
         } else if (uiState.mode == BubbleStorageMode.SHARE) {
             BottomSheet(
@@ -225,9 +222,6 @@ fun BubbleStorageScreen(
                     viewModel.updateEditMode(BubbleStorageMode.EDIT)
                     updateViewMode(false)
                 },
-                baseState = baseState,
-                clearToastMessage = { viewModel.clearToastMessage() },
-                showToastMessage = false
             ) {
                 Column(
                     modifier = Modifier

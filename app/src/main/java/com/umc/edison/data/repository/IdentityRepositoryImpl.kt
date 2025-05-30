@@ -36,7 +36,7 @@ class IdentityRepositoryImpl @Inject constructor(
         flowDataResource(
             dataAction = {
                 val allResults = userRemoteDataSource.getAllMyIdentityResults()
-                allResults.firstOrNull { it.category == category }
+                allResults.firstOrNull { it.category.toDomain() == category }
                     ?: throw IllegalArgumentException("Identity not found for category: $category")
 
             }

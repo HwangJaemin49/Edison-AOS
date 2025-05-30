@@ -28,7 +28,6 @@ fun ScrapBoardScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = "나의 ARTLETTER",

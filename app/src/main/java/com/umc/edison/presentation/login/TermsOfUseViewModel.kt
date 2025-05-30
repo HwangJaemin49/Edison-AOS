@@ -2,6 +2,7 @@ package com.umc.edison.presentation.login
 
 import androidx.navigation.NavHostController
 import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import com.umc.edison.ui.navigation.NavRoute
@@ -13,8 +14,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TermsOfUseViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(TermsOfUseState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

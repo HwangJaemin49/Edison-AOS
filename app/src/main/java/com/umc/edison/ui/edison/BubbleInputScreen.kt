@@ -83,7 +83,6 @@ fun BubbleInputScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BubbleInputTopBar(
                 onBackClicked = {
@@ -199,7 +198,6 @@ fun BubbleInputContent(
     onLinkClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val baseState by viewModel.baseState.collectAsState()
     val context = LocalContext.current
 
     val takePictureLauncher = rememberLauncherForActivityResult(
@@ -220,13 +218,15 @@ fun BubbleInputContent(
 
     if (uiState.isGalleryOpen) {
         ImageGallery(
-            onImageSelected = { uriList ->
-                viewModel.addContentBlocks(uriList)
+            selectedImages = uiState.selectedImages,
+            onImageSelected = { uri ->
+                viewModel.toggleImageSelection(uri)
+            },
+            onConfirmed = {
+                viewModel.addContentBlocks()
             },
             onClose = { viewModel.closeGallery() },
             multiSelectMode = true,
-            baseState = baseState,
-            clearToastMessage = { viewModel.clearToastMessage() }
         )
     }
 
@@ -247,8 +247,6 @@ fun BubbleInputContent(
             onDismiss = {
                 viewModel.updateLabelEditMode(LabelEditMode.NONE)
             },
-            baseState = baseState,
-            clearToastMessage = { viewModel.clearToastMessage() }
         ) {
             LabelModalContent(
                 editMode = uiState.labelEditMode,
@@ -267,8 +265,6 @@ fun BubbleInputContent(
     if (uiState.labelEditMode == LabelEditMode.EDIT) {
         BottomSheet(
             onDismiss = { viewModel.updateLabelEditMode(LabelEditMode.NONE) },
-            baseState = baseState,
-            clearToastMessage = { viewModel.clearToastMessage() }
         ) {
             LabelSelectModalContent(
                 labels = uiState.labels,

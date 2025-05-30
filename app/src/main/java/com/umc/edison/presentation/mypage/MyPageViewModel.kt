@@ -4,6 +4,7 @@ import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
 import com.umc.edison.domain.usecase.identity.GetAllMyIdentityResultsUseCase
 import com.umc.edison.domain.usecase.artletter.GetAllScrappedArtLettersUseCase
 import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
+import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toCategoryPresentation
 import com.umc.edison.presentation.model.toPresentation
@@ -15,11 +16,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
+    toastManager: ToastManager,
     private val getLogInStateUseCase: GetLogInStateUseCase,
     private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
     private val getAllMyIdentityResultsUseCase: GetAllMyIdentityResultsUseCase,
     private val getAllScrappedArtLettersUseCase: GetAllScrappedArtLettersUseCase,
-) : BaseViewModel() {
+) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(MyPageState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 

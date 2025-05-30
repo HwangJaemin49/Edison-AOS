@@ -55,7 +55,6 @@ fun AccountManagementScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = stringResource(R.string.account_management),

@@ -53,7 +53,6 @@ fun DeleteAccountScreen(
 
     BaseContent(
         baseState = baseState,
-        clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
                 title = stringResource(id = R.string.delete_account),

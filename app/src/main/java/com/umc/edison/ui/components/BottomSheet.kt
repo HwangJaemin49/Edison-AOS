@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.umc.edison.presentation.base.BaseState
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
 import kotlinx.coroutines.launch
@@ -42,9 +41,6 @@ import kotlin.math.roundToInt
 @Composable
 fun BottomSheet(
     onDismiss: () -> Unit,
-    baseState: BaseState,
-    clearToastMessage: () -> Unit,
-    showToastMessage: Boolean = true,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     content: @Composable () -> Unit
 ) {
@@ -60,14 +56,6 @@ fun BottomSheet(
             contentAlignment = Alignment.Center
         ) {
             content()
-
-            if (baseState.toastMessage != null && showToastMessage) {
-                ToastMessage(
-                    message = baseState.toastMessage,
-                    isVisible = true,
-                    onDismiss = clearToastMessage
-                )
-            }
         }
     }
 }
@@ -80,14 +68,10 @@ fun BottomSheetPopUp(
     confirmText: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    baseState: BaseState,
-    clearToastMessage: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
     BottomSheet(
         onDismiss = onDismiss,
-        baseState = baseState,
-        clearToastMessage = clearToastMessage,
         sheetState = sheetState,
     ) {
         BottomSheetPopUpContent(
