@@ -36,8 +36,8 @@ import java.util.Date
 )
 data class LinkedBubbleLocal(
     @PrimaryKey(autoGenerate = true) override val id: Int = 0,
-    @ColumnInfo(name = "curr_bubble_id") val currBubbleId: Int,
-    @ColumnInfo(name = "link_bubble_id") val linkBubbleId: Int,
+    @ColumnInfo(name = "curr_bubble_id") val currBubbleId: String,
+    @ColumnInfo(name = "link_bubble_id") val linkBubbleId: String,
     @ColumnInfo(name = "is_back") val isBack: Boolean,
     @ColumnInfo(name = "created_at") override var createdAt: Date = Date(),
     @ColumnInfo(name = "updated_at") override var updatedAt: Date = Date(),

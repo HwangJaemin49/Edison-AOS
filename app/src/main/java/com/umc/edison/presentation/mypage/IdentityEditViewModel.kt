@@ -1,9 +1,9 @@
 package com.umc.edison.presentation.mypage
 
 import androidx.lifecycle.SavedStateHandle
-import com.umc.edison.domain.model.IdentityCategory
-import com.umc.edison.domain.usecase.mypage.GetMyIdentityResultUseCase
-import com.umc.edison.domain.usecase.mypage.UpdateIdentityUseCase
+import com.umc.edison.domain.model.identity.IdentityCategory
+import com.umc.edison.domain.usecase.identity.GetMyIdentityResultByCategoryUseCase
+import com.umc.edison.domain.usecase.identity.UpdateMyIdentityResultUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.KeywordModel
 import com.umc.edison.presentation.model.toPresentation
@@ -16,36 +16,32 @@ import javax.inject.Inject
 @HiltViewModel
 class IdentityEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getMyIdentityResultUseCase: GetMyIdentityResultUseCase,
-    private val updateIdentityUseCase: UpdateIdentityUseCase,
+    private val getMyIdentityResultByCategoryUseCase: GetMyIdentityResultByCategoryUseCase,
+    private val updateMyIdentityResultUseCase: UpdateMyIdentityResultUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(IdentityEditState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id = savedStateHandle.get<Int>("id") ?: throw IllegalArgumentException("id is required")
+        val id: Int =
+            savedStateHandle["identityId"] ?: throw IllegalArgumentException("id is required")
         fetchIdentityTestResult(id)
     }
 
     private fun fetchIdentityTestResult(id: Int) {
-        val category = IdentityCategory.entries[id]
+        val category = when (id) {
+            1 -> IdentityCategory.EXPLAIN
+            2 -> IdentityCategory.FIELD
+            3 -> IdentityCategory.ENVIRONMENT
+            4 -> IdentityCategory.INSPIRATION
+            else -> throw IllegalArgumentException("Invalid category id")
+        }
 
         collectDataResource(
-            flow = getMyIdentityResultUseCase(category),
+            flow = getMyIdentityResultByCategoryUseCase(category),
             onSuccess = { identity ->
-                _uiState.update {
-                    it.copy(identity = identity.toPresentation())
-                }
+                _uiState.update { it.copy(identity = identity.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -60,7 +56,7 @@ class IdentityEditViewModel @Inject constructor(
             }
         } else {
             if (uiState.value.identity.selectedKeywords.size >= 5) {
-                _uiState.update {
+                _baseState.update {
                     it.copy(toastMessage = "최대 5개의 키워드를 선택할 수 있습니다.")
                 }
             } else {
@@ -77,7 +73,7 @@ class IdentityEditViewModel @Inject constructor(
 
     fun updateIdentity() {
         collectDataResource(
-            flow = updateIdentityUseCase(_uiState.value.identity.toDomain()),
+            flow = updateMyIdentityResultUseCase(_uiState.value.identity.toDomain()),
             onSuccess = {
                 _uiState.update {
                     it.copy(
@@ -85,22 +81,9 @@ class IdentityEditViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
             onComplete = {
-                _uiState.update { it.copy(
-                    isLoading = false,
-                    isEdited = true,
-                ) }
+                _uiState.update { it.copy(isEdited = true) }
             }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

@@ -70,6 +70,7 @@ fun ArtLetterHomeScreen(
     viewModel: ArtLetterHomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchAllArtLetters()
@@ -81,7 +82,7 @@ fun ArtLetterHomeScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = { TopBar(navHostController, viewModel) },
         modifier = Modifier.fillMaxSize(),
@@ -227,9 +228,7 @@ fun EditorPickSection(
                         .clickable(
                             onClick = {
                                 navHostController.navigate(
-                                    NavRoute.ArtLetterDetail.createRoute(
-                                        artLetter.artLetterId.toString()
-                                    )
+                                    NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)
                                 )
                             },
                             indication = null,
@@ -317,9 +316,7 @@ fun ArtBoardSection(
                 artLetter = it as ArtLetterPreviewModel,
                 onArtLetterClick = { artLetter ->
                     navHostController.navigate(
-                        NavRoute.ArtLetterDetail.createRoute(
-                            artLetter.artLetterId.toString()
-                        )
+                        NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)
                     )
                 },
                 onBookmarkClick = { artLetter ->

@@ -9,35 +9,22 @@ data class BubbleStorageState(
     val bubbles: List<BubbleModel>,
     override val selectedBubbles: List<BubbleModel>,
     override val mode: BaseBubbleMode,
-    override val isLoading: Boolean,
-    override val error: Throwable?,
-    override val toastMessage: String?
-) : BaseBubbleState<BubbleStorageMode>(selectedBubbles, mode, isLoading, error, toastMessage) {
+) : BaseBubbleState<BubbleStorageMode>(selectedBubbles, mode) {
     companion object {
         val DEFAULT = BubbleStorageState(
             bubbles = emptyList(),
             selectedBubbles = emptyList(),
             mode = BubbleStorageMode.NONE,
-            isLoading = false,
-            error = null,
-            toastMessage = null
         )
     }
 
     override fun copyState(
         selectedBubbles: List<BubbleModel>,
         mode: BaseBubbleMode,
-        isLoading: Boolean,
-        error: Throwable?,
-        toastMessage: String?
     ): BaseBubbleState<BubbleStorageMode> {
         return copy(
             selectedBubbles = selectedBubbles,
             mode = mode,
-            isLoading = isLoading,
-            error = error,
-            toastMessage = toastMessage
         )
     }
 }
-

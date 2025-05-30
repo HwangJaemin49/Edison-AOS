@@ -1,37 +1,27 @@
 package com.umc.edison.data.datasources
 
-import com.umc.edison.data.model.BubbleEntity
+import com.umc.edison.data.model.bubble.BubbleEntity
 
 interface BubbleLocalDataSource {
-    suspend fun getAllBubbles(): List<BubbleEntity>
-    suspend fun getStorageBubbles(): List<BubbleEntity>
-    suspend fun getSearchBubbles(query: String): List<BubbleEntity>
+    // CREATE
     suspend fun addBubbles(bubbles: List<BubbleEntity>)
     suspend fun addBubble(bubble: BubbleEntity) : BubbleEntity
 
-    suspend fun getBubblesByLabel(labelId: Int): List<BubbleEntity>
-    suspend fun getBubble(bubbleId: Int): BubbleEntity
+    // READ
+    suspend fun getAllBubbles(): List<BubbleEntity>
+    suspend fun getAllRecentBubbles(dayBefore: Int): List<BubbleEntity>
+    suspend fun getAllTrashedBubbles(): List<BubbleEntity>
+    suspend fun getBubble(id: String): BubbleEntity
+    suspend fun getBubblesByLabelId(labelId: String): List<BubbleEntity>
+    suspend fun getBubblesWithoutLabel(): List<BubbleEntity>
+    suspend fun getSearchBubbleResults(query: String): List<BubbleEntity>
+    suspend fun getUnSyncedBubbles(): List<BubbleEntity>
 
-    suspend fun moveBubblesToTrash(bubbles: List<BubbleEntity>)
-    suspend fun moveBubbleToTrash(bubble: BubbleEntity)
-
+    // UPDATE
     suspend fun updateBubbles(bubbles: List<BubbleEntity>)
     suspend fun updateBubble(bubble: BubbleEntity) : BubbleEntity
-
-    suspend fun syncBubbles(bubbles: List<BubbleEntity>)
-    suspend fun getUnSyncedBubbles(): List<BubbleEntity>
     suspend fun markAsSynced(bubble: BubbleEntity)
 
-    suspend fun getTrashedBubbles(): List<BubbleEntity>
-
-    suspend fun recoverBubbles(bubbles: List<BubbleEntity>)
-    suspend fun recoverBubble(bubble: BubbleEntity)
-
-    suspend fun softDeleteBubbles(bubbles: List<BubbleEntity>)
-    suspend fun softDeleteBubble(bubble: BubbleEntity)
-
-    suspend fun deleteBubble(bubble: BubbleEntity)
-    suspend fun addLinkedBubble(bubble: BubbleEntity)
-
-    suspend fun deleteAllBubbles()
+    // DELETE
+    suspend fun deleteBubbles(bubbles: List<BubbleEntity>)
 }

@@ -2,9 +2,9 @@ package com.umc.edison.presentation.mypage
 
 import androidx.lifecycle.SavedStateHandle
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
-import com.umc.edison.domain.usecase.mypage.GetScrapArtLettersByCategoryUseCase
+import com.umc.edison.domain.usecase.artletter.GetScrappedArtLettersByCategoryUseCase
 import com.umc.edison.presentation.base.BaseViewModel
-import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.presentation.model.toPreviewPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,32 +14,27 @@ import javax.inject.Inject
 @HiltViewModel
 class ScrapBoardDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getScrapArtLettersByCategoryUseCase: GetScrapArtLettersByCategoryUseCase,
+    private val getScrappedArtLettersByCategoryUseCase: GetScrappedArtLettersByCategoryUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(ScrapBoardDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     init {
-        val category = savedStateHandle.get<String>("name") ?: ""
+        val category: String =
+            savedStateHandle["name"] ?: throw IllegalArgumentException("category name is required")
         fetchScrapArtLetters(category)
     }
 
     private fun fetchScrapArtLetters(name: String) {
         collectDataResource(
-            flow = getScrapArtLettersByCategoryUseCase(name),
+            flow = getScrappedArtLettersByCategoryUseCase(name),
             onSuccess = { artLetters ->
-                _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update { it.copy(artLetters = artLetters.toPreviewPresentation()) }
             },
             onLoading = {
-                _uiState.update { it.copy(isLoading = true, categoryName = name) }
+                _uiState.update { it.copy(categoryName = name) }
             },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -59,19 +54,6 @@ class ScrapBoardDetailViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

@@ -19,15 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.umc.edison.presentation.login.IdentityTestViewModel
@@ -38,12 +35,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.IntOffset
-import com.umc.edison.domain.model.IdentityCategory
 import com.umc.edison.ui.components.KeywordChip
-import com.umc.edison.ui.navigation.NavRoute
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray500
 import kotlinx.coroutines.CoroutineScope
@@ -55,12 +51,12 @@ fun IdentityTestScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: IdentityTestViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     val scrollState = rememberScrollState()
 
     val tabs = listOf("아이덴티티 테스트1", "아이덴티티 테스트2", "아이덴티티 테스트3", "아이덴티티 테스트4")
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState(
         pageCount = { tabs.size },
         initialPageOffsetFraction = 0f,
@@ -82,7 +78,7 @@ fun IdentityTestScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Column(
@@ -122,10 +118,10 @@ fun IdentityTestScreen(
                 ) { page ->
                     selectedTabIndex = pagerState.currentPage
                     when (page) {
-                        0 -> Identitytest1(pagerState, coroutineScope)
-                        1 -> Identitytest2(pagerState, coroutineScope)
-                        2 -> Identitytest3(pagerState, coroutineScope)
-                        3 -> Identitytest4(navHostController, pagerState, coroutineScope)
+                        0 -> IdentityTest1(pagerState, coroutineScope)
+                        1 -> IdentityTest2(pagerState, coroutineScope)
+                        2 -> IdentityTest3(pagerState, coroutineScope)
+                        3 -> IdentityTest4(navHostController, pagerState, coroutineScope)
                     }
                 }
             }
@@ -135,16 +131,16 @@ fun IdentityTestScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Identitytest1(
+fun IdentityTest1(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-
+    val baseState by viewModel.baseState.collectAsState()
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Column(
@@ -152,21 +148,18 @@ fun Identitytest1(
                 .fillMaxWidth()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Top,
-
-            ) {
-
+        ) {
             Text(
                 text = uiState.identity.question,
                 color = Gray800,
                 style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier.padding(top=30.dp, bottom=48.dp)
+                modifier = Modifier.padding(top = 30.dp, bottom = 48.dp)
             )
-
 
             FlowRow(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom=48.dp)
+                modifier = Modifier.padding(bottom = 48.dp)
 
             ) {
                 uiState.identity.options.forEach { keyword ->
@@ -178,61 +171,52 @@ fun Identitytest1(
                 }
             }
 
-
             Spacer(modifier = Modifier.weight(1f))
 
             BasicFullButton(
                 text = "다음으로",
                 enabled = true,
                 onClick = {
-
                     viewModel.setIdentityTestResult(pagerState, coroutineScope)
-
                 },
             )
-
         }
     }
 }
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Identitytest2(
+fun IdentityTest2(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
-
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp),
         verticalArrangement = Arrangement.Top,
-
-        ) {
-
+    ) {
         Text(
             text = uiState.identity.question,
             color = Gray800,
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.padding(top=30.dp, bottom=12.dp)
+            modifier = Modifier.padding(top = 30.dp, bottom = 12.dp)
         )
 
         Text(
             text = uiState.identity.questionTip ?: "",
             color = Gray500,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom=48.dp)
+            modifier = Modifier.padding(bottom = 48.dp)
         )
 
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(bottom=48.dp)
+            modifier = Modifier.padding(bottom = 48.dp)
         ) {
             uiState.identity.options.forEach { keyword ->
                 KeywordChip(
@@ -242,6 +226,7 @@ fun Identitytest2(
                 )
             }
         }
+
         Spacer(modifier = Modifier.weight(1f))
 
         BasicFullButton(
@@ -251,14 +236,12 @@ fun Identitytest2(
                 viewModel.setIdentityTestResult(pagerState, coroutineScope)
             },
         )
-
     }
 }
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Identitytest3(
+fun IdentityTest3(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel(),
@@ -270,22 +253,18 @@ fun Identitytest3(
             .fillMaxWidth()
             .padding(24.dp),
         verticalArrangement = Arrangement.Top,
-
-        ) {
-
-
+    ) {
         Text(
             text = uiState.identity.question,
             color = Gray800,
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.padding(top=30.dp, bottom=48.dp)
+            modifier = Modifier.padding(top = 30.dp, bottom = 48.dp)
         )
-
 
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(bottom=48.dp)
+            modifier = Modifier.padding(bottom = 48.dp)
         ) {
             uiState.identity.options.forEach { keyword ->
                 KeywordChip(
@@ -302,56 +281,51 @@ fun Identitytest3(
             text = "다음으로",
             enabled = true,
             onClick = {
-
                 viewModel.setIdentityTestResult(pagerState, coroutineScope)
             },
         )
-
     }
 }
 
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Identitytest4(
+fun IdentityTest4(
     navHostController: NavHostController, pagerState: PagerState,
     coroutineScope: CoroutineScope,
     viewModel: IdentityTestViewModel = hiltViewModel(),
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp),
         verticalArrangement = Arrangement.Top,
-
-        ) {
-
+    ) {
         Text(
-            text = uiState.interest.question,
+            text = uiState.identity.question,
             color = Gray800,
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.padding(top=30.dp, bottom=12.dp)
+            modifier = Modifier.padding(top = 30.dp, bottom = 12.dp)
         )
 
-
         Text(
-            text = uiState.interest.questionTip,
+            text = uiState.identity.questionTip!!,
             color = Gray500,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom=48.dp)
+            modifier = Modifier.padding(bottom = 48.dp)
         )
 
         FlowRow(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(bottom=48.dp)
+            modifier = Modifier.padding(bottom = 48.dp)
         ) {
-            uiState.interest.options.forEach { keyword ->
+            uiState.identity.options.forEach { keyword ->
                 KeywordChip(
                     keyword = keyword.name,
-                    isSelected = uiState.interest.selectedKeywords.contains(keyword),
+                    isSelected = uiState.identity.selectedKeywords.contains(keyword),
                     onClick = { viewModel.toggleInterestKeyword(keyword) }
                 )
             }
@@ -371,6 +345,5 @@ fun Identitytest4(
                 }
             },
         )
-
     }
 }

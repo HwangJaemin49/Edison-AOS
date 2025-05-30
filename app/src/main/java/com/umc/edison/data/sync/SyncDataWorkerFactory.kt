@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
+import com.umc.edison.domain.usecase.sync.SyncLocalDataToServerUseCase
 import javax.inject.Inject
 
 class SyncDataWorkerFactory @Inject constructor(
-    private val syncDataUseCase: SyncDataUseCase
+    private val syncLocalDataToServerUseCase: SyncLocalDataToServerUseCase
 ) : WorkerFactory(){
     override fun createWorker(
         appContext: Context,
@@ -16,7 +16,7 @@ class SyncDataWorkerFactory @Inject constructor(
         workerParameters: WorkerParameters
     ): ListenableWorker? {
         return when(workerClassName){
-            SyncDataWorker::class.java.name -> SyncDataWorker(appContext, workerParameters, syncDataUseCase)
+            SyncDataWorker::class.java.name -> SyncDataWorker(appContext, workerParameters, syncLocalDataToServerUseCase)
             else -> null
         }
     }

@@ -1,30 +1,35 @@
 package com.umc.edison.remote.datasources
 
-import androidx.compose.runtime.key
 import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
-import com.umc.edison.data.model.ArtLetterDetailEntity
-import com.umc.edison.data.model.ArtLetterKeyWordEntity
-import com.umc.edison.data.model.ArtLetterPreviewEntity
+import com.umc.edison.data.model.artLetter.ArtLetterEntity
+import com.umc.edison.data.model.artLetter.ArtLetterKeyWordEntity
+import com.umc.edison.data.model.artLetter.ArtLetterPreviewEntity
 import com.umc.edison.remote.api.ArtLetterApiService
 import com.umc.edison.remote.model.artletter.GetEditorPickRequest
-import com.umc.edison.remote.model.artletter.RemoveRecentSearchRequest
 import com.umc.edison.remote.model.artletter.toData
 import javax.inject.Inject
 
 class ArtLetterRemoteDataSourceImpl @Inject constructor(
-    private val artLetterApiService: ArtLetterApiService
+    private val artLetterApiService: ArtLetterApiService,
 ) : ArtLetterRemoteDataSource {
+    // READ
+    override suspend fun getAllArtLetterCategories(): List<String> {
+        return artLetterApiService.getRecommendedCategories().data.categories
+    }
+
     override suspend fun getAllArtLetters(): List<ArtLetterPreviewEntity> {
         val response = artLetterApiService.getAllArtLetters().data
 
         return response.map { it.toData() }
     }
 
-    override suspend fun getSortedArtLetters(sortBy: String): List<ArtLetterPreviewEntity> {
-        return artLetterApiService.getSortedArtLetters(sortBy).data.toData()
+    override suspend fun getAllEditorPickArtLetters(): List<ArtLetterPreviewEntity> {
+        val request = GetEditorPickRequest(listOf(1, 3, 4)) // TODO: 백엔드 API 수정 필요
+        return artLetterApiService.getEditorPick(request).data.map { it.toData() }
     }
 
-    override suspend fun getRandomArtLetters(): List<ArtLetterPreviewEntity> {
+    // TODO: 백엔드 API 수정 필요
+    override suspend fun getAllRandomArtLetters(): List<ArtLetterPreviewEntity> {
         val artLetters = artLetterApiService.getAllArtLetters().data.shuffled()
         val picked = mutableListOf<ArtLetterPreviewEntity>()
 
@@ -39,10 +44,11 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         val result = mutableListOf<ArtLetterPreviewEntity>()
 
         for (i in 0 until picked.size) {
-            val detail = getArtLetterDetail(picked[i].artLetterId)
+            val detail = getArtLetter(picked[i].artLetterId)
             result.add(
                 ArtLetterPreviewEntity(
                     artLetterId = picked[i].artLetterId,
+                    category = picked[i].category,
                     title = picked[i].title,
                     thumbnail = picked[i].thumbnail,
                     scraped = picked[i].scraped,
@@ -54,44 +60,40 @@ class ArtLetterRemoteDataSourceImpl @Inject constructor(
         return result
     }
 
-    override suspend fun getArtLetterDetail(id: Int): ArtLetterDetailEntity {
+    override suspend fun getAllRecommendArtLetterKeyWords(): List<ArtLetterKeyWordEntity> {
+        val artLetterIds = listOf(5, 6, 7) // TODO: 백엔드 API 수정 필요
+        val response = artLetterApiService.getRecommendedKeywords(artLetterIds).data
+        return response.map { it.toData() }
+    }
+
+    override suspend fun getAllScrappedArtLetters(): List<ArtLetterPreviewEntity> {
+        return artLetterApiService.getMyScrapArtLetters().data.map { it.toData() }
+    }
+
+    override suspend fun getArtLetter(id: Int): ArtLetterEntity {
         return artLetterApiService.getArtLetterDetail(id).data.toData()
     }
 
+    override suspend fun getScrappedArtLettersByCategory(category: String): List<ArtLetterPreviewEntity> {
+        return artLetterApiService.getScrappedArtLettersByCategory(category).data.map { it.toData() }
+    }
+
+    override suspend fun getSortedArtLetters(sortBy: String): List<ArtLetterPreviewEntity> {
+        return artLetterApiService.getSortedArtLetters(sortBy).data.toData()
+    }
+
+    override suspend fun getSearchArtLetterResults(keyword: String, sortType: String): List<ArtLetterPreviewEntity> {
+        val response = artLetterApiService.getSearchArtLetters(keyword, sortType).data
+
+        return response.map { it.toData() }
+    }
+
+    // UPDATE
     override suspend fun postArtLetterLike(id: Int) {
         artLetterApiService.postArtLetterLike(id)
     }
 
     override suspend fun postArtLetterScrap(id: Int) {
         artLetterApiService.postArtLetterScrap(id)
-    }
-
-    override suspend fun postEditorPickArtLetter(): List<ArtLetterPreviewEntity> {
-        val request = GetEditorPickRequest(listOf(1, 3, 4))
-        return artLetterApiService.getEditorPick(request).data.map { it.toData() }
-    }
-
-    override suspend fun getSearchArtLetters(keyword: String,sortType: String): List<ArtLetterPreviewEntity> {
-        val response = artLetterApiService.getSearchArtLetters(keyword, sortType).data
-
-        return response.map { it.toData() }
-    }
-
-    override suspend fun getArtLetterKeyWord(): List<ArtLetterKeyWordEntity> {
-        val artletterIds = listOf(5, 6, 7)
-        val response = artLetterApiService.getRecommendedKeywords(artletterIds).data
-        return response.map { it.toData() }
-    }
-
-    override suspend fun getArtLetterCategory(): List<String> {
-        return artLetterApiService.getRecommendedCategories().data.categories
-    }
-
-    override suspend fun removeRecentSearch(keyword: String) {
-        artLetterApiService.removeRecentSearch(keyword)
-    }
-
-    override suspend fun getRecentSearches(): List<String> {
-        return artLetterApiService.getRecentSearches().data.keywords
     }
 }

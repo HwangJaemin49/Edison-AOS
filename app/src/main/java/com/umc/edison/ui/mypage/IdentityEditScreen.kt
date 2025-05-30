@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.umc.edison.presentation.base.BaseState
+import com.umc.edison.presentation.model.IdentityCategoryType
 import com.umc.edison.presentation.mypage.IdentityEditState
 import com.umc.edison.presentation.mypage.IdentityEditViewModel
 import com.umc.edison.ui.BaseContent
@@ -37,8 +39,8 @@ fun IdentityEditScreen(
     updateShowBottomNav: (Boolean) -> Unit,
     viewModel: IdentityEditViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     LaunchedEffect(Unit) {
         updateShowBottomNav(false)
@@ -53,18 +55,18 @@ fun IdentityEditScreen(
     BackHandler { viewModel.updateIdentity() }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
-                title = "Identity 고르기",
+                title = if (uiState.identity.category == IdentityCategoryType.INSPIRATION) "관심사 고르기" else "Identity 고르기",
                 onBack = {
                     viewModel.updateIdentity()
                 }
             )
         }
     ) {
-        IdentityContent(viewModel, uiState)
+        IdentityContent(viewModel, uiState, baseState)
     }
 }
 
@@ -72,10 +74,11 @@ fun IdentityEditScreen(
 @Composable
 private fun IdentityContent(
     viewModel: IdentityEditViewModel,
-    uiState: IdentityEditState
+    uiState: IdentityEditState,
+    baseState: BaseState
 ) {
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         Column(

@@ -3,12 +3,14 @@ package com.umc.edison.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.umc.edison.data.model.BubbleEntity
+import com.umc.edison.data.model.bubble.BubbleEntity
 import java.util.Date
+import java.util.UUID
 
 @Entity
 data class BubbleLocal(
-    @PrimaryKey(autoGenerate = true) override val id: Int = 0,
+    @PrimaryKey
+    @ColumnInfo(name = "id") override val uuid: String = UUID.randomUUID().toString(),
     val title: String?,
     val content: String?,
     @ColumnInfo(name = "main_image") val mainImage: String?,
@@ -21,7 +23,7 @@ data class BubbleLocal(
 ) : LocalMapper<BubbleEntity>, BaseSyncLocal {
 
     override fun toData(): BubbleEntity = BubbleEntity(
-        id = id,
+        id = uuid,
         title = title,
         content = content,
         mainImage = mainImage,
@@ -31,11 +33,14 @@ data class BubbleLocal(
         createdAt = createdAt,
         updatedAt = updatedAt,
         deletedAt = deletedAt,
+        backLinks = emptyList(),
+        linkedBubble = null,
+        isSynced = isSynced,
     )
 }
 
 fun BubbleEntity.toLocal(): BubbleLocal = BubbleLocal(
-    id = id,
+    uuid = id,
     title = title,
     content = content,
     mainImage = mainImage,

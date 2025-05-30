@@ -79,7 +79,8 @@ fun LabelSelectModalContent(
 
         // 하단 버튼들
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(top = 17.dp, end = 27.dp, bottom = 17.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {

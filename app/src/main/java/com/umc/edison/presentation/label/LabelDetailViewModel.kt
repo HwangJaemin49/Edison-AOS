@@ -1,11 +1,13 @@
 package com.umc.edison.presentation.label
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
-import com.umc.edison.domain.usecase.bubble.MoveBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.GetBubblesByLabelUseCase
+import com.umc.edison.domain.usecase.bubble.GetBubblesWithoutLabelUseCase
+import com.umc.edison.domain.usecase.bubble.MoveBubblesToOtherLabelUseCase
+import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
-import com.umc.edison.domain.usecase.label.GetLabelDetailUseCase
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
+import com.umc.edison.domain.usecase.label.GetLabelUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.LabelDetailMode
 import com.umc.edison.presentation.model.LabelModel
@@ -19,43 +21,75 @@ import javax.inject.Inject
 @HiltViewModel
 class LabelDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val getLabelDetailUseCase: GetLabelDetailUseCase,
-    private val moveBubblesUseCase: MoveBubblesUseCase,
+    private val getBubblesByLabelUseCase: GetBubblesByLabelUseCase,
+    private val getBubblesWithoutLabelUseCase: GetBubblesWithoutLabelUseCase,
+    private val getLabelUseCase: GetLabelUseCase,
+    private val moveBubblesToOtherLabelUseCase: MoveBubblesToOtherLabelUseCase,
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
-    override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
-    override val syncDataUseCase: SyncDataUseCase,
+    override val trashBubblesUseCase: TrashBubblesUseCase,
 ) : BaseBubbleViewModel<LabelDetailMode, LabelDetailState>() {
     override val _uiState = MutableStateFlow(LabelDetailState.DEFAULT)
     override val uiState = _uiState.asStateFlow()
 
     init {
-        val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
+        val id: String? = savedStateHandle["labelId"]
+        Log.i("LabelDetailViewModel", "labelId: $id")
         fetchLabelDetail(id)
     }
 
-    fun fetchLabelDetail(id: Int) {
+    fun fetchLabelDetail(id: String?) {
         _uiState.update { LabelDetailState.DEFAULT }
 
-        collectDataResource(
-            flow = getLabelDetailUseCase(id),
-            onSuccess = { label ->
-                val shuffledBubbles = label.bubbles.shuffled().toPresentation()
-                _uiState.update {
-                    it.copy(
-                        label = label.toPresentation().copy(bubbles = shuffledBubbles)
-                    )
+        if (id.isNullOrEmpty()) {
+            collectDataResource(
+                flow = getBubblesWithoutLabelUseCase(),
+                onSuccess = { bubbles ->
+                    val shuffledBubbles = bubbles.shuffled().toPresentation()
+                    _uiState.update {
+                        it.copy(
+                            bubbles = shuffledBubbles,
+                            label = it.label.copy(bubbleCnt = shuffledBubbles.size),
+                        )
+                    }
                 }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
-        )
+            )
+        } else {
+            collectDataResource(
+                flow = getBubblesByLabelUseCase(id),
+                onSuccess = { bubbles ->
+                    val shuffledBubbles = bubbles.shuffled().toPresentation()
+                    _uiState.update {
+                        it.copy(
+                            bubbles = shuffledBubbles,
+                        )
+                    }
+                },
+                onComplete = {
+                    _uiState.update {
+                        it.copy(
+                            label = it.label.copy(
+                                bubbleCnt = it.bubbles.size,
+                            ),
+                        )
+                    }
+                }
+            )
+
+            collectDataResource(
+                flow = getLabelUseCase(id),
+                onSuccess = { label ->
+                    _uiState.update {
+                        it.copy(
+                            label = it.label.copy(
+                                id = label.id,
+                                name = label.name,
+                                color = label.color,
+                            ),
+                        )
+                    }
+                },
+            )
+        }
     }
 
     fun getMovableLabels() {
@@ -63,26 +97,17 @@ class LabelDetailViewModel @Inject constructor(
             flow = getAllLabelsUseCase(),
             onSuccess = { allLabels ->
                 val movableLabels = allLabels.toPresentation().filter { label ->
-                    _uiState.value.label.id != label.id && label.id != 0
+                    _uiState.value.label.id != label.id
                 }
 
                 _uiState.update { it.copy(movableLabels = movableLabels) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
     fun moveSelectedBubbles(label: LabelModel, showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
-            flow = moveBubblesUseCase(
+            flow = moveBubblesToOtherLabelUseCase(
                 bubbles = _uiState.value.selectedBubbles.toSet().map { it.toDomain() },
                 moveFrom = _uiState.value.label.toDomain(),
                 moveTo = label.toDomain()
@@ -92,15 +117,6 @@ class LabelDetailViewModel @Inject constructor(
                 showBottomNav(true)
                 fetchLabelDetail(label.id)
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 

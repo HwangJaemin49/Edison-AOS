@@ -3,10 +3,8 @@ package com.umc.edison.presentation.storage
 import android.app.Application
 import android.content.Intent
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.viewModelScope
-import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
-import com.umc.edison.domain.usecase.bubble.GetStorageBubbleUseCase
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
+import com.umc.edison.domain.usecase.bubble.GetAllRecentBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
 import com.umc.edison.presentation.baseBubble.BaseBubbleViewModel
 import com.umc.edison.presentation.baseBubble.BubbleStorageMode
 import com.umc.edison.presentation.model.toPresentation
@@ -14,39 +12,26 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class BubbleStorageViewModel @Inject constructor(
     private val context: Application,
-    private val getStorageBubbleUseCase: GetStorageBubbleUseCase,
-    override val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase,
-    override val syncDataUseCase: SyncDataUseCase,
+    private val getAllRecentBubblesUseCase: GetAllRecentBubblesUseCase,
+    override val trashBubblesUseCase: TrashBubblesUseCase,
 ) : BaseBubbleViewModel<BubbleStorageMode, BubbleStorageState>() {
 
     override val _uiState = MutableStateFlow(BubbleStorageState.DEFAULT)
     override val uiState = _uiState.asStateFlow()
 
-
-
     fun fetchStorageBubbles() {
         _uiState.update { BubbleStorageState.DEFAULT }
         collectDataResource(
-            flow = getStorageBubbleUseCase(),
+            flow = getAllRecentBubblesUseCase(),
             onSuccess = { bubbles ->
                 val sortedBubbles = bubbles.sortedBy { it.date }
                 _uiState.update { it.copy(bubbles = sortedBubbles.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -54,7 +39,6 @@ class BubbleStorageViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 mode = BubbleStorageMode.EDIT,
-                toastMessage = "서비스 준비 중입니다."
             )
         }
     }
@@ -65,7 +49,7 @@ class BubbleStorageViewModel @Inject constructor(
 
         if (selectedBubbles.isEmpty()) return
 
-        val textsToShare = selectedBubbles.map { bubble ->
+        val textsToShare = selectedBubbles.joinToString("---\n\n") { bubble ->
             val title = bubble.title ?: ""
             val content = bubble.contentBlocks
                 .filter { it.type.name == "TEXT" }
@@ -75,7 +59,7 @@ class BubbleStorageViewModel @Inject constructor(
                 }
 
             "$title\n\n$content"
-        }.joinToString("---\n\n")
+        }
 
 
         val sendIntent = Intent().apply {
@@ -88,18 +72,6 @@ class BubbleStorageViewModel @Inject constructor(
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // context가 Application이기 때문에 필요함
         context.startActivity(shareIntent)
     }
-
-    fun syncData() {
-        viewModelScope.launch {
-            try {
-                syncDataUseCase()
-            } catch (e: Throwable) {
-                _uiState.update { it.copy(error = e) }
-            }
-        }
-    }
-
-
 
     override fun refreshDataAfterDeletion() {
         fetchStorageBubbles()

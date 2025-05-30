@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.space
 
-import com.umc.edison.domain.usecase.bubble.GetSearchBubblesUseCase
-import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
+import com.umc.edison.domain.usecase.bubble.SearchBubblesUseCase
+import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.toPresentation
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BubbleSpaceViewModel @Inject constructor(
     private val getLogInStateUseCase: GetLogInStateUseCase,
-    private val getSearchBubblesUseCase: GetSearchBubblesUseCase,
+    private val searchBubblesUseCase: SearchBubblesUseCase,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(BubbleSpaceState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -25,9 +25,6 @@ class BubbleSpaceViewModel @Inject constructor(
             onSuccess = { isLoggedIn ->
                 _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error, isLoading = false) }
-            }
         )
     }
 
@@ -50,21 +47,14 @@ class BubbleSpaceViewModel @Inject constructor(
         }
 
         collectDataResource(
-            flow = getSearchBubblesUseCase(_uiState.value.query),
+            flow = searchBubblesUseCase(_uiState.value.query),
             onSuccess = { bubbles ->
                 _uiState.update { it.copy(searchResults = bubbles.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
             onComplete = {
                 if (uiState.value.searchResults.isEmpty()) {
-                    _uiState.update { it.copy(toastMessage = "검색 결과를 찾을 수 없습니다.") }
+                    _baseState.update { it.copy(toastMessage = "검색 결과를 찾을 수 없습니다.") }
                 }
-                _uiState.update { it.copy(isLoading = false) }
             }
         )
     }
@@ -76,9 +66,4 @@ class BubbleSpaceViewModel @Inject constructor(
             _uiState.update { it.copy(searchResults = emptyList()) }
         }
     }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

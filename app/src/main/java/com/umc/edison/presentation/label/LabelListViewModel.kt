@@ -1,5 +1,7 @@
 package com.umc.edison.presentation.label
 
+import com.umc.edison.domain.usecase.bubble.GetBubblesByLabelUseCase
+import com.umc.edison.domain.usecase.bubble.GetBubblesWithoutLabelUseCase
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
@@ -16,35 +18,73 @@ import javax.inject.Inject
 @HiltViewModel
 class LabelListViewModel @Inject constructor(
     private val getAllLabelsUseCase: GetAllLabelsUseCase,
+    private val getBubblesByLabelUseCase: GetBubblesByLabelUseCase,
+    private val getBubblesWithoutLabelUseCase: GetBubblesWithoutLabelUseCase,
     private val addLabelUseCase: AddLabelUseCase,
     private val updateLabelUseCase: UpdateLabelUseCase,
     private val deleteLabelUseCase: DeleteLabelUseCase,
 ) : BaseViewModel() {
-
     private val _uiState = MutableStateFlow(LabelListState.DEFAULT)
     val uiState = _uiState.asStateFlow()
-
-    init {
-        fetchLabels()
-    }
 
     fun fetchLabels() {
         _uiState.update { LabelListState.DEFAULT }
         collectDataResource(
             flow = getAllLabelsUseCase(),
             onSuccess = { labels ->
-                val sortedLabels = labels.sortedWith(compareBy({ it.id == 0 }, { it.bubbles.size })).reversed()
-
-                _uiState.update { it.copy(labels = sortedLabels.toPresentation()) }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update { it.copy(labels = labels.distinctBy { it.id }.toPresentation()) }
             },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
+                fetchBubblesByLabel()
+            }
+        )
+    }
+
+    private fun fetchBubblesByLabel() {
+        _uiState.value.labels.forEach {
+            if (it.id.isNullOrEmpty()) return@forEach
+
+            collectDataResource(
+                flow = getBubblesByLabelUseCase(it.id),
+                onSuccess = { bubbles ->
+                    _uiState.update { uiState ->
+                        uiState.copy(
+                            labels = uiState.labels.map { label ->
+                                if (label.id == it.id) {
+                                    label.copy(bubbleCnt = bubbles.size)
+                                } else {
+                                    label
+                                }
+                            }
+                        )
+                    }
+                },
+                onComplete = {
+                    // 버블 개수 많은 순으로 정렬
+                    _uiState.update {
+                        it.copy(
+                            labels = it.labels.sortedByDescending { it.bubbleCnt }
+                        )
+                    }
+                    fetchBubblesWithoutLabel()
+                }
+            )
+        }
+    }
+
+    private fun fetchBubblesWithoutLabel() {
+        collectDataResource(
+            flow = getBubblesWithoutLabelUseCase(),
+            onSuccess = { bubbles ->
+                _uiState.update {
+                    val labels = listOf(
+                        LabelModel.DEFAULT.copy(bubbleCnt = bubbles.size)
+                    ) + it.labels
+
+                    it.copy(
+                        labels = labels.distinctBy { it.id }
+                    )
+                }
             }
         )
     }
@@ -65,12 +105,6 @@ class LabelListViewModel @Inject constructor(
                     updateEditMode(LabelEditMode.NONE)
                     _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
-                onError = { error ->
-                    _uiState.update { it.copy(error = error) }
-                },
-                onLoading = {
-                    _uiState.update { it.copy(isLoading = true) }
-                },
                 onComplete = {
                     fetchLabels()
                 }
@@ -82,12 +116,6 @@ class LabelListViewModel @Inject constructor(
                     updateEditMode(LabelEditMode.NONE)
                     _uiState.update { it.copy(selectedLabel = LabelListState.DEFAULT.selectedLabel) }
                 },
-                onError = { error ->
-                    _uiState.update { it.copy(error = error) }
-                },
-                onLoading = {
-                    _uiState.update { it.copy(isLoading = true) }
-                },
                 onComplete = {
                     fetchLabels()
                 }
@@ -97,27 +125,19 @@ class LabelListViewModel @Inject constructor(
 
     fun deleteSelectedLabel() {
         collectDataResource(
-            flow = deleteLabelUseCase(_uiState.value.selectedLabel.toDomain()),
+            flow = deleteLabelUseCase(_uiState.value.selectedLabel.toDomain().id),
             onSuccess = {
                 updateEditMode(LabelEditMode.NONE)
-                _uiState.update { it.copy(
-                    labels = it.labels.filter { label -> label.id != it.selectedLabel.id },
-                    selectedLabel = LabelListState.DEFAULT.selectedLabel
-                ) }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update {
+                    it.copy(
+                        labels = it.labels.filter { label -> label.id != it.selectedLabel.id },
+                        selectedLabel = LabelListState.DEFAULT.selectedLabel
+                    )
+                }
             },
             onComplete = {
                 fetchLabels()
             }
         )
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

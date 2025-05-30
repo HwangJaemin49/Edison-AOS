@@ -2,9 +2,7 @@ package com.umc.edison.ui.artboard
 
 import android.content.Intent
 import io.branch.referral.util.LinkProperties
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -32,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -69,19 +66,13 @@ import com.umc.edison.ui.theme.Gray800
 import io.branch.indexing.BranchUniversalObject
 import kotlin.math.roundToInt
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun ArtLetterDetailScreen(
-    artLetterId: String,
     navHostController: NavHostController,
     viewModel: ArtLetterDetailViewModel = hiltViewModel()
 ) {
-    // ✅ artLetterId로 데이터 로딩 (최초 1회)
-    LaunchedEffect(artLetterId) {
-        viewModel.loadArtLetter(artLetterId)
-    }
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenHeightPx = with(LocalDensity.current) { screenHeight.toPx() }
@@ -90,7 +81,7 @@ fun ArtLetterDetailScreen(
     var sheetOffsetPx by remember { mutableFloatStateOf(collapsedOffset) }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -214,13 +205,17 @@ fun ArtLetterDetailScreen(
                             modifier = Modifier
                                 .size(24.dp)
                                 .clickable {
-                                    val artLetterIdToShare = uiState.artLetter.artLetterId.toString()
+                                    val artLetterIdToShare =
+                                        uiState.artLetter.artLetterId.toString()
                                     val branchUniversalObject = BranchUniversalObject()
                                         .setCanonicalIdentifier("artLetter/$artLetterIdToShare")
                                         .setTitle(uiState.artLetter.title)
                                         .setContentDescription(uiState.artLetter.content.take(100))
                                         .setContentMetadata(
-                                            ContentMetadata().addCustomMetadata("artLetterId", artLetterIdToShare)
+                                            ContentMetadata().addCustomMetadata(
+                                                "artLetterId",
+                                                artLetterIdToShare
+                                            )
                                         )
 
                                     val linkProperties = LinkProperties()
@@ -420,9 +415,7 @@ fun ArtLetterDetailContent(
                         .wrapContentHeight()
                         .clickable {
                             navHostController.navigate(
-                                NavRoute.ArtLetterDetail.createRoute(
-                                    artLetter.artLetterId.toString()
-                                )
+                                NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)
                             )
                         },
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -445,7 +438,9 @@ fun ArtLetterDetailContent(
                     }
 
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {

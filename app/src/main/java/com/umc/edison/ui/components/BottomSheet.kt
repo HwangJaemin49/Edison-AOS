@@ -42,7 +42,7 @@ import kotlin.math.roundToInt
 @Composable
 fun BottomSheet(
     onDismiss: () -> Unit,
-    uiState: BaseState,
+    baseState: BaseState,
     clearToastMessage: () -> Unit,
     showToastMessage: Boolean = true,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -61,9 +61,9 @@ fun BottomSheet(
         ) {
             content()
 
-            if (uiState.toastMessage != null && showToastMessage) {
+            if (baseState.toastMessage != null && showToastMessage) {
                 ToastMessage(
-                    message = uiState.toastMessage!!,
+                    message = baseState.toastMessage,
                     isVisible = true,
                     onDismiss = clearToastMessage
                 )
@@ -80,13 +80,13 @@ fun BottomSheetPopUp(
     confirmText: String,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    uiState: BaseState,
+    baseState: BaseState,
     clearToastMessage: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
     BottomSheet(
         onDismiss = onDismiss,
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = clearToastMessage,
         sheetState = sheetState,
     ) {

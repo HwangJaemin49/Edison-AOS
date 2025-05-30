@@ -1,7 +1,7 @@
 package com.umc.edison.remote.model.artletter
 
 import com.google.gson.annotations.SerializedName
-import com.umc.edison.data.model.ArtLetterDetailEntity
+import com.umc.edison.data.model.artLetter.ArtLetterEntity
 import com.umc.edison.remote.model.RemoteMapper
 
 class GetArtLetterDetailResponse (
@@ -12,16 +12,16 @@ class GetArtLetterDetailResponse (
     @SerializedName("readTime") val readTime: Int,
     @SerializedName("writer") val writer: String,
     @SerializedName("tags") val tags: String,
-    @SerializedName("thumbnail") val thumbnail: String?,
+    @SerializedName("thumbnail") val thumbnail: String,
     @SerializedName("likesCnt") val likesCnt: Int,
     @SerializedName("scrapsCnt") val scrapsCnt: Int,
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String,
     @SerializedName("liked") val liked: Boolean,
     @SerializedName("scraped") val scraped: Boolean
-) : RemoteMapper<ArtLetterDetailEntity> {
+) : RemoteMapper<ArtLetterEntity> {
 
-    override fun toData(): ArtLetterDetailEntity = ArtLetterDetailEntity(
+    override fun toData(): ArtLetterEntity = ArtLetterEntity(
         artLetterId = artLetterId,
         title = title,
         content = content,
@@ -29,7 +29,7 @@ class GetArtLetterDetailResponse (
         readTime = readTime,
         writer = writer,
         tags = tags.split(" "),
-        thumbnail = thumbnail ?: "",
+        thumbnail = thumbnail,
         likesCnt = likesCnt,
         liked = liked,
         scraped = scraped

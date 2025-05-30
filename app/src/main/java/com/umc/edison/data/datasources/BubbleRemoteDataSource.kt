@@ -1,11 +1,22 @@
 package com.umc.edison.data.datasources
 
-import com.umc.edison.data.model.BubbleEntity
-import com.umc.edison.data.model.PositionedBubbleEntity
+import com.umc.edison.data.model.bubble.BubbleEntity
+import com.umc.edison.data.model.bubble.PositionBubbleEntity
 
 interface BubbleRemoteDataSource {
-    suspend fun getBubblePosition(): List<PositionedBubbleEntity>
+    // CREATE
+    suspend fun addBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
+    suspend fun addBubble(bubble: BubbleEntity): BubbleEntity
 
-    suspend fun syncBubble(bubble: BubbleEntity): BubbleEntity
-    suspend fun syncBubbleToLocal()
+    // READ
+    suspend fun getAllClusteredBubbles(): List<PositionBubbleEntity>
+
+    // UPDATE
+    suspend fun recoverBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
+    suspend fun updateBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
+    suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity
+
+    // DELETE
+    suspend fun deleteBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
+    suspend fun trashBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity>
 }

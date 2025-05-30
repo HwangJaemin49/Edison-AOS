@@ -1,10 +1,8 @@
 package com.umc.edison.presentation.mypage
 
-import androidx.lifecycle.viewModelScope
 import com.umc.edison.domain.usecase.bubble.DeleteBubblesUseCase
-import com.umc.edison.domain.usecase.mypage.GetTrashedBubblesUseCase
-import com.umc.edison.domain.usecase.mypage.RecoverBubblesUseCase
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
+import com.umc.edison.domain.usecase.bubble.GetAllTrashedBubblesUseCase
+import com.umc.edison.domain.usecase.bubble.RecoverBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.toPresentation
@@ -12,35 +10,24 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TrashViewModel @Inject constructor(
-    private val getTrashedBubblesUseCase: GetTrashedBubblesUseCase,
+    private val getAllTrashedBubblesUseCase: GetAllTrashedBubblesUseCase,
     private val recoverBubblesUseCase: RecoverBubblesUseCase,
     private val deleteBubblesUseCase: DeleteBubblesUseCase,
-    private val syncDataUseCase: SyncDataUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(TrashState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     fun fetchDeletedBubbles() {
         collectDataResource(
-            flow = getTrashedBubblesUseCase(),
+            flow = getAllTrashedBubblesUseCase(),
             onSuccess = { bubbles ->
                 bubbles.sortedByDescending { it.date }
                 _uiState.update { it.copy(bubbles = bubbles.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -83,22 +70,15 @@ class TrashViewModel @Inject constructor(
             onSuccess = {
                 _uiState.update {
                     it.copy(
-                        toastMessage = "버블이 삭제되었습니다.",
                         mode = BubbleRecoverMode.NONE,
                         bubbles = it.bubbles - it.selectedBubbles.toSet(),
                     )
                 }
+                _baseState.update {
+                    it.copy(toastMessage = "버블이 삭제되었습니다.")
+                }
                 fetchDeletedBubbles()
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -108,37 +88,14 @@ class TrashViewModel @Inject constructor(
             onSuccess = {
                 _uiState.update {
                     it.copy(
-                        toastMessage = "버블이 복원되었습니다.",
                         mode = BubbleRecoverMode.NONE,
                         bubbles = it.bubbles - it.selectedBubbles.toSet(),
                     )
                 }
-                syncData()
+                _baseState.update {
+                    it.copy(toastMessage = "버블이 복원되었습니다.")
+                }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
-
-    private fun syncData() {
-        viewModelScope.launch {
-            try {
-                syncDataUseCase()
-            } catch (e: Throwable) {
-                _uiState.update { it.copy(error = e) }
-            }
-        }
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

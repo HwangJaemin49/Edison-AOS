@@ -3,10 +3,10 @@ package com.umc.edison.presentation.artletter
 import com.umc.edison.domain.usecase.artletter.GetAllArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.GetSortedArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
-import com.umc.edison.domain.usecase.artletter.GetEditorPickUseCase
-import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
+import com.umc.edison.domain.usecase.artletter.GetAllEditorPickArtLettersUseCase
+import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
 import com.umc.edison.presentation.base.BaseViewModel
-import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.presentation.model.toPreviewPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,12 +16,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ArtLetterHomeViewModel @Inject constructor(
     private val getLogInStateUseCase: GetLogInStateUseCase,
-    private val getEditorPickUseCase: GetEditorPickUseCase,
+    private val getAllEditorPickArtLettersUseCase: GetAllEditorPickArtLettersUseCase,
     private val getAllArtLettersUseCase: GetAllArtLettersUseCase,
     private val getSortedArtLettersUseCase: GetSortedArtLettersUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
 ) : BaseViewModel() {
-
     private val _uiState = MutableStateFlow(ArtLetterHomeState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
@@ -35,9 +34,6 @@ class ArtLetterHomeViewModel @Inject constructor(
             onSuccess = { isLoggedIn ->
                 _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -45,17 +41,8 @@ class ArtLetterHomeViewModel @Inject constructor(
         collectDataResource(
             flow = getAllArtLettersUseCase(),
             onSuccess = { artLetters ->
-                _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
+                _uiState.update { it.copy(artLetters = artLetters.toPreviewPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -80,15 +67,6 @@ class ArtLetterHomeViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -96,43 +74,21 @@ class ArtLetterHomeViewModel @Inject constructor(
         collectDataResource(
             flow = getSortedArtLettersUseCase(sortBy),
             onSuccess = { artLetters ->
-                _uiState.update { it.copy(artLetters = artLetters.toPresentation()) }
+                _uiState.update { it.copy(artLetters = artLetters.toPreviewPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
     fun fetchEditorsPick() {
         collectDataResource(
-            flow = getEditorPickUseCase(),
+            flow = getAllEditorPickArtLettersUseCase(),
             onSuccess = { artLetters ->
-                _uiState.update { it.copy(editorsPick = artLetters.toPresentation()) }
+                _uiState.update { it.copy(editorsPick = artLetters.toPreviewPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
     fun updateShowLoginModal(show: Boolean) {
         _uiState.update { it.copy(showLoginModal = show) }
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

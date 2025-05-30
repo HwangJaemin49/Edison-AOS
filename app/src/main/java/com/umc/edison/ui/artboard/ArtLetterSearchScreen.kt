@@ -1,6 +1,5 @@
 package com.umc.edison.ui.artboard
 
-
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -74,6 +73,7 @@ fun ArtLetterSearchScreen(
     viewModel: ArtLetterSearchViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
     var showPopup by remember { mutableStateOf(false) }
 
     BackHandler {
@@ -85,7 +85,7 @@ fun ArtLetterSearchScreen(
     }
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         containerColor = Color(0xFFF5F5F5)
     ) {
@@ -188,7 +188,7 @@ fun ArtLetterSearchScreen(
                                     artLetter = artLetter as ArtLetterPreviewModel,
                                     onArtLetterClick = { selectedArtLetter ->
                                         navHostController.navigate(
-                                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId.toString())
+                                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
                                         )
                                     },
                                     onBookmarkClick = { viewModel.postArtLetterScrap(it.artLetterId) }
@@ -244,7 +244,7 @@ fun SearchResultBar(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ResultChip(text = "# " + text)
+        ResultChip(text = "# $text")
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = "에 관련된 아트레터",
@@ -397,7 +397,7 @@ fun KeywordSection(
                     onKeywordClick = {
                         navHostController.navigate(
                             NavRoute.ArtLetterDetail.createRoute(
-                                keywordModel.artletterId.toString()
+                                keywordModel.artLetterId
                             )
                         )
                     },
@@ -516,7 +516,7 @@ fun NoResultSection(text: String) {
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "# " + text,
+                    text = "# $text",
                     style = MaterialTheme.typography.displayMedium.copy(color = Gray800)
                 )
             }
@@ -571,7 +571,7 @@ fun Recommend(
                     artLetter = artLetter,
                     onArtLetterClick = { selectedArtLetter ->
                         navHostController.navigate(
-                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId.toString())
+                            NavRoute.ArtLetterDetail.createRoute(selectedArtLetter.artLetterId)
                         )
                     },
                     onBookmarkClick = { artLetter ->

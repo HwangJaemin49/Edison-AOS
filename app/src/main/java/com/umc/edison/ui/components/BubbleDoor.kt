@@ -3,10 +3,8 @@ package com.umc.edison.ui.components
 import android.graphics.BlurMaskFilter
 import android.graphics.LinearGradient
 import android.graphics.Shader
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +46,6 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Size
-import com.umc.edison.domain.model.ContentType
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.ContentBlockModel
 import com.umc.edison.ui.theme.Gray100
@@ -60,35 +57,28 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.platform.UriHandler
-import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import com.mohamedrejeb.richeditor.annotation.ExperimentalRichTextApi
 import com.mohamedrejeb.richeditor.model.RichTextState
-import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import com.mohamedrejeb.richeditor.ui.BasicRichText
 import com.mohamedrejeb.richeditor.ui.BasicRichTextEditor
-import com.mohamedrejeb.richeditor.ui.material3.RichText
 import com.umc.edison.presentation.edison.BubbleInputState
 import com.umc.edison.presentation.edison.parseHtml
+import com.umc.edison.presentation.model.ContentType
 import com.umc.edison.ui.theme.Red100
 import com.umc.edison.ui.theme.Red500
 import com.umc.edison.ui.theme.White000
@@ -103,7 +93,7 @@ fun BubbleDoor(
     onImageDeleted: (ContentBlockModel) -> Unit = {},
     onMainSelected: (String?) -> Unit = {},
     bubbleInputState: BubbleInputState = BubbleInputState.DEFAULT,
-    onLinkClick: (Int) -> Unit = {},
+    onLinkClick: (String) -> Unit = {},
     onBackLinkDeleted: (BubbleModel) -> Unit = {},
     onLinkBubbleDeleted: (BubbleModel) -> Unit = {},
 ) {
@@ -181,7 +171,7 @@ private fun BubbleContent(
     uiState: BubbleInputState,
     deleteClicked: (ContentBlockModel) -> Unit,
     mainClicked: (String?) -> Unit,
-    onLinkClick: (Int) -> Unit,
+    onLinkClick: (String) -> Unit,
     onBackLinkDeleted: (BubbleModel) -> Unit,
     onLinkBubbleDeleted: (BubbleModel) -> Unit
 ) {
@@ -229,7 +219,7 @@ private fun BubbleContent(
             )
         }
 
-        var deletedImageBlockId by remember { mutableStateOf<Int>(-1) }
+        var deletedImageBlockId by remember { mutableIntStateOf(-1) }
 
         bubble.contentBlocks.forEachIndexed { index, contentBlock ->
             when (contentBlock.type) {
@@ -246,7 +236,7 @@ private fun BubbleContent(
                     val isInitialized = remember(index) { mutableStateOf(false) }
 
                     LaunchedEffect(deletedImageBlockId) {
-                        deletedImageBlockId?.let {
+                        deletedImageBlockId.let {
                             richTextState.setHtml(contentBlock.content)
                             deletedImageBlockId = -1
                         }
@@ -471,9 +461,7 @@ private fun BubbleContent(
                                         val offset = layout.getOffsetForPosition(offsetPos)
                                         annotatedString.getStringAnnotations("URL", offset, offset)
                                             .firstOrNull()?.let { annotation ->
-                                                annotation.item.toIntOrNull()?.let { bubbleId ->
-                                                    onLinkClick(bubbleId)
-                                                }
+                                                onLinkClick(annotation.item)
                                             }
                                     }
                                 }
@@ -577,9 +565,7 @@ private fun BubbleContent(
                                     val offset = layout.getOffsetForPosition(offsetPos)
                                     annotatedString.getStringAnnotations("URL", offset, offset)
                                         .firstOrNull()?.let { annotation ->
-                                            annotation.item.toIntOrNull()?.let { bubbleId ->
-                                                onLinkClick(bubbleId)
-                                            }
+                                            onLinkClick(annotation.item)
                                         }
                                 }
                             }

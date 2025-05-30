@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.model
 
 import androidx.compose.ui.geometry.Offset
-import com.umc.edison.domain.model.ClusteredBubblePosition
+import com.umc.edison.domain.model.bubble.ClusteredBubble
 
 data class PositionedBubbleModel(
     val bubble: BubbleModel,
@@ -9,7 +9,7 @@ data class PositionedBubbleModel(
     val groupId: Int
 )
 
-fun ClusteredBubblePosition.toPresentation(): PositionedBubbleModel {
+fun ClusteredBubble.toPresentation(): PositionedBubbleModel {
     val scale = 400f
 
     return PositionedBubbleModel(
@@ -19,6 +19,6 @@ fun ClusteredBubblePosition.toPresentation(): PositionedBubbleModel {
     )
 }
 
-fun List<ClusteredBubblePosition>.toPresentation(): List<PositionedBubbleModel> {
+fun List<ClusteredBubble>.toPresentation(): List<PositionedBubbleModel> {
     return map { it.toPresentation() }
 }

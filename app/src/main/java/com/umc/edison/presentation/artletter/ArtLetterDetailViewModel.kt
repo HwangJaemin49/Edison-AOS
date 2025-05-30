@@ -1,41 +1,37 @@
 package com.umc.edison.presentation.artletter
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.umc.edison.domain.usecase.artletter.GetArtLetterDetailUseCase
-import com.umc.edison.domain.usecase.artletter.GetRandomArtLettersUseCase
+import androidx.lifecycle.SavedStateHandle
+import com.umc.edison.domain.usecase.artletter.GetArtLetterUseCase
+import com.umc.edison.domain.usecase.artletter.GetAllRandomArtLettersUseCase
 import com.umc.edison.domain.usecase.artletter.LikeArtLetterUseCase
 import com.umc.edison.domain.usecase.artletter.ScrapArtLetterUseCase
-import com.umc.edison.domain.usecase.mypage.GetLogInStateUseCase
+import com.umc.edison.domain.usecase.user.GetLogInStateUseCase
 import com.umc.edison.presentation.base.BaseViewModel
-import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.presentation.model.toDetailPresentation
+import com.umc.edison.presentation.model.toPreviewPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ArtLetterDetailViewModel @Inject constructor(
-    private val getArtLetterDetailUseCase: GetArtLetterDetailUseCase,
+    savedStateHandle: SavedStateHandle,
+    private val getArtLetterUseCase: GetArtLetterUseCase,
     private val likeArtLetterUseCase: LikeArtLetterUseCase,
     private val scrapArtLetterUseCase: ScrapArtLetterUseCase,
-    private val getRandomArtLettersUseCase: GetRandomArtLettersUseCase,
+    private val getAllRandomArtLettersUseCase: GetAllRandomArtLettersUseCase,
     private val getLogInStateUseCase: GetLogInStateUseCase
 ) : BaseViewModel() {
-
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
-    fun loadArtLetter(id: String) {
-        val intId = id.toIntOrNull()
-        if (intId == null) {
-            _uiState.update { it.copy(error = Exception("Invalid artLetterId: $id")) }
-            return
-        }
+    init {
+        val id: Int = savedStateHandle["artLetterId"]
+            ?: throw IllegalArgumentException("artLetterId is required")
 
-        fetchArtLetterDetail(intId)
+        fetchArtLetterDetail(id)
         fetchRandomArtLetters()
         getLoginState()
     }
@@ -46,36 +42,26 @@ class ArtLetterDetailViewModel @Inject constructor(
             onSuccess = { isLoggedIn ->
                 _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
     private fun fetchArtLetterDetail(id: Int) {
         collectDataResource(
-            flow = getArtLetterDetailUseCase(id),
+            flow = getArtLetterUseCase(id),
             onSuccess = { artLetterDetail ->
-                _uiState.update { it.copy(artLetter = artLetterDetail.toPresentation()) }
+                _uiState.update { it.copy(artLetter = artLetterDetail.toDetailPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = { _uiState.update { it.copy(isLoading = true) } },
-            onComplete = { _uiState.update { it.copy(isLoading = false) } }
         )
     }
 
     private fun fetchRandomArtLetters() {
         collectDataResource(
-            flow = getRandomArtLettersUseCase(),
+            flow = getAllRandomArtLettersUseCase(),
             onSuccess = { artLetters ->
-                val unique = artLetters.filter { it.artLetterId != _uiState.value.artLetter.artLetterId }
-                _uiState.update { it.copy(relatedArtLetters = unique.toPresentation()) }
+                val unique =
+                    artLetters.filter { it.artLetterId != _uiState.value.artLetter.artLetterId }
+                _uiState.update { it.copy(relatedArtLetters = unique.toPreviewPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            }
         )
     }
 
@@ -99,7 +85,6 @@ class ArtLetterDetailViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error -> _uiState.update { it.copy(error = error) } }
         )
     }
 
@@ -120,7 +105,6 @@ class ArtLetterDetailViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error -> _uiState.update { it.copy(error = error) } }
         )
     }
 
@@ -151,7 +135,6 @@ class ArtLetterDetailViewModel @Inject constructor(
                             )
                         }
                     },
-                    onError = { error -> _uiState.update { it.copy(error = error) } }
                 )
             }
         }
@@ -159,9 +142,5 @@ class ArtLetterDetailViewModel @Inject constructor(
 
     fun updateShowLoginModal(show: Boolean) {
         _uiState.update { it.copy(showLoginModal = show) }
-    }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
     }
 }

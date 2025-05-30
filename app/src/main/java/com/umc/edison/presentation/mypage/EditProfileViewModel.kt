@@ -1,7 +1,7 @@
 package com.umc.edison.presentation.mypage
 
-import com.umc.edison.domain.usecase.mypage.GetProfileInfoUseCase
-import com.umc.edison.domain.usecase.mypage.UpdateUserProfileUseCase
+import com.umc.edison.domain.usecase.user.GetMyProfileInfoUseCase
+import com.umc.edison.domain.usecase.user.UpdateProfileInfoUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.toPresentation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,9 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val getProfileInfoUseCase: GetProfileInfoUseCase,
-    private val updateUserProfileUseCase: UpdateUserProfileUseCase
-
+    private val getMyProfileInfoUseCase: GetMyProfileInfoUseCase,
+    private val updateUserProfileUseCase: UpdateProfileInfoUseCase
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(EditProfileState.DEFAULT)
     val uiState = _uiState.asStateFlow()
@@ -25,19 +24,10 @@ class EditProfileViewModel @Inject constructor(
 
     private fun fetchProfileInfo() {
         collectDataResource(
-            flow = getProfileInfoUseCase(),
+            flow = getMyProfileInfoUseCase(),
             onSuccess = { user ->
                 _uiState.update { it.copy(user = user.toPresentation()) }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -45,17 +35,8 @@ class EditProfileViewModel @Inject constructor(
         collectDataResource(
             flow = updateUserProfileUseCase(_uiState.value.user.toDomain()),
             onSuccess = {
-                _uiState.update { it.copy(toastMessage = "프로필이 수정되었습니다.") }
+                _baseState.update { it.copy(toastMessage = "프로필이 수정되었습니다.") }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -66,9 +47,4 @@ class EditProfileViewModel @Inject constructor(
     fun updateUserProfileImage(profileImage: String) {
         _uiState.update { it.copy(user = it.user.copy(profileImage = profileImage)) }
     }
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
 }

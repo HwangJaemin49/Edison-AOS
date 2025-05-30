@@ -1,0 +1,14 @@
+package com.umc.edison.domain.usecase.artletter
+
+import com.umc.edison.domain.DataResource
+import com.umc.edison.domain.model.artLetter.ArtLetter
+import com.umc.edison.domain.repository.ArtLetterRepository
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+
+class GetScrappedArtLettersByCategoryUseCase @Inject constructor(
+    private val artLetterRepository: ArtLetterRepository
+) {
+    operator fun invoke(category: String): Flow<DataResource<List<ArtLetter>>> =
+        artLetterRepository.getScrappedArtLettersByCategory(category)
+}

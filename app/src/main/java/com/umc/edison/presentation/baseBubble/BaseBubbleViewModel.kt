@@ -1,22 +1,17 @@
 package com.umc.edison.presentation.baseBubble
 
-import androidx.lifecycle.viewModelScope
-import com.umc.edison.domain.usecase.bubble.SoftDeleteBubblesUseCase
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
+import com.umc.edison.domain.usecase.bubble.TrashBubblesUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.BubbleModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> : BaseViewModel() {
-
     protected abstract val _uiState: MutableStateFlow<S>
-    open val uiState get() = _uiState.asStateFlow()
+    open val uiState = _uiState.asStateFlow()
 
-    abstract val softDeleteBubblesUseCase: SoftDeleteBubblesUseCase
-    abstract val syncDataUseCase: SyncDataUseCase
+    abstract val trashBubblesUseCase: TrashBubblesUseCase
 
     fun updateEditMode(mode: BaseBubbleMode) {
         if (mode == BaseBubbleMode.NONE) {
@@ -51,7 +46,7 @@ abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> :
 
     fun deleteSelectedBubbles(showBottomNav: (Boolean) -> Unit) {
         collectDataResource(
-            flow = softDeleteBubblesUseCase(
+            flow = trashBubblesUseCase(
                 _uiState.value.selectedBubbles.toSet().map { it.toDomain() }
             ),
             onSuccess = {
@@ -59,32 +54,8 @@ abstract class BaseBubbleViewModel<M : BaseBubbleMode, S : BaseBubbleState<M>> :
                 showBottomNav(true)
                 refreshDataAfterDeletion()
             },
-            onError = { error ->
-                _uiState.update { it.copyState(error = error) as S }
-            },
-            onLoading = {
-                _uiState.update { it.copyState(isLoading = true) as S }
-            },
-            onComplete = {
-                _uiState.update { it.copyState(isLoading = false) as S }
-                syncData()
-            }
         )
     }
 
-    private fun syncData() {
-        viewModelScope.launch {
-            try {
-                syncDataUseCase()
-            } catch (e: Throwable) {
-                _uiState.update { it.copyState(error = e) as S }
-            }
-        }
-    }
-
     protected abstract fun refreshDataAfterDeletion()
-
-    override fun clearToastMessage() {
-        _uiState.update { it.copyState(toastMessage = null) as S }
-    }
 }

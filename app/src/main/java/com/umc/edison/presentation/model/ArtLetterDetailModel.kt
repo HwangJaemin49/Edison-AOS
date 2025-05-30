@@ -1,6 +1,6 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.ArtLetterDetail
+import com.umc.edison.domain.model.artLetter.ArtLetter
 
 data class ArtLetterDetailModel(
     val artLetterId: Int,
@@ -32,7 +32,7 @@ data class ArtLetterDetailModel(
     }
 }
 
-fun ArtLetterDetail.toPresentation(): ArtLetterDetailModel = ArtLetterDetailModel(
+fun ArtLetter.toDetailPresentation(): ArtLetterDetailModel = ArtLetterDetailModel(
     artLetterId = artLetterId,
     title = title,
     content = content,

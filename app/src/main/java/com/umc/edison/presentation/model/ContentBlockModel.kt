@@ -1,17 +1,20 @@
 package com.umc.edison.presentation.model
 
-import com.umc.edison.domain.model.ContentBlock
-import com.umc.edison.domain.model.ContentType
-
 data class ContentBlockModel(
     val type: ContentType,
     var content: String,
     var position: Int,
 ) {
-    fun toDomain(): ContentBlock = ContentBlock(type, content, position)
+    fun toDomain(): String {
+        // Text 타입의 경우 앞에 %<TEXT>와 뒤에 </TEXT>%가 붙어있고
+        // Image 타입의 경우 앞에 %<IMAGE>와 뒤에 </IMAGE>%가 붙어있음
+        return when (type) {
+            ContentType.TEXT -> "%<TEXT>$content</TEXT>%"
+            ContentType.IMAGE -> "%<IMAGE>$content</IMAGE>%"
+        }
+    }
 }
 
-fun ContentBlock.toPresentation(): ContentBlockModel =
-    ContentBlockModel(type, content, position)
-
-fun List<ContentBlock>.toPresentation(): List<ContentBlockModel> = map { it.toPresentation() }
+enum class ContentType {
+    TEXT, IMAGE
+}

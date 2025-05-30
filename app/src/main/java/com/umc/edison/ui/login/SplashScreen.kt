@@ -74,8 +74,4 @@ fun SplashScreen(navController: NavController, updateShowBottomNav: (Boolean) ->
             Spacer(modifier = Modifier.weight(0.6f))
         }
     }
-
 }
-
-
-

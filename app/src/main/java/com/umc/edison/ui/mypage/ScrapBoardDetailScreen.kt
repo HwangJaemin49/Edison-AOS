@@ -23,11 +23,11 @@ fun ScrapBoardDetailScreen(
     navHostController: NavHostController,
     viewModel: ScrapBoardDetailViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     BaseContent(
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
         topBar = {
             BackButtonTopBar(
@@ -48,9 +48,7 @@ fun ScrapBoardDetailScreen(
                 artLetter = it as ArtLetterPreviewModel,
                 onArtLetterClick = { artLetter ->
                     navHostController.navigate(
-                        NavRoute.ArtLetterDetail.createRoute(
-                            artLetter.artLetterId.toString()
-                        )
+                        NavRoute.ArtLetterDetail.createRoute(artLetter.artLetterId)
                     )
                 },
                 onBookmarkClick = { artLetter ->

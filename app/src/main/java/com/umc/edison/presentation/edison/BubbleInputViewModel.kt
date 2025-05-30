@@ -5,19 +5,17 @@ import android.net.Uri
 import android.text.Html
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
-import com.umc.edison.domain.model.ContentType
 import com.umc.edison.domain.usecase.bubble.AddBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.GetAllBubblesUseCase
 import com.umc.edison.domain.usecase.bubble.GetBubbleUseCase
 import com.umc.edison.domain.usecase.bubble.UpdateBubbleUseCase
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.label.LabelEditMode
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.presentation.model.ContentBlockModel
+import com.umc.edison.presentation.model.ContentType
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
 import com.umc.edison.ui.components.IconType
@@ -27,7 +25,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
@@ -41,31 +38,19 @@ class BubbleInputViewModel @Inject constructor(
     private val addLabelUseCase: AddLabelUseCase,
     private val addBubbleUseCase: AddBubbleUseCase,
     private val updateBubbleUseCase: UpdateBubbleUseCase,
-    private val syncDataUseCase: SyncDataUseCase,
 ) : BaseViewModel() {
-
     private val _uiState = MutableStateFlow(BubbleInputState.DEFAULT)
     val uiState = _uiState.asStateFlow()
 
     init {
-        val id: Int = savedStateHandle["id"] ?: throw IllegalArgumentException("ID is required")
+        val id: String? = savedStateHandle["bubbleId"]
         fetchBubble(id)
         fetchLabels()
         fetchBubbles()
     }
 
-    private fun syncData() {
-        viewModelScope.launch {
-            try {
-                syncDataUseCase()
-            } catch (e: Throwable) {
-                _uiState.update { it.copy(error = e) }
-            }
-        }
-    }
-
-    private fun fetchBubble(bubbleId: Int) {
-        if (bubbleId == 0) {
+    private fun fetchBubble(bubbleId: String?) {
+        if (bubbleId.isNullOrEmpty()) {
             addTextBlockToFront()
             return
         }
@@ -73,7 +58,8 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getBubbleUseCase(bubbleId),
             onSuccess = { bubble ->
-                val sortedContentBlocks = bubble.contentBlocks.toPresentation().sortedBy { it.position }
+                val sortedContentBlocks =
+                    bubble.toPresentation().contentBlocks.sortedBy { it.position }
                 _uiState.update {
                     it.copy(
                         bubble = bubble.toPresentation().copy(contentBlocks = sortedContentBlocks),
@@ -81,14 +67,7 @@ class BubbleInputViewModel @Inject constructor(
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
             onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
                 addTextBlockToFront()
             }
         )
@@ -98,12 +77,11 @@ class BubbleInputViewModel @Inject constructor(
         collectDataResource(
             flow = getAllBubblesUseCase(),
             onSuccess = { bubbles ->
-                _uiState.update { it.copy(bubbles = bubbles.toPresentation().filter {
-                    bubble -> bubble.id != _uiState.value.bubble.id
-                }) }
-            },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
+                _uiState.update {
+                    it.copy(bubbles = bubbles.toPresentation().filter { bubble ->
+                        bubble.id != _uiState.value.bubble.id
+                    })
+                }
             },
         )
     }
@@ -114,20 +92,10 @@ class BubbleInputViewModel @Inject constructor(
             onSuccess = { labels ->
                 _uiState.update {
                     it.copy(
-                        labels = labels.filter { label -> label.id != 0 }.toMutableList()
-                            .toPresentation()
+                        labels = labels.toPresentation(),
                     )
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -138,15 +106,6 @@ class BubbleInputViewModel @Inject constructor(
                 updateLabelEditMode(LabelEditMode.EDIT)
                 fetchLabels()
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -418,29 +377,25 @@ class BubbleInputViewModel @Inject constructor(
         checkCanSave()
 
         if (!_uiState.value.canSave) {
-            _uiState.update { it.copy(toastMessage = "내용을 입력해주세요.") }
+            _baseState.update { it.copy(toastMessage = "내용을 입력해주세요.") }
             addTextBlockToFront()
             return
         }
 
         collectDataResource(
-            flow = if (_uiState.value.bubble.id == 0) {
+            flow = if (_uiState.value.bubble.id.isNullOrEmpty()) {
                 addBubbleUseCase(_uiState.value.bubble.toDomain())
             } else {
                 updateBubbleUseCase(_uiState.value.bubble.toDomain())
 
             },
             onSuccess = { savedBubble ->
-                _uiState.update { it.copy(toastMessage = "저장되었습니다.") }
-
-                Log.d("debug", "{$savedBubble}")
-
-                syncData()
+                _baseState.update { it.copy(toastMessage = "저장되었습니다.") }
 
                 if (isLinked) {
                     _uiState.update {
                         BubbleInputState.DEFAULT.copy(
-                            bubble = BubbleModel(
+                            bubble = BubbleModel.DEFAULT.copy(
                                 linkedBubble = savedBubble.toPresentation()
                             ),
                             bubbles = it.bubbles + savedBubble.toPresentation()
@@ -450,15 +405,6 @@ class BubbleInputViewModel @Inject constructor(
                     addTextBlock()
                 }
             },
-            onError = { error ->
-                _uiState.update { it.copy(error = error) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
-            },
-            onComplete = {
-                _uiState.update { it.copy(isLoading = false) }
-            }
         )
     }
 
@@ -575,12 +521,8 @@ class BubbleInputViewModel @Inject constructor(
         }
     }
 
-    override fun clearToastMessage() {
-        _uiState.update { it.copy(toastMessage = null) }
-    }
-
     fun updateToastMessage(message: String) {
-        _uiState.update { it.copy(toastMessage = message) }
+        _baseState.update { it.copy(toastMessage = message) }
     }
 }
 

@@ -1,8 +1,14 @@
 package com.umc.edison.data.datasources
 
-import com.umc.edison.data.model.LabelEntity
+import com.umc.edison.data.model.label.LabelEntity
 
 interface LabelRemoteDataSource {
-    suspend fun syncLabel(label: LabelEntity): LabelEntity
-    suspend fun syncLabelToLocal()
+    // CREATE
+    suspend fun addLabel(label: LabelEntity): LabelEntity
+
+    // UPDATE
+    suspend fun updateLabel(label: LabelEntity): LabelEntity
+
+    // DELETE
+    suspend fun deleteLabel(id: String): LabelEntity
 }

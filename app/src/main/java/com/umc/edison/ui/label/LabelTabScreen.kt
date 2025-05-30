@@ -36,8 +36,8 @@ fun LabelTabScreen(
     navHostController: NavHostController,
     viewModel: LabelListViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
+    val baseState by viewModel.baseState.collectAsState()
 
     val draggedIndex = remember { mutableIntStateOf(-1) }
 
@@ -54,7 +54,7 @@ fun LabelTabScreen(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
             ),
-        uiState = uiState,
+        baseState = baseState,
         clearToastMessage = { viewModel.clearToastMessage() },
     ) {
         if (uiState.labelEditMode == LabelEditMode.ADD || uiState.labelEditMode == LabelEditMode.EDIT) {
@@ -62,7 +62,7 @@ fun LabelTabScreen(
                 onDismiss = {
                     viewModel.updateEditMode(LabelEditMode.NONE)
                 },
-                uiState = uiState,
+                baseState = baseState,
                 clearToastMessage = { viewModel.clearToastMessage() }
             ) {
                 LabelModalContent(
@@ -89,7 +89,7 @@ fun LabelTabScreen(
                 onConfirm = {
                     viewModel.deleteSelectedLabel()
                 },
-                uiState = uiState,
+                baseState = baseState,
                 clearToastMessage = { viewModel.clearToastMessage() }
             )
         }
@@ -137,7 +137,7 @@ fun LabelTabScreen(
 fun LabelList(
     labels: List<LabelModel>,
     draggedIndex: Int,
-    onLabelClick: (Int) -> Unit,
+    onLabelClick: (String?) -> Unit,
     onEditClick: (Int) -> Unit,
     onDeleteClick: (Int) -> Unit,
     onDrag: (Int) -> Unit,
@@ -148,7 +148,7 @@ fun LabelList(
             LabelListItem(
                 labelColor = label.color,
                 labelText = label.name,
-                count = label.bubbles.size,
+                count = label.bubbleCnt,
                 isDragged = index == draggedIndex,
                 onClick = { onLabelClick(label.id) },
                 onEditClick = { onEditClick(index) },

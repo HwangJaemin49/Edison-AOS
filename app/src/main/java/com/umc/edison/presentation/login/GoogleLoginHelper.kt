@@ -11,9 +11,9 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.umc.edison.R
 import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.usecase.login.GoogleLoginUseCase
-import com.umc.edison.domain.usecase.sync.GetServerDataUseCase
-import com.umc.edison.domain.usecase.sync.SyncDataUseCase
+import com.umc.edison.domain.usecase.user.GoogleLoginUseCase
+import com.umc.edison.domain.usecase.sync.SyncServerDataToLocalUseCase
+import com.umc.edison.domain.usecase.sync.SyncLocalDataToServerUseCase
 import com.umc.edison.presentation.model.UserModel
 import com.umc.edison.presentation.model.toPresentation
 import kotlinx.coroutines.MainScope
@@ -24,8 +24,8 @@ import javax.inject.Singleton
 @Singleton
 class GoogleLoginHelper @Inject constructor(
     private val googleLoginUseCase: GoogleLoginUseCase,
-    private val syncDataUseCase: SyncDataUseCase,
-    private val getServerDataUseCase: GetServerDataUseCase,
+    private val syncLocalDataToServerUseCase: SyncLocalDataToServerUseCase,
+    private val syncServerDataToLocalUseCase: SyncServerDataToLocalUseCase,
 ) {
     private val coroutineScope = MainScope()
 
@@ -50,7 +50,8 @@ class GoogleLoginHelper @Inject constructor(
         coroutineScope.launch {
             try {
                 onLoading(true)
-                val response: GetCredentialResponse = credentialManager.getCredential(context, request)
+                val response: GetCredentialResponse =
+                    credentialManager.getCredential(context, request)
                 handleSignIn(response, onSuccess, onFailure, onLoading)
             } catch (e: GetCredentialException) {
                 onLoading(false)
@@ -60,6 +61,7 @@ class GoogleLoginHelper @Inject constructor(
                     is androidx.credentials.exceptions.GetCredentialCancellationException -> {
                         onFailure("사용자가 로그인 창을 닫았습니다.")
                     }
+
                     else -> {
                         onFailure("알 수 없는 로그인 오류 발생")
                     }
@@ -87,7 +89,8 @@ class GoogleLoginHelper @Inject constructor(
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                     try {
-                        val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                        val googleIdTokenCredential =
+                            GoogleIdTokenCredential.createFrom(credential.data)
                         val idToken = googleIdTokenCredential.idToken
                         Log.d("Google SignIn", "ID Token (CustomCredential): $idToken")
 
@@ -122,13 +125,13 @@ class GoogleLoginHelper @Inject constructor(
                         onSuccess(result.data.toPresentation())
 
                         try {
-                            syncDataUseCase()
+                            syncLocalDataToServerUseCase()
                         } catch (e: Throwable) {
                             Log.e("Init sync local to server data", "Failed to sync data", e)
                         }
 
                         try {
-                            getServerDataUseCase()
+                            syncServerDataToLocalUseCase()
                         } catch (e: Throwable) {
                             Log.e("Init sync server to local data", "Failed to sync data", e)
                         }

@@ -1,13 +1,20 @@
 package com.umc.edison.domain.repository
 
 import com.umc.edison.domain.DataResource
-import com.umc.edison.domain.model.Label
+import com.umc.edison.domain.model.label.Label
 import kotlinx.coroutines.flow.Flow
 
 interface LabelRepository {
-    fun getAllLabels(): Flow<DataResource<List<Label>>>
+    // CREATE
     fun addLabel(label: Label): Flow<DataResource<Unit>>
+
+    // READ
+    fun getAllLabels(): Flow<DataResource<List<Label>>>
+    fun getLabel(id: String): Flow<DataResource<Label>>
+
+    // UPDATE
     fun updateLabel(label: Label): Flow<DataResource<Unit>>
-    fun deleteLabel(label: Label): Flow<DataResource<Unit>>
-    fun getLabelDetail(labelId: Int): Flow<DataResource<Label>>
+
+    // DELETE
+    fun deleteLabel(id: String): Flow<DataResource<Unit>>
 }
