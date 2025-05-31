@@ -1,40 +1,51 @@
-name: Discord Notification - Open Issue
+name: Discord Notification - Issue Status
 
 on:
   issues:
     types:
       - opened
+      - reopened
+      - closed
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Opened Issue
+      - name: Send Issue Notification
         shell: bash
         run: |
+          ISSUE_NUMBER=${{ github.event.issue.number }}
           TITLE="${{ github.event.issue.title }}"
           BODY="${{ github.event.issue.body }}"
           AUTHOR="${{ github.event.issue.user.login }}"
           AVATAR_URL="${{ github.event.issue.user.avatar_url }}"
           ISSUE_URL="${{ github.event.issue.html_url }}"
           WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+          ACTION="${{ github.event.action }}"  # opened, reopened, closed
 
-          # 라벨 색상 (없으면 회색)
-          COLOR_HEX="${{ github.event.issue.labels[0].color }}"
-          if [ -z "$COLOR_HEX" ]; then
-            COLOR_HEX="808080"
+          # 색상 설정
+          if [ "$ACTION" = "closed" ]; then
+            COLOR_HEX="444444"  # 닫힌 이슈용 어두운 회색
+          else
+            COLOR_HEX="${{ github.event.issue.labels[0].color }}"
+            if [ -z "$COLOR_HEX" ]; then
+              COLOR_HEX="808080"
+            fi
           fi
           COLOR_DEC=$((16#${COLOR_HEX}))
 
-          # 본문 없을 경우 대비
           if [ -z "$BODY" ]; then
             BODY="(No description provided)"
           fi
 
-          # JSON 저장
+          # 상단 content 메시지 생성
+          STATUS_CAP=$(echo "$ACTION" | tr '[:lower:]' '[:upper:]')
+          CONTENT="#${ISSUE_NUMBER} Issue ${STATUS_CAP}"
+
           echo '{
             "username": "GitHub Issue Bot",
             "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "content": "'"${CONTENT}"'",
             "embeds": [{
               "author": {
                 "name": "'"${AUTHOR}"'",
@@ -47,7 +58,6 @@ jobs:
             }]
           }' > payload.json
 
-          # 전송
           curl -H "Content-Type: application/json" \
             -X POST \
             -d @payload.json \
