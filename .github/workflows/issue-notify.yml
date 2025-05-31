@@ -33,13 +33,9 @@ jobs:
           fi
           COLOR_DEC=$((16#${COLOR_HEX}))
 
-          if [ -z "$BODY" ]; then
-            BODY="(No description provided)"
-          fi
-
           # 상단 content 메시지 생성
           STATUS_CAP=$(echo "$ACTION" | tr '[:lower:]' '[:upper:]')
-          CONTENT="#${ISSUE_NUMBER} Issue ${STATUS_CAP}"
+          CONTENT="## #${ISSUE_NUMBER} Issue ${STATUS_CAP}"
 
           echo '{
             "username": "GitHub Issue Bot",
