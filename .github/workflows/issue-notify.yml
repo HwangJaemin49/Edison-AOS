@@ -34,8 +34,7 @@ jobs:
           COLOR_DEC=$((16#${COLOR_HEX}))
 
           # 상단 content 메시지 생성
-          STATUS_CAP=$(echo "$ACTION" | tr '[:lower:]' '[:upper:]')
-          CONTENT="## #${ISSUE_NUMBER} Issue ${STATUS_CAP}"
+          CONTENT="## #${ISSUE_NUMBER} Issue ${ACTION}"
 
           echo '{
             "username": "GitHub Issue Bot",
