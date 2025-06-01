@@ -26,7 +26,7 @@ jobs:
           BODY_ESCAPED=$(echo "$BODY" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
           BODY="```${BODY_ESCAPED}```"
 
-          CONTENT="#${PR_NUMBER} PR review requested"
+          CONTENT="## #${PR_NUMBER} PR review requested"
           DESCRIPTION="📬 \`${SENDER}\` requested a review from \`${REVIEWER}\`"
 
           echo '{

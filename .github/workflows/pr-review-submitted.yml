@@ -1,0 +1,62 @@
+name: Discord Notification - PR Review Submitted
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Review Submission
+        shell: bash
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          REVIEWER="${{ github.event.review.user.login }}"
+          STATE="${{ github.event.review.state }}"
+          COMMENT="${{ github.event.review.body }}"
+          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+
+          # 코멘트 escape
+          if [ -z "$COMMENT" ]; then
+            COMMENT=""
+          else
+            COMMENT_ESCAPED=$(echo "$COMMENT" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+            COMMENT="```${COMMENT_ESCAPED}```"
+          fi
+
+          # 상태별 메시지
+          if [ "$STATE" = "approved" ]; then
+            STATUS="✅ \`${REVIEWER}\` approved the PR"
+            COLOR=2ebd85
+          elif [ "$STATE" = "changes_requested" ]; then
+            STATUS="🚫 \`${REVIEWER}\` requested changes"
+            COLOR=ff5c5c
+          elif [ "$STATE" = "commented" ]; then
+            STATUS="💬 \`${REVIEWER}\` commented on the PR"
+            COLOR=999999
+          else
+            STATUS="📤 \`${REVIEWER}\` submitted a review"
+            COLOR=cccccc
+          fi
+
+          CONTENT="## #${PR_NUMBER} PR review submitted"
+
+          echo '{
+            "username": "GitHub Review Bot",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "content": "'"${CONTENT}"'",
+            "embeds": [{
+              "title": "'"${PR_TITLE}"'",
+              "url": "'"${PR_URL}"'",
+              "description": "'"${STATUS}\\n\\n${COMMENT}"'",
+              "color": '"$COLOR"'
+            }]
+          }' > payload.json
+
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d @payload.json \
+            "$WEBHOOK_URL"
