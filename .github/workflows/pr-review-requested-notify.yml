@@ -61,17 +61,19 @@ jobs:
 
           CONTENT="**📬 ${SENDER_MENTION} 님이 ${REVIEWER_MENTION} 님에게 #${PR_NUMBER} PR에 대한 리뷰를 요청했습니다.**"
 
-          echo '{
+          cat <<EOF > payload.json
+          {
             "username": "GitHub Review Bot",
             "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-            "content": "'"${CONTENT}"'",
+            "content": "${CONTENT}",
             "embeds": [{
-              "title": "'"${PR_TITLE}"'",
-              "url": "'"${PR_URL}"'",
+              "title": "${PR_TITLE}",
+              "url": "${PR_URL}",
               "description": "```\n${BODY}\n```",
               "color": 3447003
             }]
-          }' > payload.json
+          }
+          EOF
 
           curl -H "Content-Type: application/json" \
             -X POST \
