@@ -28,8 +28,6 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    env:
-      BODY: ${{ github.event.inputs.body }}
     steps:
       - name: Notify Reviewer
         shell: bash
@@ -41,6 +39,7 @@ jobs:
           PR_URL="${{ github.event.inputs.pr_url }}"
           SENDER="${{ github.event.inputs.sender }}"
           REVIEWER="${{ github.event.inputs.reviewer }}"
+          BODY="${{ github.event.inputs.body }}"
           WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
 
           get_discord_mention() {
