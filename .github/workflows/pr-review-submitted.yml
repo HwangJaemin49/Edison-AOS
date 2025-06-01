@@ -30,20 +30,18 @@ jobs:
 
           # 상태별 메시지
           if [ "$STATE" = "approved" ]; then
-            STATUS="✅ \`${REVIEWER}\` approved the PR"
+            CONTENT="✅ \`${REVIEWER}\` 님이 #${PR_NUMBER} PR을 승인했습니다."
             COLOR=2ebd85
           elif [ "$STATE" = "changes_requested" ]; then
-            STATUS="🚫 \`${REVIEWER}\` requested changes"
+            CONTENT="🚫 \`${REVIEWER}\` 님이 #${PR_NUMBER} PR에 대해 수정을 요청했습니다."
             COLOR=ff5c5c
           elif [ "$STATE" = "commented" ]; then
-            STATUS="💬 \`${REVIEWER}\` commented on the PR"
+            CONTENT="💬 \`${REVIEWER}\` 님이 #${PR_NUMBER} PR에 대해 코멘트를 남겼습니다."
             COLOR=999999
           else
-            STATUS="📤 \`${REVIEWER}\` submitted a review"
+            CONTENT="📤 \`${REVIEWER}\` 님이 #${PR_NUMBER} PR에 대한 리뷰를 제출했습니다."
             COLOR=cccccc
           fi
-
-          CONTENT="**[#${PR_NUMBER} PR review submitted]**\n"
 
           echo '{
             "username": "GitHub Review Bot",
@@ -52,7 +50,7 @@ jobs:
             "embeds": [{
               "title": "'"${PR_TITLE}"'",
               "url": "'"${PR_URL}"'",
-              "description": "'"${STATUS}\\n\\n${COMMENT}"'",
+              "description": "'"${COMMENT}"'",
               "color": '"$COLOR"'
             }]
           }' > payload.json

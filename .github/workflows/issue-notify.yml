@@ -32,9 +32,19 @@ jobs:
             fi
           fi
           COLOR_DEC=$((16#${COLOR_HEX}))
-
-          # 상단 content 메시지 생성
-          CONTENT="**[#${ISSUE_NUMBER} Issue ${ACTION}]**\n"
+          
+          # 액션에 따른 문구 설정
+          if [ "$ACTION" = "opened" ]; then
+            VERB="이슈가 생성되었습니다."
+          elif [ "$ACTION" = "reopened" ]; then
+            VERB="이슈가 다시 열렸습니다."
+          elif [ "$ACTION" = "closed" ]; then
+            VERB="이슈가 닫혔습니다."
+          else
+            VERB="이슈 상태가 변경되었습니다."
+          fi
+          
+          CONTENT="**#${ISSUE_NUMBER} ${VERB}**"
 
           echo '{
             "username": "GitHub Issue Bot",
