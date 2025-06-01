@@ -4,43 +4,21 @@ on:
   pull_request:
     types: [review_requested]
 
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: 'PR 번호'
-        required: true
-      pr_title:
-        description: 'PR 제목'
-        required: true
-      pr_url:
-        description: 'PR 링크'
-        required: true
-      body:
-        description: 'PR 본문'
-        required: false
-      sender:
-        description: '요청자 GitHub ID'
-        required: true
-      reviewer:
-        description: '리뷰 요청 받은 사람 GitHub ID'
-        required: true
-
 jobs:
   notify:
     runs-on: ubuntu-latest
-    env:
-      BODY: ${{ github.event.inputs.body }}
     steps:
       - name: Notify Reviewer
         shell: bash
         env:
           DISCORD_ID_MAP: ${{ secrets.DISCORD_ID_MAP }}
         run: |
-          PR_NUMBER="${{ github.event.inputs.pr_number }}"
-          PR_TITLE="${{ github.event.inputs.pr_title }}"
-          PR_URL="${{ github.event.inputs.pr_url }}"
-          SENDER="${{ github.event.inputs.sender }}"
-          REVIEWER="${{ github.event.inputs.reviewer }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          BODY="${{ github.event.pull_request.body }}"
+          SENDER="${{ github.event.sender.login }}"
+          REVIEWER="${{ github.event.requested_reviewer.login }}"
           WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
 
           get_discord_mention() {
@@ -58,11 +36,10 @@ jobs:
 
           if [ -z "$BODY" ]; then
             BODY="(No description provided)"
+          else
+            BODY="\`\`\`markdown\n$BODY\n\`\`\`"
           fi
-
-          BODY_ESCAPED=$(printf "%s" "$BODY" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-          BODY="```${BODY_ESCAPED}```"
-
+          
           CONTENT="**📬 ${SENDER_MENTION} 님이 ${REVIEWER_MENTION} 님에게 #${PR_NUMBER} PR에 대한 리뷰를 요청했습니다.**"
 
           echo '{
