@@ -34,7 +34,7 @@ jobs:
           COLOR_DEC=$((16#${COLOR_HEX}))
 
           # 상단 content 메시지 생성
-          CONTENT="## #${ISSUE_NUMBER} Issue ${ACTION}"
+          CONTENT="**[#${ISSUE_NUMBER} Issue ${ACTION}]**\n"
 
           echo '{
             "username": "GitHub Issue Bot",

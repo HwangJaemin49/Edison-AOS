@@ -42,7 +42,7 @@ jobs:
             COLOR=cccccc
           fi
 
-          CONTENT="## #${PR_NUMBER} PR review submitted"
+          CONTENT="**[#${PR_NUMBER} PR review submitted]**\n"
 
           echo '{
             "username": "GitHub Review Bot",

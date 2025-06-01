@@ -34,7 +34,7 @@ jobs:
           fi
           COLOR_DEC=$((16#${COLOR_HEX}))
 
-          CONTENT="## #${PR_NUMBER} PR closed"
+          CONTENT="**[#${PR_NUMBER} PR closed]]**\n"
 
           echo '{
             "username": "GitHub PR Bot",
