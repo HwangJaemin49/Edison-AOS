@@ -1,0 +1,58 @@
+name: Discord Notification - PR Closed
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  notify:
+    if: github.event.pull_request.base.ref == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send PR Closed Notification
+        shell: bash
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          TITLE="${{ github.event.pull_request.title }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          AVATAR_URL="${{ github.event.pull_request.user.avatar_url }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+          MERGED="${{ github.event.pull_request.merged }}"
+
+          if [ "$MERGED" = "true" ]; then
+            COLOR_HEX="2ebd85"
+            MERGED_BY="${{ github.event.pull_request.merged_by.login }}"
+            MERGED_FIELD='{
+              "name": "Merged by",
+              "value": "@'"${MERGED_BY}"'",
+              "inline": true
+            }'
+          else
+            COLOR_HEX="ff5c5c"
+            MERGED_FIELD=""
+          fi
+          COLOR_DEC=$((16#${COLOR_HEX}))
+
+          CONTENT="#${PR_NUMBER} PR closed"
+
+          echo '{
+            "username": "GitHub PR Bot",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "content": "'"${CONTENT}"'",
+            "embeds": [{
+              "author": {
+                "name": "'"${AUTHOR}"'",
+                "icon_url": "'"${AVATAR_URL}"'"
+              },
+              "title": "'"${TITLE}"'",
+              "url": "'"${PR_URL}"'",
+              "color": '"${COLOR_DEC}"',
+              "fields": ['"${MERGED_FIELD}"']
+            }]
+          }' > payload.json
+
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d @payload.json \
+            "$WEBHOOK_URL"
