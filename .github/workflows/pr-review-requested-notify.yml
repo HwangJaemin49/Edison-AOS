@@ -1,0 +1,47 @@
+name: Discord Notification - PR Review Requested
+
+on:
+  pull_request:
+    types: [review_requested]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Reviewer
+        shell: bash
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          BODY="${{ github.event.pull_request.body }}"
+          SENDER="${{ github.actor }}"
+          REVIEWER="${{ github.event.requested_reviewer.login }}"
+          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+
+          if [ -z "$BODY" ]; then
+            BODY="(No description provided)"
+          fi
+
+          BODY_ESCAPED=$(echo "$BODY" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          BODY="```${BODY_ESCAPED}```"
+
+          CONTENT="#${PR_NUMBER} PR review requested"
+          DESCRIPTION="📬 \`${SENDER}\` requested a review from \`${REVIEWER}\`"
+
+          echo '{
+            "username": "GitHub Review Bot",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "content": "'"${CONTENT}"'",
+            "embeds": [{
+              "title": "'"${PR_TITLE}"'",
+              "url": "'"${PR_URL}"'",
+              "description": "'"${DESCRIPTION}\\n\\n${BODY}"'",
+              "color": 3447003
+            }]
+          }' > payload.json
+
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d @payload.json \
+            "$WEBHOOK_URL"
