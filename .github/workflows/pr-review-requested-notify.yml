@@ -28,17 +28,33 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
+    env:
+      BODY: ${{ github.event.inputs.body }}
     steps:
       - name: Notify Reviewer
         shell: bash
+        env:
+          DISCORD_ID_MAP: ${{ secrets.DISCORD_ID_MAP }}
         run: |
           PR_NUMBER="${{ github.event.inputs.pr_number }}"
           PR_TITLE="${{ github.event.inputs.pr_title }}"
           PR_URL="${{ github.event.inputs.pr_url }}"
-          BODY="${{ github.event.inputs.body }}"
           SENDER="${{ github.event.inputs.sender }}"
           REVIEWER="${{ github.event.inputs.reviewer }}"
           WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+
+          get_discord_mention() {
+            local github_id=$1
+            local discord_id=$(echo "$DISCORD_ID_MAP" | jq -r --arg key "$github_id" '.[$key]')
+            if [ "$discord_id" = "null" ]; then
+              echo "\`$github_id\`"
+            else
+              echo "<@$discord_id>"
+            fi
+          }
+
+          REVIEWER_MENTION=$(get_discord_mention "$REVIEWER")
+          SENDER_MENTION="\`$SENDER\`"
 
           if [ -z "$BODY" ]; then
             BODY="(No description provided)"
@@ -47,8 +63,7 @@ jobs:
           BODY_ESCAPED=$(printf "%s" "$BODY" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
           BODY="```${BODY_ESCAPED}```"
 
-          CONTENT="**[#${PR_NUMBER} PR review requested]**"
-          DESCRIPTION="📬 \`${SENDER}\` requested a review from \`${REVIEWER}\`"
+          CONTENT="**📬 ${SENDER_MENTION} 님이 ${REVIEWER_MENTION} 님에게 #${PR_NUMBER} PR에 대한 리뷰를 요청했습니다.**"
 
           echo '{
             "username": "GitHub Review Bot",
@@ -57,7 +72,7 @@ jobs:
             "embeds": [{
               "title": "'"${PR_TITLE}"'",
               "url": "'"${PR_URL}"'",
-              "description": "'"${DESCRIPTION}\\n\\n${BODY}"'",
+              "description": "'"${BODY}"'",
               "color": 3447003
             }]
           }' > payload.json
