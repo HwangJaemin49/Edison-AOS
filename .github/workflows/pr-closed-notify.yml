@@ -34,6 +34,7 @@ jobs:
             MERGED_FIELD=""
             CONTENT="**#${PR_NUMBER} PR이 닫혔습니다.**"
           fi
+          COLOR_DEC=$((16#${COLOR_HEX}))
 
           echo '{
             "username": "GitHub PR Bot",
