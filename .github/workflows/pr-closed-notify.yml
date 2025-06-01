@@ -28,13 +28,12 @@ jobs:
               "value": "@'"${MERGED_BY}"'",
               "inline": true
             }'
+            CONTENT="**#${PR_NUMBER} PR이 develop 브랜치에 병합되었습니다.**"
           else
             COLOR_HEX="ff5c5c"
             MERGED_FIELD=""
+            CONTENT="**#${PR_NUMBER} PR이 닫혔습니다.**"
           fi
-          COLOR_DEC=$((16#${COLOR_HEX}))
-
-          CONTENT="**[#${PR_NUMBER} PR closed]]**\n"
 
           echo '{
             "username": "GitHub PR Bot",
