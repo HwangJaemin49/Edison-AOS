@@ -13,53 +13,73 @@ jobs:
     steps:
       - name: Send Issue Notification
         shell: bash
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          ISSUE_NUMBER=${{ github.event.issue.number }}
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
           TITLE="${{ github.event.issue.title }}"
           AUTHOR="${{ github.event.issue.user.login }}"
           AVATAR_URL="${{ github.event.issue.user.avatar_url }}"
           ISSUE_URL="${{ github.event.issue.html_url }}"
-          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+          BODY="${{ github.event.issue.body }}"
           ACTION="${{ github.event.action }}"  # opened, reopened, closed
 
           # 색상 설정
           if [ "$ACTION" = "closed" ]; then
-            COLOR_HEX="444444"  # 닫힌 이슈용 어두운 회색
-          else
-            COLOR_HEX="${{ github.event.issue.labels[0].color }}"
-            if [ -z "$COLOR_HEX" ]; then
-              COLOR_HEX="808080"
-            fi
-          fi
-          COLOR_DEC=$((16#${COLOR_HEX}))
-          
-          # 액션에 따른 문구 설정
-          if [ "$ACTION" = "opened" ]; then
-            VERB="이슈가 생성되었습니다."
-          elif [ "$ACTION" = "reopened" ]; then
-            VERB="이슈가 다시 열렸습니다."
-          elif [ "$ACTION" = "closed" ]; then
+            COLOR_HEX="444444"
+            EMOJI="🧩"
             VERB="이슈가 닫혔습니다."
+          elif [ "$ACTION" = "reopened" ]; then
+            COLOR_HEX="${{ github.event.issue.labels[0].color }}"
+            EMOJI="🫧"
+            VERB="이슈가 다시 열렸습니다."
+          elif [ "$ACTION" = "opened" ]; then
+            COLOR_HEX="${{ github.event.issue.labels[0].color }}"
+            EMOJI="🫧"
+            VERB="이슈가 생성되었습니다."
           else
+            COLOR_HEX="808080"
+            EMOJI="❔"
             VERB="이슈 상태가 변경되었습니다."
           fi
-          
-          CONTENT="**#${ISSUE_NUMBER} ${VERB}**"
 
-          echo '{
-            "username": "GitHub Issue Bot",
-            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-            "content": "'"${CONTENT}"'",
-            "embeds": [{
-              "author": {
-                "name": "'"${AUTHOR}"'",
-                "icon_url": "'"${AVATAR_URL}"'"
-              },
-              "title": "'"${TITLE}"'",
-              "url": "'"${ISSUE_URL}"'",
-              "color": '"${COLOR_DEC}"'
-            }]
-          }' > payload.json
+          if [ -z "$COLOR_HEX" ]; then
+            COLOR_HEX="808080"
+          fi
+          COLOR_DEC=$((16#${COLOR_HEX}))
+
+          # 본문 처리
+          if [ -z "$BODY" ]; then
+            DESCRIPTION="(No description provided)"
+          else
+            DESCRIPTION="$BODY"
+          fi
+
+          jq -n \
+            --arg username "GitHub Issue Bot" \
+            --arg avatar_url "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" \
+            --arg content "$EMOJI **#${ISSUE_NUMBER} ${VERB}**" \
+            --arg author "$AUTHOR" \
+            --arg author_icon "$AVATAR_URL" \
+            --arg title "$TITLE" \
+            --arg url "$ISSUE_URL" \
+            --arg description "$DESCRIPTION" \
+            --argjson color "$COLOR_DEC" \
+            '{
+              username: $username,
+              avatar_url: $avatar_url,
+              content: $content,
+              embeds: [{
+                author: {
+                  name: $author,
+                  icon_url: $author_icon
+                },
+                title: $title,
+                url: $url,
+                description: $description,
+                color: $color
+              }]
+            }' > payload.json
 
           curl -H "Content-Type: application/json" \
             -X POST \
