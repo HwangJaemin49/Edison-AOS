@@ -12,6 +12,7 @@ jobs:
         shell: bash
         env:
           DISCORD_ID_MAP: ${{ secrets.DISCORD_ID_MAP }}
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
@@ -19,40 +20,55 @@ jobs:
           BODY="${{ github.event.pull_request.body }}"
           SENDER="${{ github.event.sender.login }}"
           REVIEWER="${{ github.event.requested_reviewer.login }}"
-          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          AVATAR_URL="${{ github.event.pull_request.user.avatar_url }}"
 
           get_discord_mention() {
             local github_id=$1
             local discord_id=$(echo "$DISCORD_ID_MAP" | jq -r --arg key "$github_id" '.[$key]')
             if [ "$discord_id" = "null" ]; then
-              echo "\`$github_id\`"
+              echo "\`@$github_id\`"
             else
               echo "<@$discord_id>"
             fi
           }
 
           REVIEWER_MENTION=$(get_discord_mention "$REVIEWER")
-          SENDER_MENTION="\`$SENDER\`"
+          SENDER_MENTION=$(get_discord_mention "$SENDER")
 
           if [ -z "$BODY" ]; then
-            BODY="(No description provided)"
+            DESCRIPTION="(No description provided)"
           else
-            BODY="\`\`\`markdown\n$BODY\n\`\`\`"
+            DESCRIPTION="$BODY"
           fi
-          
-          CONTENT="**📬 ${SENDER_MENTION} 님이 ${REVIEWER_MENTION} 님에게 #${PR_NUMBER} PR에 대한 리뷰를 요청했습니다.**"
 
-          echo '{
-            "username": "GitHub Review Bot",
-            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-            "content": "'"${CONTENT}"'",
-            "embeds": [{
-              "title": "'"${PR_TITLE}"'",
-              "url": "'"${PR_URL}"'",
-              "description": "'"${BODY}"'",
-              "color": 3447003
-            }]
-          }' > payload.json
+          CONTENT="📬 ${SENDER_MENTION} 님이 ${REVIEWER_MENTION} 님에게 #${PR_NUMBER} PR에 대한 리뷰를 요청했습니다."
+
+          jq -n \
+            --arg username "GitHub Review Bot" \
+            --arg avatar_url "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" \
+            --arg content "**$CONTENT**" \
+            --arg author "$AUTHOR" \
+            --arg author_icon "$AVATAR_URL" \
+            --arg title "$PR_TITLE" \
+            --arg url "$PR_URL" \
+            --arg description "$DESCRIPTION" \
+            --argjson color 3447003 \
+            '{
+              username: $username,
+              avatar_url: $avatar_url,
+              content: $content,
+              embeds: [{
+                author: {
+                  name: $author,
+                  icon_url: $author_icon
+                },
+                title: $title,
+                url: $url,
+                description: $description,
+                color: $color
+              }]
+            }' > payload.json
 
           curl -H "Content-Type: application/json" \
             -X POST \
