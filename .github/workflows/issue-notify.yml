@@ -52,7 +52,7 @@ jobs:
           if [ -z "$BODY" ]; then
             DESCRIPTION="(No description provided)"
           else
-            DESCRIPTION="\n$BODY"
+            DESCRIPTION="$(printf "\n%s" "$BODY")"
           fi
 
           jq -n \
