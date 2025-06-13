@@ -11,46 +11,70 @@ jobs:
     steps:
       - name: Send PR Closed Notification
         shell: bash
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_NUMBER="${{ github.event.pull_request.number }}"
           TITLE="${{ github.event.pull_request.title }}"
           AUTHOR="${{ github.event.pull_request.user.login }}"
           AVATAR_URL="${{ github.event.pull_request.user.avatar_url }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
-          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
           MERGED="${{ github.event.pull_request.merged }}"
+          MERGED_BY="${{ github.event.pull_request.merged_by.login }}"
 
           if [ "$MERGED" = "true" ]; then
             COLOR_HEX="2ebd85"
-            MERGED_BY="${{ github.event.pull_request.merged_by.login }}"
-            MERGED_FIELD='{
-              "name": "Merged by",
-              "value": "@'"${MERGED_BY}"'",
-              "inline": true
-            }'
-            CONTENT="**#${PR_NUMBER} PR이 develop 브랜치에 병합되었습니다.**"
+            EMOJI="🔀"
+            CONTENT="$EMOJI **#${PR_NUMBER} PR이 develop 브랜치에 병합되었습니다.**"
+            FIELD_NAME="Merged by"
+            FIELD_VALUE="@${MERGED_BY}"
           else
             COLOR_HEX="ff5c5c"
-            MERGED_FIELD=""
-            CONTENT="**#${PR_NUMBER} PR이 닫혔습니다.**"
+            EMOJI="❌"
+            CONTENT="$EMOJI **#${PR_NUMBER} PR이 닫혔습니다.**"
+            FIELD_NAME=""
+            FIELD_VALUE=""
           fi
+
           COLOR_DEC=$((16#${COLOR_HEX}))
 
-          echo '{
-            "username": "GitHub PR Bot",
-            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-            "content": "'"${CONTENT}"'",
-            "embeds": [{
-              "author": {
-                "name": "'"${AUTHOR}"'",
-                "icon_url": "'"${AVATAR_URL}"'"
-              },
-              "title": "'"${TITLE}"'",
-              "url": "'"${PR_URL}"'",
-              "color": '"${COLOR_DEC}"',
-              "fields": ['"${MERGED_FIELD}"']
-            }]
-          }' > payload.json
+          if [ "$MERGED" = "true" ]; then
+            FIELDS=$(jq -n --arg name "$FIELD_NAME" --arg value "$FIELD_VALUE" '[
+              {
+                name: $name,
+                value: $value,
+                inline: true
+              }
+            ]')
+          else
+            FIELDS="[]"
+          fi
+
+          jq -n \
+            --arg username "GitHub PR Bot" \
+            --arg avatar_url "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" \
+            --arg content "$CONTENT" \
+            --arg author "$AUTHOR" \
+            --arg author_icon "$AVATAR_URL" \
+            --arg title "$TITLE" \
+            --arg url "$PR_URL" \
+            --argjson color "$COLOR_DEC" \
+            --argjson fields "$FIELDS" \
+            '{
+              username: $username,
+              avatar_url: $avatar_url,
+              content: $content,
+              embeds: [{
+                author: {
+                  name: $author,
+                  icon_url: $author_icon
+                },
+                title: $title,
+                url: $url,
+                color: $color,
+                fields: $fields
+              }]
+            }' > payload.json
 
           curl -H "Content-Type: application/json" \
             -X POST \
