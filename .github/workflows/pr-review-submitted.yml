@@ -8,54 +8,82 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     env:
-      COMMENT_RAW: ${{ github.event.review.body }}
+      DISCORD_ID_MAP: ${{ secrets.DISCORD_ID_MAP }}
+      WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
     steps:
       - name: Notify Review Submission
         shell: bash
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_TITLE="${{ github.event.pull_request.title }}"
           PR_URL="${{ github.event.pull_request.html_url }}"
           REVIEWER="${{ github.event.review.user.login }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          COMMENT="${{ github.event.review.body }}"
           STATE="${{ github.event.review.state }}"
-          WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK_URL }}"
 
-          # 코멘트 escape
-          if [ -z "$COMMENT_RAW" ]; then
-            COMMENT=""
-          else
-            COMMENT_ESCAPED=$(printf "%s" "$COMMENT_RAW" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-            COMMENT="```${COMMENT_ESCAPED}```"
-          fi
+          get_discord_mention() {
+            local github_id=$1
+            local discord_id=$(echo "$DISCORD_ID_MAP" | jq -r --arg key "$github_id" '.[$key]')
+            if [ "$discord_id" = "null" ]; then
+              echo "\`@$github_id\`"
+            else
+              echo "<@$discord_id>"
+            fi
+          }
 
-          # 상태별 메시지
+          REVIEWER_MENTION=$(get_discord_mention "$REVIEWER")
+          AUTHOR_MENTION=$(get_discord_mention "$AUTHOR")
+
+          # 상태별 메시지 및 색상 설정
           if [ "$STATE" = "approved" ]; then
-            CONTENT="✅ \`${REVIEWER}\` 님이 #${PR_NUMBER} PR을 승인했습니다."
-            COLOR=2ebd85
+            ICON="✅"
+            COLOR_HEX="2ebd85"
+            ACTION="PR을 승인했습니다."
           elif [ "$STATE" = "changes_requested" ]; then
-            CONTENT="🚫 \`${REVIEWER}\` 님이 #${PR_NUMBER} PR에 대해 수정을 요청했습니다."
-            COLOR=ff5c5c
+            ICON="🚫"
+            COLOR_HEX="ff5c5c"
+            ACTION="PR에 대해 수정을 요청했습니다."
           elif [ "$STATE" = "commented" ]; then
-            CONTENT="💬 \`${REVIEWER}\` 님이 #${PR_NUMBER} PR에 대해 코멘트를 남겼습니다."
-            COLOR=999999
+            ICON="💬"
+            COLOR_HEX="999999"
+            ACTION="PR에 대해 코멘트를 남겼습니다."
           else
-            CONTENT="📤 \`${REVIEWER}\` 님이 #${PR_NUMBER} PR에 대한 리뷰를 제출했습니다."
-            COLOR=cccccc
+            ICON="📤"
+            COLOR_HEX="cccccc"
+            ACTION="PR에 대한 리뷰를 제출했습니다."
           fi
 
-          echo '{
-            "username": "GitHub Review Bot",
-            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-            "content": "'"${CONTENT}"'",
-            "embeds": [{
-              "title": "'"${PR_TITLE}"'",
-              "url": "'"${PR_URL}"'",
-              "description": "'"${COMMENT}"'",
-              "color": '"$COLOR"'
-            }]
-          }' > payload.json
+          COLOR_DEC=$((16#${COLOR_HEX}))
+          CONTENT="**${ICON} ${REVIEWER_MENTION} 님이 ${AUTHOR_MENTION} 님의 #${PR_NUMBER} ${ACTION}**"
+
+          if [ -z "$COMMENT" ]; then
+            DESCRIPTION=""
+          else
+            DESCRIPTION="$COMMENT"
+          fi
+
+          jq -n \
+            --arg username "GitHub Review Bot" \
+            --arg avatar_url "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" \
+            --arg content "$CONTENT" \
+            --arg title "$PR_TITLE" \
+            --arg url "$PR_URL" \
+            --arg description "$DESCRIPTION" \
+            --argjson color "$COLOR_DEC" \
+            '{
+              username: $username,
+              avatar_url: $avatar_url,
+              content: $content,
+              embeds: [{
+                title: $title,
+                url: $url,
+                description: $description,
+                color: $color
+              }]
+            }' > payload.json
 
           curl -H "Content-Type: application/json" \
-            -X POST \
-            -d @payload.json \
-            "$WEBHOOK_URL"
+               -X POST \
+               -d @payload.json \
+               "$WEBHOOK_URL"
