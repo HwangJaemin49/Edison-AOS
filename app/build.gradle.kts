@@ -130,4 +130,6 @@ dependencies {
     implementation(libs.googleid)
 
     implementation("io.branch.sdk.android:library:5.+")
+
+    implementation(libs.multiplatform.settings)
 }
