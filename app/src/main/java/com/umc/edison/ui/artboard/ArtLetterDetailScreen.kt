@@ -125,7 +125,7 @@ fun ArtLetterDetailScreen(
                 expandedOffset = expandedOffset,
                 onOffsetChanged = { sheetOffsetPx = it },
             ) { animatedTopPadding ->
-                if (uiState.isLoading) {
+                if (uiState.baseState.isLoading) {
                     ArtLetterDetailSkeleton()
                 } else {
                     ArtLetterDetailContent(
@@ -316,7 +316,7 @@ fun ArtLetterDetailSkeleton() {
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(horizontal = 24.dp, vertical = 16.dp)) {
+        .padding(vertical = 8.dp)) {
 
         // 제목 1줄
         Spacer(
@@ -340,7 +340,7 @@ fun ArtLetterDetailSkeleton() {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Divider(color = Color(0xFFE0E0E0), thickness = 1.dp)
+        HorizontalDivider(color = Color(0xFFE0E0E0), thickness = 1.dp)
 
         Spacer(modifier = Modifier.height(24.dp))
 

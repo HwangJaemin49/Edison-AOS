@@ -28,6 +28,8 @@ class ArtLetterDetailViewModel @Inject constructor(
 ) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(ArtLetterDetailState.DEFAULT)
     val uiState = _uiState.asStateFlow()
+    val isLoading = uiState.value.baseState.isLoading
+    val error = uiState.value.baseState.error
 
     init {
         val id: Int = savedStateHandle["artLetterId"]
@@ -48,7 +50,9 @@ class ArtLetterDetailViewModel @Inject constructor(
     }
 
     private fun fetchArtLetterDetail(id: Int) {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update {
+            it.copy(baseState = it.baseState.copy(isLoading = true))
+        }
 
         collectDataResource(
             flow = getArtLetterUseCase(id),
@@ -56,18 +60,25 @@ class ArtLetterDetailViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         artLetter = artLetterDetail.toDetailPresentation(),
-                        isLoading = false
+                        baseState = it.baseState.copy(isLoading = false)
                     )
                 }
             },
             onError = {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update {
+                    it.copy(baseState = it.baseState.copy(isLoading = false))
+                }
             }
         )
     }
 
 
+
     private fun fetchRandomArtLetters() {
+        _uiState.update {
+            it.copy(baseState = it.baseState.copy(isLoading = true))
+        }
+
         collectDataResource(
             flow = getAllRandomArtLettersUseCase(),
             onSuccess = { artLetters ->
@@ -77,18 +88,18 @@ class ArtLetterDetailViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         relatedArtLetters = unique.toPreviewPresentation(),
-                        isLoading = false
+                        baseState = it.baseState.copy(isLoading = false)
                     )
                 }
             },
             onError = {
-                _uiState.update { it.copy(isLoading = false) }
-            },
-            onLoading = {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update {
+                    it.copy(baseState = it.baseState.copy(isLoading = false))
+                }
             }
         )
     }
+
 
 
     fun likeArtLetter() {
