@@ -1,6 +1,6 @@
 package com.umc.edison.data.repository
 
-import com.umc.edison.data.bound.flowDataResource
+import com.umc.edison.data.bound.FlowBoundResourceFactory
 import com.umc.edison.data.datasources.ArtLetterRemoteDataSource
 import com.umc.edison.domain.DataResource
 import com.umc.edison.domain.model.artLetter.ArtLetter
@@ -11,69 +11,43 @@ import javax.inject.Inject
 
 class ArtLetterRepositoryImpl @Inject constructor(
     private val artLetterRemoteDataSource: ArtLetterRemoteDataSource,
+    private val resourceFactory: FlowBoundResourceFactory
 ) : ArtLetterRepository {
     // READ
     override fun getAllArtLetterCategories(): Flow<DataResource<List<String>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getAllArtLetterCategories() }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getAllArtLetterCategories() }
 
     override fun getAllArtLetters(): Flow<DataResource<List<ArtLetter>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getAllArtLetters() }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getAllArtLetters() }
 
     override fun getAllEditorPickArtLetters(): Flow<DataResource<List<ArtLetter>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getAllEditorPickArtLetters() }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getAllEditorPickArtLetters() }
 
     override fun getAllRandomArtLetters(): Flow<DataResource<List<ArtLetter>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getAllRandomArtLetters() }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getAllRandomArtLetters() }
 
     override fun getAllRecommendArtLetterKeyWords(): Flow<DataResource<List<ArtLetterKeyWord>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getAllRecommendArtLetterKeyWords() }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getAllRecommendArtLetterKeyWords() }
 
     override fun getAllScrappedArtLetters(): Flow<DataResource<List<ArtLetter>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getAllScrappedArtLetters() }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getAllScrappedArtLetters() }
 
     override fun getArtLetter(letterId: Int): Flow<DataResource<ArtLetter>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getArtLetter(letterId) }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getArtLetter(letterId) }
 
     override fun getScrappedArtLettersByCategory(category: String): Flow<DataResource<List<ArtLetter>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getScrappedArtLettersByCategory(category) }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getScrappedArtLettersByCategory(category) }
 
     override fun getSortedArtLetters(sortBy: String): Flow<DataResource<List<ArtLetter>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getSortedArtLetters(sortBy) }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.getSortedArtLetters(sortBy) }
 
-    override fun searchArtLetters(
-        keyword: String,
-        sortType: String
-    ): Flow<DataResource<List<ArtLetter>>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.getSearchArtLetterResults(keyword, sortType) }
-        )
+    override fun searchArtLetters(keyword: String, sortType: String): Flow<DataResource<List<ArtLetter>>> =
+        resourceFactory.remote { artLetterRemoteDataSource.getSearchArtLetterResults(keyword, sortType) }
 
     // UPDATE
     override fun likeArtLetter(id: Int): Flow<DataResource<Unit>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.postArtLetterLike(id) }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.postArtLetterLike(id) }
 
     override fun scrapArtLetter(id: Int): Flow<DataResource<Unit>> =
-        flowDataResource(
-            dataAction = { artLetterRemoteDataSource.postArtLetterScrap(id) }
-        )
+        resourceFactory.remote { artLetterRemoteDataSource.postArtLetterScrap(id) }
 }

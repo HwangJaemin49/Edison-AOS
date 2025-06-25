@@ -4,8 +4,9 @@ import com.russhwolf.settings.Settings
 import com.umc.edison.data.datasources.PrefDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class PrefDataSourceImpl(
+class PrefDataSourceImpl @Inject constructor(
     private val settings: Settings
 ) : PrefDataSource {
     override suspend fun <T> get(key: String, default: T): T = withContext(Dispatchers.Default) {

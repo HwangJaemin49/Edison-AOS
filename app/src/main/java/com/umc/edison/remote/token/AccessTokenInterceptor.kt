@@ -1,11 +1,12 @@
 package com.umc.edison.remote.token
 
+import com.umc.edison.data.token.AccessTokenProvider
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
 class AccessTokenInterceptor @Inject constructor(
-    private val tokenManager: TokenManager
+    private val tokenProvider: AccessTokenProvider
 ) : Interceptor {
     companion object {
         private const val HEADER_AUTHORIZATION = "Authorization"
@@ -13,16 +14,13 @@ class AccessTokenInterceptor @Inject constructor(
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val token = tokenManager.loadAccessToken()
+        val token = tokenProvider.getAccessToken()
 
-        if (token == null) {
-            return chain.proceed(chain.request())
-        } else {
-            val request = chain.request().newBuilder()
-                .addHeader(HEADER_AUTHORIZATION, "$TOKEN_TYPE $token")
-                .build()
-
-            return chain.proceed(request)
+        val requestBuilder = chain.request().newBuilder()
+        if (!token.isNullOrEmpty()) {
+            requestBuilder.addHeader(HEADER_AUTHORIZATION, "$TOKEN_TYPE $token")
         }
+
+        return chain.proceed(requestBuilder.build())
     }
 }

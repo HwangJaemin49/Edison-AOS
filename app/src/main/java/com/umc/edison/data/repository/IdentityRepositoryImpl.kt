@@ -1,6 +1,6 @@
 package com.umc.edison.data.repository
 
-import com.umc.edison.data.bound.flowDataResource
+import com.umc.edison.data.bound.FlowBoundResourceFactory
 import com.umc.edison.data.datasources.UserRemoteDataSource
 import com.umc.edison.data.model.identity.toData
 import com.umc.edison.domain.DataResource
@@ -11,29 +11,30 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class IdentityRepositoryImpl @Inject constructor(
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val userRemoteDataSource: UserRemoteDataSource,
+    private val resourceFactory: FlowBoundResourceFactory
 ) : IdentityRepository {
     // CREATE
     override fun addUserIdentity(identity: Identity): Flow<DataResource<Unit>> =
-        flowDataResource(
+        resourceFactory.remote(
             dataAction = { userRemoteDataSource.addIdentity(identity.toData()) }
         )
 
     // READ
     override fun getAllMyIdentityResults(): Flow<DataResource<List<Identity>>> =
-        flowDataResource(
+        resourceFactory.remote(
             dataAction = { userRemoteDataSource.getAllMyIdentityResults() }
         )
 
     override fun getIdentityByCategory(category: IdentityCategory): Flow<DataResource<Identity>> =
-        flowDataResource(
+        resourceFactory.remote(
             dataAction = {
                 userRemoteDataSource.getIdentityByCategory(category.toData())
             }
         )
 
     override fun getMyIdentityResultByCategory(category: IdentityCategory): Flow<DataResource<Identity>> =
-        flowDataResource(
+        resourceFactory.remote(
             dataAction = {
                 val allResults = userRemoteDataSource.getAllMyIdentityResults()
                 allResults.firstOrNull { it.category.toDomain() == category }
@@ -44,7 +45,7 @@ class IdentityRepositoryImpl @Inject constructor(
 
     // UPDATE
     override fun updateMyIdentityResult(identity: Identity): Flow<DataResource<Unit>> =
-        flowDataResource(
+        resourceFactory.remote(
             dataAction = { userRemoteDataSource.updateIdentity(identity.toData()) }
         )
 
