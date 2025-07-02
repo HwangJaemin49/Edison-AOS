@@ -22,28 +22,40 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.navigation.NavHostController
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.umc.edison.R
 import com.umc.edison.presentation.edison.MyEdisonViewModel
+import com.umc.edison.presentation.onboarding.OnboardingPositionState
 import com.umc.edison.ui.BaseContent
 import com.umc.edison.ui.bubblestorage.BubbleStorageScreen
 import com.umc.edison.ui.components.BubbleInput
 import com.umc.edison.ui.components.MyEdisonNavBar
 import com.umc.edison.ui.login.PrefsHelper
 import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.onboarding.MyEdisonOnboarding
 import kotlinx.coroutines.launch
 
 @Composable
 fun MyEdisonScreen(
     navController: NavHostController,
     updateShowBottomNav: (Boolean) -> Unit,
+    bottomNavBarBounds: List<OnboardingPositionState>,
     viewModel: MyEdisonViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val baseState by viewModel.baseState.collectAsState()
+    val onboardingState by viewModel.onboardingState.collectAsState()
     var isViewMode by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
@@ -90,6 +102,13 @@ fun MyEdisonScreen(
                         Spacer(modifier = Modifier.weight(0.6f))
 
                         BubbleInput(
+                            modifier = Modifier
+                                .onGloballyPositioned { coordinates ->
+                                    viewModel.setBubbleInputBound(
+                                        offset = coordinates.positionOnScreen(),
+                                        size = coordinates.size,
+                                    )
+                                },
                             onClick = { navController.navigate(NavRoute.BubbleEdit.createRoute("")) },
                         )
 
@@ -98,13 +117,30 @@ fun MyEdisonScreen(
                 }
 
                 1 -> {
-                    BubbleStorageScreen(
-                        navHostController = navController,
-                        updateShowBottomNav = updateShowBottomNav,
-                        searchResults = uiState.searchResults,
-                        searchKeyword = uiState.query,
-                        updateViewMode = { flag -> isViewMode = flag },
-                    )
+                    if (onboardingState.show) {
+                        val context = LocalContext.current
+                        val imageRequest = ImageRequest.Builder(context)
+                            .data(R.drawable.bubble_ex)
+                            .crossfade(true)
+                            .build()
+                        AsyncImage(
+                            model = imageRequest,
+                            contentDescription = "Bubble Example",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            alignment = Alignment.Center,
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        )
+                    } else {
+                        BubbleStorageScreen(
+                            navHostController = navController,
+                            updateShowBottomNav = updateShowBottomNav,
+                            searchResults = uiState.searchResults,
+                            searchKeyword = uiState.query,
+                            updateViewMode = { flag -> isViewMode = flag },
+                        )
+                    }
                 }
             }
         }
@@ -141,7 +177,32 @@ fun MyEdisonScreen(
                 currentPage = pagerState.currentPage,
                 query = uiState.query,
                 isViewMode = isViewMode,
+                setNavBarPosition = { idx: Int, offset: Offset, size: IntSize ->
+                    viewModel.setNavBarPosition(
+                        idx = idx,
+                        offset = offset,
+                        size = size
+                    )
+                },
             )
         }
+    }
+
+    if (onboardingState.show) {
+        MyEdisonOnboarding(
+            onboardingState = onboardingState,
+            bottomNavBarBounds = bottomNavBarBounds,
+            changeToStorageMode = {
+                coroutineScope.launch {
+                    pagerState.scrollToPage(1)
+                }
+            },
+            onDismiss = {
+                viewModel.setHasSeenOnboarding()
+                coroutineScope.launch {
+                    pagerState.scrollToPage(0)
+                }
+            },
+        )
     }
 }

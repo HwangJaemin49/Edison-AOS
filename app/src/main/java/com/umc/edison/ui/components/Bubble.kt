@@ -68,6 +68,7 @@ import kotlin.math.sin
 @Composable
 fun BubbleInput(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     isBlur: Boolean = false,
     onBackScreenClick: () -> Unit = {}
 ) {
@@ -75,7 +76,7 @@ fun BubbleInput(
     val canvasSize = bubbleSize.size
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(
                 color = if (isBlur) Gray800.copy(alpha = 0.5f) else White000

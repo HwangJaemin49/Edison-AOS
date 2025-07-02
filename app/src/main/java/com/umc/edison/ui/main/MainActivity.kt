@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.umc.edison.presentation.onboarding.OnboardingPositionState
 import com.umc.edison.presentation.sync.SyncTrigger
 import com.umc.edison.ui.ToastScreen
 import com.umc.edison.ui.components.BubbleInput
@@ -81,12 +83,29 @@ fun MainScreen(navController: NavHostController) {
     var showInputBubble by remember { mutableStateOf(false) }
     var showBottomNav by remember { mutableStateOf(true) }
 
+    val bottomNavBarPositionState = remember { mutableStateListOf<OnboardingPositionState>() }
+
     Scaffold(
         bottomBar = {
             if (showBottomNav) {
                 BottomNavigation(
                     navController = navController,
-                    onBubbleClick = { showInputBubble = !showInputBubble }
+                    onBubbleClick = { showInputBubble = !showInputBubble },
+                    setBottomNavPosition = { idx, offset, size ->
+                        if (bottomNavBarPositionState.size > idx) {
+                            bottomNavBarPositionState[idx] = OnboardingPositionState(
+                                offset = offset,
+                                size = size
+                            )
+                        } else {
+                            bottomNavBarPositionState.add(
+                                OnboardingPositionState(
+                                    offset = offset,
+                                    size = size
+                                )
+                            )
+                        }
+                    }
                 )
             }
         },
@@ -96,7 +115,8 @@ fun MainScreen(navController: NavHostController) {
         Box(Modifier.padding(it)) {
             NavigationGraph(
                 navHostController = navController,
-                updateShowBottomNav = { flag -> showBottomNav = flag }
+                updateShowBottomNav = { flag -> showBottomNav = flag },
+                bottomNavBarBounds = bottomNavBarPositionState
             )
 
             if (showInputBubble) {

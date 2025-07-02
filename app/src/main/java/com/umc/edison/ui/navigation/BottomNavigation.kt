@@ -15,8 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -70,7 +74,8 @@ sealed class BottomNavItem(
 @Composable
 fun BottomNavigation(
     navController: NavHostController,
-    onBubbleClick: () -> Unit = {}
+    setBottomNavPosition: (Int, Offset, IntSize) -> Unit,
+    onBubbleClick: () -> Unit = {},
 ) {
     val items = listOf(
         BottomNavItem.MyEdison,
@@ -90,7 +95,7 @@ fun BottomNavigation(
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
-        items.forEach { navItem ->
+        items.forEachIndexed { idx, navItem ->
             // 현재 라우트가 세부 화면일 경우 상위 라우트로 매핑
             val isSelected = when (navItem) {
                 BottomNavItem.MyEdison -> currentRoute?.startsWith(NavRoute.MyEdison.route) == true
@@ -135,7 +140,27 @@ fun BottomNavigation(
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = White000
                 ),
-                modifier = Modifier.indication(interactionSource, null)
+                modifier = Modifier
+                    .indication(interactionSource, null)
+                    .onGloballyPositioned { coordinates ->
+                        if (idx == 2) {
+                            setBottomNavPosition(
+                                idx,
+                                coordinates.positionOnScreen() + Offset(
+                                    x = 0f,
+                                    y = - 10f
+                                ),
+                                coordinates.size
+                            )
+                        }
+                        else {
+                            setBottomNavPosition(
+                                idx,
+                                coordinates.positionOnScreen(),
+                                coordinates.size
+                            )
+                        }
+                    },
             )
         }
     }
