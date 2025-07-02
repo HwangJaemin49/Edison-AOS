@@ -125,7 +125,7 @@ fun ArtLetterDetailScreen(
                 expandedOffset = expandedOffset,
                 onOffsetChanged = { sheetOffsetPx = it },
             ) { animatedTopPadding ->
-                if (uiState.baseState.isLoading) {
+                if (baseState.isLoading) {
                     ArtLetterDetailSkeleton()
                 } else {
                     ArtLetterDetailContent(

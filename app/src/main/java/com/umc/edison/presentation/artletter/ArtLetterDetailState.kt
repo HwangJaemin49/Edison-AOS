@@ -9,7 +9,6 @@ data class ArtLetterDetailState(
     val relatedArtLetters: List<ArtLetterPreviewModel>,
     val isLoggedIn: Boolean,
     val showLoginModal: Boolean,
-    val baseState: BaseState,
 ) {
     companion object {
         val DEFAULT = ArtLetterDetailState(
@@ -17,7 +16,6 @@ data class ArtLetterDetailState(
             relatedArtLetters = emptyList(),
             isLoggedIn = false,
             showLoginModal = false,
-            baseState = BaseState.DEFAULT,
         )
     }
 }
