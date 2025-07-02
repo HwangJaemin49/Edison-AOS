@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.withContext
 
-abstract class FLowBaseBoundResource<DomainType, DataType>(
+abstract class FlowBaseBoundResource<DomainType, DataType>(
     val dataAction: suspend () -> DataType,
 ) : Flow<DataResource<DomainType>> {
     protected open suspend fun actionFromSource(

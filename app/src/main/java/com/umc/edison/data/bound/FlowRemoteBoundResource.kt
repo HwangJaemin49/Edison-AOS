@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.FlowCollector
 class FlowRemoteBoundResource<DomainType, DataType>(
     dataAction: suspend () -> DataType,
     private val retryHandler: TokenRetryHandler,
-) : FLowBaseBoundResource<DomainType, DataType>(dataAction) {
+) : FlowBaseBoundResource<DomainType, DataType>(dataAction) {
     override suspend fun collect(collector: FlowCollector<DataResource<DomainType>>) {
         collector.emit(DataResource.loading())
 

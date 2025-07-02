@@ -12,7 +12,7 @@ class FlowSyncBoundResource<DomainType, DataType, BackUpDataType>(
     private val remoteSync: suspend () -> BackUpDataType,
     private val onRemoteSuccess: (suspend (BackUpDataType) -> Unit)? = null,
     private val retryHandler: TokenRetryHandler
-) : FLowBaseBoundResource<DomainType, DataType>(localAction) {
+) : FlowBaseBoundResource<DomainType, DataType>(localAction) {
     override suspend fun collect(collector: FlowCollector<DataResource<DomainType>>) {
         actionFromSource(collector)
         actionBackUpFromSource()
