@@ -50,13 +50,19 @@ fun LabelListItem(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDrag: () -> Unit,
-    resetDrag: () -> Unit
+    resetDrag: () -> Unit,
+    modifier: Modifier,
+    showOnboarding: Boolean = false
 ) {
     val offsetX = remember { mutableFloatStateOf(0f) }
     val visibilityThreshold = -60f
 
+    if (showOnboarding) {
+        offsetX.floatValue = -120f
+    }
+
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Max)
             .clickable(

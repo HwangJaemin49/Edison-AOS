@@ -1,5 +1,6 @@
 package com.umc.edison.ui.label
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -29,6 +34,8 @@ import com.umc.edison.ui.components.BottomSheetPopUp
 import com.umc.edison.ui.components.LabelListItem
 import com.umc.edison.ui.components.LabelModalContent
 import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.onboarding.LabelListOnboardingScreen
+import com.umc.edison.ui.theme.Aqua100
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +45,7 @@ fun LabelTabScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val baseState by viewModel.baseState.collectAsState()
+    val onboardingState by viewModel.onboardingState.collectAsState()
 
     val draggedIndex = remember { mutableIntStateOf(-1) }
 
@@ -101,9 +109,14 @@ fun LabelTabScreen(
                     viewModel.updateEditMode(LabelEditMode.ADD)
                 }
             )
+            val labels = if (uiState.labels.isEmpty() && onboardingState.show) {
+                listOf(LabelModel(id = "", name = "감상", color = Aqua100, bubbleCnt = 7))
+            } else {
+                uiState.labels
+            }
 
             LabelList(
-                labels = uiState.labels,
+                labels = labels,
                 draggedIndex = draggedIndex.intValue,
                 onLabelClick = { labelId ->
                     navHostController.navigate(NavRoute.LabelDetail.createRoute(labelId))
@@ -117,12 +130,31 @@ fun LabelTabScreen(
                     viewModel.updateSelectedLabel(uiState.labels[index])
                 },
                 onDrag = { index ->
-                    // 드래그된 아이템 인덱스 업데이트
                     draggedIndex.intValue = index
                 },
                 resetDrag = {
                     draggedIndex.intValue = -1
-                }
+                },
+                setLabelItemPosition = { offset, size ->
+                    viewModel.setLabelListItemBound(offset, size)
+                },
+                showOnboarding = onboardingState.show,
+            )
+        }
+
+        if (onboardingState.show) {
+            if (uiState.labels.isNotEmpty()) {
+                draggedIndex.intValue = 1
+            } else {
+                draggedIndex.intValue = 0
+            }
+
+            LabelListOnboardingScreen(
+                onDismiss = {
+                    viewModel.setHasSeenOnboarding()
+                    draggedIndex.intValue = -1
+                },
+                labelListItemComponent = onboardingState.labelBound
             )
         }
     }
@@ -136,10 +168,24 @@ fun LabelList(
     onEditClick: (Int) -> Unit,
     onDeleteClick: (Int) -> Unit,
     onDrag: (Int) -> Unit,
-    resetDrag: () -> Unit
+    resetDrag: () -> Unit,
+    setLabelItemPosition: (Offset, IntSize) -> Unit,
+    showOnboarding: Boolean = false,
 ) {
     Column {
         labels.forEachIndexed { index, label ->
+            val modifier = if ((labels.size > 1 && index == 1) || index == 0) {
+                Modifier.onGloballyPositioned { coordinates ->
+                    setLabelItemPosition(
+                        coordinates.positionOnScreen(),
+                        coordinates.size
+                    )
+                }
+            } else {
+                Modifier
+            }
+
+            Log.i("LabelList", "index: $index, draggedIndex: $draggedIndex, label: ${label.name}")
             LabelListItem(
                 labelColor = label.color,
                 labelText = label.name,
@@ -149,7 +195,9 @@ fun LabelList(
                 onEditClick = { onEditClick(index) },
                 onDeleteClick = { onDeleteClick(index) },
                 onDrag = { onDrag(index) },
-                resetDrag = resetDrag
+                resetDrag = resetDrag,
+                modifier = modifier,
+                showOnboarding = showOnboarding && index == draggedIndex
             )
         }
     }

@@ -1,15 +1,20 @@
 package com.umc.edison.presentation.label
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
 import com.umc.edison.domain.usecase.bubble.GetBubblesByLabelUseCase
 import com.umc.edison.domain.usecase.bubble.GetBubblesWithoutLabelUseCase
 import com.umc.edison.domain.usecase.label.AddLabelUseCase
 import com.umc.edison.domain.usecase.label.DeleteLabelUseCase
 import com.umc.edison.domain.usecase.label.GetAllLabelsUseCase
 import com.umc.edison.domain.usecase.label.UpdateLabelUseCase
+import com.umc.edison.domain.usecase.onboarding.GetHasSeenOnboardingUseCase
+import com.umc.edison.domain.usecase.onboarding.SetHasSeenOnboardingUseCase
 import com.umc.edison.presentation.ToastManager
 import com.umc.edison.presentation.base.BaseViewModel
 import com.umc.edison.presentation.model.LabelModel
 import com.umc.edison.presentation.model.toPresentation
+import com.umc.edison.presentation.onboarding.OnboardingPositionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,9 +30,27 @@ class LabelListViewModel @Inject constructor(
     private val addLabelUseCase: AddLabelUseCase,
     private val updateLabelUseCase: UpdateLabelUseCase,
     private val deleteLabelUseCase: DeleteLabelUseCase,
+    private val getHasSeenOnboardingUseCase: GetHasSeenOnboardingUseCase,
+    private val setHasSeenOnboardingUseCase: SetHasSeenOnboardingUseCase
 ) : BaseViewModel(toastManager) {
     private val _uiState = MutableStateFlow(LabelListState.DEFAULT)
     val uiState = _uiState.asStateFlow()
+
+    private val _onboardingState = MutableStateFlow(LabelListOnboardingState.DEFAULT)
+    val onboardingState = _onboardingState.asStateFlow()
+
+    companion object {
+        const val SCREEN_NAME = "label_list"
+    }
+
+    init {
+        collectDataResource(
+            flow = getHasSeenOnboardingUseCase(SCREEN_NAME),
+            onSuccess = { hasSeen ->
+                _onboardingState.update { it.copy(show = !hasSeen) }
+            }
+        )
+    }
 
     fun fetchLabels() {
         _uiState.update { LabelListState.DEFAULT }
@@ -144,5 +167,18 @@ class LabelListViewModel @Inject constructor(
                 fetchLabels()
             }
         )
+    }
+
+    fun setHasSeenOnboarding() {
+        collectDataResource(
+            flow = setHasSeenOnboardingUseCase(SCREEN_NAME),
+            onSuccess = {
+                _onboardingState.update { it.copy(show = false) }
+            }
+        )
+    }
+
+    fun setLabelListItemBound(offset: Offset, size: IntSize) {
+        _onboardingState.update { it.copy(labelBound = OnboardingPositionState(offset, size)) }
     }
 }
