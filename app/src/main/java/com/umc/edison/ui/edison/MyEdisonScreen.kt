@@ -197,11 +197,13 @@ fun MyEdisonScreen(
                     pagerState.scrollToPage(1)
                 }
             },
-            onDismiss = {
-                viewModel.setHasSeenOnboarding()
+            changeToBubbleInputMode = {
                 coroutineScope.launch {
                     pagerState.scrollToPage(0)
                 }
+            },
+            onDismiss = {
+                viewModel.setHasSeenOnboarding()
             },
         )
     }

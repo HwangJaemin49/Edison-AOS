@@ -47,6 +47,7 @@ fun MyEdisonOnboarding(
     onboardingState: MyEdisonOnboardingState,
     bottomNavBarBounds: List<OnboardingPositionState>,
     changeToStorageMode: () -> Unit,
+    changeToBubbleInputMode: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     var currentPage by remember { mutableStateOf(MyEdisonOnboardingPage.MY_EDISON_BOTTOM_TAB) }
@@ -87,7 +88,10 @@ fun MyEdisonOnboarding(
             MyEdisonOnboardingPage.BUBBLE_DELETE -> {
                 BubbleDeleteOnboarding(
                     edisonNavBarComponent = onboardingState.myEdisonNavBarBounds[1],
-                    onNextPage = { currentPage = MyEdisonOnboardingPage.SPACE_BOTTOM_TAB },
+                    onNextPage = {
+                        currentPage = MyEdisonOnboardingPage.SPACE_BOTTOM_TAB
+                        changeToBubbleInputMode()
+                    },
                     statusBarHeightPx = statusBarHeightPx
                 )
             }
