@@ -39,7 +39,7 @@ import com.umc.edison.ui.theme.White000
 import kotlin.math.roundToInt
 
 internal enum class MyEdisonOnboardingPage {
-    MY_EDISON_BOTTOM_TAB, BUBBLE_INPUT, BUBBLE_STORAGE, BUBBLE_DELETE, SPACE_BOTTOM_TAB, BUBBLE_BOTTOM_TAB, ART_LETTER_BOTTOM_TAB, MY_PAGE_BOTTOM_TAB,
+    MY_EDISON_BOTTOM_TAB, BUBBLE_INPUT, BUBBLE_STORAGE, SPACE_BOTTOM_TAB, BUBBLE_BOTTOM_TAB, ART_LETTER_BOTTOM_TAB, MY_PAGE_BOTTOM_TAB,
 }
 
 @Composable
@@ -79,14 +79,6 @@ fun MyEdisonOnboarding(
 
             MyEdisonOnboardingPage.BUBBLE_STORAGE -> {
                 BubbleStorageOnboarding(
-                    edisonNavBarComponent = onboardingState.myEdisonNavBarBounds[1],
-                    onNextPage = { currentPage = MyEdisonOnboardingPage.BUBBLE_DELETE },
-                    statusBarHeightPx = statusBarHeightPx
-                )
-            }
-
-            MyEdisonOnboardingPage.BUBBLE_DELETE -> {
-                BubbleDeleteOnboarding(
                     edisonNavBarComponent = onboardingState.myEdisonNavBarBounds[1],
                     onNextPage = {
                         currentPage = MyEdisonOnboardingPage.SPACE_BOTTOM_TAB
@@ -227,8 +219,8 @@ fun BubbleInputOnboarding(
     val edisonRadius = edisonNavBarComponent.size.width.toFloat() / 2f
 
     val bubbleCenterX = bubbleInputComponent.offset.x + bubbleInputComponent.size.width / 2f
-    val bubbleCenterY = bubbleInputComponent.offset.y + bubbleInputComponent.size.height / 2f
-    val bubbleRadius = (bubbleInputComponent.size.width - 130).toFloat() / 2f
+    val bubbleCenterY = bubbleInputComponent.offset.y - statusBarHeightPx + bubbleInputComponent.size.height / 2f
+    val bubbleRadius = bubbleInputComponent.size.width.toFloat() / 2f
 
     Box(
         modifier = Modifier
@@ -289,7 +281,8 @@ fun BubbleInputOnboarding(
                         y = (edisonNavBarComponent.offset.y - statusBarHeightPx + edisonRadius * 2 + offsetY).roundToInt()
                     )
                 }
-                .background(color = White000, shape = RoundedCornerShape(16))) {
+                .background(color = White000, shape = RoundedCornerShape(16))
+        ) {
             Text(
                 text = "버블을 눌러 아이디어 작성을 시작할 수 있어요!",
                 modifier = Modifier
@@ -371,98 +364,6 @@ fun BubbleStorageOnboarding(
         ) {
             Text(
                 text = "작성한 버블은 이렇게 저장돼요!",
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.Center),
-                color = Color.Black,
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-@Composable
-fun BubbleDeleteOnboarding(
-    edisonNavBarComponent: OnboardingPositionState,
-    onNextPage: () -> Unit,
-    statusBarHeightPx: Int,
-) {
-    val density = LocalDensity.current
-
-    val edisonCenterX = edisonNavBarComponent.offset.x + edisonNavBarComponent.size.width / 2f
-    val edisonCenterY =
-        edisonNavBarComponent.offset.y - statusBarHeightPx + edisonNavBarComponent.size.height / 2f
-    val edisonRadius = edisonNavBarComponent.size.width.toFloat() / 2f
-
-    val bubbleRadius = (with(density) { 300.dp.toPx() }) / 2f
-    val bubbleCenterX = edisonCenterX - with(density) { 20.dp.toPx() } / 2f
-    val bubbleCenterY = edisonCenterY + edisonRadius + with(density) { 370.dp.toPx() }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        event.changes.forEach { it.consume() }
-                    }
-                }
-            }
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onNextPage
-            )
-            .drawWithContent {
-                val overlayRect = Rect(Offset.Zero, size)
-                val holePath = Path().apply {
-                    addRect(overlayRect)
-
-                    addOval(
-                        Rect(
-                            left = edisonCenterX - edisonRadius,
-                            top = edisonCenterY - edisonRadius,
-                            right = edisonCenterX + edisonRadius,
-                            bottom = edisonCenterY + edisonRadius
-                        )
-                    )
-
-                    addOval(
-                        Rect(
-                            left = bubbleCenterX - bubbleRadius,
-                            top = bubbleCenterY - bubbleRadius,
-                            right = bubbleCenterX + bubbleRadius,
-                            bottom = bubbleCenterY + bubbleRadius
-                        )
-                    )
-
-                    fillType = PathFillType.EvenOdd
-                }
-
-                clipPath(holePath) {
-                    drawRect(color = Black000.copy(alpha = 0.5f))
-                }
-
-                drawContent()
-            }
-    ) {
-        val offsetY = with(density) { 70.dp.toPx() }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset {
-                    IntOffset(
-                        x = 0,
-                        y = (bubbleCenterY - bubbleRadius - offsetY).roundToInt()
-                    )
-                }
-                .background(color = White000, shape = RoundedCornerShape(16))
-        ) {
-            Text(
-                text = "꾹 누르면 버블을 삭제할 수 있어요!",
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.Center),
