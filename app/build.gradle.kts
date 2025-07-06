@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -130,4 +131,6 @@ dependencies {
     implementation(libs.googleid)
 
     implementation("io.branch.sdk.android:library:5.+")
+
+    implementation(libs.multiplatform.settings)
 }

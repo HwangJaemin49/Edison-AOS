@@ -39,6 +39,7 @@ import com.umc.edison.ui.components.BubblesLayout
 import com.umc.edison.ui.components.LabelTagList
 import com.umc.edison.ui.components.calculateBubbleSize
 import com.umc.edison.ui.navigation.NavRoute
+import com.umc.edison.ui.onboarding.BubbleStorageOnboarding
 import com.umc.edison.ui.theme.Gray300
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.Gray900
@@ -55,6 +56,7 @@ fun BubbleStorageScreen(
     viewModel: BubbleStorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val onboardingState by viewModel.onboardingState.collectAsState()
     val baseState by viewModel.baseState.collectAsState()
     val context = LocalContext.current
 
@@ -144,7 +146,10 @@ fun BubbleStorageScreen(
                 isBlur = uiState.mode != BubbleStorageMode.NONE,
                 selectedBubble = uiState.selectedBubbles,
                 searchKeyword = searchKeyword,
-                isReversed = true
+                isReversed = true,
+                setGlobalBubblePosition = { offset, size ->
+                    viewModel.setBubbleBound(offset, size)
+                }
             )
 
             if (searchKeyword.isEmpty() || searchResults.isEmpty()) {
@@ -276,6 +281,15 @@ fun BubbleStorageScreen(
                     }
                 }
             }
+        }
+
+        if (!onboardingState.edisonOnboardingShow && onboardingState.show && uiState.bubbles.isNotEmpty()) {
+            BubbleStorageOnboarding(
+                onboardingState = onboardingState,
+                onDismiss = {
+                    viewModel.setHasSeenOnboarding()
+                }
+            )
         }
     }
 }

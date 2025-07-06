@@ -31,9 +31,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.IntSize
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import com.umc.edison.ui.theme.White000
@@ -47,6 +51,7 @@ fun MyEdisonNavBar(
     currentPage: Int,
     query: String,
     isViewMode: Boolean,
+    setNavBarPosition: (Int, Offset, IntSize) -> Unit,
 ) {
     var searchActive by remember { mutableStateOf(query.isNotEmpty()) }
     var text by remember { mutableStateOf(query) }
@@ -151,7 +156,15 @@ fun MyEdisonNavBar(
                             searchActive = false
                             text = ""
                         },
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier
+                            .size(36.dp)
+                            .onGloballyPositioned { coordinates ->
+                                setNavBarPosition(
+                                    0,
+                                    coordinates.positionOnScreen(),
+                                    coordinates.size
+                                )
+                            }
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_topbar_bubble),
@@ -180,7 +193,15 @@ fun MyEdisonNavBar(
                             searchActive = false
                             text = ""
                         },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier
+                            .size(32.dp)
+                            .onGloballyPositioned { coordinates ->
+                                setNavBarPosition(
+                                    1,
+                                    coordinates.positionOnScreen(),
+                                    coordinates.size
+                                )
+                            }
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_topbar_storage),

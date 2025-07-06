@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.umc.edison.presentation.onboarding.OnboardingPositionState
 import com.umc.edison.ui.artboard.ArtLetterHomeScreen
 import com.umc.edison.ui.artboard.ArtLetterDetailScreen
 import com.umc.edison.ui.artboard.ArtLetterSearchScreen
@@ -31,11 +32,12 @@ import com.umc.edison.ui.mypage.TrashScreen
 @Composable
 fun NavigationGraph(
     navHostController: NavHostController,
-    updateShowBottomNav: (Boolean) -> Unit
+    updateShowBottomNav: (Boolean) -> Unit,
+    bottomNavBarBounds: List<OnboardingPositionState>
 ) {
     NavHost(navHostController, startDestination = NavRoute.Splash.route) {
         composable(NavRoute.MyEdison.route) {
-            MyEdisonScreen(navHostController, updateShowBottomNav)
+            MyEdisonScreen(navHostController, updateShowBottomNav, bottomNavBarBounds)
         }
 
         composable(NavRoute.Space.route) {

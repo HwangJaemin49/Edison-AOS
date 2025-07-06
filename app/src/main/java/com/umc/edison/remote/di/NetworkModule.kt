@@ -1,10 +1,8 @@
 package com.umc.edison.remote.di
 
 import com.umc.edison.BuildConfig
-import com.umc.edison.remote.api.RefreshTokenApiService
 import com.umc.edison.remote.token.AccessTokenInterceptor
-import com.umc.edison.remote.token.TokenAuthenticator
-import com.umc.edison.remote.token.TokenManager
+import com.umc.edison.data.token.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,26 +47,15 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideTokenAuthenticator(
-        tokenManager: TokenManager,
-        refreshTokenApiService: RefreshTokenApiService
-    ): TokenAuthenticator {
-        return TokenAuthenticator(tokenManager, refreshTokenApiService)
-    }
-
-    @Provides
-    @Singleton
     fun provideOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
         accessTokenInterceptor: AccessTokenInterceptor,
-        tokenAuthenticator: TokenAuthenticator,
     ) : OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
         .readTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
         .writeTimeout(TIME_OUT.toLong(), TimeUnit.SECONDS)
         .addInterceptor(httpLoggingInterceptor)
         .addInterceptor(accessTokenInterceptor)
-        .authenticator(tokenAuthenticator)
         .build()
 
     @MainRetrofit

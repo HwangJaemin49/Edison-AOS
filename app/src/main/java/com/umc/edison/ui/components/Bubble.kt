@@ -68,6 +68,7 @@ import kotlin.math.sin
 @Composable
 fun BubbleInput(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     isBlur: Boolean = false,
     onBackScreenClick: () -> Unit = {}
 ) {
@@ -93,7 +94,7 @@ fun BubbleInput(
         Spacer(modifier = Modifier.height(48.dp))
 
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .size(canvasSize)
                 .clip(CircleShape)
                 .clickable { onClick() },
@@ -155,8 +156,9 @@ fun BubblePreview(
     onClick: () -> Unit,
     size: BubbleType.BubbleSize,
     bubble: BubbleModel,
+    modifier: Modifier = Modifier,
     onLongClick: () -> Unit = {},
-    searchKeyword: String = ""
+    searchKeyword: String = "",
 ) {
     if (bubble.mainImage != null) {
         ImageBubble(
@@ -165,7 +167,8 @@ fun BubblePreview(
             imageUrl = bubble.mainImage,
             onClick = onClick,
             onLongClick = onLongClick,
-            isPreview = true
+            isPreview = true,
+            modifier = modifier
         )
     } else if (bubble.title != null || checkBubbleContainText(bubble)) {
         // 제목이 있거나 본문에 텍스트가 있는 경우
@@ -176,7 +179,8 @@ fun BubblePreview(
             onLongClick = onLongClick,
             bubbleSize = size,
             isPreview = true,
-            searchKeyword = searchKeyword
+            searchKeyword = searchKeyword,
+            modifier = modifier
         )
     } else {
         // 그 외의 경우 - 본문 이미지만 있는 경우
@@ -186,7 +190,8 @@ fun BubblePreview(
             imageUrl = bubble.contentBlocks.firstOrNull()?.content ?: "",
             onClick = onClick,
             onLongClick = onLongClick,
-            isPreview = true
+            isPreview = true,
+            modifier = modifier
         )
     }
 }
@@ -197,6 +202,7 @@ private fun TextBubble(
     bubble: BubbleModel,
     colors: List<Color>,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     onLongClick: () -> Unit = {},
     bubbleSize: BubbleType.BubbleSize,
     isPreview: Boolean,
@@ -219,14 +225,15 @@ private fun TextBubble(
                 imageUrl = bubble.mainImage,
                 onClick = onClick,
                 onLongClick = onLongClick,
-                isPreview = isPreview
+                isPreview = isPreview,
+                modifier = modifier
             )
         } else {
             when (colors.size) {
-                0 -> SingleBubble(bubbleSize = bubbleSize, color = Gray100)
-                1 -> SingleBubble(bubbleSize = bubbleSize, color = colors[0])
-                2 -> DoubleBubble(bubbleSize = bubbleSize, colors = colors)
-                3 -> TripleBubble(bubbleSize = bubbleSize, colors = colors)
+                0 -> SingleBubble(bubbleSize = bubbleSize, color = Gray100, modifier = modifier)
+                1 -> SingleBubble(bubbleSize = bubbleSize, color = colors[0], modifier = modifier)
+                2 -> DoubleBubble(bubbleSize = bubbleSize, colors = colors, modifier = modifier)
+                3 -> TripleBubble(bubbleSize = bubbleSize, colors = colors, modifier = modifier)
             }
         }
 
@@ -321,6 +328,7 @@ private fun ImageBubble(
     bubbleSize: BubbleType.BubbleSize,
     imageUrl: String,
     onClick: () -> Unit,
+    modifier: Modifier,
     onLongClick: () -> Unit = {},
     isPreview: Boolean
 ) {
@@ -334,7 +342,7 @@ private fun ImageBubble(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.size(bubbleSize.size)) {
+        Canvas(modifier = modifier.size(bubbleSize.size)) {
             val outerRadius = bubbleSize.size.toPx() / 2
 
             // 큰 원 그리기
@@ -420,9 +428,10 @@ private fun ImageBubble(
 @Composable
 private fun SingleBubble(
     bubbleSize: BubbleType.BubbleSize,
-    color: Color
+    color: Color,
+    modifier: Modifier = Modifier
 ) {
-    Canvas(modifier = Modifier.size(bubbleSize.size)) {
+    Canvas(modifier = modifier.size(bubbleSize.size)) {
         // Layer Blur 효과의 반지름
         val blurRadius = 60f
         val outerRadius = bubbleSize.size.toPx() / 2
@@ -445,10 +454,11 @@ private fun SingleBubble(
 private fun DoubleBubble(
     bubbleSize: BubbleType.BubbleSize,
     colors: List<Color>,
+    modifier: Modifier = Modifier
 ) {
     require(colors.size == 2) { "DoubleBubble requires exactly two colors." }
 
-    Canvas(modifier = Modifier.size(bubbleSize.size)) {
+    Canvas(modifier = modifier.size(bubbleSize.size)) {
         // Layer Blur 효과의 반지름
         val blurRadius = 60f
         val outerRadius = bubbleSize.size.toPx() / 2
@@ -475,8 +485,9 @@ private fun DoubleBubble(
 private fun TripleBubble(
     bubbleSize: BubbleType.BubbleSize,
     colors: List<Color>,
+    modifier: Modifier = Modifier
 ) {
-    Canvas(modifier = Modifier.size(bubbleSize.size)) {
+    Canvas(modifier = modifier.size(bubbleSize.size)) {
 
         // Layer Blur 효과의 반지름
         val blurRadius = 60f

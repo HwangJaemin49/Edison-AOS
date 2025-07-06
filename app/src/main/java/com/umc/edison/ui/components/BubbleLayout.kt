@@ -1,5 +1,6 @@
 package com.umc.edison.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,15 +11,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import com.umc.edison.presentation.model.BubbleModel
 import com.umc.edison.ui.theme.White000
+
+private const val TAG = "BubbleLayoutDebug"
 
 @Composable
 fun BubblesLayout(
@@ -28,21 +40,15 @@ fun BubblesLayout(
     isBlur: Boolean = false,
     selectedBubble: List<BubbleModel> = emptyList(),
     searchKeyword: String = "",
-    isReversed: Boolean = false
+    isReversed: Boolean = false,
+    setGlobalBubblePosition: (Offset, IntSize) -> Unit = { _, _ -> },
 ) {
     val bubbleOffsets = remember { mutableStateMapOf<BubbleModel, Pair<Dp, Dp>>() }
     val totalYOffset = remember { mutableStateOf(0.dp) }
     val placedBubbles = remember { mutableStateListOf<PlacedBubble>() }
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(bubbles.size) {
-        if (isReversed && bubbles.isNotEmpty()) {
-            snapshotFlow { scrollState.maxValue }
-                .collect { maxValue ->
-                    scrollState.scrollTo(maxValue)
-                }
-        }
-    }
+    Log.d(TAG, "Bubble list size: ${bubbles.size}")
 
     Box(
         modifier = Modifier
@@ -58,17 +64,22 @@ fun BubblesLayout(
                 .height(totalYOffset.value + verticalPadding)
                 .padding(vertical = verticalPadding)
         ) {
-            bubbles.forEach { bubble ->
+            bubbles.forEachIndexed { idx, bubble ->
                 val bubbleSize = calculateBubblePreviewSize(bubble)
+                Log.d(TAG, "[$idx] Bubble size: ${bubbleSize.size}")
 
                 val (xOffset, yOffset) = bubbleOffsets.getOrPut(bubble) {
-                    calculateOffset(
+                    val offset = calculateOffset(
                         bubbleSize = bubbleSize,
                         placedBubbles = placedBubbles,
                         accumulatedYOffset = totalYOffset.value
                     )
+                    Log.d(TAG, "[$idx] Calculated offset for bubble: $offset")
+                    offset
                 }
+
                 totalYOffset.value = maxOf(totalYOffset.value, yOffset + bubbleSize.size)
+                Log.d(TAG, "[$idx] Updated totalYOffset: ${totalYOffset.value}")
 
                 placedBubbles.add(
                     PlacedBubble(
@@ -83,15 +94,25 @@ fun BubblesLayout(
                         .size(bubbleSize.size)
                         .offset(x = xOffset, y = yOffset)
                 ) {
+
                     BubblePreview(
                         bubble = bubble,
                         size = bubbleSize,
                         onClick = { onBubbleClick(bubble) },
                         onLongClick = { onBubbleLongClick(bubble) },
-                        searchKeyword = searchKeyword
+                        searchKeyword = searchKeyword,
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
+                            if (idx == bubbles.size / 2) {
+                                val position = coordinates.positionOnScreen()
+                                val size = coordinates.size
+                                Log.d(TAG, "[$idx] Middle bubble position: $position, size: $size")
+                                setGlobalBubblePosition(position, size)
+                            }
+                        }
                     )
 
                     if (isBlur && !selectedBubble.contains(bubble)) {
+                        Log.d(TAG, "[$idx] Applying blur to bubble")
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -134,11 +155,9 @@ private fun calculateOffset(
     val rightX = (maxX - minX) / 3 * 2 + minX
 
     val previous = placedBubbles.lastOrNull()
-    if (previous == null) {
-        return minX to 0.dp
-    }
 
     val positionGroup = when {
+        previous == null -> PositionGroup.LEFT
         previous.x < leftX -> PositionGroup.LEFT
         previous.x < rightX -> PositionGroup.CENTER
         else -> PositionGroup.RIGHT
@@ -151,14 +170,13 @@ private fun calculateOffset(
     }
 
     val random = kotlin.random.Random
-    val baseYOffset = accumulatedYOffset + -(bubbleSize.size / 2)
+    val baseYOffset = max(accumulatedYOffset - (bubbleSize.size / 2), 0.dp)
     val step = 10.dp
     val candidateOffsets = mutableListOf<Pair<Dp, Dp>>()
 
     for (xRange in xCandidates) {
         repeat(5) {
             val trialX = (xRange[0].value.toInt()..xRange[1].value.toInt()).random(random).dp
-
             var trialYOffset = baseYOffset
 
             while (trialYOffset < accumulatedYOffset) {
@@ -169,10 +187,15 @@ private fun calculateOffset(
                 )
 
                 val overlapExists = placedBubbles.any { placed ->
-                    isOverlapping(trialBubble, placed)
+                    val result = isOverlapping(trialBubble, placed)
+                    if (result) {
+                        Log.d(TAG, "Overlap found at x=${trialX.value}, y=${trialYOffset.value}")
+                    }
+                    result
                 }
 
                 if (!overlapExists) {
+                    Log.d(TAG, "Valid offset: x=${trialX.value}, y=${trialYOffset.value}")
                     candidateOffsets.add(trialX to trialYOffset)
                 }
 
@@ -182,10 +205,10 @@ private fun calculateOffset(
     }
 
     val screenMidX = screenWidthDp / 2
-    val fallbackXOffset = if (previous.x > screenMidX) {
-        padding
-    } else {
-        maxX
+    val fallbackXOffset = if ((previous?.x ?: minX) > screenMidX) padding else maxX
+
+    if (candidateOffsets.isEmpty()) {
+        Log.w(TAG, "No valid candidateOffsets found, falling back to x=${fallbackXOffset.value}")
     }
 
     return candidateOffsets.minByOrNull { it.second.value }
@@ -196,6 +219,11 @@ private fun isOverlapping(b1: PlacedBubble, b2: PlacedBubble): Boolean {
     val distanceX = (b1.x.value + b1.size.value / 2) - (b2.x.value + b2.size.value / 2)
     val distanceY = (b1.y.value + b1.size.value / 2) - (b2.y.value + b2.size.value / 2)
     val distance = kotlin.math.sqrt(distanceX * distanceX + distanceY * distanceY)
+    val threshold = (b1.size.value + b2.size.value) / 2 + 10.dp.value
 
-    return distance < (b1.size.value + b2.size.value) / 2 + 10.dp.value
+    val overlap = distance < threshold
+    if (overlap) {
+        Log.d(TAG, "isOverlapping: TRUE | d=$distance < threshold=$threshold")
+    }
+    return overlap
 }
