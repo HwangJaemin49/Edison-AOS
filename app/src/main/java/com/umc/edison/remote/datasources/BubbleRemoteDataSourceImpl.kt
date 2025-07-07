@@ -73,10 +73,28 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
 
     // DELETE
     override suspend fun deleteBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity> {
-        TODO("Not yet implemented")
+        val results = mutableListOf<BubbleEntity>()
+        bubbles.map {
+            results.add(deleteBubble(it))
+        }
+        return results
+    }
+
+    private suspend fun deleteBubble(bubble: BubbleEntity): BubbleEntity {
+        bubbleApiService.deleteBubble(bubble.id)
+        return bubble.copy(isDeleted = true)
     }
 
     override suspend fun trashBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity> {
-        TODO("Not yet implemented")
+        val results = mutableListOf<BubbleEntity>()
+        bubbles.map {
+            results.add(trashBubble(it))
+        }
+        return results
+    }
+
+    private suspend fun trashBubble(bubble: BubbleEntity): BubbleEntity {
+        bubbleApiService.trashBubble(bubble.id)
+        return bubble.copy(isTrashed = true)
     }
 }
