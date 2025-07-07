@@ -8,6 +8,7 @@ import com.umc.edison.remote.api.BubbleApiService
 import com.umc.edison.remote.api.BubbleSpaceApiService
 import com.umc.edison.remote.api.SyncApiService
 import com.umc.edison.remote.model.bubble.toAddBubbleRequest
+import com.umc.edison.remote.model.bubble.toUpdateBubbleRequest
 import com.umc.edison.remote.model.sync.toSyncBubbleRequest
 import javax.inject.Inject
 
@@ -41,15 +42,29 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
 
     // UPDATE
     override suspend fun recoverBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity> {
-        TODO("Not yet implemented")
+        val results = mutableListOf<BubbleEntity>()
+        bubbles.map {
+            results.add(recoverBubble(it))
+        }
+        return results
+    }
+
+    private suspend fun recoverBubble(bubble: BubbleEntity): BubbleEntity {
+        bubbleApiService.restoreBubble(bubble.id)
+
+        return bubble.copy(isTrashed = false)
     }
 
     override suspend fun updateBubbles(bubbles: List<BubbleEntity>): List<BubbleEntity> {
-        TODO("Not yet implemented")
+        val results = mutableListOf<BubbleEntity>()
+        bubbles.map {
+            results.add(updateBubble(it))
+        }
+        return results
     }
 
     override suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity {
-        TODO("Not yet implemented")
+        return bubbleApiService.updateBubble(bubble.id, bubble.toUpdateBubbleRequest()).data.toData()
     }
 
     override suspend fun syncBubble(bubble: BubbleEntity): SyncBubbleEntity {

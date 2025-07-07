@@ -7,7 +7,7 @@ import com.umc.edison.data.model.label.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
 import com.umc.edison.remote.model.parseIso8601ToDate
 
-data class AddBubbleResponse(
+data class BubbleResponse(
     @SerializedName("localIdx") val id: String,
     @SerializedName("title") val title: String?,
     @SerializedName("content") val content: String?,
