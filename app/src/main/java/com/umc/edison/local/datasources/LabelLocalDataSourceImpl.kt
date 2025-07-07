@@ -28,8 +28,8 @@ class LabelLocalDataSourceImpl @Inject constructor(
         return labelDao.getAllLabels().map { it.toData() }
     }
 
-    override suspend fun getLabel(labelId: String): LabelEntity {
-        val localLabel = labelDao.getLabelById(labelId) ?: throw Exception("Label not found")
+    override suspend fun getLabel(id: String): LabelEntity {
+        val localLabel = labelDao.getLabelById(id) ?: throw Exception("Label not found")
 
         return localLabel.toData()
     }
@@ -62,7 +62,8 @@ class LabelLocalDataSourceImpl @Inject constructor(
     }
 
     // DELETE
-    override suspend fun deleteLabel(label: LabelEntity) {
+    override suspend fun deleteLabel(id: String) {
+        val label = getLabel(id)
         labelDao.delete(label.toLocal())
     }
 }

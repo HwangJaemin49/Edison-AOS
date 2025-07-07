@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.bubble.BubbleEntity
 import com.umc.edison.data.model.label.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
+import com.umc.edison.remote.model.label.LabelResponse
 import com.umc.edison.remote.model.parseIso8601ToDate
 
 data class BubbleResponse(
@@ -17,20 +18,6 @@ data class BubbleResponse(
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String
 ) : RemoteMapper<BubbleEntity> {
-    data class LabelResponse(
-        @SerializedName("localIdx") val id: String,
-        @SerializedName("name") val name: String,
-        @SerializedName("color") val color: Int,
-    ) : RemoteMapper<LabelEntity> {
-        override fun toData(): LabelEntity {
-            return LabelEntity(
-                id = id,
-                name = name,
-                color = Color(color),
-            )
-        }
-    }
-
     override fun toData(): BubbleEntity {
         return BubbleEntity(
             id = id,

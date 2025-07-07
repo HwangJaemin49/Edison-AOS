@@ -17,5 +17,5 @@ interface LabelLocalDataSource {
     suspend fun updateLabel(label: LabelEntity)
 
     // DELETE
-    suspend fun deleteLabel(label: LabelEntity)
+    suspend fun deleteLabel(id: String)
 }
