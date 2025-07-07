@@ -1,9 +1,7 @@
 package com.umc.edison.remote.model.bubble
 
-import androidx.compose.ui.graphics.Color
 import com.google.gson.annotations.SerializedName
 import com.umc.edison.data.model.bubble.BubbleEntity
-import com.umc.edison.data.model.label.LabelEntity
 import com.umc.edison.remote.model.RemoteMapper
 import com.umc.edison.remote.model.label.LabelResponse
 import com.umc.edison.remote.model.parseIso8601ToDate
