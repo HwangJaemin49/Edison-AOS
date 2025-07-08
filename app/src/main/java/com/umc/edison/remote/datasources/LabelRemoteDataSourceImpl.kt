@@ -5,6 +5,7 @@ import com.umc.edison.data.model.label.LabelEntity
 import com.umc.edison.remote.api.LabelApiService
 import com.umc.edison.remote.api.SyncApiService
 import com.umc.edison.remote.model.label.toAddLabelRequest
+import com.umc.edison.remote.model.label.toData
 import com.umc.edison.remote.model.label.toUpdateLabelRequest
 import com.umc.edison.remote.model.sync.toSyncLabelRequest
 import javax.inject.Inject
@@ -18,7 +19,7 @@ class LabelRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getAllLabels(): List<LabelEntity> {
-        TODO("Not yet implemented")
+        return labelApiService.getAllLabels().data.toData()
     }
 
     override suspend fun updateLabel(label: LabelEntity): LabelEntity {
