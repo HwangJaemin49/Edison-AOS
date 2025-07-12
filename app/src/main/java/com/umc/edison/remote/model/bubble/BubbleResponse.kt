@@ -30,3 +30,5 @@ data class BubbleResponse(
         )
     }
 }
+
+fun List<BubbleResponse>.toData(): List<BubbleEntity> = map { it.toData() }

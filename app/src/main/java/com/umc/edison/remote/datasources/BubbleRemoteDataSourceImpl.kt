@@ -8,6 +8,7 @@ import com.umc.edison.remote.api.BubbleApiService
 import com.umc.edison.remote.api.BubbleSpaceApiService
 import com.umc.edison.remote.api.SyncApiService
 import com.umc.edison.remote.model.bubble.toAddBubbleRequest
+import com.umc.edison.remote.model.bubble.toData
 import com.umc.edison.remote.model.bubble.toUpdateBubbleRequest
 import com.umc.edison.remote.model.sync.toSyncBubbleRequest
 import javax.inject.Inject
@@ -37,7 +38,7 @@ class BubbleRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getAllBubbles(): List<BubbleEntity> {
-        TODO("Not yet implemented")
+        return bubbleApiService.getAllBubbles().data.toData()
     }
 
     // UPDATE
