@@ -102,7 +102,7 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateBubble(bubble: BubbleEntity): BubbleEntity {
+    override suspend fun updateBubble(bubble: BubbleEntity, isSynced: Boolean): BubbleEntity {
         update(bubble.toLocal(), tableName)
 
         bubbleLabelDao.deleteByBubbleId(bubble.id)
@@ -130,8 +130,8 @@ class BubbleLocalDataSourceImpl @Inject constructor(
         for(backLink in bubble.backLinks) {
             try {
                 val savedBubble = getBubble(backLink.id)
-                if (savedBubble.same(backLink)) continue
-                updateBubble(backLink)
+                if (savedBubble.same(backLink) && savedBubble.updatedAt > backLink.updatedAt) continue
+                updateBubble(backLink, true)
             } catch (_: IllegalArgumentException) {
                 addBubble(backLink)
             }

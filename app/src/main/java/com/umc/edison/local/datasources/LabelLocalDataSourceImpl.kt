@@ -47,14 +47,18 @@ class LabelLocalDataSourceImpl @Inject constructor(
         labels.map { syncLabel(it) }
     }
 
-    override suspend fun updateLabel(label: LabelEntity) {
-        update(label.toLocal(), tableName)
+    override suspend fun updateLabel(label: LabelEntity, isSynced: Boolean) {
+        update(label.toLocal(), tableName, isSynced)
     }
 
     private suspend fun syncLabel(label: LabelEntity) {
         try {
             val savedLabel = getLabel(label.id)
-            if (!savedLabel.same(label)) updateLabel(label)
+            if (!savedLabel.same(label)
+                && savedLabel.updatedAt < label.updatedAt
+            ) {
+                updateLabel(label, true)
+            }
         } catch (_: Exception) {
             addLabel(label)
         }
