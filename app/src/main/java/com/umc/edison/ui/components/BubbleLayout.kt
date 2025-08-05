@@ -1,5 +1,6 @@
 package com.umc.edison.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import kotlinx.coroutines.android.awaitFrame
 import kotlin.math.sqrt
 import kotlin.random.Random
 
+@SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun BubblesLayout(
     bubbles: List<BubbleModel>,
@@ -153,17 +155,21 @@ fun calculateGridOffset(
 ): Pair<Dp, Dp> {
     val columns = listOf(0, 1, 2)
     val random = remember { Random(System.currentTimeMillis()) }
-
     val maxX = screenWidth - bubbleSize - padding
+    val usedYOffsets = placedBubbles.map { it.y }.toSet()
 
     for (row in 0..100) {
-        val yOffset = rowHeight * row
+        val yRandomOffset = Dp(random.nextInt(0, (rowHeight.value / 2).toInt()).toFloat())
+        val yOffset = rowHeight * row + yRandomOffset
+        // 같은 yOffset이 있으면 건너뜀
+        if (usedYOffsets.contains(yOffset)) continue
         val shuffledColumns = columns.shuffled(random)
         for (col in shuffledColumns) {
             val rawX = columnWidth * col + padding
             val xOffset = min(rawX, maxX)
+            // 바로 전 버블과 xOffset이 같으면 건너뜀
+            if (placedBubbles.isNotEmpty() && placedBubbles.last().x == xOffset) continue
             val trial = PlacedBubble(xOffset, yOffset, bubbleSize)
-
             val overlaps = placedBubbles.any { isOverlapping(it, trial) }
             if (!overlaps) {
                 return xOffset to yOffset
