@@ -1,6 +1,7 @@
 package com.umc.edison.presentation.model
 
 import com.umc.edison.domain.model.bubble.Bubble
+import com.umc.edison.presentation.edison.parseHtml
 import java.util.Date
 import java.util.UUID
 
@@ -73,3 +74,16 @@ fun Bubble.toPresentation(): BubbleModel {
 }
 
 fun List<Bubble>.toPresentation(): List<BubbleModel> = map { it.toPresentation() }
+
+fun BubbleModel.getDisplayTitle(): String {
+    val selectedTitle = this.title?.takeIf { it.isNotBlank() }
+        ?: this.contentBlocks
+            .filter { it.type == ContentType.TEXT }
+            .firstOrNull { it.content.parseHtml().isNotBlank() }
+            ?.content
+            ?.parseHtml()
+            ?.take(20)
+        ?: "제목 없음"
+
+    return selectedTitle.split("\n").first()
+}
