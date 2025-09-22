@@ -218,15 +218,13 @@ fun BubbleInputContent(
 
     if (uiState.isGalleryOpen) {
         ImageGallery(
-            selectedImages = uiState.selectedImages,
-            onImageSelected = { uri ->
-                viewModel.toggleImageSelection(uri)
-            },
-            onConfirmed = {
-                viewModel.addContentBlocks()
+            onConfirmed = { selectedImages ->
+                val updatedImages = viewModel.updateSelectedImages(selectedImages)
+                viewModel.addImagesToContentBlocks(updatedImages)
+                true
             },
             onClose = { viewModel.closeGallery() },
-            multiSelectMode = true,
+            maxImageSize = BubbleInputViewModel.MAX_IMAGE_SELECTION,
         )
     }
 
