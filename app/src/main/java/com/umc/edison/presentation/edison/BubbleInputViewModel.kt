@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.update
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
-import androidx.core.net.toUri
 
 @HiltViewModel
 class BubbleInputViewModel @Inject constructor(
@@ -238,15 +237,10 @@ class BubbleInputViewModel @Inject constructor(
         }
     }
 
-    fun addContentBlocks() {
-        // uiState의 selectedImages 중 현재 ContentBlocks에 없는 이미지들만 필터링
-        val imagePaths = _uiState.value.selectedImages.filter { imageUri ->
-            _uiState.value.bubble.contentBlocks.none { it.content == imageUri.toString() }
-        }
-
+    fun addImagesToContentBlocks(uris: List<Uri>) {
         val newImageBlocks = mutableListOf<ContentBlockModel>()
 
-        imagePaths.forEachIndexed { idx, imagePath ->
+        uris.forEachIndexed { idx, imagePath ->
             val newImageBlock = ContentBlockModel(
                 type = ContentType.IMAGE,
                 content = imagePath.toString(),
@@ -259,7 +253,7 @@ class BubbleInputViewModel @Inject constructor(
         val newTextBlock = ContentBlockModel(
             type = ContentType.TEXT,
             content = "",
-            position = _uiState.value.bubble.contentBlocks.size + imagePaths.size
+            position = _uiState.value.bubble.contentBlocks.size + uris.size
         )
 
         _uiState.update {
@@ -326,11 +320,6 @@ class BubbleInputViewModel @Inject constructor(
         }
 
         if (targetIndex == -1) return
-
-        // selectedImages에서 해당 이미지 제거
-        if (_uiState.value.selectedImages.contains(contentBlock.content.toUri())) {
-            _uiState.update { it.copy(selectedImages = it.selectedImages - contentBlock.content.toUri()) }
-        }
 
         // 이미지가 첫 번째 블록일 때
         if (targetIndex == 0) {
@@ -468,6 +457,10 @@ class BubbleInputViewModel @Inject constructor(
     }
 
     fun openGallery() {
+        if (!checkCanAddImage()) {
+            return
+        }
+
         _uiState.update { it.copy(isGalleryOpen = true) }
     }
 
@@ -483,13 +476,18 @@ class BubbleInputViewModel @Inject constructor(
             it.copy(
                 cameraImagePath = null,
                 isCameraOpen = false,
-                selectedImages = it.selectedImages + savedUri
             )
         }
-        addContentBlocks()
+        addImagesToContentBlocks(
+            uris = listOf(savedUri)
+        )
     }
 
     fun updateCameraOpen(isOpen: Boolean) {
+        if (isOpen && !checkCanAddImage()) {
+            return
+        }
+
         _uiState.update { it.copy(isCameraOpen = isOpen) }
     }
 
@@ -543,18 +541,35 @@ class BubbleInputViewModel @Inject constructor(
         }
     }
 
-    fun toggleImageSelection(imageUri: Uri) {
-        val currImageSize = _uiState.value.bubble.contentBlocks.filter {
-            it.type == ContentType.IMAGE
-        }.size
+    fun updateSelectedImages(uris: List<Uri>): List<Uri> {
+        val currImageSize =
+            _uiState.value.bubble.contentBlocks.filter { it.type == ContentType.IMAGE }.size
 
-        if (_uiState.value.selectedImages.contains(imageUri)) {
-            _uiState.update { it.copy(selectedImages = it.selectedImages - imageUri) }
-        } else if (_uiState.value.selectedImages.size < 10 - currImageSize) {
-            _uiState.update { it.copy(selectedImages = it.selectedImages + imageUri) }
+        val availableSize = MAX_TOTAL_IMAGES - currImageSize
+        return if (uris.size > availableSize) {
+            showToast(MAX_TOTAL_IMAGES_LIMIT_MESSAGE)
+            uris.take(availableSize)
         } else {
-            showToast("이미지는 최대 10개까지 첨부할 수 있습니다.")
+            uris
         }
+    }
+
+    private fun checkCanAddImage(): Boolean {
+        val currImageSize =
+            _uiState.value.bubble.contentBlocks.filter { it.type == ContentType.IMAGE }.size
+        if (currImageSize >= MAX_TOTAL_IMAGES) {
+            showToast(MAX_TOTAL_IMAGES_LIMIT_MESSAGE)
+            return false
+        }
+
+        return true
+    }
+
+    companion object {
+        const val MAX_IMAGE_SELECTION = 10
+        const val MAX_TOTAL_IMAGES = 30
+
+        const val MAX_TOTAL_IMAGES_LIMIT_MESSAGE = "이미지는 최대 ${MAX_TOTAL_IMAGES}개까지 첨부할 수 있습니다."
     }
 
 }
