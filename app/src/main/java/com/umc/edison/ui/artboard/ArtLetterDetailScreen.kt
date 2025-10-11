@@ -364,8 +364,6 @@ fun ArtLetterDetailSkeleton() {
     }
 }
 
-
-
 @Composable
 fun ArtLetterDetailContent(
     viewModel: ArtLetterDetailViewModel,
@@ -447,6 +445,14 @@ fun ArtLetterDetailContent(
             Modifier.padding(top = 24.dp)
         }
     ) {
+        uiState.artLetter.writerSummary?.let { writer ->
+            WriterSummarySection(
+                name = writer.writerName,
+                url  = writer.writerUrl,
+                imageUrl = null
+            )
+        }
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = uiState.artLetter.content,
             color = Gray800,
@@ -556,6 +562,61 @@ fun ArtLetterDetailContent(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun WriterSummarySection(
+    name: String?,
+    url: String?,
+    imageUrl: String? = null,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val isClickable = !url.isNullOrBlank()
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (isClickable) {
+                    Modifier.clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        runCatching {
+                            context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+                                data = android.net.Uri.parse(url)
+                            })
+                        }
+                    }
+                } else Modifier
+            )
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Gray100)
+        ) {
+            AsyncImage(
+                model = imageUrl ?: R.drawable.ic_profile_default_small,
+                contentDescription = "Writer Profile",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        if (name != null) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.headlineLarge,
+                color = Gray800
+            )
         }
     }
 }
