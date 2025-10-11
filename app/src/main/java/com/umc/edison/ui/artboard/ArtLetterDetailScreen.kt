@@ -445,7 +445,7 @@ fun ArtLetterDetailContent(
             Modifier.padding(top = 24.dp)
         }
     ) {
-        uiState.artLetter.writerSummary?.let { writer ->
+        uiState.artLetter.writerSummary.let { writer ->
             WriterSummarySection(
                 name = writer.writerName,
                 url  = writer.writerUrl,
