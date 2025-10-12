@@ -1,11 +1,12 @@
 package com.umc.edison.presentation.model
+
 import com.umc.edison.domain.model.artLetter.WriterSummary
 
-data class WriterSummaryModel (
+data class WriterSummaryModel(
     val writerId: Int,
     val writerName: String,
     val writerUrl: String?
-){
+) {
     companion object {
         val DEFAULT = WriterSummaryModel(
             writerId = 0,
@@ -14,6 +15,7 @@ data class WriterSummaryModel (
         )
     }
 }
+
 fun WriterSummary.toPresentation(): WriterSummaryModel =
     WriterSummaryModel(
         writerId = writerId,

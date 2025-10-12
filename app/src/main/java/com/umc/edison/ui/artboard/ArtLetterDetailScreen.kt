@@ -1,7 +1,6 @@
 package com.umc.edison.ui.artboard
 
 import android.content.Intent
-import io.branch.referral.util.LinkProperties
 import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -15,12 +14,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -57,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import io.branch.referral.util.ContentMetadata
 import com.umc.edison.R
 import com.umc.edison.presentation.artletter.ArtLetterDetailState
 import com.umc.edison.presentation.artletter.ArtLetterDetailViewModel
@@ -71,7 +69,10 @@ import com.umc.edison.ui.theme.Gray500
 import com.umc.edison.ui.theme.Gray600
 import com.umc.edison.ui.theme.Gray800
 import io.branch.indexing.BranchUniversalObject
+import io.branch.referral.util.ContentMetadata
+import io.branch.referral.util.LinkProperties
 import kotlin.math.roundToInt
+import androidx.core.net.toUri
 
 @Composable
 fun ArtLetterDetailScreen(
@@ -313,9 +314,11 @@ fun ArtLetterDetailSkeleton() {
         end = Offset(translateAnim + 200f, translateAnim + 200f)
     )
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(vertical = 8.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 8.dp)
+    ) {
 
         // 제목 1줄
         Spacer(
@@ -445,13 +448,11 @@ fun ArtLetterDetailContent(
             Modifier.padding(top = 24.dp)
         }
     ) {
-        uiState.artLetter.writerSummary.let { writer ->
-            WriterSummarySection(
-                name = writer.writerName,
-                url  = writer.writerUrl,
-                imageUrl = null
-            )
-        }
+        WriterSummarySection(
+            name = uiState.artLetter.writerSummary.writerName,
+            url = uiState.artLetter.writerSummary.writerUrl,
+            imageUrl = null
+        )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = uiState.artLetter.content,
@@ -570,8 +571,8 @@ fun ArtLetterDetailContent(
 private fun WriterSummarySection(
     name: String?,
     url: String?,
+    modifier: Modifier = Modifier,
     imageUrl: String? = null,
-    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val isClickable = !url.isNullOrBlank()
@@ -587,7 +588,7 @@ private fun WriterSummarySection(
                     ) {
                         runCatching {
                             context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                                data = android.net.Uri.parse(url)
+                                data = url.toUri()
                             })
                         }
                     }
