@@ -591,7 +591,9 @@ private fun WriterSummarySection(
                             })
                         }
                     }
-                } else Modifier
+                } else {
+                    Modifier
+                }
             )
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,

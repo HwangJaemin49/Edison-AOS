@@ -5,7 +5,7 @@ import com.umc.edison.data.model.artLetter.ArtLetterEntity
 import com.umc.edison.data.model.artLetter.WriterSummaryEntity
 import com.umc.edison.remote.model.RemoteMapper
 
-class GetArtLetterDetailResponse (
+data class GetArtLetterDetailResponse(
     @SerializedName("artletterId") val artLetterId: Int,
     @SerializedName("title") val title: String,
     @SerializedName("content") val content: String,
@@ -21,7 +21,6 @@ class GetArtLetterDetailResponse (
     @SerializedName("liked") val liked: Boolean,
     @SerializedName("scraped") val scraped: Boolean
 ) : RemoteMapper<ArtLetterEntity> {
-
     override fun toData(): ArtLetterEntity = ArtLetterEntity(
         artLetterId = artLetterId,
         title = title,
@@ -35,17 +34,16 @@ class GetArtLetterDetailResponse (
         liked = liked,
         scraped = scraped
     )
-}
 
-data class WriterSummaryResponse(
-    @SerializedName("writerId") val writerId: Int,
-    @SerializedName("writerName") val writerName: String,
-    @SerializedName("writerUrl") val writerUrl: String?
-) : RemoteMapper<WriterSummaryEntity> {
-    override fun toData(): WriterSummaryEntity =
-        WriterSummaryEntity(
+    data class WriterSummaryResponse(
+        @SerializedName("writerId") val writerId: Int,
+        @SerializedName("writerName") val writerName: String,
+        @SerializedName("writerUrl") val writerUrl: String?
+    ) : RemoteMapper<WriterSummaryEntity> {
+        override fun toData(): WriterSummaryEntity = WriterSummaryEntity(
             writerId = writerId,
             writerName = writerName,
             writerUrl = writerUrl
         )
+    }
 }
